@@ -19,9 +19,9 @@
 #include <cmath>
 #include <boost/weak_ptr.hpp>
 #include <libgnomecanvasmm.h>
-#include <flowcanvas/Port.hpp>
-#include <flowcanvas/Module.hpp>
-#include <flowcanvas/Canvas.hpp>
+#include "flowcanvas/Port.hpp"
+#include "flowcanvas/Module.hpp"
+#include "flowcanvas/Canvas.hpp"
 
 using namespace std;
 
@@ -175,6 +175,13 @@ Port::set_border_width(double w)
 	_rect->property_width_units() = w;
 	if (_control_rect)
 		_control_rect->property_width_units() = w;
+}
+
+
+double
+Port::natural_width() const
+{
+	return _label->property_text_width();
 }
 
 

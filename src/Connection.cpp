@@ -19,10 +19,10 @@
 #include <cassert>
 #include <cmath>
 #include <libgnomecanvasmm.h>
-#include <flowcanvas/Connection.hpp>
-#include <flowcanvas/Canvas.hpp>
-#include <flowcanvas/Connectable.hpp>
-#include <flowcanvas/Ellipse.hpp>
+#include "flowcanvas/Connection.hpp"
+#include "flowcanvas/Canvas.hpp"
+#include "flowcanvas/Connectable.hpp"
+#include "flowcanvas/Ellipse.hpp"
 
 namespace FlowCanvas {
 	
@@ -44,7 +44,7 @@ Connection::Connection(boost::shared_ptr<Canvas>      canvas,
 	, _handle_style(HANDLE_NONE)
 	, _handle(NULL)
 {
-	_bpath.property_width_units() = 1.0;
+	_bpath.property_width_units() = 2.0;
 	set_color(color);
 
 	update_location();	

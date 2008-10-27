@@ -25,7 +25,7 @@
 #include <libgnomecanvasmm.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
-#include <flowcanvas/Connectable.hpp>
+#include "flowcanvas/Connectable.hpp"
 
 namespace FlowCanvas {
 	
@@ -88,6 +88,8 @@ public:
 	
 	double border_width() const { return _border_width; }
 	void   set_border_width(double w);
+
+	double natural_width() const;
 
 	const std::string& name() const { return _name; }
 	virtual void       set_name(const std::string& n);

@@ -23,10 +23,10 @@
 #include <iostream>
 #include <cmath>
 #include <boost/enable_shared_from_this.hpp>
-#include CONFIG_H_PATH
-#include <flowcanvas/Canvas.hpp>
-#include <flowcanvas/Port.hpp>
-#include <flowcanvas/Module.hpp>
+#include "config.h"
+#include "flowcanvas/Canvas.hpp"
+#include "flowcanvas/Port.hpp"
+#include "flowcanvas/Module.hpp"
 
 #ifdef HAVE_AGRAPH
 #include <graphviz/gvc.h>
@@ -124,6 +124,9 @@ Canvas::scroll_to_center()
 void
 Canvas::zoom_full()
 {
+	if (_items.empty())
+		return;
+
 	int win_width, win_height;
 	Glib::RefPtr<Gdk::Window> win = get_window();
 	win->get_size(win_width, win_height);
@@ -690,9 +693,10 @@ Canvas::port_event(GdkEvent* event, boost::weak_ptr<Port> weak_port)
 
 					new_control *= (port->control_max() - port->control_min());
 					new_control += port->control_min();
-					assert(new_control >= port->control_min());
-					assert(new_control <= port->control_max());
-
+					if (new_control < port->control_min())
+						new_control = port->control_min();
+					if (new_control > port->control_max())
+						new_control = port->control_max();
 					if (new_control != port->control_value())
 						port->set_control(new_control);
 				}
