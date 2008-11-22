@@ -117,6 +117,9 @@ public:
 	/** Disconnect two ports.  Should be overridden by an implementation to do something */
 	virtual void disconnect(boost::shared_ptr<Connectable> /*tail*/,
 	                        boost::shared_ptr<Connectable> /*head*/) {}
+	
+	static sigc::signal<void, Port*> signal_port_entered;
+	static sigc::signal<void, Item*> signal_item_entered;
 
 protected:
 	ItemList                                   _items;  ///< All items on this canvas

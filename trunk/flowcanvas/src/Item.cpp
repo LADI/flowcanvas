@@ -138,6 +138,7 @@ Item::on_event(GdkEvent* event)
 		break;
 
 	case GDK_ENTER_NOTIFY:
+		canvas->signal_item_entered.emit(this);
 		signal_pointer_entered.emit();
 		raise_to_top();
 		break;
