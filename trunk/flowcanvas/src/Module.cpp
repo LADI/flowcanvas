@@ -56,7 +56,7 @@ Module::Module(boost::shared_ptr<Canvas> canvas, const string& name, double x, d
 	, _port_renamed(false)
 	, _widest_input(0)
 	, _widest_output(0)
-	, _port_labels_visible(false)
+	, _port_labels_visible(true)
 	, _module_box(*this, 0, 0, 0, 0) // w, h set later
 	, _canvas_title(*this, 0, 8, name) // x set later
 	, _stacked_border(NULL)
@@ -540,11 +540,13 @@ Module::resize()
 	above_w = std::max(above_w, _embed_width);
 
 	// Basic height contains title, icon
-	double header_height = 2;
-	if (_title_visible)
-		header_height += 2 + title_height;
-	if (_icon_box && _icon_size > title_height)
-		header_height += _icon_size - title_height;
+	double header_height = 2.0;
+	if (_port_labels_visible) {
+		if (_title_visible)
+			header_height += 2 + title_height;
+		if (_icon_box && _icon_size > title_height)
+			header_height += _icon_size - title_height;
+	}
 
 	double height = header_height;
 
@@ -628,11 +630,16 @@ Module::resize()
 
 	set_height(height);
 
-	// Center title
-	if (_icon_box)
-		_canvas_title.property_x() = _icon_size + (_width - _icon_size + 1)/2.0;
-	else
-		_canvas_title.property_x() = _width/2.0;
+	if (_title_visible) {
+		if (_port_labels_visible)
+			_canvas_title.property_y() = 8;
+		else
+			_canvas_title.property_y() = (_height / 2.0) - 1.0;
+		if (_icon_box)
+			_canvas_title.property_x() = _icon_size + (_width - _icon_size + 1)/2.0;
+		else
+			_canvas_title.property_x() = _width/2.0;
+	}
 
 	// Make things actually move to their new locations (?!)
 	move(0, 0);
@@ -648,8 +655,6 @@ Module::show_port_labels(bool b)
 	} else {
 		_widest_input  = MODULE_EMPTY_PORT_WIDTH;
 		_widest_output = MODULE_EMPTY_PORT_WIDTH;
-		if (_title_visible)
-			_canvas_title.property_y() = (_height - _canvas_title.property_text_height()) / 2.0;
 	}
 
 	for (PortVector::iterator p = _ports.begin(); p != _ports.end(); ++p) {
