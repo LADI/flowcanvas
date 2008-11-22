@@ -39,6 +39,6 @@ def build(bld):
 	obj.includes     = ['.', '../engine']
 	obj.defines      = 'VERSION=\\\"' + bld.env()['MACHINA_VERSION'] + '\\\"'
 	obj.uselib_local = 'libmachina_engine libmachina_gui'
-	autowaf.use_lib(bld, obj, 'GTHREAD GLIBMM REDLANDMM RAUL MACHINA EUGENE')
+	autowaf.use_lib(bld, obj, 'GTHREAD GLIBMM REDLANDMM RAUL MACHINA EUGENE FLOWCANVAS')
 	
 	autowaf.build_wrapper(bld, 'machina.in', obj)

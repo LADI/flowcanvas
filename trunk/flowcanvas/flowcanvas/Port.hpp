@@ -54,9 +54,9 @@ public:
 	
 	void disconnect_all();
 	
-	Gnome::Art::Point src_connection_point();
-	Gnome::Art::Point dst_connection_point(const Gnome::Art::Point& src);
-	Gnome::Art::Point connection_point_vector(double dx, double dy);
+	virtual Gnome::Art::Point src_connection_point();
+	virtual Gnome::Art::Point dst_connection_point(const Gnome::Art::Point& src);
+	virtual Gnome::Art::Point connection_point_vector(double dx, double dy);
 	
 	boost::weak_ptr<Module> module() const { return _module; }
 	
