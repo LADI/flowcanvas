@@ -61,6 +61,7 @@ public:
 	
 	void set_fill_color(uint32_t c) { _rect->property_fill_color_rgba() = c; }
 	
+	void show_label(bool b);
 	void set_selected(bool b);
 	bool selected() const { return _selected; }
 

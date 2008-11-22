@@ -34,6 +34,7 @@ static const uint32_t MODULE_HILITE_FILL_COLOUR    = 0x2E3436FF;
 static const uint32_t MODULE_OUTLINE_COLOUR        = 0x93978FFF;
 static const uint32_t MODULE_HILITE_OUTLINE_COLOUR = 0xEEEEECFF;
 static const uint32_t MODULE_TITLE_COLOUR          = 0xFFFFFFFF;
+static const uint32_t MODULE_EMPTY_PORT_WIDTH      = 4;
 
 
 /** Construct a Module
@@ -55,6 +56,7 @@ Module::Module(boost::shared_ptr<Canvas> canvas, const string& name, double x, d
 	, _port_renamed(false)
 	, _widest_input(0)
 	, _widest_output(0)
+	, _port_labels_visible(false)
 	, _module_box(*this, 0, 0, 0, 0) // w, h set later
 	, _canvas_title(*this, 0, 8, name) // x set later
 	, _stacked_border(NULL)
@@ -524,8 +526,10 @@ Module::resize()
 	double widest_in  = _widest_input;
 	double widest_out = _widest_output;
 	double expand_w = (horiz ? (width / 2.0) : width) - hor_pad;
-	widest_in  = (_embed_item ? _widest_input  : std::max(_widest_input,  expand_w));
-	widest_out = (_embed_item ? _widest_output : std::max(_widest_output, expand_w));
+	if (_port_labels_visible) {
+		widest_in  = (_embed_item ? _widest_input  : std::max(_widest_input,  expand_w));
+		widest_out = (_embed_item ? _widest_output : std::max(_widest_output, expand_w));
+	}
 
 	const double widest = std::max(widest_in, widest_out);
 	const double title_height = _canvas_title.property_text_height();
@@ -632,6 +636,34 @@ Module::resize()
 
 	// Make things actually move to their new locations (?!)
 	move(0, 0);
+}
+
+
+void
+Module::show_port_labels(bool b)
+{
+	if (b) {
+		_widest_input  = 0;
+		_widest_output = 0;
+	} else {
+		_widest_input  = MODULE_EMPTY_PORT_WIDTH;
+		_widest_output = MODULE_EMPTY_PORT_WIDTH;
+		if (_title_visible)
+			_canvas_title.property_y() = (_height - _canvas_title.property_text_height()) / 2.0;
+	}
+
+	for (PortVector::iterator p = _ports.begin(); p != _ports.end(); ++p) {
+		(*p)->show_label(b);
+		if (b) {
+			if ((*p)->is_input() && (*p)->natural_width() > _widest_input)
+				_widest_input = (*p)->natural_width();
+			else if ((*p)->is_output() && (*p)->natural_width() > _widest_output)
+				_widest_output = (*p)->natural_width();
+		}
+	}
+
+	_port_labels_visible = b;
+	resize();
 }
 
 	

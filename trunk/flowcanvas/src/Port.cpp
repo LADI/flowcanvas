@@ -25,7 +25,8 @@
 
 using namespace std;
 
-#define SELECTED_COLOR 0xFF0000FF
+static const uint32_t PORT_SELECTED_COLOR   = 0xFF0000FF;
+static const uint32_t PORT_EMPTY_PORT_WIDTH = 4;
 
 namespace FlowCanvas {
 	
@@ -178,14 +179,17 @@ Port::set_border_width(double w)
 double
 Port::natural_width() const
 {
-	return _label->property_text_width();
+	if (_label)
+		return _label->property_text_width();
+	else
+		return PORT_EMPTY_PORT_WIDTH;
 }
 
 
 void
 Port::set_name(const string& n)
 {
-	if (_name != n) {
+	if (_label && _name != n) {
 		_name = n;
 
 		// Reposition label
@@ -210,7 +214,8 @@ Port::set_name(const string& n)
 void
 Port::zoom(float z)
 {
-	_label->property_size() = static_cast<int>(floor(8000.0f * z));
+	if (_label)
+		_label->property_size() = static_cast<int>(floor(8000.0f * z));
 }
 
 
@@ -261,10 +266,39 @@ Port::disconnect_all()
 
 
 void
+Port::show_label(bool b)
+{
+	if (b) {
+		// Create label first then zoom (to find size correctly)
+		if (!_label)
+			_label = new Gnome::Canvas::Text(*this, 0, 0, _name);
+
+		zoom(module().lock()->canvas().lock()->get_zoom());
+
+		const double text_width = _label->property_text_width();
+		_width = text_width + 6.0;
+		_height = _label->property_text_height();
+		_label->property_x() = text_width / 2.0 + 3.0;
+		_label->property_y() = (_height / 2.0) - 1.0;
+		_label->property_fill_color_rgba() = 0xFFFFFFFF;
+
+		_label->raise_to_top();
+	} else {
+		delete _label;
+		_label = NULL;
+		_width = PORT_EMPTY_PORT_WIDTH;
+		_rect->raise_to_top();
+	}
+		
+	_rect->property_x2() = _rect->property_x1() + _width;
+}
+
+
+void
 Port::set_selected(bool b)
 {
 	_selected = b;
-	set_fill_color((b ? SELECTED_COLOR : _color));
+	set_fill_color((b ? PORT_SELECTED_COLOR : _color));
 }
 
 
@@ -295,7 +329,7 @@ Port::set_highlighted(bool b, bool highlight_parent, bool highlight_connections,
 		_rect->property_fill_color_rgba() = _color + 0x33333300;
 		_rect->property_outline_color_rgba() = _color + 0x33333300;
 	} else {
-		_rect->property_fill_color_rgba() = (_selected ? SELECTED_COLOR : _color);
+		_rect->property_fill_color_rgba() = (_selected ? PORT_SELECTED_COLOR : _color);
 		_rect->property_outline_color_rgba() = _color;
 	}
 }

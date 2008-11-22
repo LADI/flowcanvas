@@ -55,6 +55,8 @@ public:
 
 	void zoom(double z);
 	void resize();
+	
+	void show_port_labels(bool b);
 
 	virtual void move(double dx, double dy);
 	virtual void move_to(double x, double y);
@@ -98,6 +100,7 @@ protected:
 	bool   _port_renamed;
 	double _widest_input;
 	double _widest_output;
+	bool   _port_labels_visible;
 
 	PortVector _ports;
 
