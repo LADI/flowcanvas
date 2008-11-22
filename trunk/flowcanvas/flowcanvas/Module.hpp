@@ -105,6 +105,8 @@ protected:
 	double _widest_input;
 	double _widest_output;
 	bool   _show_port_labels;
+	double _title_width;
+	double _title_height;
 
 	PortVector _ports;
 

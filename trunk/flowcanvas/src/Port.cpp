@@ -47,6 +47,7 @@ Port::Port(boost::shared_ptr<Module> module, const string& name, bool is_input, 
 	, _control_value(0.0f)
 	, _control_min(0.0f)
 	, _control_max(1.0f)
+	, _rect(NULL)
 	, _control_rect(NULL)
 	, _menu(NULL)
 {
@@ -62,15 +63,7 @@ Port::Port(boost::shared_ptr<Module> module, const string& name, bool is_input, 
 	zoom(z);
 
 	if (_label) {
-		const double text_width = _label->property_text_width();
-		_width = text_width + 6.0;
-		_height = _label->property_text_height();
-		_label->property_x() = text_width / 2.0 + 3.0;
-		_label->property_y() = (_height / 2.0) - 1.0;
-		/* WARNING: Doing this makes things extremely slow!
-		   _label->property_size() = PORT_LABEL_SIZE;
-		   _label->property_weight() = 200; */
-		_label->property_fill_color_rgba() = 0xFFFFFFFF;
+		show_label(true);
 	} else {
 		if (canvas->direction() == Canvas::HORIZONTAL) {
 			_width  = PORT_EMPTY_PORT_DEPTH * z;
@@ -322,10 +315,12 @@ Port::show_label(bool b)
 		}
 		set_width(_width);
 		set_height(_height);
-		_rect->raise_to_top();
+		if (_rect)
+			_rect->raise_to_top();
 	}
 		
-	_rect->property_x2() = _rect->property_x1() + _width;
+	if (_rect)
+		_rect->property_x2() = _rect->property_x1() + _width;
 }
 
 
@@ -411,7 +406,8 @@ Port::dst_connection_point(const Gnome::Art::Point& src)
 void
 Port::set_width(double w)
 {
-	_rect->property_x2() = _rect->property_x2() + (w - _width);
+	if (_rect)
+		_rect->property_x2() = _rect->property_x2() + (w - _width);
 	_width = w;
 	set_control(_control_value, false);
 }
@@ -420,7 +416,8 @@ Port::set_width(double w)
 void
 Port::set_height(double h)
 {
-	_rect->property_y2() = _rect->property_y1() + h;
+	if (_rect)
+		_rect->property_y2() = _rect->property_y1() + h;
 	_height = h;
 }
 

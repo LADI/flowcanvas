@@ -62,6 +62,8 @@ Module::Module(
 	, _widest_input(0)
 	, _widest_output(0)
 	, _show_port_labels(show_port_labels)
+	, _title_width(0.0)
+	, _title_height(0.0)
 	, _module_box(*this, 0, 0, 0, 0) // w, h set later
 	, _canvas_title(*this, 0, 8, name) // x set later
 	, _stacked_border(NULL)
@@ -84,6 +86,8 @@ Module::Module(
 		//if (canvas->get_zoom() != 1.0)
 		zoom(canvas->get_zoom());
 		_canvas_title.property_fill_color_rgba() = MODULE_TITLE_COLOUR;
+		_title_width = _canvas_title.property_text_width();
+		_title_height = _canvas_title.property_text_height();
 	} else {
 		_canvas_title.hide();
 	}
@@ -388,6 +392,8 @@ Module::set_name(const string& n)
 		string old_name = _name;
 		_name = n;
 		_canvas_title.property_text() = _name;
+		_title_width = _canvas_title.property_text_width();
+		_title_height = _canvas_title.property_text_height();
 		if (_title_visible)
 			resize();
 	}
@@ -445,7 +451,7 @@ Module::embed(Gtk::Container* widget)
 	_embed_container->set_border_width(2);
 	_embed_container->show_all();
 
-	const double y = 4 + _canvas_title.property_text_height();
+	const double y = 4 + _title_height;
 	delete _embed_item;
 	_embed_item = new Gnome::Canvas::Widget(*this, 2.0, y, *_embed_container);
 	_embed_item->show();
@@ -536,9 +542,7 @@ Module::resize_horiz()
 	// side that the port isn't right on the edge).
 	const double hor_pad = (_title_visible ? 10.0 : 20.0);
 	
-	double width = (_title_visible
-		? _canvas_title.property_text_width() + 10.0
-		: 1.0);
+	double width = (_title_visible ? _title_width + 10.0 : 1.0);
 	
 	if (_icon_box)
 		width += _icon_size + 2;
@@ -556,7 +560,6 @@ Module::resize_horiz()
 	}
 
 	const double widest = std::max(widest_in, widest_out);
-	const double title_height = _canvas_title.property_text_height();
 
 	double above_w   = std::max(width, widest + hor_pad);
 	double between_w = std::max(width, widest_in + widest_out + _embed_width);
@@ -567,9 +570,9 @@ Module::resize_horiz()
 	double header_height = 2.0;
 	if (_show_port_labels) {
 		if (_title_visible)
-			header_height += 2 + title_height;
-		if (_icon_box && _icon_size > title_height)
-			header_height += _icon_size - title_height;
+			header_height += 2 + _title_height;
+		if (_icon_box && _icon_size > _title_height)
+			header_height += _icon_size - _title_height;
 	}
 
 	double height = header_height;
@@ -685,14 +688,12 @@ Module::resize_vert()
 	if (_icon_box)
 		width += _icon_size + 2;
 	
-	const double title_height = _canvas_title.property_text_height();
-
 	double height = 4.0;
 	if (_show_port_labels) {
 		if (_title_visible)
-			height += 2 + title_height;
-		if (_icon_box && _icon_size > title_height)
-			height += _icon_size - title_height;
+			height += 2 + _title_height;
+		if (_icon_box && _icon_size > _title_height)
+			height += _icon_size - _title_height;
 	}
 
 	height += MODULE_EMPTY_PORT_DEPTH * 4.0;
