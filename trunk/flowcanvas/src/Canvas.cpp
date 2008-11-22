@@ -46,6 +46,7 @@ Canvas::Canvas(double width, double height)
 	, _drag_state(NOT_DRAGGING)
 	, _remove_objects(true)
 	, _locked(false)
+	, _direction(HORIZONTAL)
 	, _base_rect(*root(), 0, 0, width, height)
 	, _select_rect(NULL)
 	, _select_dash(NULL)
@@ -1206,7 +1207,10 @@ Canvas::render_to_dot(const string& dot_output_filename)
 	GVC_t* gvc = gvContext();
 	Agraph_t* G = agopen((char*)"g", AGDIGRAPH);
 
-	agraphattr(G, (char*)"rankdir", (char*)"LR");
+	if (_direction == HORIZONTAL)
+		agraphattr(G, (char*)"rankdir", (char*)"LR");
+	else
+		agraphattr(G, (char*)"rankdir", (char*)"TD");
 
 	unsigned id = 0;
 	for (ItemList::const_iterator i = _items.begin(); i != _items.end(); ++i) {
@@ -1259,7 +1263,10 @@ Canvas::arrange(bool use_length_hints)
 	GVC_t* gvc = gvContext();
 	Agraph_t* G = agopen((char*)"g", AGDIGRAPH);
 
-	agraphattr(G, (char*)"rankdir", (char*)"LR");
+	if (_direction == HORIZONTAL)
+		agraphattr(G, (char*)"rankdir", (char*)"LR");
+	else
+		agraphattr(G, (char*)"rankdir", (char*)"TD");
 
 	unsigned id = 0;
 	for (ItemList::const_iterator i = _items.begin(); i != _items.end(); ++i) {

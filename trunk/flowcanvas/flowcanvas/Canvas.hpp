@@ -106,6 +106,14 @@ public:
 	void resize(double width, double height);
 	void resize_all_items();
 
+	enum FlowDirection {
+		HORIZONTAL,
+		VERTICAL
+	};
+
+	void set_direction(FlowDirection d) { _direction = d; }
+	FlowDirection direction() const     { return _direction; }
+
 	/** Dash applied to selected items.
 	 * Set an object's property_dash() to this for the "rubber band" effect */
 	ArtVpathDash* select_dash() { return _select_dash; }
@@ -172,6 +180,8 @@ private:
 	
 	bool _remove_objects; // flag to avoid removing objects from destructors when unnecessary
 	bool _locked;
+	
+	FlowDirection _direction;
 
 	Gnome::Canvas::Rect  _base_rect;   ///< Background
 	Gnome::Canvas::Rect* _select_rect; ///< Rectangle for drag selection

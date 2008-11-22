@@ -41,7 +41,8 @@ public:
 	       const std::string&        name,
 	       double                    x = 0,
 	       double                    y = 0,
-	       bool                      show_title = true);
+	       bool                      show_title = true,
+	       bool                      show_port_labels = true);
 
 	virtual ~Module();
 	
@@ -56,7 +57,8 @@ public:
 	void zoom(double z);
 	void resize();
 	
-	void show_port_labels(bool b);
+	bool show_port_labels(bool b) { return _show_port_labels; }
+	void set_show_port_labels(bool b);
 
 	virtual void move(double dx, double dy);
 	virtual void move_to(double x, double y);
@@ -87,6 +89,8 @@ protected:
 
 	void fit_canvas();
 	void measure_ports();
+	void resize_horiz();
+	void resize_vert();
 	
 	void port_renamed() { _port_renamed = true; }
 	
@@ -100,7 +104,7 @@ protected:
 	bool   _port_renamed;
 	double _widest_input;
 	double _widest_output;
-	bool   _port_labels_visible;
+	bool   _show_port_labels;
 
 	PortVector _ports;
 

@@ -26,7 +26,8 @@
 using namespace std;
 
 static const uint32_t PORT_SELECTED_COLOR   = 0xFF0000FF;
-static const uint32_t PORT_EMPTY_PORT_WIDTH = 4;
+static const uint32_t PORT_EMPTY_PORT_BREADTH = 8;
+static const uint32_t PORT_EMPTY_PORT_DEPTH = 4;
 
 namespace FlowCanvas {
 	
@@ -49,26 +50,44 @@ Port::Port(boost::shared_ptr<Module> module, const string& name, bool is_input, 
 	, _control_rect(NULL)
 	, _menu(NULL)
 {
-	// Create label first and zoom (to find size correctly)
-	_label = new Gnome::Canvas::Text(*this, 0, 0, _name);
-	zoom(module->canvas().lock()->get_zoom());
+	boost::shared_ptr<Canvas> canvas = module->canvas().lock();
 
-	const double text_width = _label->property_text_width();
-	_width = text_width + 6.0;
-	_height = _label->property_text_height();
-	_label->property_x() = text_width / 2.0 + 3.0;
-	_label->property_y() = (_height / 2.0) - 1.0;
-	/* WARNING: Doing this makes things extremely slow!
-	_label->property_size() = PORT_LABEL_SIZE;
-	_label->property_weight() = 200; */
-	_label->property_fill_color_rgba() = 0xFFFFFFFF;
+	// Create label first and zoom (to find size correctly)
+	if (canvas->direction() == Canvas::HORIZONTAL)
+		_label = new Gnome::Canvas::Text(*this, 0, 0, _name);
+	else
+		_label = NULL;
+	
+	double z = canvas->get_zoom();
+	zoom(z);
+
+	if (_label) {
+		const double text_width = _label->property_text_width();
+		_width = text_width + 6.0;
+		_height = _label->property_text_height();
+		_label->property_x() = text_width / 2.0 + 3.0;
+		_label->property_y() = (_height / 2.0) - 1.0;
+		/* WARNING: Doing this makes things extremely slow!
+		   _label->property_size() = PORT_LABEL_SIZE;
+		   _label->property_weight() = 200; */
+		_label->property_fill_color_rgba() = 0xFFFFFFFF;
+	} else {
+		if (canvas->direction() == Canvas::HORIZONTAL) {
+			_width  = PORT_EMPTY_PORT_DEPTH * z;
+			_height = PORT_EMPTY_PORT_BREADTH * z;
+		} else {
+			_width  = PORT_EMPTY_PORT_BREADTH * z;
+			_height = PORT_EMPTY_PORT_DEPTH * z;
+		}
+	}
 
 	// Create rect to enclose label
 	_rect = new Gnome::Canvas::Rect(*this, 0, 0, _width, _height);
 	set_border_width(0.0);
 	_rect->property_fill_color_rgba() = color;
 	
-	_label->raise_to_top();
+	if (_label)
+		_label->raise_to_top();
 }
 
 
@@ -182,7 +201,7 @@ Port::natural_width() const
 	if (_label)
 		return _label->property_text_width();
 	else
-		return PORT_EMPTY_PORT_WIDTH;
+		return PORT_EMPTY_PORT_DEPTH; // Used by Canvas::resize_horiz only
 }
 
 
@@ -268,16 +287,24 @@ Port::disconnect_all()
 void
 Port::show_label(bool b)
 {
+	boost::shared_ptr<Module> m = module().lock();
+	boost::shared_ptr<Canvas> canvas = (m ? m->canvas().lock() : boost::shared_ptr<Canvas>());
+	
+	if (!canvas)
+		return;
+	
 	if (b) {
 		// Create label first then zoom (to find size correctly)
 		if (!_label)
 			_label = new Gnome::Canvas::Text(*this, 0, 0, _name);
 
-		zoom(module().lock()->canvas().lock()->get_zoom());
+		zoom(canvas->get_zoom());
 
 		const double text_width = _label->property_text_width();
 		_width = text_width + 6.0;
 		_height = _label->property_text_height();
+		set_width(_width);
+		set_height(_height);
 		_label->property_x() = text_width / 2.0 + 3.0;
 		_label->property_y() = (_height / 2.0) - 1.0;
 		_label->property_fill_color_rgba() = 0xFFFFFFFF;
@@ -286,7 +313,15 @@ Port::show_label(bool b)
 	} else {
 		delete _label;
 		_label = NULL;
-		_width = PORT_EMPTY_PORT_WIDTH;
+		if (canvas->direction() == Canvas::HORIZONTAL) {
+			_width  = PORT_EMPTY_PORT_DEPTH;
+			_height = PORT_EMPTY_PORT_BREADTH;
+		} else {
+			_width  = PORT_EMPTY_PORT_BREADTH;
+			_height = PORT_EMPTY_PORT_DEPTH;
+		}
+		set_width(_width);
+		set_height(_height);
 		_rect->raise_to_top();
 	}
 		
@@ -340,8 +375,23 @@ Port::set_highlighted(bool b, bool highlight_parent, bool highlight_connections,
 Gnome::Art::Point
 Port::src_connection_point()
 {
-	double x = (is_input()) ? _rect->property_x1() : _rect->property_x2();
-	double y = _rect->property_y1() + _height / 2.0;
+	bool horizontal = true;
+	boost::shared_ptr<Module> m = module().lock();
+	if (m) {
+		boost::shared_ptr<Canvas> canvas = m->canvas().lock();
+		if (canvas)
+			horizontal = (canvas->direction() == Canvas::HORIZONTAL);
+	}
+	
+	double x, y;
+
+	if (horizontal) {
+		x = (is_input()) ? _rect->property_x1() : _rect->property_x2();
+		y = _rect->property_y1() + _height / 2.0;
+	} else {
+		x = _rect->property_x1() + _width / 2.0;
+		y = (is_input()) ? _rect->property_y1() : _rect->property_y2();
+	}
 	
 	i2w(x, y); // convert to world-relative coords
 	
@@ -354,12 +404,7 @@ Port::src_connection_point()
 Gnome::Art::Point
 Port::dst_connection_point(const Gnome::Art::Point& src)
 {
-	double x = (is_input()) ? _rect->property_x1() : _rect->property_x2();
-	double y = _rect->property_y1() + _height / 2.0;
-	
-	i2w(x, y); // convert to world-relative coords
-	
-	return Gnome::Art::Point(x, y);
+	return src_connection_point();
 }
 
 
@@ -369,6 +414,33 @@ Port::set_width(double w)
 	_rect->property_x2() = _rect->property_x2() + (w - _width);
 	_width = w;
 	set_control(_control_value, false);
+}
+
+
+void
+Port::set_height(double h)
+{
+	_rect->property_y2() = _rect->property_y1() + h;
+	_height = h;
+}
+
+
+Gnome::Art::Point
+Port::connection_point_vector(double dx, double dy)
+{
+	bool horizontal = true;
+	boost::shared_ptr<Module> m = module().lock();
+	if (m) {
+		boost::shared_ptr<Canvas> canvas = m->canvas().lock();
+		if (canvas)
+			horizontal = (canvas->direction() == Canvas::HORIZONTAL);
+	}
+
+	if (horizontal) {
+		return Gnome::Art::Point(dx, 0);
+	} else {
+		return Gnome::Art::Point(0, dy);
+	}
 }
 
 

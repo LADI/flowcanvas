@@ -54,8 +54,9 @@ public:
 	
 	void disconnect_all();
 	
-	virtual Gnome::Art::Point src_connection_point();
-	virtual Gnome::Art::Point dst_connection_point(const Gnome::Art::Point& src);
+	Gnome::Art::Point src_connection_point();
+	Gnome::Art::Point dst_connection_point(const Gnome::Art::Point& src);
+	Gnome::Art::Point connection_point_vector(double dx, double dy);
 	
 	boost::weak_ptr<Module> module() const { return _module; }
 	
@@ -82,10 +83,11 @@ public:
 	virtual void create_menu();
 	void         set_menu(Gtk::Menu* m);
 
-	Gtk::Menu* menu() const           { return _menu; }
+	Gtk::Menu* menu() const { return _menu; }
 
 	double width() const { return _width; }
 	void   set_width(double w);
+	void   set_height(double h);
 	
 	double border_width() const { return _border_width; }
 	void   set_border_width(double w);

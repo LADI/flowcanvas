@@ -138,18 +138,26 @@ Connection::update_location()
 		double dx = fabs(dst_x - src_x);
 		double dy = fabs(dst_y - src_y);
 
+		Gnome::Art::Point src_vec = src->connection_point_vector(dx/3.0, dy/3.0);
+		Gnome::Art::Point dst_vec = dst->connection_point_vector(dx/3.0, dy/3.0);
+
+		double src_point_dx = src_vec.get_x();
+		double src_point_dy = src_vec.get_y();
+		double dst_point_dx = dst_vec.get_x();
+		double dst_point_dy = dst_vec.get_y();
+
 		// Path 1 (src_x, src_y) -> (join_x, join_y)
 		// Control point 1
-		const double src_x1 = src_x + (dx+dy)/5.0;//std::min(x_dist+y_dist, 40.0);
-		const double src_y1 = src_y;
+		const double src_x1 = src_x + src_point_dx;
+		const double src_y1 = src_y + src_point_dy;
 		// Control point 2
 		const double src_x2 = (join_x + src_x1) / 2.0;
 		const double src_y2 = (join_y + src_y1) / 2.0;
 
 		// Path 2, (join_x, join_y) -> (dst_x, dst_y)
 		// Control point 1
-		const double dst_x1 = dst_x - (dx + dy)/5.0;//std::min(x_dist+y_dist, 40.0);
-		const double dst_y1 = dst_y;
+		const double dst_x1 = dst_x - dst_point_dx;
+		const double dst_y1 = dst_y - dst_point_dy;
 		// Control point 2
 		const double dst_x2 = (join_x + dst_x1) / 2.0;
 		const double dst_y2 = (join_y + dst_y1) / 2.0;
@@ -168,8 +176,7 @@ Connection::update_location()
 		gnome_canvas_path_def_lineto(_path, join_x, join_y);
 		gnome_canvas_path_def_lineto(_path, dst_x2, dst_y2);
 		gnome_canvas_path_def_lineto(_path, dst_x1, dst_y1);
-		gnome_canvas_path_def_lineto(_path, dst_x, dst_y);
-		*/
+		gnome_canvas_path_def_lineto(_path, dst_x, dst_y);*/
 		
 		if (_show_arrowhead) {
 

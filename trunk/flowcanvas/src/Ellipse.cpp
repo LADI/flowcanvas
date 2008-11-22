@@ -114,6 +114,13 @@ Ellipse::dst_connection_point(const Gnome::Art::Point& src)
 }
 
 
+Gnome::Art::Point
+Ellipse::connection_point_vector(double dx, double dy)
+{
+	return Gnome::Art::Point(0, 0);
+}
+
+
 /** Set the border width of the module.
  *
  * Do NOT directly set the width_units property on the rect, use this function.

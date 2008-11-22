@@ -31,6 +31,7 @@ public:
 
 	virtual Gnome::Art::Point src_connection_point() = 0;
 	virtual Gnome::Art::Point dst_connection_point(const Gnome::Art::Point& src) = 0;
+	virtual Gnome::Art::Point connection_point_vector(double dx, double dy) = 0;
 	
 	virtual void add_connection(boost::shared_ptr<Connection> c);
 	virtual void remove_connection(boost::shared_ptr<Connection> c);
