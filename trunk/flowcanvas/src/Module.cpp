@@ -94,13 +94,6 @@ Module::Module(
 
 	set_width(10.0);
 	set_height(10.0);
-
-	signal_pointer_entered.connect(sigc::bind(sigc::mem_fun(this,
-		&Module::set_highlighted), true));
-	signal_pointer_exited.connect(sigc::bind(sigc::mem_fun(this,
-		&Module::set_highlighted), false));
-	signal_dropped.connect(sigc::mem_fun(this,
-		&Module::on_drop));
 }
 
 
@@ -114,10 +107,19 @@ Module::~Module()
 bool
 Module::on_event(GdkEvent* event)
 {
-	if (event->type == GDK_KEY_PRESS || event->type == GDK_KEY_RELEASE) {
-		boost::shared_ptr<Canvas> canvas = _canvas.lock();
-		if (canvas)
+	boost::shared_ptr<Canvas> canvas;
+	switch (event->type) {
+	case GDK_KEY_PRESS:
+	case GDK_KEY_RELEASE:
+		if ((canvas = _canvas.lock()))
 			canvas->canvas_event(event);
+		break;
+	case GDK_ENTER_NOTIFY:
+		set_highlighted(true);
+		break;
+	case GDK_LEAVE_NOTIFY:
+		set_highlighted(false);
+	default: break;
 	}
 
 	return Item::on_event(event);

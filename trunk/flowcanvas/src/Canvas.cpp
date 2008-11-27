@@ -36,8 +36,8 @@ using namespace std;
 
 namespace FlowCanvas {
 	
-sigc::signal<void, Port*> Canvas::signal_port_entered;
-sigc::signal<void, Item*> Canvas::signal_item_entered;
+sigc::signal<void, Gnome::Canvas::Item*> Canvas::signal_item_entered;
+sigc::signal<void, Gnome::Canvas::Item*> Canvas::signal_item_left;
 
 Canvas::Canvas(double width, double height)
 	: _zoom(1.0)
@@ -762,7 +762,7 @@ Canvas::port_event(GdkEvent* event, boost::weak_ptr<Port> weak_port)
 		break;
 
 	case GDK_ENTER_NOTIFY:
-		signal_port_entered.emit(port.get());
+		signal_item_entered.emit(port.get());
 		if (!control_dragging && !port->selected()) {
 			port->set_highlighted(true);
 			return true;
@@ -781,6 +781,7 @@ Canvas::port_event(GdkEvent* event, boost::weak_ptr<Port> weak_port)
 		} else if (!control_dragging) {
 			port->set_highlighted(false);
 		}
+		signal_item_left.emit(port.get());
 		break;
 	
 	default:

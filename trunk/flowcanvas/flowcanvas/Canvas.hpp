@@ -126,8 +126,8 @@ public:
 	virtual void disconnect(boost::shared_ptr<Connectable> /*tail*/,
 	                        boost::shared_ptr<Connectable> /*head*/) {}
 	
-	static sigc::signal<void, Port*> signal_port_entered;
-	static sigc::signal<void, Item*> signal_item_entered;
+	static sigc::signal<void, Gnome::Canvas::Item*> signal_item_entered;
+	static sigc::signal<void, Gnome::Canvas::Item*> signal_item_left;
 
 protected:
 	ItemList                                   _items;  ///< All items on this canvas

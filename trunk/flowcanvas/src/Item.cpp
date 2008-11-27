@@ -139,13 +139,11 @@ Item::on_event(GdkEvent* event)
 
 	case GDK_ENTER_NOTIFY:
 		canvas->signal_item_entered.emit(this);
-		signal_pointer_entered.emit();
 		raise_to_top();
 		break;
 
 	case GDK_LEAVE_NOTIFY:
-		signal_pointer_exited.emit();
-		//set_highlighted(false);
+		canvas->signal_item_left.emit(this);
 		break;
 
 	default:
