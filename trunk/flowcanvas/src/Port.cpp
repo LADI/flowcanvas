@@ -26,8 +26,8 @@
 using namespace std;
 
 static const uint32_t PORT_SELECTED_COLOR   = 0xFF0000FF;
-static const uint32_t PORT_EMPTY_PORT_BREADTH = 8;
-static const uint32_t PORT_EMPTY_PORT_DEPTH = 4;
+static const uint32_t PORT_EMPTY_PORT_BREADTH = 16;
+static const uint32_t PORT_EMPTY_PORT_DEPTH = 32;
 
 namespace FlowCanvas {
 	
@@ -59,18 +59,18 @@ Port::Port(boost::shared_ptr<Module> module, const string& name, bool is_input, 
 	else
 		_label = NULL;
 	
-	double z = canvas->get_zoom();
+	const double z = canvas->get_zoom();
 	zoom(z);
 
 	if (_label) {
 		show_label(true);
 	} else {
 		if (canvas->direction() == Canvas::HORIZONTAL) {
-			_width  = PORT_EMPTY_PORT_DEPTH * z;
-			_height = PORT_EMPTY_PORT_BREADTH * z;
+			_width  = module->empty_port_depth() * z;
+			_height = module->empty_port_breadth() * z;
 		} else {
-			_width  = PORT_EMPTY_PORT_BREADTH * z;
-			_height = PORT_EMPTY_PORT_DEPTH * z;
+			_width  = module->empty_port_breadth() * z;
+			_height = module->empty_port_depth() * z;
 		}
 	}
 
@@ -99,7 +99,7 @@ Port::show_control()
 		_control_rect = new Gnome::Canvas::Rect(*this, 0.5, 0.5, 0.0, _height - 0.5);
 		//_control_rect->property_outline_color_rgba() = 0xFFFFFF45;
 		_control_rect->property_width_pixels() = 0;
-		_control_rect->property_fill_color_rgba() = 0xFFFFFF40;
+		_control_rect->property_fill_color_rgba() = 0xFFFFFF80;
 		_control_rect->show();
 	}
 }

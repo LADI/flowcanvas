@@ -79,6 +79,9 @@ public:
 	void set_icon(const Glib::RefPtr<Gdk::Pixbuf>& icon);
 
 	size_t num_ports() const { return _ports.size(); }
+			
+	double empty_port_breadth() const;
+	double empty_port_depth() const;
 
 protected:
 	virtual void on_drop(double new_x, double new_y);

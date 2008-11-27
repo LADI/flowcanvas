@@ -34,8 +34,8 @@ static const uint32_t MODULE_HILITE_FILL_COLOUR    = 0x2E3436FF;
 static const uint32_t MODULE_OUTLINE_COLOUR        = 0x93978FFF;
 static const uint32_t MODULE_HILITE_OUTLINE_COLOUR = 0xEEEEECFF;
 static const uint32_t MODULE_TITLE_COLOUR          = 0xFFFFFFFF;
-static const uint32_t MODULE_EMPTY_PORT_BREADTH    = 8;
-static const uint32_t MODULE_EMPTY_PORT_DEPTH      = 4;
+static const double   MODULE_EMPTY_PORT_BREADTH    = 12.0;
+static const double   MODULE_EMPTY_PORT_DEPTH      = 6.0;
 
 
 /** Construct a Module
@@ -123,6 +123,20 @@ Module::on_event(GdkEvent* event)
 	}
 
 	return Item::on_event(event);
+}
+
+
+double
+Module::empty_port_breadth() const
+{
+	return MODULE_EMPTY_PORT_BREADTH;
+}
+
+
+double
+Module::empty_port_depth() const
+{
+	return MODULE_EMPTY_PORT_DEPTH;
 }
 
 
