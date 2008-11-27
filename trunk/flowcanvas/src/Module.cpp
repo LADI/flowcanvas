@@ -681,7 +681,7 @@ Module::resize_horiz()
 
 	if (_title_visible) {
 		if (_show_port_labels)
-			_canvas_title.property_y() = 8;
+			_canvas_title.property_y() = _title_height / 2.0;
 		else
 			_canvas_title.property_y() = (_height / 2.0) - 1.0;
 		if (_icon_box)
