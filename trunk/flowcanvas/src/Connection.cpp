@@ -48,8 +48,7 @@ Connection::Connection(boost::shared_ptr<Canvas>      canvas,
 	set_color(color);
 
 	update_location();	
-	lower_to_bottom();
-	raise(1); // raise above base rect
+	raise_to_top();
 }
 
 

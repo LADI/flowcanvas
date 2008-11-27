@@ -122,7 +122,13 @@ Module::on_event(GdkEvent* event)
 	default: break;
 	}
 
-	return Item::on_event(event);
+	bool ret = Item::on_event(event);
+	
+	if (event->type == GDK_ENTER_NOTIFY)
+		for (PortVector::iterator p = _ports.begin(); p != _ports.end(); ++p)
+			(*p)->raise_connections();
+
+	return ret;
 }
 
 
