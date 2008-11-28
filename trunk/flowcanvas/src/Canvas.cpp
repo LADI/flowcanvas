@@ -1199,6 +1199,7 @@ Canvas::get_port_at(double x, double y)
 }
 
 
+#ifdef HAVE_AGRAPH
 class GVNodes : public std::map<boost::shared_ptr<Item>, Agnode_t*> {
 public:
 	GVNodes() : gvc(0), G(0) {}
@@ -1213,6 +1214,9 @@ public:
 	GVC_t*    gvc;
 	Agraph_t* G;
 };
+#else
+class GVNodes : public std::map<boost::shared_ptr<Item>, void*> {};
+#endif
 
 
 GVNodes
