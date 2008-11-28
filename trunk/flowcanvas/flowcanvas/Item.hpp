@@ -106,7 +106,6 @@ public:
 	sigc::signal<void, double, double> signal_dropped;
 
 protected:
-	
 	virtual void on_drag(double dx, double dy);
 	virtual void on_click(GdkEventButton*);
 	virtual void on_double_click(GdkEventButton*);

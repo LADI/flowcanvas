@@ -84,7 +84,6 @@ public:
 	double empty_port_depth() const;
 
 protected:
-	virtual void on_drop(double new_x, double new_y);
 	virtual bool on_event(GdkEvent* ev);
 	
 	virtual void set_width(double w);

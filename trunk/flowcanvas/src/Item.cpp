@@ -127,6 +127,7 @@ Item::on_event(GdkEvent* event)
 			ungrab(event->button.time);
 			dragging = false;
 			if (click_x != drag_start_x || click_y != drag_start_y) {
+				store_location();
 				signal_dropped.emit(click_x, click_y);
 			} else if (!double_click) {
 				on_click(&event->button);

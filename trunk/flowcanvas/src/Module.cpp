@@ -199,13 +199,6 @@ Module::set_icon(const Glib::RefPtr<Gdk::Pixbuf>& icon)
 
 
 void
-Module::on_drop(double new_x, double new_y)
-{
-	store_location();
-}
-
-
-void
 Module::zoom(double z)
 {
 	_canvas_title.property_size() = static_cast<int>(floor(9000.0f * z));
