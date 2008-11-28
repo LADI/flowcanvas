@@ -35,6 +35,7 @@ namespace FlowCanvas {
 	
 class Port;
 class Module;
+class GVNodes;
 
 
 /** \defgroup FlowCanvas Canvas widget for dataflow systems.
@@ -142,6 +143,8 @@ private:
 
 	friend class Module;
 	bool port_event(GdkEvent* event, boost::weak_ptr<Port> port);
+
+	GVNodes layout_dot(bool use_length_hints, const std::string& filename);
 
 	void remove_connection(boost::shared_ptr<Connection> c);
 	bool are_connected(boost::shared_ptr<const Connectable> tail,

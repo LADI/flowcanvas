@@ -1199,70 +1199,37 @@ Canvas::get_port_at(double x, double y)
 }
 
 
-void
-Canvas::render_to_dot(const string& dot_output_filename)
+class GVNodes : public std::map<boost::shared_ptr<Item>, Agnode_t*> {
+public:
+	GVNodes() : gvc(0), G(0) {}
+
+	void cleanup() {
+		gvFreeLayout(gvc, G);
+		agclose (G);
+		gvc = 0;
+		G = 0;
+	}
+	
+	GVC_t*    gvc;
+	Agraph_t* G;
+};
+
+
+GVNodes
+Canvas::layout_dot(bool use_length_hints, const std::string& filename)
 {
+	GVNodes nodes;
+
 #ifdef HAVE_AGRAPH
-	std::map<boost::shared_ptr<Item>, Agnode_t*> nodes;
-
-	GVC_t* gvc = gvContext();
-	Agraph_t* G = agopen((char*)"g", AGDIGRAPH);
-
-	if (_direction == HORIZONTAL)
-		agraphattr(G, (char*)"rankdir", (char*)"LR");
-	else
-		agraphattr(G, (char*)"rankdir", (char*)"TD");
-
-	unsigned id = 0;
-	for (ItemList::const_iterator i = _items.begin(); i != _items.end(); ++i) {
-		std::ostringstream id_ss;
-		id_ss << "n" << id++;
-		nodes.insert(std::make_pair(*i, agnode(G, strdup(id_ss.str().c_str()))));
-	}
-	
-	for (ConnectionList::iterator i = _connections.begin(); i != _connections.end(); ++i) {
-		const boost::shared_ptr<Connection> c = *i;
-		const boost::shared_ptr<Item> src = boost::dynamic_pointer_cast<Item>(c->source().lock());
-		const boost::shared_ptr<Item> dst = boost::dynamic_pointer_cast<Item>(c->dest().lock());
-		if (!src || !dst)
-			continue;
-
-		Agnode_t* src_node = nodes[src];
-		Agnode_t* dst_node = nodes[dst];
-
-		assert(src_node && dst_node);
-
-		agedge(G, src_node, dst_node);
-	}
-
-	gvLayout (gvc, G, (char*)"dot");
-		
-	FILE* out_fd = fopen(dot_output_filename.c_str(), "w+");
-	if (out_fd) {
-		gvRender (gvc, G, (char*)"dot", out_fd);
-		fclose(out_fd);
-	}
-	
-	gvFreeLayout(gvc, G);
-	agclose(G);
-	gvFreeContext(gvc);
-
-#endif
-}
-	
-
-void
-Canvas::arrange(bool use_length_hints)
-{
 	/* FIXME: Are the strdup's here a leak?
 	 * GraphViz documentation disagrees with function prototypes.
 	 */
-#ifdef HAVE_AGRAPH
-	typedef std::map<boost::shared_ptr<Item>, Agnode_t*> Nodes;
-	Nodes nodes;
-
+	
 	GVC_t* gvc = gvContext();
 	Agraph_t* G = agopen((char*)"g", AGDIGRAPH);
+
+	nodes.gvc = gvc;
+	nodes.G = G;
 
 	if (_direction == HORIZONTAL)
 		agraphattr(G, (char*)"rankdir", (char*)"LR");
@@ -1281,13 +1248,13 @@ Canvas::arrange(bool use_length_hints)
 			ss.str("");
 			ss << (*i)->height() / 96.0;
 			agsafeset(node, (char*)"height", strdup(ss.str().c_str()), (char*)"");
-			//agsafeset(node, (char*)"shape", agstrdup((char*)"box"), (char*)"");
 			agsafeset(node, (char*)"shape", (char*)"box", (char*)"");
+			agsafeset(node, (char*)"label", (char*)(*i)->name().c_str(), (char*)"");
 		} else {
 			agsafeset(node, (char*)"width", (char*)"1.0", (char*)"");
 			agsafeset(node, (char*)"height", (char*)"1.0", (char*)"");
-			//agsafeset(node, (char*)"shape", agstrdup((char*)"ellipse"), (char*)"");
 			agsafeset(node, (char*)"shape", (char*)"ellipse", (char*)"");
+			agsafeset(node, (char*)"label", (char*)(*i)->name().c_str(), (char*)"");
 		}
 		assert(node);
 		nodes.insert(std::make_pair(*i, node));
@@ -1302,8 +1269,8 @@ Canvas::arrange(bool use_length_hints)
 		boost::shared_ptr<Item> src_item = boost::dynamic_pointer_cast<Item>(c->source().lock());
 		boost::shared_ptr<Item> dst_item = boost::dynamic_pointer_cast<Item>(c->dest().lock());
 		
-		Nodes::iterator src_i = nodes.end();
-		Nodes::iterator dst_i = nodes.end();
+		GVNodes::iterator src_i = nodes.end();
+		GVNodes::iterator dst_i = nodes.end();
 
 		Agnode_t* src_node = NULL;
 		Agnode_t* dst_node = NULL;
@@ -1336,25 +1303,49 @@ Canvas::arrange(bool use_length_hints)
 
 	gvLayout (gvc, G, (char*)"dot");
 	gvRender (gvc, G, (char*)"dot", fopen("/dev/null", "w"));
-	//gvRender (gvc, G, (char*)"dot", fopen("/home/dave/test.dot", "w"));
+	
+	if (filename != "") {
+		FILE* fd = fopen(filename.c_str(), "w");
+		gvRender (gvc, G, (char*)"dot", fd);
+		fclose(fd);
+	}
+#endif
+
+	return nodes;
+}
+	
+
+void
+Canvas::render_to_dot(const string& dot_output_filename)
+{
+#ifdef HAVE_AGRAPH
+	GVNodes nodes = layout_dot(false, dot_output_filename);
+	nodes.cleanup();
+#endif
+}
+
+
+void
+Canvas::arrange(bool use_length_hints)
+{
+#ifdef HAVE_AGRAPH
+	GVNodes nodes = layout_dot(use_length_hints, "");
 
 	double least_x=HUGE_VAL, least_y=HUGE_VAL, most_x=0, most_y=0;
 	
-	// FIXME: locale kludges
+	// Set numeric locale to POSIX for reading graphviz output with strtod
 	char* locale = strdup(setlocale(LC_NUMERIC, NULL));
 	setlocale(LC_NUMERIC, "POSIX");
 
 	// Arrange to graphviz coordinates
-	for (std::map<boost::shared_ptr<Item>, Agnode_t*>::iterator i = nodes.begin();
-			i != nodes.end(); ++i) {
+	for (GVNodes::iterator i = nodes.begin(); i != nodes.end(); ++i) {
 		char* pos_prop = agget(i->second, (char*)"pos");
 		assert(pos_prop);
-		string pos(pos_prop);
+		const string pos(pos_prop);
 		const string x_str = pos.substr(0, pos.find(","));
 		const string y_str = pos.substr(pos.find(",")+1);
-		double x = strtod(x_str.c_str(), NULL) * 1.25;
-		double y = -strtod(y_str.c_str(), NULL) * 1.25;
-		//cerr << "MOVE: " << x << ", " << y << endl;
+		const double x = strtod(x_str.c_str(), NULL) * 1.25;
+		const double y = -strtod(y_str.c_str(), NULL) * 1.25;
 		i->first->property_x() = x - i->first->width()/2.0;
 		i->first->property_y() = y - i->first->height()/2.0;
 		least_x = std::min(least_x, x);
@@ -1363,6 +1354,7 @@ Canvas::arrange(bool use_length_hints)
 		most_y = std::max(most_y, y);
 	}
 	
+	// Reset numeric locale to original value
 	setlocale(LC_NUMERIC, locale);
 	free(locale);
 
@@ -1378,19 +1370,15 @@ Canvas::arrange(bool use_length_hints)
 	if (graph_height + 10 > _height)
 		resize(_width, graph_height + 10);
 
-	// This isn't trial and error code.  Honest!
-	
 	// Center on canvas
-	for (std::map<boost::shared_ptr<Item>, Agnode_t*>::iterator i = nodes.begin();
-			i != nodes.end(); ++i) {
+	for (GVNodes::iterator i = nodes.begin(); i != nodes.end(); ++i) {
 		i->first->move((_width / 2.0) - graph_width/2.0,
 		              ((_height / 2.0) + graph_height/2.0));
 	}
 
 	scroll_to_center();
-
-	gvFreeLayout(gvc, G);
-	agclose (G);
+	
+	nodes.cleanup();
 #endif
 }
 
