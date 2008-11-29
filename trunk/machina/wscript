@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import os
-import Params
 import autowaf
 
 # Version of this package (even if built as a child)
@@ -52,14 +51,14 @@ def configure(conf):
 	
 	autowaf.print_summary(conf)
 	autowaf.display_header('Machina Configuration')
-	autowaf.display_msg("Jack", str(conf.env['HAVE_JACK'] == 1), 'YELLOW')
-	autowaf.display_msg("Build GUI", str(conf.env['BUILD_GUI'] == 1), 'YELLOW')
+	autowaf.display_msg(conf, "Jack", str(conf.env['HAVE_JACK'] == 1))
+	autowaf.display_msg(conf, "Build GUI", str(conf.env['BUILD_GUI'] == 1))
 	print
 
 def build(bld):
 	bld.add_subdirs('src/engine')
 
-	if bld.env()['BUILD_GUI']:
+	if bld.env['BUILD_GUI']:
 		bld.add_subdirs('src/gui')
 
 	#bld.add_subdirs('src/machina')

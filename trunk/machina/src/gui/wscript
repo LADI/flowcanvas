@@ -1,9 +1,8 @@
 #!/usr/bin/env python
-import Params
 import autowaf
 
 def build(bld):
-	obj = bld.create_obj('cpp', 'shlib')
+	obj = bld.new_task_gen('cxx', 'shlib')
 	obj.source = '''
 		EdgeView.cpp
 		MachinaCanvas.cpp
@@ -29,15 +28,15 @@ def build(bld):
 	''')
 	
 	# GUI runtime files
-	install_files('DATADIR', 'machina', 'machina.glade')
-	install_files('DATADIR', 'machina', 'machina.svg')
+	bld.install_files('${DATADIR}/machina', 'machina.glade')
+	bld.install_files('${DATADIR}/machina', 'machina.svg')
 
 	# Executable
-	obj = bld.create_obj('cpp', 'program')
+	obj = bld.new_task_gen('cxx', 'program')
 	obj.target       = 'machina_gui'
 	obj.source       = 'main.cpp'
 	obj.includes     = ['.', '../engine']
-	obj.defines      = 'VERSION=\\\"' + bld.env()['MACHINA_VERSION'] + '\\\"'
+	obj.defines      = 'VERSION=\\\"' + bld.env['MACHINA_VERSION'] + '\\\"'
 	obj.uselib_local = 'libmachina_engine libmachina_gui'
 	autowaf.use_lib(bld, obj, 'GTHREAD GLIBMM REDLANDMM RAUL MACHINA EUGENE FLOWCANVAS')
 	

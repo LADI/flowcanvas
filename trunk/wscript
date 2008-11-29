@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import string
 import os
-import Params
 import autowaf
 
 # Variables for 'waf dist'

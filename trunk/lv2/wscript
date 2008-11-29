@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import Params
 import autowaf
 
 # Version of this package (even if built as a child)
@@ -27,10 +26,10 @@ def configure(conf):
 	conf.env.append_value('shlib_EXTENSION', ext)
 		
 def build_plugin(bld, lang, name):
-	bundle_path = bld.env()['LV2DIRNAME'] + name + '.lv2'
-	ext = bld.env()['shlib_EXTENSION'][0]
+	bundle_path = bld.env['LV2DIRNAME'] + name + '.lv2'
+	ext = bld.env['shlib_EXTENSION'][0]
 
-	penv = bld.env().copy()
+	penv = bld.env.copy()
 	penv['shlib_PATTERN'] = '%s' + ext
 
 	# Library
@@ -38,20 +37,19 @@ def build_plugin(bld, lang, name):
 	if lang != 'cc':
 		ext = 'cpp'
 	
-	obj          = bld.create_obj(lang, 'shlib')
-	obj.env      = penv
-	obj.source   = 'plugins/%s.lv2/%s.%s' % (name, name, ext)
-	obj.includes = '.'
-	obj.name     = name
-	obj.target   = name
-	obj.inst_var = 'PREFIX'
-	obj.inst_dir = bld.env()['LV2DIRNAME'] + name + '.lv2'
+	obj              = bld.new_task_gen(lang, 'shlib')
+	obj.env          = penv
+	obj.source       = 'plugins/%s.lv2/%s.%s' % (name, name, ext)
+	obj.includes     = '.'
+	obj.name         = name
+	obj.target       = name
+	obj.install_path = '${LV2DIR}/' + name + '.lv2'
 
 	# Data
 	data_file     = 'plugins/%s.lv2/%s.ttl' % (name, name)
 	manifest_file = 'plugins/%s.lv2/manifest.ttl' % (name)
-	install_files('LV2DIR', name + '.lv2', data_file)
-	install_files('LV2DIR', name + '.lv2', manifest_file)
+	bld.install_files('${LV2DIR}/' + name + '.lv2', data_file)
+	bld.install_files('${LV2DIR}/' + name + '.lv2', manifest_file)
 
 def build(bld):
 	# LV2 extensions
@@ -68,9 +66,6 @@ def build(bld):
 		uri_map
 		variables
 	'''
-	# These don't need to be installed, but the option might be nice...
-	#for i in extensions.split():
-	#	install_files('PREFIX', 'include/lv2/ext', 'ext/%s/lv2_%s*.h' % (i, i))
 
 	# LV2 plugins
 	c_plugins = '''
@@ -81,8 +76,8 @@ def build(bld):
 	for i in c_plugins.split():
 		build_plugin(bld, 'cc', i)
 	
-	cpp_plugins = '''
+	cxx_plugins = '''
 		transpose
 	'''
-	for i in cpp_plugins.split():
-		build_plugin(bld, 'cpp', i)
+	for i in cxx_plugins.split():
+		build_plugin(bld, 'cxx', i)

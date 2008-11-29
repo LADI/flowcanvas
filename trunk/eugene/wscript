@@ -43,36 +43,36 @@ def configure(conf):
 
 def build(bld):
 	# Headers
-	install_files('INCLUDEDIR', 'eugene', 'eugene/*.h')
-	install_files('INCLUDEDIR', 'eugene', 'eugene/*.hpp')
+	bld.install_files('${INCLUDEDIR}/eugene', 'eugene/*.h')
+	bld.install_files('${INCLUDEDIR}/eugene', 'eugene/*.hpp')
 	
 	# Pkgconfig file
 	autowaf.build_pc(bld, 'EUGENE', EUGENE_VERSION, 'GLIBMM GTHREAD')
 	
 	# Library
-	obj = bld.create_obj('cpp', 'shlib')
+	obj = bld.new_task_gen('cxx', 'shlib')
 	obj.source = '''
 		src/LABS.cpp
 		src/Sphere.cpp
 		src/TSP.cpp
 	'''
-	obj.includes = ['.']
-	obj.name     = 'libeugene'
-	obj.target   = 'eugene'
-	obj.uselib   = 'GLIBMM GTHREAD'
-	obj.vnum     = EUGENE_LIB_VERSION
-	obj.inst_dir = bld.env()['LIBDIRNAME']
+	obj.includes     = ['.']
+	obj.name         = 'libeugene'
+	obj.target       = 'eugene'
+	obj.uselib       = 'GLIBMM GTHREAD'
+	obj.vnum         = EUGENE_LIB_VERSION
+	obj.install_path = '${BINDIR}'
 	
 	# Console app
-	prog = bld.create_obj('cpp', 'program')
+	prog = bld.new_task_gen('cxx', 'program')
 	prog.source       = 'src/eugene.cpp'
 	obj.includes      = ['.']
 	prog.uselib_local = 'libeugene'
 	prog.target       = 'src/eugene'
-	prog.inst_dir     = bld.env()['BINDIRNAME']
+	prog.install_path = '${BINDIR}'
 
 	# GUI app
-	prog = bld.create_obj('cpp', 'program')
+	prog = bld.new_task_gen('cxx', 'program')
 	prog.source = '''
 		gui/MainWindow.cpp
 		gui/TSPCanvas.cpp
@@ -82,9 +82,9 @@ def build(bld):
 	prog.uselib_local = 'libeugene'
 	prog.uselib       = 'GTKMM GLADEMM GTHREAD GNOMECANVASMM FLOWCANVAS'
 	prog.target       = 'gui/eugene_tsp_gui'
-	prog.inst_dir     = bld.env()['BINDIRNAME']
+	prog.install_path = '${BINDIR}'
 	
-	install_files('PREFIX', 'share/eugene', 'gui/eugene_tsp_gui.glade')
+	bld.install_files('${PREFIX}/share/eugene', 'gui/eugene_tsp_gui.glade')
 	
 def shutdown():
 	autowaf.shutdown()

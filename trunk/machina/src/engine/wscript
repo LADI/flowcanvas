@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import Params
 import autowaf
 
 def build(bld):
@@ -23,7 +22,7 @@ def build(bld):
 		SMFDriver.cpp
 	'''
 
-	obj = bld.create_obj('cpp', 'shlib')
+	obj = bld.new_task_gen('cxx', 'shlib')
 	obj.source = core_source
 	obj.includes     = ['.', '..']
 	obj.name         = 'libmachina_engine'
