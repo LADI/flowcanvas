@@ -16,7 +16,7 @@ blddir = 'build'
 
 def set_options(opt):
 	opt.add_option('--bundle-only', action='store_true', default=False, dest='bundle_only',
-			help="Only install bundle (not header or pkg-config file)")
+			help="Only install LV2 bundle (not header or pkg-config file)")
 	autowaf.set_options(opt)
 
 def configure(conf):
