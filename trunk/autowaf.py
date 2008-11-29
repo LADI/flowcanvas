@@ -113,7 +113,7 @@ def configure(conf):
 		conf.env['INCLUDEDIR'] = conf.env['PREFIX'] + '/Headers/'
 		conf.env['LIBDIR'] = conf.env['PREFIX'] + '/Libraries/'
 		conf.env['DATADIR'] = conf.env['PREFIX'] + '/Resources/'
-		conf.env['HTMLDIR'] = conf.env['PREFIX'] + '/Resources/Documenation/'
+		conf.env['HTMLDIR'] = conf.env['PREFIX'] + '/Resources/Documentation/'
 		conf.env['MANDIR'] = conf.env['PREFIX'] + '/Resources/Man/'
 		conf.env['LV2DIR'] = conf.env['PREFIX'] + '/PlugIns/'
 	else:
