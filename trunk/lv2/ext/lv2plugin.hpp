@@ -33,9 +33,9 @@
 #include <string>
 #include <vector>
 
-#include <lv2.h>
-#include <ext/lv2types.hpp>
-#include <ext/uri_map/lv2_uri_map.h>
+#include "lv2.h"
+#include "ext/lv2types.hpp"
+#include "ext/uri_map/lv2_uri_map.h"
 
 
 namespace LV2 {

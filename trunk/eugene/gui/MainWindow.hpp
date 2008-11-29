@@ -18,7 +18,7 @@
 #pragma once
 #include <boost/shared_ptr.hpp>
 #include <gtkmm.h>
-#include <eugene/TSP.hpp>
+#include "eugene/TSP.hpp"
 #include "GladeFile.hpp"
 #include "Widget.hpp"
 

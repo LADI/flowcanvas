@@ -1,5 +1,5 @@
-#include <redlandmm/Model.hpp>
-#include <redlandmm/Query.hpp>
+#include "redlandmm/Model.hpp"
+#include "redlandmm/Query.hpp"
 
 int
 main()

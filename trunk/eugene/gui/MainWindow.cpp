@@ -15,20 +15,20 @@
  * with Eugene.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <eugene/Problem.hpp>
-#include <eugene/Selection.hpp>
-#include <eugene/OnePointCrossover.hpp>
-#include <eugene/PartiallyMappedCrossover.hpp>
-#include <eugene/OrderCrossover.hpp>
-#include <eugene/PositionBasedCrossover.hpp>
-#include <eugene/InjectionCrossover.hpp>
-#include <eugene/HybridCrossover.hpp>
-#include <eugene/HybridMutation.hpp>
-#include <eugene/TournamentSelection.hpp>
-#include <eugene/RouletteSelection.hpp>
-#include <eugene/RankSelection.hpp>
-#include <eugene/TSP.hpp>
-#include <eugene/GAImpl.hpp>
+#include "eugene/Problem.hpp"
+#include "eugene/Selection.hpp"
+#include "eugene/OnePointCrossover.hpp"
+#include "eugene/PartiallyMappedCrossover.hpp"
+#include "eugene/OrderCrossover.hpp"
+#include "eugene/PositionBasedCrossover.hpp"
+#include "eugene/InjectionCrossover.hpp"
+#include "eugene/HybridCrossover.hpp"
+#include "eugene/HybridMutation.hpp"
+#include "eugene/TournamentSelection.hpp"
+#include "eugene/RouletteSelection.hpp"
+#include "eugene/RankSelection.hpp"
+#include "eugene/TSP.hpp"
+#include "eugene/GAImpl.hpp"
 #include "MainWindow.hpp"
 #include "TSPCanvas.hpp"
 

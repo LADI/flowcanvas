@@ -19,8 +19,8 @@
 #include <string>
 #include <boost/utility.hpp>
 #include <boost/shared_ptr.hpp>
-#include <flowcanvas/flowcanvas.hpp>
-#include <eugene/TSP.hpp>
+#include "flowcanvas/flowcanvas.hpp"
+#include "eugene/TSP.hpp"
 
 namespace Eugene {
 

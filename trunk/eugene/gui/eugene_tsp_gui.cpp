@@ -19,15 +19,15 @@
 #include <time.h>
 #include <gtkmm.h>
 #include <glibmm.h>
-#include <flowcanvas/Canvas.hpp>
-#include <flowcanvas/Ellipse.hpp>
-#include <eugene/Gene.hpp>
-#include <eugene/GA.hpp>
-#include <eugene/GAImpl.hpp>
-#include <eugene/Crossover.hpp>
-#include <eugene/Problem.hpp>
-#include <eugene/Mutation.hpp>
-#include <eugene/TSP.hpp>
+#include "flowcanvas/Canvas.hpp"
+#include "flowcanvas/Ellipse.hpp"
+#include "eugene/Gene.hpp"
+#include "eugene/GA.hpp"
+#include "eugene/GAImpl.hpp"
+#include "eugene/Crossover.hpp"
+#include "eugene/Problem.hpp"
+#include "eugene/Mutation.hpp"
+#include "eugene/TSP.hpp"
 #include "MainWindow.hpp"
 
 using namespace std;

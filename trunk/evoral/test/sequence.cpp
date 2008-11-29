@@ -1,5 +1,5 @@
-#include <evoral/Sequence.hpp>
-#include <evoral/TypeMap.hpp>
+#include "evoral/Sequence.hpp"
+#include "evoral/TypeMap.hpp"
 
 using namespace Evoral;
 

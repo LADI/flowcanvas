@@ -19,8 +19,8 @@ global g_step
 g_step = 0
 
 # Compute dependencies globally
-import preproc
-preproc.go_absolute = True
+#import preproc
+#preproc.go_absolute = True
 
 def set_options(opt):
 	"Add standard autowaf options if they havn't been added yet"

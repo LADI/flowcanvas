@@ -15,13 +15,13 @@
  * with Eugene.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <flowcanvas/flowcanvas.hpp>
-#include <eugene/GAImpl.hpp>
-#include <eugene/Problem.hpp>
-#include <eugene/TSP.hpp>
-#include <eugene/Selection.hpp>
-#include <eugene/Mutation.hpp>
-#include <eugene/Crossover.hpp>
+#include "flowcanvas/flowcanvas.hpp"
+#include "eugene/GAImpl.hpp"
+#include "eugene/Problem.hpp"
+#include "eugene/TSP.hpp"
+#include "eugene/Selection.hpp"
+#include "eugene/Mutation.hpp"
+#include "eugene/Crossover.hpp"
 #include "TSPCanvas.hpp"
 	
 using namespace FlowCanvas;
