@@ -61,7 +61,7 @@ def build(bld):
 	obj.target       = 'eugene'
 	obj.uselib       = 'GLIBMM GTHREAD'
 	obj.vnum         = EUGENE_LIB_VERSION
-	obj.install_path = '${BINDIR}'
+	obj.install_path = '${LIBDIR}'
 	
 	# Console app
 	prog = bld.new_task_gen('cxx', 'program')
