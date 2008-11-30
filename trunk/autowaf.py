@@ -92,6 +92,8 @@ def check_pkg(conf, name, **args):
 			if 'vnum' in args:
 				conf.env['VERSION_' + name] = args['vnum']
 			conf.define('HAVE_' + args['destvar'], int(found))
+		elif args['mandatory']:
+			conf.fatal("Required package " + name + " not found")
 
 def chop_prefix(conf, var):
 	name = conf.env[var][len(conf.env['PREFIX']):]
