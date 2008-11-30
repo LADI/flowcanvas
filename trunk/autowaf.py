@@ -222,7 +222,8 @@ def display_msg(conf, msg, status = None, color = None):
 		color = 'GREEN'
 	elif type(status) == bool and not status or status == "False":
 		color = 'YELLOW'
-	conf.check_message_custom(msg, '', status, color=color)
+	print "%s :" % msg.ljust(conf.line_just),
+	Utils.pprint(color, status)
 
 def print_summary(conf):
 	global g_step
