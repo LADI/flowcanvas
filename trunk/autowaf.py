@@ -86,13 +86,13 @@ def check_pkg(conf, name, **args):
 		if checked_version and checked_version < args['vnum']:
 			check = True;
 	if check:
-		conf.check_cfg(package=name, uselib_store=args['destvar'], args="--cflags --libs")
-		found = bool(conf.env['LIB_' + args['destvar']])
+		found = conf.check_cfg(package=name, uselib_store=args['destvar'], args="--cflags --libs")
+		found = bool(conf.env['HAVE_' + args['destvar']])
 		if found:
 			if 'vnum' in args:
 				conf.env['VERSION_' + name] = args['vnum']
 			conf.define('HAVE_' + args['destvar'], int(found))
-		elif args['mandatory']:
+		elif args['mandatory'] == True:
 			conf.fatal("Required package " + name + " not found")
 
 def chop_prefix(conf, var):
