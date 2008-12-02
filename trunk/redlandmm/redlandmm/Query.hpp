@@ -53,7 +53,7 @@ public:
 		_query += query;
 	}
 
-	Results run(World& world, Model& model, const Glib::ustring base_uri="") const;
+	Results run(World& world, Model& model, Glib::ustring base_uri="") const;
 
 	const Glib::ustring& string() const { return _query; };
 

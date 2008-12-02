@@ -27,7 +27,7 @@ namespace Redland {
 
 
 Query::Results
-Query::run(World& world, Model& model, const Glib::ustring base_uri_str) const
+Query::run(World& world, Model& model, Glib::ustring base_uri_str) const
 {
 	Glib::Mutex::Lock lock(world.mutex());
 
@@ -37,9 +37,10 @@ Query::run(World& world, Model& model, const Glib::ustring base_uri_str) const
 
 	Results result;
 
-	librdf_uri* base_uri = NULL;
-	if (base_uri_str != "")
-		base_uri = librdf_new_uri(world.world(),
+	if (base_uri_str == "")
+		base_uri_str = model.base_uri().to_c_string();
+
+	librdf_uri* base_uri = librdf_new_uri(world.world(),
 				(const unsigned char*)base_uri_str.c_str());
 
 	librdf_query* q = librdf_new_query(world.world(), "sparql",

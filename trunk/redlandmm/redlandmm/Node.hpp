@@ -72,6 +72,8 @@ public:
 	const char* to_c_string() const;
 	std::string to_string() const;
 
+	Glib::ustring to_turtle_token() const;
+
 	bool is_int() const;
 	int  to_int() const;
 

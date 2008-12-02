@@ -122,9 +122,9 @@ Node::to_c_string() const
 	}
 }
 
-/*
+
 Glib::ustring
-Node::to_quoted_uri_string() const
+Node::to_turtle_token() const
 {
 	assert(type() == RESOURCE);
 	assert(librdf_node_get_uri(_c_obj));
@@ -133,7 +133,7 @@ Node::to_quoted_uri_string() const
 	str.append(">");
 	return str;
 }
-*/
+
 
 bool
 Node::is_int() const
