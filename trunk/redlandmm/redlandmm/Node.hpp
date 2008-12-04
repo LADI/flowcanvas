@@ -21,6 +21,7 @@
 #include <string>
 #include <stdexcept>
 #include <librdf.h>
+#include <glibmm/ustring.h>
 #include "redlandmm/Wrapper.hpp"
 
 namespace Redland {
