@@ -24,7 +24,8 @@ def build(bld):
 
 	obj = bld.new_task_gen('cxx', 'shlib')
 	obj.source = core_source
-	obj.includes     = ['.', '..']
+	obj.export_incdirs = ['.']
+	obj.includes     = '.'
 	obj.name         = 'libmachina_engine'
 	obj.target       = 'machina_engine'
 	core_libs = 'GLIBMM GTHREAD RAUL REDLANDMM JACK EUGENE'

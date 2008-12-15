@@ -56,6 +56,7 @@ def build(bld):
 	
 	# Library
 	obj = bld.new_task_gen('cxx', 'shlib')
+	obj.export_incdirs = ['.']
 	obj.source = '''
 		src/Canvas.cpp 
 		src/Connectable.cpp 
@@ -65,7 +66,7 @@ def build(bld):
 		src/Module.cpp 
 		src/Port.cpp
 	'''
-	obj.includes     = ['.']
+	obj.includes     = ['.', './src']
 	obj.name         = 'libflowcanvas'
 	obj.target       = 'flowcanvas'
 	obj.uselib       = 'GTKMM GNOMECANVASMM AGRAPH'

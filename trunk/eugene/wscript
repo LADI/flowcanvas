@@ -56,7 +56,8 @@ def build(bld):
 		src/Sphere.cpp
 		src/TSP.cpp
 	'''
-	obj.includes     = ['.']
+	obj.export_incdirs = ['.']
+	obj.includes     = ['.', './src']
 	obj.name         = 'libeugene'
 	obj.target       = 'eugene'
 	obj.uselib       = 'GLIBMM GTHREAD'
@@ -66,7 +67,7 @@ def build(bld):
 	# Console app
 	prog = bld.new_task_gen('cxx', 'program')
 	prog.source       = 'src/eugene.cpp'
-	obj.includes      = ['.']
+	obj.includes      = ['.', './src']
 	prog.uselib_local = 'libeugene'
 	prog.target       = 'src/eugene'
 	prog.install_path = '${BINDIR}'
@@ -78,7 +79,7 @@ def build(bld):
 		gui/TSPCanvas.cpp
 		gui/eugene_tsp_gui.cpp
 	'''
-	obj.includes      = ['.']
+	obj.includes      = ['.', './src', './gui']
 	prog.uselib_local = 'libeugene'
 	prog.uselib       = 'GTKMM GLADEMM GTHREAD GNOMECANVASMM FLOWCANVAS'
 	prog.target       = 'gui/eugene_tsp_gui'

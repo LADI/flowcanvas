@@ -12,6 +12,7 @@ def build(bld):
 	'''
 
 	obj.includes       = ['.', '..', '../engine']
+	obj.export_incdirs = ['.']
 	obj.name           = 'libmachina_gui'
 	obj.target         = 'machina_gui'
 	obj.uselib_local   = 'libmachina_engine'

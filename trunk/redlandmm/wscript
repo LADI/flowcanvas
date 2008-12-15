@@ -41,7 +41,8 @@ def build(bld):
 		src/Query.cpp
 		src/World.cpp
 	'''
-	obj.includes = '..'
+	obj.export_incdirs = ['.']
+	obj.includes = ['.', './src']
 	obj.name     = 'libredlandmm'
 	obj.target   = 'redlandmm'
 	obj.uselib   = 'REDLAND GLIBMM GTHREAD'
@@ -51,7 +52,7 @@ def build(bld):
 	# Unit tests
 	obj = bld.new_task_gen('cxx', 'program')
 	obj.source       = 'tests/rdf_test.cpp'
-	obj.includes     = ['.']
+	obj.includes     = ['.', './src']
 	obj.uselib_local = 'libredlandmm'
 	obj.target       = 'tests/rdf_test'
 	obj.install_path = ''

@@ -51,7 +51,8 @@ def build(bld):
 		src/SMFReader.cpp
 		src/Sequence.cpp
 	'''
-	obj.includes     = ['.']
+	obj.export_incdirs = ['.']
+	obj.includes     = ['.', './src']
 	obj.name         = 'libevoral'
 	obj.target       = 'evoral'
 	obj.uselib       = 'GLIBMM GTHREAD'
@@ -61,7 +62,7 @@ def build(bld):
 	# Unit tests
 	obj              = bld.new_task_gen('cxx', 'program')
 	obj.source       = 'test/sequence.cpp'
-	obj.includes     = '..'
+	obj.includes     = ['.', './src']
 	obj.uselib_local = 'libevoral'
 	obj.target       = 'sequence'
 	obj.install_path = ''
