@@ -18,8 +18,6 @@
 #ifndef MACHINA_PROBLEM_HPP
 #define MACHINA_PROBLEM_HPP
 
-#include "config.h"
-
 #include <map>
 #include "raul/MIDISink.hpp"
 #include "machina/Machine.hpp"

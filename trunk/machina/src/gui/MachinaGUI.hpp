@@ -20,9 +20,9 @@
 
 #include <string>
 #include <libgnomecanvasmm.h>
+#include "config.h"
 #include "raul/SharedPtr.hpp"
 #include "raul/Maid.hpp"
-#include "machina/Engine.hpp"
 
 using namespace std;
 

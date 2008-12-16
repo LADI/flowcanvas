@@ -15,12 +15,12 @@
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
+#include "config.h"
 #include <signal.h>
 #include <iostream>
 #include <string>
 #include <libgnomecanvasmm.h>
 #include "redlandmm/World.hpp"
-#include "config.h"
 #include "machina/Machine.hpp"
 #include "machina/Loader.hpp"
 #include "machina/SMFDriver.hpp"

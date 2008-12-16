@@ -20,7 +20,7 @@
 
 #include "config.h"
 
-#if HAVE_EUGENE
+#ifdef HAVE_EUGENE
 	#include "eugene/Mutation.hpp"
 	#define SUPER : public Eugene::Mutation<Machine>
 #else
