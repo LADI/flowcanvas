@@ -83,7 +83,7 @@ osc_print_connect_port(LV2_Handle instance, uint32_t port, void* data)
 }
 
 
-static int
+static uint32_t
 osc_print_message_run(LV2_Handle instance, uint32_t* valid_inputs, uint32_t* valid_outputs)
 {
 	Print* plugin = (Print*)instance;

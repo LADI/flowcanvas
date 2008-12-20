@@ -55,9 +55,9 @@ typedef struct {
 	 * to that port in the duration of this function invocation.
 	 * The plugin must return 1 if outputs have been written, 0 otherwise.
 	 */
-	int (*message_run)(LV2_Handle instance,
-	                   uint32_t*  valid_inputs,
-	                   uint32_t*  valid_outputs);
+	uint32_t (*message_run)(LV2_Handle instance,
+	                        uint32_t*  valid_inputs,
+	                        uint32_t*  valid_outputs);
 
 	/** The message thread function alalogous to the LV2 connect_port
 	 * function.  This function must only be used to connect ports that
