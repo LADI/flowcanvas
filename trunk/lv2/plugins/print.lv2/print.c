@@ -83,8 +83,8 @@ osc_print_connect_port(LV2_Handle instance, uint32_t port, void* data)
 }
 
 
-static bool
-osc_print_message_run(LV2_Handle instance, uint32_t* outputs_written)
+static int
+osc_print_message_run(LV2_Handle instance, uint32_t* valid_inputs, uint32_t* valid_outputs)
 {
 	Print* plugin = (Print*)instance;
 
@@ -93,11 +93,11 @@ osc_print_message_run(LV2_Handle instance, uint32_t* outputs_written)
 		//for (uint32_t i=0; i < plugin->input_buffer->event_count; ++i)
 		//	lv2_osc_message_print(lv2_osc_buffer_get_message(plugin->input_buffer, i));
 		
-		LV2_CONTEXTS_SET_OUTPUT_WRITTEN(outputs_written, 0);
+		lv2_contexts_set_output_valid(valid_outputs, 0);
 		return true;
 	
 	} else {
-		LV2_CONTEXTS_UNSET_OUTPUT_WRITTEN(outputs_written, 0);
+		lv2_contexts_unset_output_valid(valid_outputs, 0);
 		return false;
 	}
 }

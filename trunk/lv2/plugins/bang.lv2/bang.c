@@ -87,8 +87,8 @@ bang_connect_port(LV2_Handle instance, uint32_t port, void* data)
 }
 
 
-static bool
-bang_message_run(LV2_Handle instance, uint32_t* outputs_written)
+static int
+bang_message_run(LV2_Handle instance, uint32_t* valid_inputs, uint32_t* valid_outputs)
 {
 	printf("BANG MESSAGE RUN\n");
 	/*
@@ -103,12 +103,12 @@ bang_message_run(LV2_Handle instance, uint32_t* outputs_written)
 
 		}
 		
-		LV2_CONTEXTS_SET_OUTPUT_WRITTEN(outputs_written, 1);
+		lv2_contexts_set_output_valid(valid_outputs, 1);
 		return true;
 	
 	} else {
 		
-		LV2_CONTEXTS_UNSET_OUTPUT_WRITTEN(outputs_written, 1);
+		lv2_contexts_unset_output_valid(valid_outputs, 1);
 		return false;
 
 	}

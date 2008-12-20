@@ -106,7 +106,7 @@ A context which is executed only when there is work to be done
 (e.g. a message is received).  Extension data is a pointer to a
 
 struct LV2BlockingContext {
-	bool (*run)(LV2Handle instance, uint8_t* outputs_written)
+	bool (*run)(LV2Handle instance, uint8_t* valid_inputs, uint8_t* valid_outputs)
 	void (*connect_port)(LV2_Handle instance, uint32_t port, void* data);
 }
 
@@ -114,10 +114,12 @@ When run is called, any pending input in ports associated with this context
 should be read, and true returned iff output was written (meaning plugins
 connected to ports where output has been written should be executed).
 
-The callback MUST set the nth bit of outputs_written to 1 if the port with
-index n was written to, otherwise 0.  The macros LV2_THREADS_SET_OUTPUT_WRITTEN
-and LV2_THREADS_UNSET_OUTPUT_WRITTEN are provided for this (see lv2_contexts.h).
-The callback MUST NOT touch any bits which correspond to ports for other contexts.
+Before calling run, the host MUST set the nth bit of valid_inputs to 1 if the
+input port with index n has valid input that should be processed, otherwise 0.
+Before returning from run, the plugin MUST set the nth bit of valid_outputs
+to 1 if the port with index n was written to, otherwise 0.
+The header lv2_contexts.h provides utility functions for these purposes.
+The plugin MUST NOT touch any bits corresponding to ports on another context.
 """ .
 
 
