@@ -19,7 +19,7 @@
 #ifndef EVORAL_MIDI_EVENT_HPP
 #define EVORAL_MIDI_EVENT_HPP
 
-#include "config.h"
+#include "wafconfig.h"
 #include "evoral/Event.hpp"
 #include "evoral/midi_events.h"
 #ifdef EVORAL_MIDI_XML
