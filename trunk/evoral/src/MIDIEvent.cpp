@@ -16,21 +16,30 @@
  * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include "wafconfig.h"
 #include "evoral/MIDIEvent.hpp"
 
 namespace Evoral {
 
 #ifdef EVORAL_MIDI_XML
 
-MIDIEvent::MIDIEvent(const XMLNode& event)
+MIDIEvent::MIDIEvent(const XMLNode& event) 
+  : Event()
 {
 	string name = event.name();
 	
 	if (name == "ControlChange") {
+		_buffer = (uint8_t*) ::malloc(3);
+		_owns_buffer = true;
+		set_type(MIDI_CMD_CONTROL);
 		
+		set_cc_number(atoi(event.property("Control")->value().c_str()));
+		set_cc_value (atoi(event.property("Value")->value().c_str()));
 	} else if (name == "ProgramChange") {
-		
+		_buffer = (uint8_t*) ::malloc(2);
+		_owns_buffer = true;
+		set_type(MIDI_CMD_PGM_CHANGE);
+
+		set_pgm_number(atoi(event.property("Number")->value().c_str()));
 	}
 }
 
