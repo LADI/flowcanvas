@@ -44,18 +44,26 @@ def set_options(opt):
 			help="Build documentation - requires doxygen [Default: False]")
 	opt.add_option('--bundle', action='store_true', default=False,
 			help="Build a self-contained bundle [Default: False]")
-	opt.add_option('--bindir', type='string', help="Executable programs [Default: PREFIX/bin]")
-	opt.add_option('--libdir', type='string', help="Libraries [Default: PREFIX/lib]")
-	opt.add_option('--includedir', type='string', help="Header files [Default: PREFIX/include]")
-	opt.add_option('--datadir', type='string', help="Shared data [Default: PREFIX/share]")
-	opt.add_option('--mandir', type='string', help="Manual pages [Default: DATADIR/man]")
-	opt.add_option('--htmldir', type='string', help="HTML documentation [Default: DATADIR/doc/PACKAGE]")
-	if sys.platform == "darwin":
-		opt.add_option('--lv2dir', type='string', help="LV2 bundles [Default: /Library/Audio/Plug-Ins/LV2]")
-	else:
-		opt.add_option('--lv2dir', type='string', help="LV2 bundles [Default: LIBDIR/lv2]")
+	opt.add_option('--bindir', type='string',
+			help="Executable programs [Default: PREFIX/bin]")
+	opt.add_option('--libdir', type='string',
+			help="Libraries [Default: PREFIX/lib]")
+	opt.add_option('--includedir', type='string',
+			help="Header files [Default: PREFIX/include]")
+	opt.add_option('--datadir', type='string',
+			help="Shared data [Default: PREFIX/share]")
+	opt.add_option('--mandir', type='string',
+			help="Manual pages [Default: DATADIR/man]")
+	opt.add_option('--htmldir', type='string',
+			help="HTML documentation [Default: DATADIR/doc/PACKAGE]")
 	opt.add_option('--lv2-user', action='store_true', default=False, dest='lv2_user',
 			help="Install LV2 bundles to user-local location [Default: False]")
+	if sys.platform == "darwin":
+		opt.add_option('--lv2dir', type='string',
+				help="LV2 bundles [Default: /Library/Audio/Plug-Ins/LV2]")
+	else:
+		opt.add_option('--lv2dir', type='string',
+				help="LV2 bundles [Default: LIBDIR/lv2]")
 	g_step = 1
 
 def check_header(conf, name, define='', mandatory=False):
