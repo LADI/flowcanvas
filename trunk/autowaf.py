@@ -10,6 +10,7 @@ import Configure
 import Options
 import Utils
 import sys
+from TaskGen import feature, before, after
 
 global g_is_child
 g_is_child = False
@@ -21,6 +22,12 @@ g_step = 0
 # Compute dependencies globally
 #import preproc
 #preproc.go_absolute = True
+
+@feature('cc', 'cxx')
+@after('apply_lib_vars')
+@before('apply_obj_vars_cc', 'apply_obj_vars_cxx')
+def include_config_h(self):
+	self.env.append_value('INC_PATHS', self.bld.srcnode) # config.h
 
 def set_options(opt):
 	"Add standard autowaf options if they havn't been added yet"

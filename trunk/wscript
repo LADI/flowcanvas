@@ -2,6 +2,7 @@
 import string
 import os
 import autowaf
+from TaskGen import feature, before, after
 
 # Variables for 'waf dist'
 VERSION = '0.0.1'
@@ -11,9 +12,11 @@ APPNAME = 'drobillad'
 srcdir = '.'
 blddir = 'build'
 	
-# Absolute paths (for building against local library versions)
-abssrcdir = os.path.abspath(srcdir)
-absblddir = os.path.abspath(blddir)
+@feature('cc', 'cxx')
+@after('apply_lib_vars')
+@before('apply_obj_vars_cc', 'apply_obj_vars_cxx')
+def include_lv2_h(self):
+	self.env.append_value('INC_PATHS', self.bld.path.find_dir('lv2core'))
 
 def set_options(opt):
 	autowaf.set_options(opt)
