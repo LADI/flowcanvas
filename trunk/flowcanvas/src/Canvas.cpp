@@ -88,7 +88,7 @@ Canvas::lock(bool l)
 {
 	_locked = l;
 	if (l)
-		_base_rect.property_fill_color_rgba() = 0x232425FF;
+		_base_rect.property_fill_color_rgba() = 0x131415FF;
 	else
 		_base_rect.property_fill_color_rgba() = 0x000000FF;
 
