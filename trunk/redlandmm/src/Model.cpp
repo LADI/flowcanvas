@@ -236,7 +236,11 @@ Model::add_statement(const Node& subject,
 
 	assert(subject.get_node());
 	assert(predicate.get_node());
-	assert(object.get_node());
+
+	if (!object.get_node()) {
+		cerr << "WARNING: Object node is nil, statement skipped" << endl;
+		return;
+	}
 
 	librdf_statement* triple = librdf_new_statement_from_nodes(_world.world(),
 			subject.get_node(), predicate.get_node(), object.get_node());
@@ -251,6 +255,11 @@ Model::add_statement(const Node&   subject,
                      const Node&   object)
 {
 	Glib::Mutex::Lock lock(_world.mutex());
+	
+	if (!object.get_node()) {
+		cerr << "WARNING: Object node is nil, statement skipped" << endl;
+		return;
+	}
 
 	const string predicate_uri = _world.expand_uri(predicate_id);
 	librdf_node* predicate = librdf_new_node_from_uri_string(_world.world(),
