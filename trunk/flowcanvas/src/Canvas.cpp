@@ -706,6 +706,9 @@ Canvas::port_event(GdkEvent* event, boost::weak_ptr<Port> weak_port)
 			} else {
 				port_dragging = true;
 			}
+			cerr << "PORT PRESS GRAB" << endl;
+			port->grab(GDK_POINTER_MOTION_MASK | GDK_BUTTON_RELEASE_MASK | GDK_LEAVE_NOTIFY_MASK,
+					Gdk::Cursor(Gdk::ARROW), event->button.time);
 		} else if (event->button.button == 3) {
 			port->popup_menu(event->button.button, event->button.time);
 		} else {
@@ -737,6 +740,10 @@ Canvas::port_event(GdkEvent* event, boost::weak_ptr<Port> weak_port)
 		break;
 
 	case GDK_BUTTON_RELEASE:
+		if (event->button.button == 1) {
+			cerr << "PORT RELEASE UNGRAB" << endl;
+			port->ungrab(event->button.time);
+		}
 		if (port_dragging) {
 			if (_connect_port) { // dragging
 				ports_joined(port, _connect_port);
@@ -758,8 +765,6 @@ Canvas::port_event(GdkEvent* event, boost::weak_ptr<Port> weak_port)
 		} else {
 			handled = false;
 		}
-		cerr << "PORT RELEASE UNGRAB" << endl;
-		_base_rect.ungrab(event->button.time);
 		break;
 
 	case GDK_ENTER_NOTIFY:
@@ -775,7 +780,9 @@ Canvas::port_event(GdkEvent* event, boost::weak_ptr<Port> weak_port)
 			_drag_state = CONNECTION;
 			_connect_port = port;
 			
-			cerr << "PORT LEAVE GRAB" << endl;
+			cerr << "PORT LEAVE PRESS UNGRAB" << endl;
+			port->ungrab(event->button.time);
+			cerr << "PORT LEAVE DRAG GRAB" << endl;
 			_base_rect.grab(GDK_POINTER_MOTION_MASK | GDK_BUTTON_RELEASE_MASK,
 				Gdk::Cursor(Gdk::CROSSHAIR), event->button.time);
 
@@ -877,7 +884,7 @@ Canvas::scroll_drag_handler(GdkEvent* event)
 	
 	if (event->type == GDK_BUTTON_PRESS && event->button.button == 2) {
 		cerr << "SCROLL GRAB" << endl;
-		_base_rect.grab(GDK_POINTER_MOTION_MASK | GDK_BUTTON_RELEASE_MASK | GDK_BUTTON_PRESS_MASK,
+		_base_rect.grab(GDK_POINTER_MOTION_MASK | GDK_BUTTON_RELEASE_MASK,
 			Gdk::Cursor(Gdk::FLEUR), event->button.time);
 		get_scroll_offsets(original_scroll_x, original_scroll_y);
 		scroll_offset_x = 0;
@@ -934,6 +941,9 @@ Canvas::select_drag_handler(GdkEvent* event)
 		_select_rect->property_width_units() = 0.5;
 		_select_rect->lower_to_bottom();
 		_base_rect.lower_to_bottom();
+		cerr << "SELECT PRESS GRAB" << endl;
+		_base_rect.grab(GDK_POINTER_MOTION_MASK | GDK_BUTTON_RELEASE_MASK,
+				Gdk::Cursor(Gdk::ARROW), event->button.time);
 		return true;
 	} else if (event->type == GDK_MOTION_NOTIFY && _drag_state == SELECT) {
 		assert(_select_rect);
@@ -1136,9 +1146,6 @@ Canvas::connection_drag_handler(GdkEvent* event)
 			drag_connection->update_location();
 		}
 	} else if (event->type == GDK_BUTTON_RELEASE && _drag_state == CONNECTION) {
-		cerr << "CONNECTION RELEASE UNGRAB 1" << endl;
-		_base_rect.ungrab(event->button.time);
-		
 		double x = event->button.x;
 		double y = event->button.y;
 		_base_rect.i2w(x, y);
@@ -1172,7 +1179,7 @@ Canvas::connection_drag_handler(GdkEvent* event)
 		
 		// Clean up dragging stuff
 		
-		cerr << "CONNECTION RELEASE UNGRAB 2" << endl;
+		cerr << "CONNECTION RELEASE UNGRAB" << endl;
 		_base_rect.ungrab(event->button.time);
 		
 		if (_connect_port)

@@ -96,9 +96,8 @@ Item::on_event(GdkEvent* event)
 			drag_start_x = x;
 			drag_start_y = y;
 			cerr << "ITEM PRESS GRAB" << endl;
-			grab(GDK_POINTER_MOTION_MASK | GDK_BUTTON_RELEASE_MASK | GDK_BUTTON_PRESS_MASK,
-			           Gdk::Cursor(Gdk::FLEUR),
-			           event->button.time);
+			grab(GDK_POINTER_MOTION_MASK | GDK_BUTTON_RELEASE_MASK,
+					Gdk::Cursor(Gdk::FLEUR), event->button.time);
 			dragging = true;
 		}
 		break;
