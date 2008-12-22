@@ -39,7 +39,7 @@ def configure(conf):
 	build_gui = conf.env['HAVE_GLADEMM'] == 1 and conf.env['HAVE_FLOWCANVAS'] == 1
 
 	conf.define('MACHINA_VERSION', MACHINA_VERSION)
-	conf.define('BUILD_GUI', build_gui)
+	conf.define('BUILD_MACHINA_GUI', int(build_gui))
 	if conf.env['BUNDLE']:
 		conf.define('MACHINA_DATA_DIR', os.path.normpath(
 				conf.env['DATADIRNAME'] + 'machina'))
@@ -52,13 +52,13 @@ def configure(conf):
 	autowaf.print_summary(conf)
 	autowaf.display_header('Machina Configuration')
 	autowaf.display_msg(conf, "Jack", str(conf.env['HAVE_JACK'] == 1))
-	autowaf.display_msg(conf, "Build GUI", str(conf.env['BUILD_GUI'] == 1))
+	autowaf.display_msg(conf, "GUI", str(conf.env['BUILD_MACHINA_GUI'] == 1))
 	print
 
 def build(bld):
 	bld.add_subdirs('src/engine')
 
-	if bld.env['BUILD_GUI']:
+	if bld.env['BUILD_MACHINA_GUI']:
 		bld.add_subdirs('src/gui')
 
 	#bld.add_subdirs('src/machina')

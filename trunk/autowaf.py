@@ -74,11 +74,11 @@ def check_header(conf, name, define='', mandatory=False):
 	checked = conf.env['AUTOWAF_HEADERS']
 	if not name in checked:
 		checked[name] = True
-		conf.check(header_name=name)
-		found = bool(conf.env['LIB_' + name.upper()])
-		if found and define != '':
-			conf.define(define, int(found))
-		if mandatory and not found:
+		if define != '':
+			conf.check(header_name=name, define_name=define)
+		else:
+			conf.check(header_name=name)
+		if mandatory and not conf.env['LIB_' + name.upper()]:
 			raise Configure.ConfigurationError("Required header not found")
 
 def check_tool(conf, name):
@@ -196,7 +196,7 @@ def configure(conf):
 	g_step = 2
 	
 def set_local_lib(conf, name, has_objects):
-	conf.define('HAVE_' + name.upper(), True)
+	conf.define('HAVE_' + name.upper(), 1)
 	if has_objects:
 		if type(conf.env['AUTOWAF_LOCAL_LIBS']) != dict:
 			conf.env['AUTOWAF_LOCAL_LIBS'] = {}
@@ -239,7 +239,7 @@ def display_msg(conf, msg, status = None, color = None):
 		color = 'GREEN'
 	elif type(status) == bool and not status or status == "False":
 		color = 'YELLOW'
-	print "%s :" % msg.ljust(conf.line_just),
+	print "%s : " % msg.ljust(conf.line_just),
 	Utils.pprint(color, status)
 
 def print_summary(conf):
