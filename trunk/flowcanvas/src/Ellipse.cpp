@@ -323,7 +323,7 @@ Ellipse::resize()
 	// side that the port isn't right on the edge).
 	double hor_pad = 5.0;
 	if (!_title_visible)
-		hor_pad = 15.0; // leave more room for something to grab for dragging
+		hor_pad = 15.0; // leave more room for a mouse target for dragging
 
 	boost::shared_ptr<Port> p;
 	

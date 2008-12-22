@@ -79,6 +79,7 @@ Item::on_event(GdkEvent* event)
 
 	case GDK_2BUTTON_PRESS:
 		if (dragging) {
+			cerr << "ITEM 2_PRESS UNGRAB" << endl;
 			ungrab(event->button.time);
 			dragging = false;
 		}
@@ -94,6 +95,7 @@ Item::on_event(GdkEvent* event)
 			// happened (if not, it's just a click)
 			drag_start_x = x;
 			drag_start_y = y;
+			cerr << "ITEM PRESS GRAB" << endl;
 			grab(GDK_POINTER_MOTION_MASK | GDK_BUTTON_RELEASE_MASK | GDK_BUTTON_PRESS_MASK,
 			           Gdk::Cursor(Gdk::FLEUR),
 			           event->button.time);
@@ -124,6 +126,7 @@ Item::on_event(GdkEvent* event)
 
 	case GDK_BUTTON_RELEASE:
 		if (dragging) {
+			cerr << "ITEM RELEASE UNGRAB" << endl;
 			ungrab(event->button.time);
 			dragging = false;
 			if (click_x != drag_start_x || click_y != drag_start_y) {

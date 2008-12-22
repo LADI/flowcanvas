@@ -758,6 +758,7 @@ Canvas::port_event(GdkEvent* event, boost::weak_ptr<Port> weak_port)
 		} else {
 			handled = false;
 		}
+		cerr << "PORT RELEASE UNGRAB" << endl;
 		_base_rect.ungrab(event->button.time);
 		break;
 
@@ -774,6 +775,7 @@ Canvas::port_event(GdkEvent* event, boost::weak_ptr<Port> weak_port)
 			_drag_state = CONNECTION;
 			_connect_port = port;
 			
+			cerr << "PORT LEAVE GRAB" << endl;
 			_base_rect.grab(GDK_POINTER_MOTION_MASK | GDK_BUTTON_RELEASE_MASK,
 				Gdk::Cursor(Gdk::CROSSHAIR), event->button.time);
 
@@ -874,6 +876,7 @@ Canvas::scroll_drag_handler(GdkEvent* event)
 	bool first_motion = true;
 	
 	if (event->type == GDK_BUTTON_PRESS && event->button.button == 2) {
+		cerr << "SCROLL GRAB" << endl;
 		_base_rect.grab(GDK_POINTER_MOTION_MASK | GDK_BUTTON_RELEASE_MASK | GDK_BUTTON_PRESS_MASK,
 			Gdk::Cursor(Gdk::FLEUR), event->button.time);
 		get_scroll_offsets(original_scroll_x, original_scroll_y);
@@ -903,6 +906,7 @@ Canvas::scroll_drag_handler(GdkEvent* event)
 		last_x = x;
 		last_y = y;
 	} else if (event->type == GDK_BUTTON_RELEASE && _drag_state == SCROLL) {
+		cerr << "SCROLL UNGRAB" << endl;
 		_base_rect.ungrab(event->button.time);
 		_drag_state = NOT_DRAGGING;
 	} else {
@@ -958,6 +962,7 @@ Canvas::select_drag_handler(GdkEvent* event)
 			}
 		}
 		
+		cerr << "SELECT RELEASE UNGRAB" << endl;
 		_base_rect.ungrab(event->button.time);
 		
 		delete _select_rect;
@@ -1131,6 +1136,7 @@ Canvas::connection_drag_handler(GdkEvent* event)
 			drag_connection->update_location();
 		}
 	} else if (event->type == GDK_BUTTON_RELEASE && _drag_state == CONNECTION) {
+		cerr << "CONNECTION RELEASE UNGRAB 1" << endl;
 		_base_rect.ungrab(event->button.time);
 		
 		double x = event->button.x;
@@ -1166,6 +1172,7 @@ Canvas::connection_drag_handler(GdkEvent* event)
 		
 		// Clean up dragging stuff
 		
+		cerr << "CONNECTION RELEASE UNGRAB 2" << endl;
 		_base_rect.ungrab(event->button.time);
 		
 		if (_connect_port)
