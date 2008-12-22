@@ -298,20 +298,6 @@ def build_pc(bld, name, version, libs):
 		obj.dict[i + '_LIBS']   = link_flags(bld.env, i)
 		obj.dict[i + '_CFLAGS'] = compile_flags(bld.env, i)
 
-# Wrapper script (for bundle)
-def build_wrapper(bld, template, prog):
-	if not bld.env['BUNDLE']:
-		return
-	obj              = bld.new_task_gen('subst')
-	obj.chmod        = 0755
-	obj.source       = template
-	obj.install_path = '${PREFIX}'
-	obj.dict = {
-		'EXECUTABLE'   : prog.target + ".bin",
-		'LIB_DIR_NAME' : bld.env['LIBDIRNAME']
-	}
-	prog.target = prog.target + '.bin'
-
 # Doxygen API documentation
 def build_dox(bld, name, version, srcdir, blddir):
 	if not bld.env['BUILD_DOCS']:
