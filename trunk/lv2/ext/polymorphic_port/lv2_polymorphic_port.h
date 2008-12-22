@@ -34,13 +34,13 @@
 /** The data field of the LV2_Feature for this extension.
  *
  * To support this feature the host must pass an LV2_Feature struct to the
- * instantiate method with URI "http://lv2plug.in/ns/ext/data-access"
+ * instantiate method with URI "http://lv2plug.in/ns/ext/polymorphic-port"
  * and data pointed to an instance of this struct.
  */
 typedef struct {
 	
 	/** A URI mapped to an integer with the LV2 URI map extension
-	 * <http://lv2plug.in/ns/ext/uri-map> which described the type of
+	 * <http://lv2plug.in/ns/ext/uri-map> which describes the type of
 	 * data pointed to by buf.
 	 */
 	uint32_t type;
