@@ -465,7 +465,7 @@ Canvas::remove_item(boost::shared_ptr<Item> item)
 
 boost::shared_ptr<Connection>
 Canvas::remove_connection(boost::shared_ptr<Connectable> item1,
-                              boost::shared_ptr<Connectable> item2)
+                          boost::shared_ptr<Connectable> item2)
 {
 	boost::shared_ptr<Connection> ret;
 
@@ -493,7 +493,7 @@ Canvas::remove_connection(boost::shared_ptr<Connectable> item1,
  */
 bool
 Canvas::are_connected(boost::shared_ptr<const Connectable> tail,
-                          boost::shared_ptr<const Connectable> head)
+                      boost::shared_ptr<const Connectable> head)
 {
 	for (ConnectionList::const_iterator c = _connections.begin(); c != _connections.end(); ++c) {
 		const boost::shared_ptr<Connectable> src = (*c)->source().lock();
@@ -834,7 +834,8 @@ void
 Canvas::on_parent_changed(Gtk::Widget* old_parent)
 {
 	_parent_event_connection.disconnect();
-	_parent_event_connection = get_parent()->signal_event().connect(sigc::mem_fun(*this, &Canvas::frame_event));
+	_parent_event_connection = get_parent()->signal_event().connect(
+			sigc::mem_fun(*this, &Canvas::frame_event));
 }
 
 
@@ -980,10 +981,12 @@ Canvas::animate_selected()
 	
 	_select_dash->offset = i;
 	
-	for (list<boost::shared_ptr<Item> >::iterator m = _selected_items.begin(); m != _selected_items.end(); ++m)
+	for (ItemList::iterator m = _selected_items.begin();
+			m != _selected_items.end(); ++m)
 		(*m)->select_tick();
 	
-	for (list<boost::shared_ptr<Connection> >::iterator c = _selected_connections.begin(); c != _selected_connections.end(); ++c)
+	for (ConnectionList::iterator c = _selected_connections.begin();
+			c != _selected_connections.end(); ++c)
 		(*c)->select_tick();
 	
 	return true;
@@ -1116,7 +1119,8 @@ Canvas::connection_drag_handler(GdkEvent* event)
 					drag_module->set_height(m->height());
 					drag_port->property_x() = p->property_x().get_value();
 					drag_port->property_y() = p->property_y().get_value();
-					// Make the drag port as wide as the snapped port so the connection coords are the same
+					// Make the drag port as wide as the snapped port
+					// so the connection coords are the same
 					drag_port->_rect->property_x2() = p->_rect->property_x2().get_value();
 					drag_port->_rect->property_y2() = p->_rect->property_y2().get_value();
 				}
@@ -1142,7 +1146,7 @@ Canvas::connection_drag_handler(GdkEvent* event)
 			drag_connection->show();
 	
 		if (p) {
-			if (p == _connect_port) {   // drag ended on same port it started on
+			if (p == _connect_port) {  // drag ended on same port it started on
 				if (_selected_ports.empty()) {  // no active port, just activate (hilite) it
 					select_port(_connect_port);
 				} else {  // there is already an active port, connect it with this one
