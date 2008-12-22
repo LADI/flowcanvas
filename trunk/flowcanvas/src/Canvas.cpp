@@ -706,9 +706,6 @@ Canvas::port_event(GdkEvent* event, boost::weak_ptr<Port> weak_port)
 			} else {
 				port_dragging = true;
 			}
-			cerr << "{ PORT PRESS" << endl;
-			port->grab(GDK_POINTER_MOTION_MASK | GDK_BUTTON_RELEASE_MASK | GDK_LEAVE_NOTIFY_MASK,
-					Gdk::Cursor(Gdk::ARROW), event->button.time);
 		} else if (event->button.button == 3) {
 			port->popup_menu(event->button.button, event->button.time);
 		} else {
@@ -740,10 +737,6 @@ Canvas::port_event(GdkEvent* event, boost::weak_ptr<Port> weak_port)
 		break;
 
 	case GDK_BUTTON_RELEASE:
-		if (event->button.button == 1) {
-			cerr << "} PORT RELEASE" << endl;
-			port->ungrab(event->button.time);
-		}
 		if (port_dragging) {
 			if (_connect_port) { // dragging
 				ports_joined(port, _connect_port);
@@ -780,11 +773,11 @@ Canvas::port_event(GdkEvent* event, boost::weak_ptr<Port> weak_port)
 			_drag_state = CONNECTION;
 			_connect_port = port;
 			
-			cerr << "} PORT PRESS LEAVE" << endl;
-			port->ungrab(event->button.time);
+			//cerr << "} PORT PRESS LEAVE" << endl;
+			//port->ungrab(event->crossing.time);
 			cerr << "{ PORT LEAVE" << endl;
-			_base_rect.grab(GDK_POINTER_MOTION_MASK | GDK_BUTTON_RELEASE_MASK,
-				Gdk::Cursor(Gdk::CROSSHAIR), event->button.time);
+			_base_rect.grab(GDK_BUTTON_PRESS_MASK | GDK_POINTER_MOTION_MASK | GDK_BUTTON_RELEASE_MASK,
+				Gdk::Cursor(Gdk::CROSSHAIR), event->crossing.time);
 
 			port_dragging = false;
 		} else if (!control_dragging) {
@@ -1146,6 +1139,9 @@ Canvas::connection_drag_handler(GdkEvent* event)
 			drag_connection->update_location();
 		}
 	} else if (event->type == GDK_BUTTON_RELEASE && _drag_state == CONNECTION) {
+		cerr << "} CONNECTION RELEASE" << endl;
+		_base_rect.ungrab(event->button.time);
+		
 		double x = event->button.x;
 		double y = event->button.y;
 		_base_rect.i2w(x, y);
@@ -1178,9 +1174,6 @@ Canvas::connection_drag_handler(GdkEvent* event)
 		}
 		
 		// Clean up dragging stuff
-		
-		cerr << "} CONNECTION RELEASE" << endl;
-		_base_rect.ungrab(event->button.time);
 		
 		if (_connect_port)
 			_connect_port->set_highlighted(false);
