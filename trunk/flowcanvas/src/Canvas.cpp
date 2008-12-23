@@ -772,14 +772,10 @@ Canvas::port_event(GdkEvent* event, boost::weak_ptr<Port> weak_port)
 		if (port_dragging) {
 			_drag_state = CONNECTION;
 			_connect_port = port;
-			
-			//cerr << "} PORT PRESS LEAVE" << endl;
-			//port->ungrab(event->crossing.time);
-			cerr << "{ PORT LEAVE" << endl;
-			_base_rect.grab(GDK_BUTTON_PRESS_MASK | GDK_POINTER_MOTION_MASK | GDK_BUTTON_RELEASE_MASK,
-				Gdk::Cursor(Gdk::CROSSHAIR), event->crossing.time);
-
 			port_dragging = false;
+			_base_rect.grab(
+				GDK_BUTTON_PRESS_MASK|GDK_POINTER_MOTION_MASK|GDK_BUTTON_RELEASE_MASK,
+				Gdk::Cursor(Gdk::CROSSHAIR), event->crossing.time);
 		} else if (!control_dragging) {
 			port->set_highlighted(false);
 		}
@@ -876,8 +872,7 @@ Canvas::scroll_drag_handler(GdkEvent* event)
 	bool first_motion = true;
 	
 	if (event->type == GDK_BUTTON_PRESS && event->button.button == 2) {
-		cerr << "{ SCROLL" << endl;
-		_base_rect.grab(GDK_POINTER_MOTION_MASK | GDK_BUTTON_RELEASE_MASK,
+		_base_rect.grab(GDK_POINTER_MOTION_MASK|GDK_BUTTON_RELEASE_MASK,
 			Gdk::Cursor(Gdk::FLEUR), event->button.time);
 		get_scroll_offsets(original_scroll_x, original_scroll_y);
 		scroll_offset_x = 0;
@@ -906,7 +901,6 @@ Canvas::scroll_drag_handler(GdkEvent* event)
 		last_x = x;
 		last_y = y;
 	} else if (event->type == GDK_BUTTON_RELEASE && _drag_state == SCROLL) {
-		cerr << "} SCROLL" << endl;
 		_base_rect.ungrab(event->button.time);
 		_drag_state = NOT_DRAGGING;
 	} else {
@@ -934,8 +928,7 @@ Canvas::select_drag_handler(GdkEvent* event)
 		_select_rect->property_width_units() = 0.5;
 		_select_rect->lower_to_bottom();
 		_base_rect.lower_to_bottom();
-		cerr << "{ SELECT PRESS" << endl;
-		_base_rect.grab(GDK_POINTER_MOTION_MASK | GDK_BUTTON_RELEASE_MASK,
+		_base_rect.grab(GDK_POINTER_MOTION_MASK|GDK_BUTTON_RELEASE_MASK,
 				Gdk::Cursor(Gdk::ARROW), event->button.time);
 		return true;
 	} else if (event->type == GDK_MOTION_NOTIFY && _drag_state == SELECT) {
@@ -965,7 +958,6 @@ Canvas::select_drag_handler(GdkEvent* event)
 			}
 		}
 		
-		cerr << "} SELECT RELEASE" << endl;
 		_base_rect.ungrab(event->button.time);
 		
 		delete _select_rect;
@@ -1139,7 +1131,6 @@ Canvas::connection_drag_handler(GdkEvent* event)
 			drag_connection->update_location();
 		}
 	} else if (event->type == GDK_BUTTON_RELEASE && _drag_state == CONNECTION) {
-		cerr << "} CONNECTION RELEASE" << endl;
 		_base_rect.ungrab(event->button.time);
 		
 		double x = event->button.x;
