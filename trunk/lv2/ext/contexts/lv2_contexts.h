@@ -36,7 +36,7 @@ lv2_contexts_unset_port_valid(void* flags, uint32_t index) {
 }
 
 static inline int
-lv2_contexts_port_is_valid(void* flags, uint32_t index) {
+lv2_contexts_port_is_valid(const void* flags, uint32_t index) {
 	return (((uint8_t*)flags)[index / 8] & (1 << (index % 8))) != 0;
 }
 
