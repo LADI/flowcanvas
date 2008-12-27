@@ -88,7 +88,7 @@ bang_connect_port(LV2_Handle instance, uint32_t port, void* data)
 
 
 static uint32_t
-bang_message_run(LV2_Handle instance, uint32_t* valid_inputs, uint32_t* valid_outputs)
+bang_message_run(LV2_Handle instance, const void* valid_inputs, void* valid_outputs)
 {
 	printf("BANG MESSAGE RUN\n");
 	/*
