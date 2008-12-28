@@ -93,22 +93,24 @@ def check_tool(conf, name):
 
 def check_pkg(conf, name, **args):
 	"Check for a package iff it hasn't been checked for yet"
-	var_name = 'HAVE_' + args['destvar']
+	var_name = 'HAVE_' + args['uselib_store']
 	check = not var_name in conf.env
-	if not check and 'vnum' in args:
+	if not check and 'atleast_version' in args:
 		# Re-check if version is newer than previous check
 		checked_version = conf.env['VERSION_' + name]
-		if checked_version and checked_version < args['vnum']:
+		if checked_version and checked_version < args['atleast_version']:
 			check = True;
 	if check:
-		found = conf.check_cfg(package=name, uselib_store=args['destvar'], args="--cflags --libs")
-		found = bool(conf.env['HAVE_' + args['destvar']])
+		conf.check_cfg(package=name, args="--cflags --libs", **args)
+		found = bool(conf.env['HAVE_' + args['uselib_store']])
 		if found:
-			if 'vnum' in args:
-				conf.env['VERSION_' + name] = args['vnum']
-			conf.define('HAVE_' + args['destvar'], int(found))
-		elif args['mandatory'] == True:
-			conf.fatal("Required package " + name + " not found")
+			conf.define('HAVE_' + args['uselib_store'], int(found))
+			if 'atleast_version' in args:
+				conf.env['VERSION_' + name] = args['atleast_version']
+		else:
+			conf.undefine('HAVE_' + args['uselib_store'])
+			if args['mandatory'] == True:
+				conf.fatal("Required package " + name + " not found")
 
 def chop_prefix(conf, var):
 	name = conf.env[var][len(conf.env['PREFIX']):]

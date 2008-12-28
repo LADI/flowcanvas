@@ -19,7 +19,7 @@ def set_options(opt):
 def configure(conf):
 	autowaf.check_tool(conf, 'compiler_cc')
 	autowaf.check_tool(conf, 'compiler_cxx')
-	autowaf.check_pkg(conf, 'lv2core', destvar='LV2CORE', vnum='1', mandatory=True)
+	autowaf.check_pkg(conf, 'lv2core', uselib_store='LV2CORE', atleast_version='1', mandatory=True)
 	conf.env.append_value('CCFLAGS', '-std=c99')
 	pat = conf.env['shlib_PATTERN']
 	ext = pat[pat.rfind('.'):]
