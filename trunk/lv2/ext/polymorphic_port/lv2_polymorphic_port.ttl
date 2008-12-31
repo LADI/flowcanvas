@@ -19,14 +19,14 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-@prefix :      <http://lv2plug.in/ns/ext/polymorphic-port#> .
+@prefix :      <http://lv2plug.in/ns/dev/polymorphic-port#> .
 @prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix doap:  <http://usefulinc.com/ns/doap#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 
-<http://lv2plug.in/ns/ext/polymorphic-port> a lv2:Specification ;
+<http://lv2plug.in/ns/dev/polymorphic-port> a lv2:Specification ;
 	doap:license <http://usefulinc.com/doap/licenses/mit> ;
 	doap:name "LV2 Polymorphic Ports" ;
 	rdfs:comment "Defines LV2 ports which can dynamically change type" ;
@@ -42,29 +42,16 @@
     rdfs:label      "Polymorphic port" ;
     rdfs:subClassOf lv2:Port ;
     rdfs:comment    """
-Ports of this type contain a struct of type LV2_Polymorphic_Buffer,
-defined in <lv2_polymorphic_port.h>.  These ports contain a pointer
-and a uint32_t type field which is a URI mapped to an integer (using the
-LV2 URI Map extension) which describes the type of data pointed to.
+Ports of this type may be connected to buffers of several types.  The plugin
+provides a set_type function for the host to specify which type a port is
+currently connected to.
 
-Hosts MUST obey the following rules in order to instantiate a plugin
-with polymorphic ports:
-
-  * When connecting polymorphic ports to buffers, the type field of that
-    buffer MUST be set appropriately.  The type field of a buffer MUST NOT
-    be changed at any other time (i.e. if the type is changed connect_port
-    MUST be called to notify the port of the change, even if the port is
-	connected to the same LV2_Polymorphic_Buffer)
-
-  * When connecting output polymorphic ports, the type field MAY be set
-    to 0 to indicate the plugin may produce any (supported) type based
-    on the types of its inputs.  The plugin MUST then set the type field
-    to the type it has chosen.  Otherwise, the type field MUST be set to
-    the host expects to receive from the plugin.  If a port is :generic
-    but a plugin cannot produce the requested output type, the plugin
-    MUST set the type field to 0.  The host MUST check for this situation
-    when connecting any :generic port to a buffer with a type not explicitly
-    listed as supported by the port with :supportsType.
+A Port specifies the types it supports using the :supportsType property.
+The type specific in the normal LV2 manner (<port> a <sometype>) is the
+"default type".  If the port is connected without set_type being called
+for that port, the type of the buffer is assumed to be the default type.
+In this way polymorphic plugins are backwards compatible and may be used by
+hosts which are not aware of the polymorphic port extension.
 """ .
 
 :generic a lv2:PortProperty ;
