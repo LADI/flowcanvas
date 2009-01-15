@@ -194,6 +194,7 @@ def configure(conf):
 	if Options.options.strict:
 		conf.env['CCFLAGS'] = '-O0 -g -std=c99 -pedantic'
 		append_cxx_flags('-Wall -Wextra -Wno-unused-parameter')
+		conf.env.append_value('CXXFLAGS', '-Woverloaded-virtual')
 	append_cxx_flags('-fPIC -DPIC')
 	g_step = 2
 	
