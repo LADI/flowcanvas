@@ -758,29 +758,23 @@ ControlList::unlocked_eval (double x) const
 	double fraction;
 
 	const_iterator length_check_iter = _events.begin();
-	for (npoints = 0; npoints < 4; ++npoints, ++length_check_iter)
-		if (length_check_iter == _events.end())
+	for (npoints = 0; npoints < 4; ++npoints, ++length_check_iter) {
+		if (length_check_iter == _events.end()) {
 			break;
+		}
+	}
 
 	switch (npoints) {
 	case 0:
 		return _default_value;
 
 	case 1:
-		if (x >= _events.front()->when) {
-			return _events.front()->value;
-		} else {
-			// return _default_value;
-			return _events.front()->value;
-		} 
+		return _events.front()->value;
 		
 	case 2:
 		if (x >= _events.back()->when) {
 			return _events.back()->value;
-		} else if (x == _events.front()->when) {
-			return _events.front()->value;
- 		} else if (x < _events.front()->when) {
-			// return _default_value;
+ 		} else if (x <= _events.front()->when) {
 			return _events.front()->value;
 		}
 
@@ -789,32 +783,26 @@ ControlList::unlocked_eval (double x) const
 		upos = _events.back()->when;
 		uval = _events.back()->value;
 		
-		if (_interpolation == Discrete)
+		if (_interpolation == Discrete) {
 			return lval;
+		}
 
-		/* linear interpolation betweeen the two points
-		*/
-
+		/* linear interpolation betweeen the two points */
 		fraction = (double) (x - lpos) / (double) (upos - lpos);
 		return lval + (fraction * (uval - lval));
 
 	default:
-
 		if (x >= _events.back()->when) {
 			return _events.back()->value;
-		} else if (x == _events.front()->when) {
-			return _events.front()->value;
- 		} else if (x < _events.front()->when) {
-			// return _default_value;
+ 		} else if (x <= _events.front()->when) {
 			return _events.front()->value;
 		}
 
 		return multipoint_eval (x);
-		break;
 	}
 
 	/*NOTREACHED*/ /* stupid gcc */
-	return 0.0;
+	return _default_value;
 }
 
 double
@@ -971,7 +959,7 @@ ControlList::rt_safe_earliest_event_discrete_unlocked (double start, double end,
 		const bool past_start = (inclusive ? first->when >= start : first->when > start);
 
 		/* Earliest points is in range, return it */
-		if (past_start >= start && first->when < end) {
+		if (past_start && first->when < end) {
 
 			x = first->when;
 			y = first->value;
@@ -1005,7 +993,7 @@ ControlList::rt_safe_earliest_event_discrete_unlocked (double start, double end,
 bool
 ControlList::rt_safe_earliest_event_linear_unlocked (double start, double end, double& x, double& y, bool inclusive) const
 {
-	//cerr << "earliest_event(" << start << ", " << end << ", " << x << ", " << y << ", " << inclusive << endl;
+	cerr << "earliest_event(start: " << start << ", end: " << end << ", x: " << x << ", y: " << y << ", inclusive: " << inclusive <<  ")" << endl;
 
 	const_iterator length_check_iter = _events.begin();
 	if (_events.empty()) // 0 events
@@ -1048,12 +1036,12 @@ ControlList::rt_safe_earliest_event_linear_unlocked (double start, double end, d
 			 * (Optimize for immediate call this cycle within range) */
 			_search_cache.left = x;
 			//++_search_cache.range.first;
-			assert(inclusive ? x >= start : x > start);
+			assert(x >= start);
 			return true;
 		}
 			
 		if (fabs(first->value - next->value) <= 1) {
-			if (next->when <= end && (!inclusive || next->when > start)) {
+			if (next->when <= end && (next->when > start)) {
 				x = next->when;
 				y = next->value;
 				/* Move left of cache to this point
@@ -1090,9 +1078,9 @@ ControlList::rt_safe_earliest_event_linear_unlocked (double start, double end, d
 			x = first->when + (y - first->value) / (double)slope;
 		}
 
-		/*cerr << first->value << " @ " << first->when << " ... "
+		cerr << first->value << " @ " << first->when << " ... "
 				<< next->value << " @ " << next->when
-				<< " = " << y << " @ " << x << endl;*/
+				<< " = " << y << " @ " << x << endl;
 
 		assert(    (y >= first->value && y <= next->value)
 				|| (y <= first->value && y >= next->value) );
