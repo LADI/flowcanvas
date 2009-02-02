@@ -34,6 +34,7 @@ namespace Evoral {
  * This packs a timestamp, size, and size bytes of data flat into the buffer.
  * Useful for MIDI events, OSC messages, etc.
  */
+template<typename T>
 class EventRingBuffer : public Evoral::RingBuffer<uint8_t>, public Evoral::EventSink {
 public:
 
@@ -44,25 +45,25 @@ public:
 
 	size_t capacity() const { return _size; }
 	
-	bool peek_time(EventTime* time);
+	bool peek_time(T* time);
 
-	uint32_t write(EventTime  time, EventType  type, uint32_t  size, const uint8_t* buf);
-	bool     read (EventTime* time, EventType* type, uint32_t* size,       uint8_t* buf);
+	uint32_t write(T  time, EventType  type, uint32_t  size, const uint8_t* buf);
+	bool     read (T* time, EventType* type, uint32_t* size,       uint8_t* buf);
 };
 
 
 inline bool
-EventRingBuffer::peek_time(EventTime* time)
+EventRingBuffer::peek_time(T* time)
 {
-	bool success = RingBuffer<uint8_t>::full_peek(sizeof(EventTime), (uint8_t*)time);
+	bool success = RingBuffer<uint8_t>::full_peek(sizeof(T), (uint8_t*)time);
 	return success;
 }
 
 
 inline bool
-EventRingBuffer::read(EventTime* time, EventType* type, uint32_t* size, uint8_t* buf)
+EventRingBuffer::read(T* time, EventType* type, uint32_t* size, uint8_t* buf)
 {
-	bool success = RingBuffer<uint8_t>::full_read(sizeof(EventTime), (uint8_t*)time);
+	bool success = RingBuffer<uint8_t>::full_read(sizeof(T), (uint8_t*)time);
 	if (success)
 		success = RingBuffer<uint8_t>::full_read(sizeof(EventType), (uint8_t*)type);
 	if (success)
@@ -75,12 +76,12 @@ EventRingBuffer::read(EventTime* time, EventType* type, uint32_t* size, uint8_t*
 
 
 inline uint32_t
-EventRingBuffer::write(EventTime time, EventType type, uint32_t size, const uint8_t* buf)
+EventRingBuffer::write(T time, EventType type, uint32_t size, const uint8_t* buf)
 {
-	if (write_space() < (sizeof(EventTime) + sizeof(EventType) + sizeof(uint32_t) + size)) {
+	if (write_space() < (sizeof(T) + sizeof(EventType) + sizeof(uint32_t) + size)) {
 		return 0;
 	} else {
-		RingBuffer<uint8_t>::write(sizeof(EventTime), (uint8_t*)&time);
+		RingBuffer<uint8_t>::write(sizeof(T), (uint8_t*)&time);
 		RingBuffer<uint8_t>::write(sizeof(EventType), (uint8_t*)&type);
 		RingBuffer<uint8_t>::write(sizeof(uint32_t), (uint8_t*)&size);
 		RingBuffer<uint8_t>::write(size, buf);
