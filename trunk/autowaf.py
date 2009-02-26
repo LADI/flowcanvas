@@ -52,6 +52,8 @@ def set_options(opt):
 			help="Header files [Default: PREFIX/include]")
 	opt.add_option('--datadir', type='string',
 			help="Shared data [Default: PREFIX/share]")
+	opt.add_option('--configdir', type='string',
+			help="Configuration data [Default: PREFIX/etc]")
 	opt.add_option('--mandir', type='string',
 			help="Manual pages [Default: DATADIR/man]")
 	opt.add_option('--htmldir', type='string',
@@ -89,9 +91,14 @@ def check_tool(conf, name):
 		conf.check_tool(name)
 		checked[name] = True
 
+def nameify(name):
+	return name.replace('/', '_').replace('++', 'PP').replace('-', '_')
+
 def check_pkg(conf, name, **args):
+	if not 'mandatory' in args:
+		args['mandatory'] = True
 	"Check for a package iff it hasn't been checked for yet"
-	var_name = 'HAVE_' + args['uselib_store']
+	var_name = 'HAVE_' + nameify(args['uselib_store'])
 	check = not var_name in conf.env
 	if not check and 'atleast_version' in args:
 		# Re-check if version is newer than previous check
@@ -100,13 +107,13 @@ def check_pkg(conf, name, **args):
 			check = True;
 	if check:
 		conf.check_cfg(package=name, args="--cflags --libs", **args)
-		found = bool(conf.env['HAVE_' + args['uselib_store']])
+		found = bool(conf.env[var_name])
 		if found:
-			conf.define('HAVE_' + args['uselib_store'], int(found))
+			conf.define(var_name, int(found))
 			if 'atleast_version' in args:
 				conf.env['VERSION_' + name] = args['atleast_version']
 		else:
-			conf.undefine('HAVE_' + args['uselib_store'])
+			conf.undefine(var_name)
 			if args['mandatory'] == True:
 				conf.fatal("Required package " + name + " not found")
 
@@ -122,15 +129,16 @@ def configure(conf):
 	global g_step
 	if g_step > 1:
 		return
-	def append_cxx_flags(val):
-		conf.env.append_value('CCFLAGS', val)
-		conf.env.append_value('CXXFLAGS', val)
-	conf.line_just = 42
+	def append_cxx_flags(vals):
+		conf.env.append_value('CCFLAGS', vals.split())
+		conf.env.append_value('CXXFLAGS', vals.split())
+	conf.line_just = 43
 	check_tool(conf, 'misc')
 	check_tool(conf, 'compiler_cc')
 	check_tool(conf, 'compiler_cxx')
 	conf.env['BUILD_DOCS'] = Options.options.build_docs
 	conf.env['DEBUG'] = Options.options.debug
+	conf.env['STRICT'] = Options.options.strict
 	conf.env['PREFIX'] = os.path.abspath(os.path.expanduser(os.path.normpath(conf.env['PREFIX'])))
 	if Options.options.bundle:
 		conf.env['BUNDLE'] = True
@@ -160,6 +168,10 @@ def configure(conf):
 			conf.env['DATADIR'] = Options.options.datadir
 		else:
 			conf.env['DATADIR'] = conf.env['PREFIX'] + '/share/'
+		if Options.options.configdir:
+			conf.env['CONFIGDIR'] = Options.options.configdir
+		else:
+			conf.env['CONFIGDIR'] = conf.env['PREFIX'] + '/etc/'
 		if Options.options.htmldir:
 			conf.env['HTMLDIR'] = Options.options.htmldir
 		else:
@@ -185,20 +197,23 @@ def configure(conf):
 	conf.env['BINDIRNAME'] = chop_prefix(conf, 'BINDIR')
 	conf.env['LIBDIRNAME'] = chop_prefix(conf, 'LIBDIR')
 	conf.env['DATADIRNAME'] = chop_prefix(conf, 'DATADIR')
+	conf.env['CONFIGDIRNAME'] = chop_prefix(conf, 'CONFIGDIR')
 	conf.env['LV2DIRNAME'] = chop_prefix(conf, 'LV2DIR')
 	
 	if Options.options.debug:
-		conf.env['CCFLAGS'] = '-O0 -g -std=c99'
-		conf.env['CXXFLAGS'] = '-O0 -g -ansi'
+		conf.env['CCFLAGS'] = [ '-O0', '-g' ]
+		conf.env['CXXFLAGS'] = [ '-O0',  '-g' ]
+	else:
+		append_cxx_flags('-DNDEBUG')
 	if Options.options.strict:
-		conf.env['CCFLAGS'] = '-O0 -g -std=c99 -pedantic'
+		conf.env.append_value('CCFLAGS', [ '-std=c99', '-pedantic' ])
+		conf.env.append_value('CXXFLAGS', [ '-ansi', '-Woverloaded-virtual'])
 		append_cxx_flags('-Wall -Wextra -Wno-unused-parameter')
-		conf.env.append_value('CXXFLAGS', '-Woverloaded-virtual')
 	append_cxx_flags('-fPIC -DPIC')
 	g_step = 2
 	
 def set_local_lib(conf, name, has_objects):
-	conf.define('HAVE_' + name.upper(), 1)
+	conf.define('HAVE_' + nameify(name.upper()), 1)
 	if has_objects:
 		if type(conf.env['AUTOWAF_LOCAL_LIBS']) != dict:
 			conf.env['AUTOWAF_LOCAL_LIBS'] = {}
@@ -254,6 +269,7 @@ def print_summary(conf):
 	display_header('Global configuration')
 	display_msg(conf, "Install prefix", conf.env['PREFIX'])
 	display_msg(conf, "Debuggable build", str(conf.env['DEBUG']))
+	display_msg(conf, "Strict compiler flags", str(conf.env['STRICT']))
 	display_msg(conf, "Build documentation", str(conf.env['BUILD_DOCS']))
 	print
 	g_step = 3
@@ -325,6 +341,38 @@ def build_dox(bld, name, version, srcdir, blddir):
 	out1.command = 'doxygen'
 	out1.argv = [os.path.abspath(doc_dir) + '/reference.doxygen']
 	out1.command_is_external = True
+
+# Version code file generation
+def build_version_files(header_path, source_path, domain, major, minor, micro):
+	header_path = os.path.abspath(header_path)
+	source_path = os.path.abspath(source_path)
+	text  = "int " + domain + "_major_version = " + str(major) + ";\n"
+	text += "int " + domain + "_minor_version = " + str(minor) + ";\n"
+	text += "int " + domain + "_micro_version = " + str(micro) + ";\n"
+	try:
+		o = file(source_path, 'w')
+		o.write(text)
+		o.close()
+	except IOError:
+		print "Could not open", source_path, " for writing\n"
+		sys.exit(-1)
+
+	text  = "#ifndef __" + domain + "_version_h__\n"
+	text += "#define __" + domain + "_version_h__\n"
+	text += "extern const char* " + domain + "_revision;\n"
+	text += "extern int " + domain + "_major_version;\n"
+	text += "extern int " + domain + "_minor_version;\n"
+	text += "extern int " + domain + "_micro_version;\n"
+	text += "#endif /* __" + domain + "_version_h__ */\n"
+	try:
+		o = file(header_path, 'w')
+		o.write(text)
+		o.close()
+	except IOError:
+		print "Could not open", header_path, " for writing\n"
+		sys.exit(-1)
+		
+	return None
 
 def shutdown():
 	# This isn't really correct (for packaging), but people asking is annoying
