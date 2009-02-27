@@ -19,33 +19,41 @@ def set_options(opt):
 def configure(conf):
 	autowaf.configure(conf)
 	autowaf.check_tool(conf, 'compiler_cxx')
-	autowaf.check_pkg(conf, 'glibmm-2.4', uselib_store='GLIBMM', atleast_version='2.14.0', mandatory=True)
-	autowaf.check_pkg(conf, 'gthread-2.0', uselib_store='GTHREAD', atleast_version='2.14.0', mandatory=True)
-	autowaf.check_pkg(conf, 'gtkmm-2.4', uselib_store='GTKMM', atleast_version='2.11.12', mandatory=False)
-	autowaf.check_pkg(conf, 'jack', uselib_store='JACK', atleast_version='0.109.0', mandatory=True)
-	autowaf.check_pkg(conf, 'raul', uselib_store='RAUL', atleast_version='0.5.1', mandatory=True)
-	autowaf.check_pkg(conf, 'flowcanvas', uselib_store='FLOWCANVAS', atleast_version='0.5.1', mandatory=False)
-	autowaf.check_pkg(conf, 'libglademm-2.4', uselib_store='GLADEMM', atleast_version='2.6.0', mandatory=False)
-	autowaf.check_pkg(conf, 'redlandmm', uselib_store='REDLANDMM', atleast_version='0.0.0', mandatory=False)
-	autowaf.check_pkg(conf, 'eugene', uselib_store='EUGENE', atleast_version='0.0.0', mandatory=True)
+	autowaf.check_pkg(conf, 'glibmm-2.4', uselib_store='GLIBMM',
+			atleast_version='2.14.0', mandatory=True)
+	autowaf.check_pkg(conf, 'gthread-2.0', uselib_store='GTHREAD',
+			atleast_version='2.14.0', mandatory=True)
+	autowaf.check_pkg(conf, 'gtkmm-2.4', uselib_store='GTKMM',
+			atleast_version='2.11.12', mandatory=False)
+	autowaf.check_pkg(conf, 'jack', uselib_store='JACK',
+			atleast_version='0.109.0', mandatory=True)
+	autowaf.check_pkg(conf, 'raul', uselib_store='RAUL',
+			atleast_version='0.5.1', mandatory=True)
+	autowaf.check_pkg(conf, 'flowcanvas', uselib_store='FLOWCANVAS',
+			atleast_version='0.5.1', mandatory=False)
+	autowaf.check_pkg(conf, 'libglademm-2.4', uselib_store='GLADEMM',
+			atleast_version='2.6.0', mandatory=False)
+	autowaf.check_pkg(conf, 'redlandmm', uselib_store='REDLANDMM',
+			atleast_version='0.0.0', mandatory=False)
+	autowaf.check_pkg(conf, 'eugene', uselib_store='EUGENE',
+			atleast_version='0.0.0', mandatory=False)
 
 	# Check for posix_memalign (OSX, amazingly, doesn't have it)
-	fe = conf.create_function_enumerator()
-	fe.headers = ['stdlib.h']
-	fe.function = 'posix_memalign'
-	fe.define = 'HAVE_POSIX_MEMALIGN'
-	fe.run()
+	conf.check(
+			function_name='posix_memalign',
+			header_name='stdlib.h',
+			define_name='HAVE_POSIX_MEMALIGN')
 
 	build_gui = conf.env['HAVE_GLADEMM'] == 1 and conf.env['HAVE_FLOWCANVAS'] == 1
+	
+	conf.define('MACHINA_PPQN', 19200)
 
 	conf.define('MACHINA_VERSION', MACHINA_VERSION)
 	conf.define('BUILD_MACHINA_GUI', int(build_gui))
 	if conf.env['BUNDLE']:
-		conf.define('MACHINA_DATA_DIR', os.path.normpath(
-				conf.env['DATADIRNAME'] + 'machina'))
+		conf.define('MACHINA_DATA_DIR', os.path.join(conf.env['DATADIRNAME'] + 'machina'))
 	else:
-		conf.define('MACHINA_DATA_DIR', os.path.normpath(
-				conf.env['DATADIR'] + 'machina'))
+		conf.define('MACHINA_DATA_DIR', os.path.join(conf.env['DATADIR'], 'machina'))
 	
 	conf.write_config_header('wafconfig.h')
 	

@@ -25,6 +25,7 @@
 #include <libgnomecanvasmm.h>
 #include <libglademm/xml.h>
 #include "redlandmm/Model.hpp"
+#include "machina/Engine.hpp"
 #include "machina/Machine.hpp"
 #include "machina/Mutation.hpp"
 #include "machina/SMFDriver.hpp"
@@ -240,7 +241,7 @@ MachinaGUI::scrolled_window_event(GdkEvent* event)
 					i != selection.end(); ++i) {
 				SharedPtr<NodeView> view = PtrCast<NodeView>(*i);
 				if (view) {
-					machine()->remove_node(view->node());
+					_engine->machine()->remove_node(view->node());
 					_canvas->remove_item(view);
 				}
 			}
@@ -446,7 +447,7 @@ MachinaGUI::menu_file_save()
 		
 		Redland::Model model(_engine->rdf_world());
 		model.set_base_uri(_save_uri);
-		machine()->write_state(model);
+		_engine->machine()->write_state(model);
 		model.serialise_to_file(_save_uri);
 	}
 }

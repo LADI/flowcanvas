@@ -25,6 +25,7 @@
 #include "machina/Edge.hpp"
 #include "machina/Machine.hpp"
 #include "machina/ActionFactory.hpp"
+#include "wafconfig.h"
 
 using namespace Raul;
 using namespace std;
@@ -74,7 +75,7 @@ Loader::load(const Glib::ustring& uri)
 
 	cout << "[Loader] Loading " << machine_uri << " from " << document_uri << endl;
 
-	machine = SharedPtr<Machine>(new Machine(TimeUnit::beats(LV2_EVENT_PPQN)));
+	machine = SharedPtr<Machine>(new Machine(TimeUnit::beats(MACHINA_PPQN)));
 	
 	typedef std::map<string, SharedPtr<Node> > Created;
 	Created created;
@@ -94,7 +95,7 @@ Loader::load(const Glib::ustring& uri)
 	for (Query::Results::iterator i = results.begin(); i != results.end(); ++i) {
 		const char* node_id = (*i)["node"];
 		SharedPtr<Node> node(new Node(
-				TimeStamp(TimeUnit(TimeUnit::BEATS, LV2_EVENT_PPQN), (double)(*i)["duration"]),
+				TimeStamp(TimeUnit(TimeUnit::BEATS, MACHINA_PPQN), (double)(*i)["duration"]),
 				true));
 		machine->add_node(node);
 		created[node_id] = node;
@@ -115,7 +116,7 @@ Loader::load(const Glib::ustring& uri)
 		const char* node_id = (*i)["node"];
 		if (created.find(node_id) == created.end()) {
 			SharedPtr<Node> node(new Node(
-				TimeStamp(TimeUnit(TimeUnit::BEATS, LV2_EVENT_PPQN), (double)(*i)["duration"]),
+				TimeStamp(TimeUnit(TimeUnit::BEATS, MACHINA_PPQN), (double)(*i)["duration"]),
 				false));
 			machine->add_node(node); 
 			created[node_id] = node;

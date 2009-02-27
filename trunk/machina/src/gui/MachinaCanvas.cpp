@@ -18,11 +18,12 @@
 #include <map>
 #include "raul/SharedPtr.hpp"
 #include "raul/TimeStamp.hpp"
-#include "machina/Node.hpp"
-#include "machina/Machine.hpp"
 #include "machina/Action.hpp"
 #include "machina/Edge.hpp"
+#include "machina/Engine.hpp"
 #include "machina/LearnRequest.hpp"
+#include "machina/Machine.hpp"
+#include "machina/Node.hpp"
 #include "MachinaGUI.hpp"
 #include "MachinaCanvas.hpp"
 #include "NodeView.hpp"
@@ -53,7 +54,7 @@ MachinaCanvas::node_clicked(WeakPtr<NodeView> item, GdkEventButton* event)
 	
 	// Middle click, learn
 	if (event->button == 2) {
-		_app->machine()->learn(Machina::LearnRequest::create(_app->maid(), node->node()));
+		_app->engine()->machine()->learn(Machina::LearnRequest::create(_app->maid(), node->node()));
 		return;
 	} else if (event->button == 3) {
 		SharedPtr<NodeView> last = _last_clicked.lock();
@@ -82,7 +83,7 @@ MachinaCanvas::canvas_event(GdkEvent* event)
 {
 	static int last = 0;
 
-	SharedPtr<Machina::Machine> machine = _app->machine();
+	SharedPtr<Machina::Machine> machine = _app->engine()->machine();
 	if (!machine)
 		return false;
 

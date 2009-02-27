@@ -36,8 +36,8 @@ public:
 	MachinaGUI(SharedPtr<Machina::Engine> engine);
 	~MachinaGUI();
 
-	boost::shared_ptr<MachinaCanvas>    canvas()  { return _canvas; }
-	boost::shared_ptr<Machina::Machine> machine() { return _engine->machine(); }
+	boost::shared_ptr<MachinaCanvas>   canvas() { return _canvas; }
+	boost::shared_ptr<Machina::Engine> engine() { return _engine; }
 	
 	SharedPtr<Raul::Maid> maid() { return _maid; }
 	

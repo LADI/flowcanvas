@@ -21,8 +21,9 @@
 #include <string>
 #include <libgnomecanvasmm.h>
 #include "redlandmm/World.hpp"
-#include "machina/Machine.hpp"
+#include "machina/Engine.hpp"
 #include "machina/Loader.hpp"
+#include "machina/Machine.hpp"
 #include "machina/SMFDriver.hpp"
 #include "MachinaGUI.hpp"
 

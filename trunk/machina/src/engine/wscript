@@ -7,7 +7,6 @@ def build(bld):
 		ActionFactory.cpp
 		Edge.cpp
 		Engine.cpp
-		Evolver.cpp
 		JackDriver.cpp
 		LearnRequest.cpp
 		Loader.cpp
@@ -16,18 +15,23 @@ def build(bld):
 		MidiAction.cpp
 		Mutation.cpp
 		Node.cpp
-		Problem.cpp
 		RaulJackDriver.cpp
 		Recorder.cpp
 		SMFDriver.cpp
 	'''
-
+	if bld.env['HAVE_EUGENE']:
+		core_source += '''
+			Evolver.cpp
+			Problem.cpp
+		'''
 	obj = bld.new_task_gen('cxx', 'shlib')
 	obj.source = core_source
 	obj.export_incdirs = ['.']
 	obj.includes     = '.'
 	obj.name         = 'libmachina_engine'
 	obj.target       = 'machina_engine'
-	core_libs = 'GLIBMM GTHREAD RAUL REDLANDMM JACK EUGENE'
+	core_libs = 'GLIBMM GTHREAD RAUL REDLANDMM JACK'
+	if bld.env['HAVE_EUGENE']:
+		core_libs += ' EUGENE '
 	autowaf.use_lib(bld, obj, core_libs)
 	
