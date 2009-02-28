@@ -16,6 +16,7 @@
  */
 
 #include <cassert>
+#include <iostream>
 #include "raul/Atom.hpp"
 #include "raul/AtomRDF.hpp"
 #include "redlandmm/World.hpp"
@@ -25,6 +26,7 @@
 #include "machina/ActionFactory.hpp"
 
 using namespace Raul;
+using namespace std;
 
 namespace Machina {
 
@@ -133,6 +135,8 @@ Node::enter(SharedPtr<MIDISink> sink, TimeStamp time)
 	_changed = true;
 	_is_active = true;
 	_enter_time = time;
+
+	cerr << "ENTERING " << this << endl;
 	
 	if (sink && _enter_action)
 		_enter_action->execute(sink, time);
@@ -143,6 +147,8 @@ void
 Node::exit(SharedPtr<MIDISink> sink, TimeStamp time)
 {
 	assert(_is_active);
+	
+	cerr << "EXITING " << this << endl;
 	
 	if (sink && _exit_action)
 		_exit_action->execute(sink, time);

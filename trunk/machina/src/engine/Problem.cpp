@@ -90,15 +90,15 @@ Problem::fitness(const Machine& const_machine) const
 
 	// FIXME: timing stuff here isn't right at all...
 	
-	static const unsigned ppqn = 19200;
+	static const unsigned ppqn = MACHINA_PPQN;
 	Raul::TimeSlice time(ppqn, ppqn, 120.0);
-	time.set_slice(TimeStamp(_unit, 0, 0), TimeDuration(_unit, 2*ppqn));
+	time.set_slice(TimeStamp(_unit, 0, 0), TimeDuration(_unit, 2 * ppqn));
 		
 	machine.run(time);
 	if (eval->n_notes() == 0)
 		return 0.0f; // bad dog
 	
-	TimeStamp end(_unit, time.start_ticks().ticks() + 2*ppqn);
+	TimeStamp end(_unit, time.start_ticks().ticks() + 2 * ppqn);
 	time.set_slice(end, TimeStamp(_unit, 0, 0));
 
 	while (eval->n_notes() < _target.n_notes()) {

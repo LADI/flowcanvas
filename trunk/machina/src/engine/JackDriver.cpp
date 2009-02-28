@@ -35,7 +35,7 @@ JackDriver::JackDriver(SharedPtr<Machine> machine)
 	, _output_port(NULL)
 	, _frames_unit(TimeUnit::FRAMES, 48000)
 	, _beats_unit(TimeUnit::BEATS, 19200)
-	, _cycle_time(48000, 19200, 120.0)
+	, _cycle_time(48000, MACHINA_PPQN, 120.0)
 	, _bpm(120.0)
 	, _quantization(0.0f)
 	, _record_time(machine->time().unit())
@@ -124,7 +124,7 @@ void
 JackDriver::process_input(SharedPtr<Machine> machine, const TimeSlice& time)
 {
 	// We only actually read Jack input at the beginning of a cycle
-	assert(time.offset_ticks().is_zero());
+	//assert(time.offset_ticks().is_zero());
 	assert(_input_port);
 
 	if (_recording.get()) {
@@ -235,19 +235,19 @@ JackDriver::on_process(jack_nframes_t nframes)
 {
 	_cycle_time.set_bpm(_bpm.get());
 
-	TimeStamp    start(_cycle_time.ticks_unit(), 0, 0);
-	TimeDuration length(_cycle_time.ticks_unit(), nframes, 0);
-	_cycle_time.set_slice(start, length);
-	
-	_cycle_time.set_offset(TimeStamp(_cycle_time.ticks_unit(), 0, 0));
-
 	assert(_output_port);
 #ifdef JACK_MIDI_NEEDS_NFRAMES
 	jack_midi_clear_buffer(jack_port_get_buffer(_output_port, nframes), nframes);
 #else
 	jack_midi_clear_buffer(jack_port_get_buffer(_output_port, nframes));
 #endif
-	
+
+	TimeStamp length_ticks(TimeStamp(_cycle_time.ticks_unit(), nframes));
+	TimeStamp length_beats(_cycle_time.ticks_to_beats(length_ticks));
+
+	_cycle_time.set_length(length_ticks);
+	_cycle_time.set_offset(TimeStamp(_cycle_time.ticks_unit(), 0, 0));
+
 	/* Take a reference to machine here and use only it during the process
 	 * cycle so _machine can be switched with set_machine during a cycle. */
 	SharedPtr<Machine> machine = _machine;
@@ -271,7 +271,7 @@ JackDriver::on_process(jack_nframes_t nframes)
 	machine->set_sink(shared_from_this());
 	
 	if (_recording.get())
-		_record_time += length;
+		_record_time += length_beats;
 
 	if (_stop.pending())
 		machine->reset(_cycle_time.start_beats());
@@ -286,15 +286,16 @@ JackDriver::on_process(jack_nframes_t nframes)
 		const TimeDuration run_dur_frames = _cycle_time.beats_to_ticks(run_dur);
 
 		// Machine didn't run at all (empty, or no initial states)
-		if (run_dur_frames.ticks() == 0) {
+
+		if (run_dur.is_zero()) {
 			machine->reset(machine->time()); // Try again next cycle
 			_cycle_time.set_slice(TimeStamp(_cycle_time.ticks_unit(), 0, 0), run_dur_frames);
 			goto end;
 
 		// Machine ran for portion of cycle (finished)
-		} else if (run_dur_frames < _cycle_time.length_ticks()) {
+		} else if (machine->is_finished()) {
 			const TimeStamp finish_offset = _cycle_time.offset_ticks() + run_dur_frames;
-			assert(finish_offset < length);
+			assert(finish_offset < length_ticks);
 			
 			machine->reset(machine->time());
 
@@ -319,7 +320,6 @@ JackDriver::on_process(jack_nframes_t nframes)
 	}
 
 end:
-
 	/* Remember the last machine run, in case a switch happens and
 	 * we need to finalize it next cycle. */
 	_last_machine = machine;

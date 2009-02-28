@@ -221,7 +221,7 @@ Machine::enter_node(SharedPtr<Raul::MIDISink> sink, SharedPtr<Node> node)
 	 * while all actions are still MIDI notes... */
 	size_t index = (rand() % MAX_ACTIVE_NODES);
 	for (size_t i=0; i < MAX_ACTIVE_NODES; ++i) {
-		if (_active_nodes.at(index)== NULL) {
+		if (_active_nodes.at(index) == NULL) {
 			node->enter(sink, _time);
 			assert(node->is_active());
 			_active_nodes.at(index) = node;
@@ -290,9 +290,9 @@ Machine::exit_node(SharedPtr<Raul::MIDISink> sink, SharedPtr<Node> node)
 }
 
 
-/** Run the machine for @a nframes frames.
+/** Run the machine for a (real) time slice.
  *
- * Returns the duration of time the machine actually ran (from 0 to nframes).
+ * Returns the duration of time the machine actually ran.
  * 
  * Caller can check is_finished() to determine if the machine still has any
  * active states.  If not, time() will return the exact time stamp the
@@ -363,7 +363,7 @@ Machine::run(const Raul::TimeSlice& time)
 		}
 
 	}
-
+	
 	//assert(this_time <= time.length_beats());
 	return this_time;
 }
