@@ -336,6 +336,7 @@ def build_dox(bld, name, version, srcdir, blddir):
 	}
 	obj.install_path = ''
 	out1 = bld.new_task_gen('command-output')
+	out1.dependencies = [obj]
 	out1.stdout = '/doc/doxygen.out'
 	out1.stdin = '/doc/reference.doxygen' # whatever..
 	out1.command = 'doxygen'
