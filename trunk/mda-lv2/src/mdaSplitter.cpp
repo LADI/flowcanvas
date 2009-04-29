@@ -139,10 +139,10 @@ void mdaSplitter::getParameterName(LvzInt32 index, char *label)
   switch(index)
   {
     case  0: strcpy(label, "Mode"); break; 
-    case  1: 
-    case  2: strcpy(label, "Freq"); break;
-    case  3: 
-    case  4: strcpy(label, "Level"); break;
+    case  1: strcpy(label, "Freq"); break;
+    case  2: strcpy(label, "Freq Mode"); break;
+    case  3: strcpy(label, "Level"); break;
+    case  4: strcpy(label, "Level Mode"); break;
     case  5: strcpy(label, "Envelope"); break;
     default: strcpy(label, "Output");
   }
