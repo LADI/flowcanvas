@@ -25,7 +25,7 @@
 #include "machina/Edge.hpp"
 #include "machina/Machine.hpp"
 #include "machina/ActionFactory.hpp"
-#include "wafconfig.h"
+#include "machina-config.h"
 
 using namespace Raul;
 using namespace std;

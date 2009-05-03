@@ -40,7 +40,7 @@ def configure(conf):
 	autowaf.check_header(conf, 'boost/shared_ptr.hpp', mandatory=True)
 	autowaf.check_header(conf, 'boost/weak_ptr.hpp', mandatory=True)
 	
-	conf.write_config_header('wafconfig.h')
+	conf.write_config_header('flowcanvas-config.h')
 	conf.env['ANTI_ALIAS'] = bool(Options.options.anti_alias)
 	
 	autowaf.print_summary(conf)

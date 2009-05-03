@@ -20,7 +20,7 @@
 
 #include <string>
 #include <libgnomecanvasmm.h>
-#include "wafconfig.h"
+#include "machina-config.h"
 #include "raul/SharedPtr.hpp"
 #include "raul/Maid.hpp"
 

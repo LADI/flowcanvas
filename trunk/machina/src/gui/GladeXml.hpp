@@ -19,7 +19,7 @@
 #include <string>
 #include <gtkmm.h>
 #include <libglademm/xml.h>
-#include "wafconfig.h"
+#include "machina-config.h"
 
 class GladeXml
 {

@@ -55,7 +55,7 @@ def configure(conf):
 	else:
 		conf.define('MACHINA_DATA_DIR', os.path.join(conf.env['DATADIR'], 'machina'))
 	
-	conf.write_config_header('wafconfig.h')
+	conf.write_config_header('machina-config.h')
 	
 	autowaf.print_summary(conf)
 	autowaf.display_header('Machina Configuration')

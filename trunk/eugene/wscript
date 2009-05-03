@@ -41,7 +41,7 @@ def configure(conf):
 	conf.env.append_value('CXXFLAGS', '-fopenmp')
 	conf.env.append_value('LINKFLAGS', '-fopenmp')
 	conf.define('DATA_DIR', os.path.join(conf.env['PREFIX'], 'share', 'eugene'))
-	conf.write_config_header('wafconfig.h')
+	conf.write_config_header('eugene-config.h')
 	
 	autowaf.print_summary(conf)
 

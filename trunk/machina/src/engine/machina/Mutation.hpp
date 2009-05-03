@@ -18,7 +18,7 @@
 #ifndef MACHINA_MACHINE_MUTATION_HPP
 #define MACHINA_MACHINE_MUTATION_HPP
 
-#include "wafconfig.h"
+#include "machina-config.h"
 
 #ifdef HAVE_EUGENE
 	#include "eugene/Mutation.hpp"
