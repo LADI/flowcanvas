@@ -39,10 +39,10 @@ def configure(conf):
 	# Boost headers
 	autowaf.check_header(conf, 'boost/shared_ptr.hpp', mandatory=True)
 	autowaf.check_header(conf, 'boost/weak_ptr.hpp', mandatory=True)
-	
+
 	conf.write_config_header('flowcanvas-config.h')
 	conf.env['ANTI_ALIAS'] = bool(Options.options.anti_alias)
-	
+
 	autowaf.print_summary(conf)
 	autowaf.display_header('FlowCanvas Configuration')
 	autowaf.display_msg(conf, "Auto-arrange", str(conf.env['HAVE_AGRAPH'] == 1))
@@ -52,20 +52,20 @@ def configure(conf):
 def build(bld):
 	# Headers
 	bld.install_files('${INCLUDEDIR}/flowcanvas', 'flowcanvas/*.hpp')
-	
+
 	# Pkgconfig file
 	autowaf.build_pc(bld, 'FLOWCANVAS', FLOWCANVAS_VERSION, 'AGRAPH GLIBMM GNOMECANVASMM')
-	
+
 	# Library
 	obj = bld.new_task_gen('cxx', 'shlib')
 	obj.export_incdirs = ['.']
 	obj.source = '''
-		src/Canvas.cpp 
-		src/Connectable.cpp 
-		src/Connection.cpp 
-		src/Ellipse.cpp 
-		src/Item.cpp 
-		src/Module.cpp 
+		src/Canvas.cpp
+		src/Connectable.cpp
+		src/Connection.cpp
+		src/Ellipse.cpp
+		src/Item.cpp
+		src/Module.cpp
 		src/Port.cpp
 	'''
 	obj.includes     = ['.', './src']
@@ -74,7 +74,7 @@ def build(bld):
 	obj.uselib       = 'GTKMM GNOMECANVASMM AGRAPH'
 	obj.vnum         = FLOWCANVAS_LIB_VERSION
 	obj.install_path = '${LIBDIR}'
-	
+
 	# Documentation
 	autowaf.build_dox(bld, 'FLOWCANVAS', FLOWCANVAS_VERSION, srcdir, blddir)
 	bld.install_files('${HTMLDIR}', blddir + '/default/doc/html/*')

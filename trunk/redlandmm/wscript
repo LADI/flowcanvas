@@ -28,10 +28,10 @@ def configure(conf):
 def build(bld):
 	# Headers
 	bld.install_files('${INCLUDEDIR}/redlandmm', 'redlandmm/*.hpp')
-	
+
 	# Pkgconfig file
 	autowaf.build_pc(bld, 'REDLANDMM', REDLANDMM_VERSION, 'GLIBMM GTHREAD REDLAND')
-	
+
 	# Library
 	obj = bld.new_task_gen('cxx', 'shlib')
 	obj.source = '''

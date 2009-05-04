@@ -27,7 +27,7 @@ def build(bld):
 		SIGCPP
 		EUGENE
 	''')
-	
+
 	# GUI runtime files
 	bld.install_files('${DATADIR}/machina', 'machina.glade')
 	bld.install_files('${DATADIR}/machina', 'machina.svg')

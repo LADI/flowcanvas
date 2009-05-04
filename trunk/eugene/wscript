@@ -37,22 +37,22 @@ def configure(conf):
 	# Boost headers
 	autowaf.check_header(conf, 'boost/shared_ptr.hpp', mandatory=True)
 	autowaf.check_header(conf, 'boost/weak_ptr.hpp', mandatory=True)
-	
+
 	conf.env.append_value('CXXFLAGS', '-fopenmp')
 	conf.env.append_value('LINKFLAGS', '-fopenmp')
 	conf.define('DATA_DIR', os.path.join(conf.env['PREFIX'], 'share', 'eugene'))
 	conf.write_config_header('eugene-config.h')
-	
+
 	autowaf.print_summary(conf)
 
 def build(bld):
 	# Headers
 	bld.install_files('${INCLUDEDIR}/eugene', 'eugene/*.h')
 	bld.install_files('${INCLUDEDIR}/eugene', 'eugene/*.hpp')
-	
+
 	# Pkgconfig file
 	autowaf.build_pc(bld, 'EUGENE', EUGENE_VERSION, 'GLIBMM GTHREAD')
-	
+
 	# Library
 	obj = bld.new_task_gen('cxx', 'shlib')
 	obj.source = '''
@@ -67,7 +67,7 @@ def build(bld):
 	obj.uselib       = 'GLIBMM GTHREAD'
 	obj.vnum         = EUGENE_LIB_VERSION
 	obj.install_path = '${LIBDIR}'
-	
+
 	# Console app
 	prog = bld.new_task_gen('cxx', 'program')
 	prog.source       = 'src/eugene.cpp'
@@ -88,9 +88,9 @@ def build(bld):
 	prog.uselib       = 'GTKMM GLADEMM GTHREAD GNOMECANVASMM FLOWCANVAS'
 	prog.target       = 'gui/eugene_tsp_gui'
 	prog.install_path = '${BINDIR}'
-	
+
 	bld.install_files('${PREFIX}/share/eugene', 'gui/eugene_tsp_gui.glade')
-	
+
 def shutdown():
 	autowaf.shutdown()
 

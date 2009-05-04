@@ -11,7 +11,7 @@ APPNAME = 'drobillad'
 # Mandatory variables
 srcdir = '.'
 blddir = 'build'
-	
+
 @feature('cc', 'cxx')
 @after('apply_lib_vars')
 @before('apply_obj_vars_cc', 'apply_obj_vars_cxx')

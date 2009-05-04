@@ -24,7 +24,7 @@ def configure(conf):
 	pat = conf.env['shlib_PATTERN']
 	ext = pat[pat.rfind('.'):]
 	conf.env.append_value('shlib_EXTENSION', ext)
-		
+	
 def build_plugin(bld, lang, name):
 	ext = bld.env['shlib_EXTENSION'][0]
 
@@ -35,7 +35,7 @@ def build_plugin(bld, lang, name):
 	ext = 'c'
 	if lang != 'cc':
 		ext = 'cpp'
-	
+
 	obj              = bld.new_task_gen(lang, 'shlib')
 	obj.env          = penv
 	obj.source       = 'plugins/%s.lv2/%s.%s' % (name, name, ext)
@@ -74,7 +74,7 @@ def build(bld):
 	'''
 	for i in c_plugins.split():
 		build_plugin(bld, 'cc', i)
-	
+
 	cxx_plugins = '''
 		transpose
 	'''

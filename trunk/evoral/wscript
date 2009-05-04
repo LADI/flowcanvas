@@ -37,10 +37,10 @@ def build(bld):
 	# Headers
 	#bld.install_files('${INCLUDEDIR}/evoral', 'evoral/*.h')
 	#bld.install_files('${INCLUDEDIR}/evoral', 'evoral/*.hpp')
-	
+
 	# Pkgconfig file
 	#autowaf.build_pc(bld, 'EVORAL', EVORAL_VERSION, 'GLIBMM GTHREAD')
-	
+
 	# Library
 	obj = bld.new_task_gen('cxx', 'shlib')
 	obj.source = '''
@@ -62,7 +62,7 @@ def build(bld):
 	obj.uselib       = 'GLIBMM GTHREAD'
 	obj.vnum         = EVORAL_LIB_VERSION
 	obj.install_path = ''
-	
+
 	# Unit tests
 	obj              = bld.new_task_gen('cxx', 'program')
 	obj.source       = 'test/sequence.cpp'
