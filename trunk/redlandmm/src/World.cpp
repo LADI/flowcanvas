@@ -36,6 +36,11 @@ static const char* const RDF_LANG = "turtle";
 World::World()
 	: _next_blank_id(0)
 {
+	if (!Glib::thread_supported())
+		Glib::thread_init();
+
+	_mutex = new Glib::Mutex();
+
 	_c_obj = librdf_new_world();
 	assert(_c_obj);
 	librdf_world_open(_c_obj);
@@ -46,7 +51,7 @@ World::World()
 
 World::~World()
 {
-	Glib::Mutex::Lock lock(_mutex);
+	Glib::Mutex::Lock lock(*_mutex);
 	librdf_free_world(_c_obj);
 }
 

@@ -56,6 +56,16 @@ def build(bld):
 	obj.uselib_local = 'libredlandmm'
 	obj.target       = 'tests/rdf_test'
 	obj.install_path = ''
+	
+	# Utilities
+	utils = 'utils/rdf_diff'
+	for i in utils.split():
+		obj = bld.new_task_gen('cxx', 'program')
+		obj.source       = i + '.cpp'
+		obj.includes     = ['.']
+		obj.uselib_local = 'libredlandmm'
+		obj.target       = i
+		obj.install_path = '${BINDIR}'
 
 	# Documentation
 	autowaf.build_dox(bld, 'REDLANDMM', REDLANDMM_VERSION, srcdir, blddir)

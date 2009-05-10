@@ -48,13 +48,13 @@ public:
 
 	librdf_world* world() { return _c_obj; }
 
-	Glib::Mutex& mutex() { return _mutex; }
+	Glib::Mutex& mutex() { return *_mutex; }
 
 private:
 	void setup_prefixes();
 
-	Glib::Mutex   _mutex;
-	Namespaces    _prefixes;
+	Glib::Mutex* _mutex;
+	Namespaces   _prefixes;
 
 	std::set<std::string> _blank_ids;
 	size_t                _next_blank_id;

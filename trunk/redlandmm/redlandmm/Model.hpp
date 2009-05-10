@@ -55,7 +55,21 @@ public:
 	                   const std::string& predicate,
 	                   const Node&        object);   
 	
+	void add_statement(librdf_statement* statement);
+	
 	World& world() const { return _world; }
+
+	class Delta {
+	public:
+		Delta(const Model& from, const Model& to);
+
+		void serialise(Model& model, const std::string& lang, const std::string& uri) const;
+		void apply(const Model& from, Model& to) const;
+	
+	private:
+		Model* _additions;
+		Model* _removals;
+	};
 
 private:
 	friend class Query;
