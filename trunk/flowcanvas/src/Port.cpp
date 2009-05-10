@@ -215,8 +215,8 @@ Port::set_name(const string& n)
 			_control_rect->property_x2() = _control_rect->property_x1() + (_control_value * (_width-1));
 			_control_rect->property_y2() = _height - 0.5;
 		}
-		_label->property_x() = text_width / 2 + 1;
-		_label->property_y() = _height / 2;
+		_label->property_x() = (_width / 2.0) - 3.0;
+		_label->property_y() = (_height / 2.0);
 
 		signal_renamed.emit();
 	}
@@ -298,8 +298,8 @@ Port::show_label(bool b)
 		_height = _label->property_text_height();
 		set_width(_width);
 		set_height(_height);
-		_label->property_x() = text_width / 2.0 + 3.0;
-		_label->property_y() = (_height / 2.0) - 1.0;
+		_label->property_x() = (_width / 2.0) - 3.0;
+		_label->property_y() = (_height / 2.0);
 		_label->property_fill_color_rgba() = 0xFFFFFFFF;
 
 		_label->raise_to_top();
