@@ -136,6 +136,13 @@ Node::to_turtle_token() const
 
 
 bool
+Node::is_resource() const
+{
+	return _c_obj && librdf_node_is_resource(_c_obj);
+}
+
+
+bool
 Node::is_int() const
 {
 	if (_c_obj && librdf_node_get_type(_c_obj) == LIBRDF_NODE_TYPE_LITERAL) {
@@ -188,15 +195,17 @@ Node::is_bool() const
 {
 	if (_c_obj && librdf_node_get_type(_c_obj) == LIBRDF_NODE_TYPE_LITERAL) {
 		librdf_uri* datatype_uri = librdf_node_get_literal_value_datatype_uri(_c_obj);
-		if (datatype_uri && !strcmp((const char*)librdf_uri_as_string(datatype_uri),
+		if (datatype_uri) {
+			if (!strcmp((const char*)librdf_uri_as_string(datatype_uri),
 					"http://www.w3.org/2001/XMLSchema#boolean"))
 			return true;
+		}
 	}
 	return false;
 }
 
 
-float
+bool
 Node::to_bool() const
 {
 	assert(is_bool());

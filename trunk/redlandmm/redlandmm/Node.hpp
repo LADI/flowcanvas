@@ -55,10 +55,9 @@ public:
 	librdf_node* get_node() const { return _c_obj; }
 	librdf_uri*  get_uri()  const { return librdf_node_get_uri(_c_obj); }
 	
-	inline operator int()           const { return to_int(); }
-	inline operator float()         const { return to_float(); }
-	inline operator bool()          const { return is_bool() ? to_bool() : (_world && _c_obj); }
-	inline operator const char*()   const { return to_c_string(); }
+	bool is_valid() const { return type() != UNKNOWN; }
+
+	inline operator const char*() const { return to_c_string(); }
 
 	const Node& operator=(const Node& other) {
 		if (_c_obj)
@@ -68,24 +67,41 @@ public:
 		return *this;
 	}
 
-	inline bool operator==(const Node& other) const { return librdf_node_equals(_c_obj, other._c_obj); }
+	inline bool operator==(const Node& other) const {
+		return librdf_node_equals(_c_obj, other._c_obj);
+	}
 	
 	const char* to_c_string() const;
 	std::string to_string() const;
 
 	Glib::ustring to_turtle_token() const;
 
+	bool is_resource() const;
+	
 	bool is_int() const;
 	int  to_int() const;
 
 	bool  is_float() const;
 	float to_float() const;
 	
-	bool  is_bool() const;
-	float to_bool() const;
+
+	bool is_bool() const;
+	bool to_bool() const;
 
 private:
 	World* _world;
+};
+
+
+class Resource : public Node {
+public:
+	Resource(World& world, const std::string& s) : Node(world, Node::RESOURCE, s) {}
+};
+
+
+class Literal : public Node {
+public:
+	Literal(World& world, const std::string& s) : Node(world, Node::LITERAL, s) {}
 };
 
 
