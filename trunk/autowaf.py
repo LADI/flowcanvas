@@ -224,7 +224,6 @@ def set_local_lib(conf, name, has_objects):
 		conf.env['AUTOWAF_LOCAL_HEADERS'][name.lower()] = True
 
 def use_lib(bld, obj, libs):
-	abssrcdir = os.path.abspath('.')
 	libs_list = libs.split()
 	for l in libs_list:
 		in_headers = l.lower() in bld.env['AUTOWAF_LOCAL_HEADERS']
@@ -236,10 +235,10 @@ def use_lib(bld, obj, libs):
 				obj.uselib_local = 'lib' + l.lower() + ' '
 		
 		if in_headers or in_libs:
-			inc_flag = '-iquote ' + os.path.join(abssrcdir, l.lower())
+			inc_flag = '-iquote../' + l.lower()
 			for f in ['CCFLAGS', 'CXXFLAGS']:
 				if not inc_flag in bld.env[f]:
-					bld.env.prepend_value(f, inc_flag)
+					bld.env.append_value(f, inc_flag)
 		else:
 			if hasattr(obj, 'uselib'):
 				obj.uselib += ' ' + l

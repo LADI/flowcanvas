@@ -23,6 +23,12 @@ def configure(conf):
 	autowaf.configure(conf)
 
 def build(bld):
+	# Header "library"
+	obj = bld.new_task_gen()
+	obj.export_incdirs = ['.']
+	obj.name           = 'liblv2core'
+	obj.target         = 'lv2core'
+
 	if not Options.options.bundle_only:
 		# Header
 		bld.install_files('${INCLUDEDIR}', 'lv2.h')
