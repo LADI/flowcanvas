@@ -1,4 +1,4 @@
-/* Formant filter plugin.  Copyright (C) 2005 Dave Robillard.
+/* Formant filter plugin.  Copyright (C) 2005-2009 Dave Robillard.
  *
  * Based on SSM formant filter,
  * Copyright (C) 2001 David Griffiths <dave@pawfal.org>

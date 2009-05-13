@@ -1,5 +1,5 @@
 /* LV2 Plugin Variables Extension (Private Implementation)
- * Copyright (C) 2007 Dave Robillard <dave@drobilla.net>
+ * Copyright (C) 2007-2009 Dave Robillard <http://drobilla.net>
  *
  * This header is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free

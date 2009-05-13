@@ -1,5 +1,5 @@
 /* Fixed point number class
- * Copyright (C) 2008 Dave Robillard <drobilla.net>
+ * Copyright (C) 2008-2009 Dave Robillard <drobilla.net>
  * Copyright (C) 2006 Henry Strickland & Ryan Seto
  *
  * <http://www.opensource.org/licenses/mit-license.php>

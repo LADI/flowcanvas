@@ -1,4 +1,4 @@
-/* This file is an audio plugin.  Copyright (C) 2005 Dave Robillard.
+/* This file is an audio plugin.  Copyright (C) 2005-2009 Dave Robillard.
  *
  * This plugin is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free

@@ -1,5 +1,5 @@
 /* lv2_extension_data.h - C header file for the LV2 Instance Access extension.
- * Copyright (C) 2008 Dave Robillard <dave@drobilla.net>
+ * Copyright (C) 2008-2009 Dave Robillard <http://drobilla.net>
  *
  * This header is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published

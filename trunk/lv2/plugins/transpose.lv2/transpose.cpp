@@ -1,5 +1,5 @@
 /* An LV2 plugin which transposes MIDI notes.
- * Copyright (C) 2008 Dave Robillard
+ * Copyright (C) 2008-2009 Dave Robillard
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
