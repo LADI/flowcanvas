@@ -13,17 +13,17 @@ mdaRoundPan::mdaRoundPan(audioMasterCallback audioMaster)	: AudioEffectX(audioMa
   //inits here!
   fParam1 = (float)0.5; //pan
   fParam2 = (float)0.8; //auto
-  
+
   //size = 1500;
   //bufpos = 0;
 	//buffer = new float[size];
   //buffer2 = new float[size];
 
-  setNumInputs(2);		  
-	setNumOutputs(2);		  
+  setNumInputs(2);
+	setNumOutputs(2);
 	setUniqueID("mdaRoundPan");    // identify here
-	DECLARE_LVZ_DEPRECATED(canMono) ();				      
-	canProcessReplacing();	
+	DECLARE_LVZ_DEPRECATED(canMono) ();
+	canProcessReplacing();
 	strcpy(programName, "Round Panner");
 	suspend();		// flush buffer
 
@@ -134,29 +134,29 @@ void mdaRoundPan::process(float **inputs, float **outputs, LvzInt32 sampleFrames
 	float *in2 = inputs[1];
 	float *out1 = outputs[0];
 	float *out2 = outputs[1];
-	float a, c, d, x=0.5, y=(float)0.7854;	
+	float a, c, d, x=0.5, y=(float)0.7854;
   float ph, dph, fourpi=(float)12.566371;
-  
+
   ph = phi;
   dph = dphi;
 
-  --in1;	
-	--in2;	
+  --in1;
+	--in2;
 	--out1;
 	--out2;
 	while(--sampleFrames >= 0)
 	{
 		a = x * (*++in1 + *++in2);
-		
+
     c = out1[1];
 		d = out2[1]; //process from here...
-          
+
     c += (float)(a * -sin((x * ph) - y)); // output
 		d += (float)(a * sin((x * ph) + y));
 
     ph = ph + dph;
 
-    *++out1 = c;	
+    *++out1 = c;
 		*++out2 = d;
 	}
   if(ph<0.0) ph = ph + fourpi; else if(ph>fourpi) ph = ph - fourpi;
@@ -169,23 +169,23 @@ void mdaRoundPan::processReplacing(float **inputs, float **outputs, LvzInt32 sam
 	float *in2 = inputs[1];
 	float *out1 = outputs[0];
 	float *out2 = outputs[1];
-	float a, c, d, x=0.5, y=(float)0.7854;	
+	float a, c, d, x=0.5, y=(float)0.7854;
   float ph, dph, fourpi=(float)12.566371;
-  
+
   ph = phi;
   dph = dphi;
-  
-	--in1;	
-	--in2;	
+
+	--in1;
+	--in2;
 	--out1;
 	--out2;
 	while(--sampleFrames >= 0)
 	{
 		a = x * (*++in1 + *++in2); //process from here...
-		    
+
 		c = (float)(a * -sin((x * ph) - y)); // output
 		d = (float)(a * sin((x * ph) + y));
-		    
+
     ph = ph + dph;
 
     *++out1 = c;

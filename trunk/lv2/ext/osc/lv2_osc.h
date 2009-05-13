@@ -1,6 +1,6 @@
 /* LV2 OSC Messages Extension
  * Copyright (C) 2007 Dave Robillard <dave@drobilla.net>
- * 
+ *
  * This header is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option)
@@ -45,7 +45,7 @@ typedef union {
 	float   f; /**< 32 bit IEEE-754 floating point number ("float") */
 	char    s; /**< Standard C, NULL terminated string */
 	uint8_t b; /**< Blob (int32 size then size bytes padded to 32 bits) */
-	
+
 	/* "Nonstandard" OSC types (defined in the OSC standard) */
 	int64_t h; /* 64 bit signed integer */
 	// t       /* OSC-timetag */
@@ -76,7 +76,7 @@ typedef struct {
 	uint32_t types_offset;   /**< Offset of types string in data */
 
 	/** Take the address of this member to get a pointer to the remaining data.
-	 * 
+	 *
 	 * Contents are an argument index:
 	 * uint32_t argument_index[argument_count]
 	 *

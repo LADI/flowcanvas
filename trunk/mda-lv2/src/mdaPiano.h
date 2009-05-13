@@ -35,7 +35,7 @@ struct VOICE  //voice state
   long  pos;
   long  end;
   long  loop;
-  
+
   float env;  //envelope
   float dec;
 
@@ -87,7 +87,7 @@ public:
 	virtual bool getProductString (char* text);
 	virtual LvzInt32 getVendorVersion () {return 1;}
 	virtual LvzInt32 canDo (char* text);
-  
+
   virtual LvzInt32 getNumMidiInputChannels ()  { return 1; }
 
   long guiUpdate;

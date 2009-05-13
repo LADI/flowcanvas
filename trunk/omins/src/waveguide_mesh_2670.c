@@ -1,23 +1,23 @@
 /* This file is an audio plugin.  Copyright (C) 2005 Loki Davison. Based on code by Brook Eaton and a couple
- * of papers... 
- * 
+ * of papers...
+ *
  * Implements a Waveguide Mesh drum. FIXME to be extended, to have rimguides, power normalisation and all
  * manner of other goodies.
  *
  * Tension is well, drum tension
- * power is how hard you hit it. 
- *  
- * 
+ * power is how hard you hit it.
+ *
+ *
  * This plugin is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option)
  * any later version.
- * 
+ *
  * This plugin is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
@@ -79,12 +79,12 @@ typedef struct
     LADSPA_Data* tension;
     LADSPA_Data* power;
     LADSPA_Data* ex_x;
-    LADSPA_Data* ex_y;    
+    LADSPA_Data* ex_y;
 
     /* vars */
     _junction mesh[LENGTH][WIDTH];
     LADSPA_Data last_trigger;
-    
+
 } WgMesh;
 
 
@@ -109,7 +109,7 @@ wgmesh_instantiate(const LADSPA_Descriptor* descriptor,
 		plugin->mesh[i][j].e_temp = INITIAL;
 	}
     }
-    plugin->last_trigger = 0.0; 
+    plugin->last_trigger = 0.0;
     return (LADSPA_Handle)plugin;
 }
 
@@ -151,15 +151,15 @@ inline static void excite_mesh(WgMesh* plugin, LADSPA_Data power, LADSPA_Data ex
 	int i=ex_x,j=ex_y;
 	LADSPA_Data temp;
 	LADSPA_Data Yj;
-		
+
 	Yj = 2*(INIT_DELTA*INIT_DELTA/((INIT_T*INIT_T)*(INIT_GAMMA*INIT_GAMMA))); // junction admittance
 	temp = power*2/(LENGTH+WIDTH);
 	plugin->mesh[i][j].v_junction = plugin->mesh[i][j].v_junction +  temp;
-	plugin->mesh[i][j].n_junction = plugin->mesh[i][j].n_junction + Yj*temp/PORTS; 
+	plugin->mesh[i][j].n_junction = plugin->mesh[i][j].n_junction + Yj*temp/PORTS;
 	// All velocities leaving the junction are equal to
-	plugin->mesh[i][j].s_junction = plugin->mesh[i][j].s_junction + Yj*temp/PORTS; 
+	plugin->mesh[i][j].s_junction = plugin->mesh[i][j].s_junction + Yj*temp/PORTS;
 			// the total velocity in the junction * the admittance
-			plugin->mesh[i][j].e_junction = plugin->mesh[i][j].e_junction + Yj*temp/PORTS; 
+			plugin->mesh[i][j].e_junction = plugin->mesh[i][j].e_junction + Yj*temp/PORTS;
 			// divided by the number of outgoing ports.
 			plugin->mesh[i][j].w_junction = plugin->mesh[i][j].w_junction + Yj*temp/PORTS;
 			//mesh[i][j].c_junction = 0;
@@ -167,7 +167,7 @@ inline static void excite_mesh(WgMesh* plugin, LADSPA_Data power, LADSPA_Data ex
 
 void
 wgmesh_run_cr(LADSPA_Handle instance, unsigned long nframes)
-{	
+{
 	WgMesh*  plugin = (WgMesh*)instance;
 	LADSPA_Data tension = *(plugin->tension);
 	LADSPA_Data ex_x = *(plugin->ex_x);
@@ -179,7 +179,7 @@ wgmesh_run_cr(LADSPA_Handle instance, unsigned long nframes)
 	size_t i,j,k;
 	LADSPA_Data filt, trg, oldfilt;
 	LADSPA_Data Yc,Yj,tempN,tempS,tempE,tempW;
-	
+
 	// Set input variables //
 	oldfilt = plugin->mesh[LENGTH-LENGTH/4][WIDTH-WIDTH/4].v_junction;
 
@@ -187,15 +187,15 @@ wgmesh_run_cr(LADSPA_Handle instance, unsigned long nframes)
 		if (tension==0)
 			tension=0.0001;
 		trg = input[k];
-		    
+
 		if (trg > 0.0f && !(last_trigger > 0.0f))
 		{
 		    //printf("got trigger, exciting mesh, %f \n", tension);
 		    excite_mesh(plugin, power[k], ex_x, ex_y);
 		}
 
-		//junction admitance	
-		Yj = 2*INIT_DELTA*INIT_DELTA/(( (tension)*((tension) )*(INIT_GAMMA*INIT_GAMMA))); 
+		//junction admitance
+		Yj = 2*INIT_DELTA*INIT_DELTA/(( (tension)*((tension) )*(INIT_GAMMA*INIT_GAMMA)));
 		Yc = Yj-4; // junction admittance (left shift is for multiply by 2!)
 		//plugin->v_power = power[k];
 
@@ -203,15 +203,15 @@ wgmesh_run_cr(LADSPA_Handle instance, unsigned long nframes)
 			// INNER MESH //
 			for (j=1; j<WIDTH-1; j++) { // to multiply by 2 - simply shift to the left by 1!
 				plugin->mesh[i][j].v_junction = 2.0*(plugin->mesh[i][j].n_junction + plugin->mesh[i][j].s_junction
-					+ plugin->mesh[i][j].e_junction + plugin->mesh[i][j].w_junction + Yc*plugin->mesh[i][j].c_junction)/Yj; 
+					+ plugin->mesh[i][j].e_junction + plugin->mesh[i][j].w_junction + Yc*plugin->mesh[i][j].c_junction)/Yj;
 
-				plugin->mesh[i][j+1].s_junction = plugin->mesh[i][j].v_junction - plugin->mesh[i][j].n_junction; 
-				plugin->mesh[i][j-1].n_junction = plugin->mesh[i][j].v_junction - plugin->mesh[i][j].s_temp; 
+				plugin->mesh[i][j+1].s_junction = plugin->mesh[i][j].v_junction - plugin->mesh[i][j].n_junction;
+				plugin->mesh[i][j-1].n_junction = plugin->mesh[i][j].v_junction - plugin->mesh[i][j].s_temp;
 
-				plugin->mesh[i+1][j].e_junction = plugin->mesh[i][j].v_junction - plugin->mesh[i][j].w_junction; 
-				plugin->mesh[i-1][j].w_junction = plugin->mesh[i][j].v_junction - plugin->mesh[i][j].e_temp; 
+				plugin->mesh[i+1][j].e_junction = plugin->mesh[i][j].v_junction - plugin->mesh[i][j].w_junction;
+				plugin->mesh[i-1][j].w_junction = plugin->mesh[i][j].v_junction - plugin->mesh[i][j].e_temp;
 
-				plugin->mesh[i][j].c_junction = plugin->mesh[i][j].v_junction - plugin->mesh[i][j].c_junction; 
+				plugin->mesh[i][j].c_junction = plugin->mesh[i][j].v_junction - plugin->mesh[i][j].c_junction;
 
 				plugin->mesh[i][j].s_temp = plugin->mesh[i][j].s_junction; //
 				plugin->mesh[i][j].e_temp = plugin->mesh[i][j].e_junction; // update current values in the temp slots!
@@ -229,7 +229,7 @@ wgmesh_run_cr(LADSPA_Handle instance, unsigned long nframes)
 			plugin->mesh[1][i].e_junction = plugin->mesh[1][i].e_temp = tempE;
 			tempW = plugin->mesh[WIDTH-1][i].w_junction;
 			plugin->mesh[WIDTH-1][i].w_junction = -plugin->mesh[WIDTH-1][i].e_junction;
-			plugin->mesh[WIDTH-2][i].w_junction = tempW;			
+			plugin->mesh[WIDTH-2][i].w_junction = tempW;
 		}
 
 		filt = LOSS*(plugin->mesh[LENGTH-LENGTH/4][WIDTH-WIDTH/4].v_junction + oldfilt);
@@ -298,7 +298,7 @@ _init()
 		port_range_hints[MESH_POWER].HintDescriptor = LADSPA_HINT_DEFAULT_1 | LADSPA_HINT_BOUNDED_BELOW;
 		port_range_hints[MESH_POWER].LowerBound = 0.000f;
 		port_range_hints[MESH_POWER].UpperBound = 20.000f;
-		
+
 		port_range_hints[MESH_EX_X].HintDescriptor = LADSPA_HINT_DEFAULT_1 | LADSPA_HINT_BOUNDED_BELOW | LADSPA_HINT_BOUNDED_ABOVE | LADSPA_HINT_INTEGER;
 		port_range_hints[MESH_EX_X].LowerBound = 0.950f; //1
 		port_range_hints[MESH_EX_X].UpperBound = LENGTH-0.99;//length-1 ish
@@ -306,7 +306,7 @@ _init()
 		port_range_hints[MESH_EX_Y].HintDescriptor = LADSPA_HINT_DEFAULT_1 | LADSPA_HINT_BOUNDED_BELOW | LADSPA_HINT_BOUNDED_ABOVE | LADSPA_HINT_INTEGER;
 		port_range_hints[MESH_EX_Y].LowerBound = 0.950f; //1
 		port_range_hints[MESH_EX_Y].UpperBound = LENGTH-0.99;//length-1 ish
-		
+
 		port_range_hints[MESH_INPUT1].HintDescriptor = 0;
 		port_range_hints[MESH_OUTPUT].HintDescriptor = 0;
 		wg_mesh_cr_desc->instantiate = wgmesh_instantiate;

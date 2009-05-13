@@ -23,7 +23,7 @@ mdaDynamics::mdaDynamics(audioMasterCallback audioMaster)	: AudioEffectX(audioMa
   setNumInputs(2);		    // stereo in
 	setNumOutputs(2);		    // stereo out
 	setUniqueID("mdaDynamics");    // identify
-	DECLARE_LVZ_DEPRECATED(canMono) ();				      
+	DECLARE_LVZ_DEPRECATED(canMono) ();
 	canProcessReplacing();	// supports both accumulating and replacing output
 	strcpy(programName, "Dynamics");	// default program name
 
@@ -67,7 +67,7 @@ void mdaDynamics::setParameter(LvzInt32 index, float value)
   //calcs here
   mode=0;
   thr = (float)pow(10.f, 2.f * fParam1 - 2.f);
-  rat = 2.5f * fParam2 - 0.5f; 
+  rat = 2.5f * fParam2 - 0.5f;
   if(rat>1.0) { rat = 1.f + 16.f*(rat-1.f) * (rat - 1.f); mode = 1; }
   if(rat<0.0) { rat = 0.6f*rat; mode=1; }
   trim = (float)pow(10.f, 2.f * fParam3); //was  - 1.f);
@@ -75,11 +75,11 @@ void mdaDynamics::setParameter(LvzInt32 index, float value)
   rel = (float)pow(10.f, -2.f - 3.f * fParam5);
 
   if(fParam6>0.98) lthr=0.f; //limiter
-  else { lthr=0.99f*(float)pow(10.0f,int(30.0*fParam6 - 20.0)/20.f); 
-         mode=1; } 
-  
+  else { lthr=0.99f*(float)pow(10.0f,int(30.0*fParam6 - 20.0)/20.f);
+         mode=1; }
+
   if(fParam7<0.02) { xthr=0.f; } //expander
-  else { xthr=(float)pow(10.f,3.f * fParam7 - 3.f); mode=1; } 
+  else { xthr=(float)pow(10.f,3.f * fParam7 - 3.f); mode=1; }
   xrat = 1.f - (float)pow(10.f, -2.f - 3.3f * fParam9);
   irel = (float)pow(10.0,-2.0/getSampleRate());
   gatt = (float)pow(10.f, -0.002f - 3.f * fParam8);
@@ -135,18 +135,18 @@ void mdaDynamics::getParameterDisplay(LvzInt32 index, char *text)
 	switch(index)
   {
     case 0: long2string((long)(40.0*fParam1 - 40.0),text); break;
-    case 1: if(fParam2>0.58) 
-            { if(fParam2<0.62) strcpy(text, "Limit"); 
+    case 1: if(fParam2>0.58)
+            { if(fParam2<0.62) strcpy(text, "Limit");
               else float2strng(-rat,text); }
-            else 
-            { if(fParam2<0.2) float2strng(0.5f+2.5f*fParam2,text); 
+            else
+            { if(fParam2<0.2) float2strng(0.5f+2.5f*fParam2,text);
               else float2strng(1.f/(1.f-rat),text); } break;
     case 2: long2string((long)(40.0*fParam3 - 0.0),text); break; ///was -20.0
     case 3: long2string((long)(-301030.1 / (getSampleRate() * log10(1.0 - att))),text); break;
     case 4: long2string((long)(-301.0301 / (getSampleRate() * log10(1.0 - rel))),text); break;
-    case 5: if(lthr==0.f) strcpy(text, "OFF"); 
+    case 5: if(lthr==0.f) strcpy(text, "OFF");
             else long2string((long)(30.0*fParam6 - 20.0),text); break;
-    case 6: if(xthr==0.f) strcpy(text, "OFF"); 
+    case 6: if(xthr==0.f) strcpy(text, "OFF");
             else long2string((long)(60.0*fParam7 - 60.0),text); break;
     case 7: long2string((long)(-301030.1 / (getSampleRate() * log10(1.0 - gatt))),text); break;
     case 8: long2string((long)(-1806.0 / (getSampleRate() * log10(xrat))),text); break;
@@ -161,14 +161,14 @@ void mdaDynamics::getParameterLabel(LvzInt32 index, char *label)
   {
     case 0: strcpy(label, "dB"); break;
     case 1: strcpy(label, ":1"); break;
-    case 2: strcpy(label, "dB"); break; 
-    case 3: strcpy(label, "탎"); break; 
-    case 4: strcpy(label, "ms"); break; 
-    case 5: strcpy(label, "dB"); break; 
-    case 6: strcpy(label, "dB"); break; 
-    case 7: strcpy(label, "탎"); break; 
-    case 8: strcpy(label, "ms"); break; 
-    case 9: strcpy(label, "%"); break; 
+    case 2: strcpy(label, "dB"); break;
+    case 3: strcpy(label, "탎"); break;
+    case 4: strcpy(label, "ms"); break;
+    case 5: strcpy(label, "dB"); break;
+    case 6: strcpy(label, "dB"); break;
+    case 7: strcpy(label, "탎"); break;
+    case 8: strcpy(label, "ms"); break;
+    case 9: strcpy(label, "%"); break;
   }
 }
 
@@ -183,9 +183,9 @@ void mdaDynamics::process(float **inputs, float **outputs, LvzInt32 sampleFrames
 	float *out2 = outputs[1];
   float a, b, c, d, i, j, g, e=env, e2=env2, ra=rat, re=(1.f-rel), at=att, ga=gatt;
   float tr=trim, th=thr, lth=lthr, xth=xthr, ge=genv, y=dry;
-    
-  --in1;	
-	--in2;	
+
+  --in1;
+	--in2;
 	--out1;
 	--out2;
 
@@ -198,24 +198,24 @@ void mdaDynamics::process(float **inputs, float **outputs, LvzInt32 sampleFrames
       b = *++in2;
       c = out1[1];
       d = out2[1];
-  
+
       i = (a<0.f)? -a : a;
       j = (b<0.f)? -b : b;
       i = (j>i)? j : i;
-        
+
       e = (i>e)? e + at * (i - e) : e * re;
       e2 = (i>e)? i : e2 * re; //ir;
       g = (e>th)? tr / (1.f + ra * ((e/th) - 1.f)) : tr;
 
       if(g<0.f) g=0.f;
-      if(g*e2>lth) g = lth/e2; //limit 
+      if(g*e2>lth) g = lth/e2; //limit
 
       ge = (e>xth)? ge + ga - ga * ge : ge * xrat; //gate
 
       c += a * (g * ge + y);
       d += b * (g * ge + y);
 
-      *++out1 = c;	
+      *++out1 = c;
 		  *++out2 = d;
 	  }
   }
@@ -227,18 +227,18 @@ void mdaDynamics::process(float **inputs, float **outputs, LvzInt32 sampleFrames
       b = *++in2;
       c = out1[1];
       d = out2[1];
-  
+
       i = (a<0.f)? -a : a;
       j = (b<0.f)? -b : b;
       i = (j>i)? j : i;
-        
+
       e = (i>e)? e + at * (i - e) : e * re;
       g = (e>th)? tr / (1.f + ra * ((e/th) - 1.f)) : tr;
 
       c += a * (g + y);
       d += b * (g + y);
 
-      *++out1 = c;	
+      *++out1 = c;
 		  *++out2 = d;
 	  }
   }
@@ -254,9 +254,9 @@ void mdaDynamics::processReplacing(float **inputs, float **outputs, LvzInt32 sam
 	float *out1 = outputs[0];
 	float *out2 = outputs[1];
   float a, b, i, j, g, e=env, e2=env2, ra=rat, re=(1.f-rel), at=att, ga=gatt;
-  float tr=trim, th=thr, lth=lthr, xth=xthr, ge=genv, y=dry;  
-	--in1;	
-	--in2;	
+  float tr=trim, th=thr, lth=lthr, xth=xthr, ge=genv, y=dry;
+	--in1;
+	--in2;
 	--out1;
 	--out2;
 
@@ -267,23 +267,23 @@ void mdaDynamics::processReplacing(float **inputs, float **outputs, LvzInt32 sam
 	  {
       a = *++in1;
       b = *++in2;
-  
+
       i = (a<0.f)? -a : a;
       j = (b<0.f)? -b : b;
       i = (j>i)? j : i;
-        
+
       e = (i>e)? e + at * (i - e) : e * re;
       e2 = (i>e)? i : e2 * re; //ir;
-      
+
       g = (e>th)? tr / (1.f + ra * ((e/th) - 1.f)) : tr;
 
-      if(g<0.f) g=0.f; 
-      if(g*e2>lth) g = lth/e2; //limit 
+      if(g<0.f) g=0.f;
+      if(g*e2>lth) g = lth/e2; //limit
 
       ge = (e>xth)? ge + ga - ga * ge : ge * xrat; //gate
 
-      *++out1 = a * (g * ge + y);	
-		  *++out2 = b * (g * ge + y);	
+      *++out1 = a * (g * ge + y);
+		  *++out2 = b * (g * ge + y);
     }
   }
   else //compressor only
@@ -292,16 +292,16 @@ void mdaDynamics::processReplacing(float **inputs, float **outputs, LvzInt32 sam
 	  {
       a = *++in1;
       b = *++in2;
-  
+
       i = (a<0.f)? -a : a;
       j = (b<0.f)? -b : b;
       i = (j>i)? j : i; //get peak level
-        
+
       e = (i>e)? e + at * (i - e) : e * re; //envelope
       g = (e>th)? tr / (1.f + ra * ((e/th) - 1.f)) : tr; //gain
 
       *++out1 = a * (g + y); //vca
-		  *++out2 = b * (g + y);	
+		  *++out2 = b * (g + y);
     }
   }
   if(e <1.0e-10) env =0.f; else env =e;

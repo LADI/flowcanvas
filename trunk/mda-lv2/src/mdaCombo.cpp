@@ -24,11 +24,11 @@ mdaCombo::mdaCombo(audioMasterCallback audioMaster)	: AudioEffectX(audioMaster, 
 	buffer = new float[size];
 	buffe2 = new float[size];
 
-  setNumInputs(2);		  
-	setNumOutputs(2);		  
+  setNumInputs(2);
+	setNumOutputs(2);
 	setUniqueID("mdaCombo");    // identify here
-	DECLARE_LVZ_DEPRECATED(canMono) ();				      
-	canProcessReplacing();	
+	DECLARE_LVZ_DEPRECATED(canMono) ();
+	canProcessReplacing();
 	strcpy(programName, "Amp & Speaker Simulator");
 	suspend();		// flush buffer
 
@@ -58,49 +58,49 @@ void mdaCombo::setParameter(LvzInt32 index, float value)
   {
     case 0: trim = 0.5f; lpf = 0.f;                 //DI
             mix1 = (float)0.0; mix2 = (float)0.0;
-            del1 = 0; del2 = 0; 
+            del1 = 0; del2 = 0;
             break;
 
     case 1: trim = 0.53f; lpf = filterFreq(2700.f); //speaker sim
             mix1 = (float)0.0; mix2 = (float)0.0;
             del1 = 0; del2 = 0;
-            hpf = filterFreq(382.f); 
+            hpf = filterFreq(382.f);
             break;
 
     case 2: trim = 1.10f; lpf = filterFreq(1685.f); //radio
-            mix1 = -1.70f; mix2 = 0.82f; 
+            mix1 = -1.70f; mix2 = 0.82f;
             del1 = int(getSampleRate() / 6546.f);
-            del2 = int(getSampleRate() / 4315.f); 
+            del2 = int(getSampleRate() / 4315.f);
             break;
 
     case 3: trim = 0.98f; lpf = filterFreq(1385.f); //mesa boogie 1"
             mix1 = -0.53f; mix2 = 0.21f;
             del1 = int(getSampleRate() / 7345.f);
-            del2 = int(getSampleRate() / 1193.f); 
+            del2 = int(getSampleRate() / 1193.f);
             break;
 
     case 4: trim = 0.96f; lpf = filterFreq(1685.f); //mesa boogie 8"
-            mix1 = -0.85f; mix2 = 0.41f; 
+            mix1 = -0.85f; mix2 = 0.41f;
             del1 = int(getSampleRate() / 6546.f);
-            del2 = int(getSampleRate() / 3315.f); 
+            del2 = int(getSampleRate() / 3315.f);
             break;
-   
-    case 5: trim = 0.59f; lpf = lpf = filterFreq(2795.f); 
+
+    case 5: trim = 0.59f; lpf = lpf = filterFreq(2795.f);
             mix1 = -0.29f; mix2 = 0.38f;          //Marshall 4x12" celestion
             del1 = int(getSampleRate() / 982.f);
             del2 = int(getSampleRate() / 2402.f);
-            hpf = filterFreq(459.f); 
+            hpf = filterFreq(459.f);
             break;
-   
-    case 6: trim = 0.30f; lpf = filterFreq(1744.f); //scooped-out metal 
-            mix1 = -0.96f; mix2 = 1.6f; 
+
+    case 6: trim = 0.30f; lpf = filterFreq(1744.f); //scooped-out metal
+            mix1 = -0.96f; mix2 = 1.6f;
             del1 = int(getSampleRate() / 356.f);
             del2 = int(getSampleRate() / 1263.f);
-            hpf = filterFreq(382.f); 
+            hpf = filterFreq(382.f);
             break;
   }
 
-  mode = (fParam2<0.5)? 1 : 0; 
+  mode = (fParam2<0.5)? 1 : 0;
   if(mode) //soft clipping
   {
     drive = (float)pow(10.f, 2.f - 6.f * fParam2);
@@ -146,7 +146,7 @@ void mdaCombo::suspend()
 float mdaCombo::filterFreq(float hz)
 {
   float j, k, r=0.999f;
-  
+
   j = r * r - 1;
   k = (float)(2.f - 2.f * r * r * cos(0.647f * hz / getSampleRate() ));
   return (float)((sqrt(k*k - 4.f*j*j) - k) / (2.f*j));
@@ -202,7 +202,7 @@ void mdaCombo::getParameterDisplay(LvzInt32 index, char *text)
 	switch(index)
   {
     case 0: switch(int(fParam1*6.9))
-            { 
+            {
               case 0: strcpy(text, "D.I."); break;
               case 1: strcpy(text, "Spkr Sim"); break;
               //case 2: strcpy(text, "Phone"); break;
@@ -216,7 +216,7 @@ void mdaCombo::getParameterDisplay(LvzInt32 index, char *text)
     case 1: long2string((long)(200 * fParam2 - 100), text); break;
     case 2: long2string((long)(200 * fParam3 - 100), text); break;
     case 3: long2string((long)(40 * fParam4 - 20), text); break;
-    case 4: if(fParam5>0.5) strcpy(text, "STEREO"); 
+    case 4: if(fParam5>0.5) strcpy(text, "STEREO");
                        else strcpy(text, "MONO"); break;
     case 5: long2string((long)(100 * fParam6), text); break;
     case 6: long2string((long)(100 * fParam7), text); break;
@@ -246,7 +246,7 @@ void mdaCombo::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
 	float *in2 = inputs[1];
 	float *out1 = outputs[0];
 	float *out2 = outputs[1];
-	float a, b, c, d, trm, m1=mix1, m2=mix2, clp=clip;	
+	float a, b, c, d, trm, m1=mix1, m2=mix2, clp=clip;
   float o=lpf, i=1.f-lpf, o2=hpf, i2=1.f-hpf, bi=bias, drv=drive;
   float f1=ff1, f2=ff2, f3=ff3, f4=ff4, f5=ff5;
   float a2, b2, f6=ff6, f7=ff7, f8=ff8, f9=ff9, f10=ff10;
@@ -255,11 +255,11 @@ void mdaCombo::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
 
   trm = trim * i * i * i * i;
 
-  --in1;	
-	--in2;	
+  --in1;
+	--in2;
 	--out1;
 	--out2;
-	
+
   if(fParam5>0.5) //stereo
   {
     while(--sampleFrames >= 0)
@@ -279,10 +279,10 @@ void mdaCombo::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
         b = (a<-clp)? -clp : b;  b2 = (a2<-clp)? -clp : b2;
       }
 
-      *(buffer + bp) = b;        *(buffe2 + bp) = b2; 
+      *(buffer + bp) = b;        *(buffe2 + bp) = b2;
       b += (m1* *(buffer+((bp+d1)%1000))) + (m2* *(buffer+((bp+d2)%1000)));
       b2+= (m1* *(buffe2+((bp+d1)%1000))) + (m2* *(buffe2+((bp+d2)%1000)));
-  
+
       f1 = o * f1 + trm * b;     f6 = o * f6 + trm * b2;
       f2 = o * f2 +  f1;      f7 = o * f7 +  f6;
       f3 = o * f3 +  f2;      f8 = o * f8 +  f7;
@@ -293,7 +293,7 @@ void mdaCombo::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
 
       bp = (bp==0)? 999 : bp - 1; //buffer position
 
-      *++out1 = c + b;	
+      *++out1 = c + b;
 		  *++out2 = d + b2;
       bp=bufpos;
 	  }
@@ -307,13 +307,13 @@ void mdaCombo::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
 		    a = drv * (*++in1 + *++in2 + bi);
 		    c = out1[1];
 		    d = out2[1]; //process from here...
-          
+
         b = (a>0.f)? a : -a;
         b = a / (1.f + b);
 
-        *(buffer + bp) = b; 
+        *(buffer + bp) = b;
         b += (m1* *(buffer+((bp+d1)%1000))) + (m2* *(buffer+((bp+d2)%1000)));
-    
+
         f1 = o * f1 + trm * b;
         f2 = o * f2 +  f1;
         f3 = o * f3 +  f2;
@@ -324,7 +324,7 @@ void mdaCombo::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
 
         bp = (bp==0)? 999 : bp - 1; //buffer position
 
-        *++out1 = c + b;	
+        *++out1 = c + b;
 		    *++out2 = d + b;
 	    }
     }
@@ -335,13 +335,13 @@ void mdaCombo::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
 		    a = drv * (*++in1 + *++in2 + bi);
 		    c = out1[1];
 		    d = out2[1]; //process from here...
-          
+
         b = (a>clp)? clp : a; //distort
         b = (a<-clp)? -clp : b;
-      
-        *(buffer + bp) = b; 
+
+        *(buffer + bp) = b;
         b += (m1* *(buffer+((bp+d1)%1000))) + (m2* *(buffer+((bp+d2)%1000)));
-    
+
         f1 = o * f1 + trm * b;
         f2 = o * f2 +  f1;
         f3 = o * f3 +  f2;
@@ -352,7 +352,7 @@ void mdaCombo::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
 
         bp = (bp==0)? 999 : bp - 1; //buffer position
 
-        *++out1 = c + b;	
+        *++out1 = c + b;
 		    *++out2 = d + b;
 	    }
     }
@@ -360,7 +360,7 @@ void mdaCombo::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
   bufpos = bp;
   if(fabs(f1)<1.0e-10) { ff1=0.f; ff2=0.f; ff3=0.f; ff4=0.f; ff5=0.f;  }
                   else { ff1=f1;  ff2=f2;  ff3=f3;  ff4=f4;  ff5=f5;   }
-  if(fabs(f6)<1.0e-10) { ff6=0.f; ff7=0.f; ff8=0.f; ff9=0.f; ff10=0.f; } 
+  if(fabs(f6)<1.0e-10) { ff6=0.f; ff7=0.f; ff8=0.f; ff9=0.f; ff10=0.f; }
                   else { ff6=f6;  ff7=f7;  ff8=f8;  ff9=f9;  ff10=f10; }
   if(fabs(h0)<1.0e-10) { hh0 = hh1 = 0.0f; } else { hh0=h0; hh1=h1; }
 }
@@ -371,17 +371,17 @@ void mdaCombo::processReplacing(float **inputs, float **outputs, LvzInt32 sample
 	float *in2 = inputs[1];
 	float *out1 = outputs[0];
 	float *out2 = outputs[1];
-	float a, b, trm, m1=mix1, m2=mix2, clp=clip;	
+	float a, b, trm, m1=mix1, m2=mix2, clp=clip;
   float o=lpf, i=1.f-lpf, o2=hpf, bi=bias, drv=drive;
   float f1=ff1, f2=ff2, f3=ff3, f4=ff4, f5=ff5;
   float a2, b2, f6=ff6, f7=ff7, f8=ff8, f9=ff9, f10=ff10;
   float hf=hhf, hq=hhq, h0=hh0, h1=hh1;
   long d1=del1, d2=del2, bp = bufpos;
-  
+
   trm = trim * i * i * i * i;
 
-	--in1;	
-	--in2;	
+	--in1;
+	--in2;
 	--out1;
 	--out2;
 
@@ -402,10 +402,10 @@ void mdaCombo::processReplacing(float **inputs, float **outputs, LvzInt32 sample
         b = (a<-clp)? -clp : b;  b2 = (a2<-clp)? -clp : b2;
       }
 
-      *(buffer + bp) = b;        *(buffe2 + bp) = b2; 
+      *(buffer + bp) = b;        *(buffe2 + bp) = b2;
       b += (m1* *(buffer+((bp+d1)%1000))) + (m2* *(buffer+((bp+d2)%1000)));
       b2+= (m1* *(buffe2+((bp+d1)%1000))) + (m2* *(buffe2+((bp+d2)%1000)));
-  
+
       f1 = o * f1 + trm * b;     f6 = o * f6 + trm * b2;
       f2 = o * f2 + f1;      f7 = o * f7 + f6;
       f3 = o * f3 + f2;      f8 = o * f8 + f7;
@@ -415,8 +415,8 @@ void mdaCombo::processReplacing(float **inputs, float **outputs, LvzInt32 sample
       b = f4 - f5;               b2 = f9 - f10;
 
       if(bp==0) bufpos=999; else bufpos=bp-1;
- 
-      *++out1 = b;	
+
+      *++out1 = b;
 		  *++out2 = b2;
 	  }
   }
@@ -427,7 +427,7 @@ void mdaCombo::processReplacing(float **inputs, float **outputs, LvzInt32 sample
 	    while(--sampleFrames >= 0)
 	    {
 		    a = drv * (*++in1 + *++in2 + bi);
-          
+
         h0 += hf * (h1 + a); //resonant highpass (Chamberlin SVF)
         h1 -= hf * (h0 + hq * h1);
         a += h1;
@@ -435,9 +435,9 @@ void mdaCombo::processReplacing(float **inputs, float **outputs, LvzInt32 sample
         b = (a>0.f)? a : -a;
         b = a / (1.f + b);
 
-        *(buffer + bp) = b; 
+        *(buffer + bp) = b;
         b += (m1* *(buffer+((bp+d1)%1000))) + (m2* *(buffer+((bp+d2)%1000)));
-    
+
         f1 = o * f1 + trm * b;
         f2 = o * f2 + f1;
         f3 = o * f3 + f2;
@@ -457,17 +457,17 @@ void mdaCombo::processReplacing(float **inputs, float **outputs, LvzInt32 sample
       while(--sampleFrames >= 0)
 	    {
 		    a = drv * (*++in1 + *++in2 + bi);
-      
+
         h0 += hf * (h1 + a); //resonant highpass (Chamberlin SVF)
         h1 -= hf * (h0 + hq * h1);
         a += h1;
 
         b = (a>clp)? clp : a; //distort
         b = (a<-clp)? -clp : b;
-      
-        *(buffer + bp) = b; 
+
+        *(buffer + bp) = b;
         b += (m1* *(buffer+((bp+d1)%1000))) + (m2* *(buffer+((bp+d2)%1000)));
-    
+
         f1 = o * f1 + trm * b;
         f2 = o * f2 + f1;
         f3 = o * f3 + f2;
@@ -486,7 +486,7 @@ void mdaCombo::processReplacing(float **inputs, float **outputs, LvzInt32 sample
   bufpos = bp;
   if(fabs(f1)<1.0e-10) { ff1=0.f; ff2=0.f; ff3=0.f; ff4=0.f; ff5=0.f;  }
                   else { ff1=f1;  ff2=f2;  ff3=f3;  ff4=f4;  ff5=f5;   }
-  if(fabs(f6)<1.0e-10) { ff6=0.f; ff7=0.f; ff8=0.f; ff9=0.f; ff10=0.f; } 
+  if(fabs(f6)<1.0e-10) { ff6=0.f; ff7=0.f; ff8=0.f; ff9=0.f; ff10=0.f; }
                   else { ff6=f6;  ff7=f7;  ff8=f8;  ff9=f9;  ff10=f10; }
   if(fabs(h0)<1.0e-10) { hh0 = hh1 = 0.0f; } else { hh0=h0; hh1=h1; }
 }

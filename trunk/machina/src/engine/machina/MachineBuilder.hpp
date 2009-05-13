@@ -1,15 +1,15 @@
 /* This file is part of Machina.
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * Machina is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
- * 
+ *
  * Machina is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
@@ -35,7 +35,7 @@ public:
 	void set_time(Raul::TimeStamp time) { _time = time; }
 
 	void event(Raul::TimeStamp time_offset, size_t size, unsigned char* buf);
-	
+
 	void reset();
 	void resolve();
 
@@ -49,10 +49,10 @@ private:
 	connect_nodes(SharedPtr<Machine> m,
                   SharedPtr<Node>    tail, Raul::TimeStamp tail_end_time,
      	          SharedPtr<Node>    head, Raul::TimeStamp head_start_time);
-	
+
 	typedef std::list<SharedPtr<Node> > ActiveList;
 	ActiveList _active_nodes;
-	
+
 	typedef std::list<std::pair<Raul::TimeStamp, SharedPtr<Node> > > PolyList;
 	PolyList _poly_nodes;
 

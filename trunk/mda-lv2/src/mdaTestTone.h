@@ -34,7 +34,7 @@ protected:
 	float fParam0, fParam1, fParam2;
 	float fParam3, fParam4, fParam5;
 	float fParam6, fParam7;
-  
+
   float thru, left, right, len;
   float zz0, zz1, zz2, zz3, zz4, zz5, phi, dphi;
   float sw, swd, swx, fscale, cal, calx;

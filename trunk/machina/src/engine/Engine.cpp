@@ -1,15 +1,15 @@
 /* This file is part of Machina.
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * Machina is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
- * 
+ *
  * Machina is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
@@ -38,9 +38,9 @@ Engine::load_machine(const Glib::ustring& uri)
 		m->activate();
 		_driver->set_machine(m);
 	}
-	
+
 	// .. and drop it in this thread (to prevent deallocation in the RT thread)
-	
+
 	return m;
 }
 
@@ -56,9 +56,9 @@ Engine::import_machine(const Glib::ustring& uri)
 		m->activate();
 		_driver->machine()->nodes().append(m->nodes());
 	}
-	
+
 	// Discard m
-	
+
 	return _driver->machine();
 }
 
@@ -73,9 +73,9 @@ Engine::import_midi(const Glib::ustring& uri, double q, Raul::TimeDuration durat
 	SharedPtr<Machine> m = file_driver->learn(uri, q, duration);
 	m->activate();
 	_driver->machine()->nodes().append(m->nodes());
-	
+
 	// Discard m
-	
+
 	return _driver->machine();
 }
 

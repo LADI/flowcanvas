@@ -1,15 +1,15 @@
 /* This file is part of Machina.
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * Machina is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
- * 
+ *
  * Machina is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
@@ -94,7 +94,7 @@ static ArtVpathDash* selector_dash()
 		selector_dash->n_dash = 2;
 		selector_dash->dash = art_new(double, 2);
 		selector_dash->dash[0] = 8;
-		selector_dash->dash[1] = 8;		
+		selector_dash->dash[1] = 8;
 	}
 
 	return selector_dash;
@@ -114,7 +114,7 @@ NodeView::update_state(bool show_labels)
 {
 	static const uint32_t active_color = 0x408040FF;
 	static const uint32_t active_border_color = 0x00FF00FF;
-	
+
 	if (_node->is_active()) {
 		if (_color != active_color) {
 			_old_color = _color;
@@ -125,9 +125,9 @@ NodeView::update_state(bool show_labels)
 		set_base_color(_old_color);
 		set_border_color(_default_border_color);
 	}
-		
+
 	_ellipse.property_dash() = _node->is_selector() ? selector_dash() : 0;
-	
+
 	set_border_width(_node->is_initial() ? 4.0 : 1.0);
 
 	if (show_labels)

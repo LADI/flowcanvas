@@ -1,7 +1,7 @@
 /* lv2_object.h - C header file for the LV2 Object extension.
- * 
+ *
  * Copyright (C) 2008 Dave Robillard <dave@drobilla.net>
- * 
+ *
  * This header is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation; either version 2 of the License, or
@@ -53,14 +53,14 @@ typedef void (*LV2_Object_Destructor)(LV2_Object* object);
  * plugin's instantiate method with 'URI' "http://lv2plug.in/ns/ext/object" and
  * 'data' pointing to an instance of this struct. */
 typedef struct {
-	
+
 	/** Opaque pointer to host data.
 	 *
 	 * The plugin MUST pass this to any call to functions in this struct.
 	 * Otherwise, it must not be interpreted in any way.
 	 */
 	LV2_Object_Callback_Data callback_data;
-	
+
 	/** Create (allocate) a new LV2 Object.
 	 *
 	 * The returned value has size bytes of memory immediately following the
@@ -79,12 +79,12 @@ typedef struct {
 	                              uint32_t                 context,
 	                              uint32_t                 type,
 	                              uint32_t                 size);
-	
+
 	/** Reference an LV2 Object.
 	 *
 	 * This function can be called to increment the reference count of a
 	 * object (preventing destruction while a reference is held).
-	 * 
+	 *
 	 * Note that when an object is the payload of an event sent to a plugin,
 	 * the plugin implicitly already has a reference to the object so this
 	 h* function is not required for typical event processing situations.
@@ -95,8 +95,8 @@ typedef struct {
 	LV2_Object* (*lv2_object_ref)(LV2_Object_Callback_Data callback_data,
 	                                uint32_t                 context,
 	                                LV2_Object*              object);
-	
-	
+
+
 	/** Unreference an LV2 Object.
 	 *
 	 * Plugins must call this function whenever they drop a reference to an
@@ -124,7 +124,7 @@ typedef struct {
  * the header in memory is the contents of the object (though the object
  * itself may not be POD, i.e. objects may contain pointers). */
 typedef struct {
-	
+
 	/** Opaque host data associated with this object.
 	 *
 	 * Plugins must not interpret this data in any way.  Hosts may store
@@ -132,7 +132,7 @@ typedef struct {
 	 * here, via the lv2_object_new method (which is the only way for a
 	 * plugin to allocate a new LV2 Object. */
 	LV2_Object_Host_Data host_data;
-	
+
 	/** Destructor function for this object.
 	 */
 	LV2_Object_Destructor destructor;

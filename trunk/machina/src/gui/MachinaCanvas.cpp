@@ -1,15 +1,15 @@
 /* This file is part of Machina.
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * Machina is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
- * 
+ *
  * Machina is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
@@ -48,10 +48,10 @@ MachinaCanvas::node_clicked(WeakPtr<NodeView> item, GdkEventButton* event)
 	SharedPtr<NodeView> node = PtrCast<NodeView>(item.lock());
 	if (!node)
 		return;
-	
+
 	if (event->state & GDK_CONTROL_MASK)
 		return;
-	
+
 	// Middle click, learn
 	if (event->button == 2) {
 		_app->engine()->machine()->learn(Machina::LearnRequest::create(_app->maid(), node->node()));
@@ -110,7 +110,7 @@ MachinaCanvas::canvas_event(GdkEvent* event)
 		machine->add_node(node);
 
 		return true;
-	
+
 	} else {
 		return Canvas::canvas_event(event);
 	}
@@ -123,7 +123,7 @@ MachinaCanvas::connect_node(boost::shared_ptr<NodeView> src,
 {
 	SharedPtr<Machina::Edge> edge(new Machina::Edge(src->node(), head->node()));
 	src->node()->add_edge(edge);
-	
+
 	boost::shared_ptr<Connection> c(new EdgeView(shared_from_this(),
 			src, head, edge));
 	src->add_connection(c);
@@ -173,7 +173,7 @@ MachinaCanvas::build(SharedPtr<const Machina::Machine> machine, bool show_labels
 
 	for (Machina::Machine::Nodes::const_iterator i = machine->nodes().begin();
 			i != machine->nodes().end(); ++i) {
-	
+
 		const SharedPtr<NodeView> view = create_node_view(*i);
 		views.insert(std::make_pair((*i), view));
 	}
@@ -191,7 +191,7 @@ MachinaCanvas::build(SharedPtr<const Machina::Machine> machine, bool show_labels
 				cerr << "WARNING: Edge to node with no view" << endl;
 				continue;
 			}
-				
+
 			boost::shared_ptr<Connection> c(new EdgeView(shared_from_this(),
 					view, head_view, (*e)));
 			view->add_connection(c);
@@ -199,7 +199,7 @@ MachinaCanvas::build(SharedPtr<const Machina::Machine> machine, bool show_labels
 			add_connection(c);
 		}
 	}
-	
+
 	arrange();
 }
 

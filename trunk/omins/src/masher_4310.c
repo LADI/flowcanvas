@@ -63,7 +63,7 @@ typedef struct {
 	LADSPA_Data *grain_pitch;
 	LADSPA_Data *density;
 	LADSPA_Data *output;
-	
+
 	Sample grain_store[GRAINSTORE_SIZE];
 	GrainDesc overlaps[OVERLAPS_SIZE];
 	size_t overlaps_size;
@@ -93,7 +93,7 @@ masher_activate(LADSPA_Handle instance)
 {
 	Masher *plugin = (Masher*)instance;
 	int i = 0;
-	
+
 	plugin->overlaps_size = 0;
 	plugin->write_grain = 0;
 
@@ -147,17 +147,17 @@ void
 masher_run(LADSPA_Handle instance, unsigned long nframes)
 {
 	Masher* plugin = (Masher*)instance;
-	
+
 	static const int randomness       = 1.0; // FIXME: make a control port
 	int              read_grain       = 0;   // FIXME: what is this?
 	int              grain_store_size = 100; // FIXME: what is this? (max 1000)
 
 	const LADSPA_Data grain_pitch = *plugin->grain_pitch;
 	const LADSPA_Data density     = *plugin->density;
-	
+
 	const LADSPA_Data* const in  = plugin->input;
 	LADSPA_Data* const       out = plugin->output;
-	
+
 	Sample out_sample = { out, nframes };
 
 	size_t n           = 0;
@@ -166,7 +166,7 @@ masher_run(LADSPA_Handle instance, unsigned long nframes)
 	bool   first       = true;
 	size_t grain_index = 0;
 	size_t next_grain  = 0;
-	
+
 	// Zero output buffer
 	for (n = 0; n < nframes; ++n)
 		out[n] = 0.0f;
@@ -210,7 +210,7 @@ masher_run(LADSPA_Handle instance, unsigned long nframes)
 			if (n + grain_length > nframes) {
 				if (plugin->overlaps_size < OVERLAPS_SIZE) {
 					GrainDesc new_grain;
-	
+
 					new_grain.pos = n;
 					new_grain.grain = grain_num;
 					plugin->overlaps[plugin->overlaps_size++] = new_grain;

@@ -51,7 +51,7 @@ mdaLoudness::mdaLoudness(audioMasterCallback audioMaster): AudioEffectX(audioMas
   setNumInputs(2);
   setNumOutputs(2);
   setUniqueID("mdaLoudness");
-	DECLARE_LVZ_DEPRECATED(canMono) ();				      
+	DECLARE_LVZ_DEPRECATED(canMono) ();
   canProcessReplacing();
 
   programs = new mdaLoudnessProgram[numPrograms];
@@ -65,7 +65,7 @@ void mdaLoudness::resume() ///update internal parameters...
 {
   float f, tmp;
   long  i;
-  
+
   tmp = param[0] + param[0] - 1.0f;
   igain = 60.0f * tmp * tmp;
   if(tmp<0.0f) igain *= -1.0f;
@@ -84,12 +84,12 @@ void mdaLoudness::resume() ///update internal parameters...
 
   A0 = 1.0f - (float)exp(-6.283153f * A0 / getSampleRate());
 
-  if(igain>0) 
+  if(igain>0)
   {
     //if(mode==0) suspend();  //don't click when switching mode
-    mode=1; 
+    mode=1;
   }
-  else 
+  else
   {
     //if(mode==1) suspend();
     mode=0;
@@ -126,10 +126,10 @@ void mdaLoudness::setProgram(LvzInt32 program)
   resume();
 }
 
-void  mdaLoudness::setParameter(LvzInt32 index, float value) 
-{ 
+void  mdaLoudness::setParameter(LvzInt32 index, float value)
+{
   programs[curProgram].param[index] = param[index] = value; //bug was here!
-  resume(); 
+  resume();
 }
 
 float mdaLoudness::getParameter(LvzInt32 index) { return param[index]; }
@@ -206,7 +206,7 @@ void mdaLoudness::process(float **inputs, float **outputs, LvzInt32 sampleFrames
                                         b -= z2 * a1;
       c += a * g;
       d += b * g;
-      
+
       *++out1 = c;
       *++out2 = d;
     }
@@ -268,7 +268,7 @@ void mdaLoudness::processReplacing(float **inputs, float **outputs, LvzInt32 sam
                                         b -= z2 * a1;
       c = a * g;
       d = b * g;
-      
+
       *++out1 = c;
       *++out2 = d;
     }

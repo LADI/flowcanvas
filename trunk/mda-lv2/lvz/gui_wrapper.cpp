@@ -1,6 +1,6 @@
 /* LVZ - A C++ interface for writing LV2 plugins.
  * Copyright (C) 2008 Dave Robillard <http://drobilla.net>
- *  
+ *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option)
@@ -82,10 +82,10 @@ mda_ui_instantiate(const struct _LV2UI_Descriptor* descriptor,
 	ui->effect = NULL;
 
 	typedef struct { const void* (*extension_data)(const char* uri); } LV2_DataAccess;
-				
+
 	typedef const void*         (*extension_data_func)(const char* uri);
 	typedef const AudioEffectX* (*get_effect_func)(LV2_Handle instance);
-	
+
 	LV2_Handle      instance = NULL;
 	get_effect_func get_effect = NULL;
 
@@ -116,10 +116,10 @@ mda_ui_instantiate(const struct _LV2UI_Descriptor* descriptor,
 
 	ui->socket = GTK_SOCKET(gtk_socket_new());
 	gtk_widget_show_all(GTK_WIDGET(ui->socket));
-	
+
 	*widget = ui->socket;
 	g_timeout_add(30, mda_ui_idle, ui);
-	
+
 	return ui;
 }
 
@@ -141,7 +141,7 @@ mda_ui_port_event(LV2UI_Handle ui,
 	// VST UIs seem to not use this at all, it's all polling
 	// The shit the proprietary people come up (and get away) with...
 }
- 
+
 
 static const void*
 mda_ui_extension_data(const char* uri)

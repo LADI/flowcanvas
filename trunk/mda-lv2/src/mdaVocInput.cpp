@@ -31,8 +31,8 @@ mdaVocInput::mdaVocInput(audioMasterCallback audioMaster): AudioEffectX(audioMas
 {
   setNumInputs(2);
   setNumOutputs(2);
-  setUniqueID("mdaVocInput");  ///identify plug-in here 
-	DECLARE_LVZ_DEPRECATED(canMono) ();				      
+  setUniqueID("mdaVocInput");  ///identify plug-in here
+	DECLARE_LVZ_DEPRECATED(canMono) ();
   canProcessReplacing();
 
   programs = new mdaVocInputProgram[numPrograms];
@@ -118,7 +118,7 @@ void mdaVocInput::getParameterDisplay(LvzInt32 index, char *text)
                              case 1: strcpy(string, "FREE");   break;
                              case 2: strcpy(string, "QUANT"); } break;
 
-    case  1: if(track) sprintf(string, "%ld", (long)(48.0f * param[1] - 24.0f)); 
+    case  1: if(track) sprintf(string, "%ld", (long)(48.0f * param[1] - 24.0f));
                   else midi2string((long)(48.0f * param[1] + 21.0f), string); break;
 
     case  4: midi2string((long)(48.0f * param[4] + 45.0f), string); break;
@@ -166,14 +166,14 @@ void mdaVocInput::midi2string(long n, char *text) //show name of MIDI note numbe
     case  8: t[p++]='G'; t[p++]='#'; break;
     case  9: t[p++]='A';             break;
     case 10: t[p++]='A'; t[p++]='#'; break;
-    default: t[p++]='B';             
-  }    
+    default: t[p++]='B';
+  }
   t[p++] = ' ';
-  
+
   if(o < 0) { t[p++] = '-';  o = -o; }
-  t[p++] = (char)(48 + (o % 10)); 
-  
-  t[p] = 0; 
+  t[p++] = (char)(48 + (o % 10));
+
+  t[p] = 0;
   strcpy(text, t);
 }
 
@@ -186,7 +186,7 @@ void mdaVocInput::process(float **inputs, float **outputs, LvzInt32 sampleFrames
   float *out2 = outputs[1];
   float a, b, c, d;
   float ds=pstep, s=sawbuf, n=noise;
-  float l0=lbuf0, l1=lbuf1, l2=lbuf2, l3=lbuf3; 
+  float l0=lbuf0, l1=lbuf1, l2=lbuf2, l3=lbuf3;
   float le=lenv, he=henv, et=lfreq*0.1f, lf=lfreq, v=vuv, mn=minp, mx=maxp;
   float rootm=39.863137f;
   long  tr=track;
@@ -197,7 +197,7 @@ void mdaVocInput::process(float **inputs, float **outputs, LvzInt32 sampleFrames
   --out2;
   while(--sampleFrames >= 0)
   {
-    a = *++in1; 
+    a = *++in1;
     b = *++in2;
     c = out1[1];
     d = out2[1];
@@ -226,14 +226,14 @@ void mdaVocInput::process(float **inputs, float **outputs, LvzInt32 sampleFrames
           if(tr==2)            //quantize pitch
           {
             ds = rootm * (float)(log10(ds) - root);
-            ds = (float)pow(1.0594631, floor(ds + 0.5) + rootm * root);   
+            ds = (float)pow(1.0594631, floor(ds + 0.5) + rootm * root);
           }
         }
         l3 = l2;               //restart period measurement
       }
       l2=l1;                   //remember previous sample
     }
-  
+
     b = 0.00001f * (float)((rand() & 32767) - 16384);  //sibilance
     if(le>he) b *= s * n;                    //...or modulated breath noise
     b += s; s += ds; if(s>0.5f) s-=1.0f;     //badly aliased sawtooth!
@@ -249,7 +249,7 @@ void mdaVocInput::process(float **inputs, float **outputs, LvzInt32 sampleFrames
   if(fabs(he)>1.0e-10) henv = he; else henv=0.0f; //catch denormals
   if(fabs(l1)>1.0e-10) { lbuf0=l0; lbuf1=l1; lenv=le; } else { lbuf0 = lbuf1= lenv = 0.0f; }
   lbuf2=l2, lbuf3=l3;
-  if(tr) pstep=ds;     
+  if(tr) pstep=ds;
 }
 
 
@@ -261,7 +261,7 @@ void mdaVocInput::processReplacing(float **inputs, float **outputs, LvzInt32 sam
   float *out2 = outputs[1];
   float a, b;
   float ds=pstep, s=sawbuf, n=noise;
-  float l0=lbuf0, l1=lbuf1, l2=lbuf2, l3=lbuf3; 
+  float l0=lbuf0, l1=lbuf1, l2=lbuf2, l3=lbuf3;
   float le=lenv, he=henv, et=lfreq*0.1f, lf=lfreq, v=vuv, mn=minp, mx=maxp;
   float rootm=39.863137f;
   long  tr=track;
@@ -272,7 +272,7 @@ void mdaVocInput::processReplacing(float **inputs, float **outputs, LvzInt32 sam
   --out2;
   while(--sampleFrames >= 0)
   {
-    a = *++in1; 
+    a = *++in1;
     b = *++in2;
 
     l0 -= lf * (l1 + a);       //fundamental filter (peaking 2nd-order 100Hz lpf)
@@ -299,14 +299,14 @@ void mdaVocInput::processReplacing(float **inputs, float **outputs, LvzInt32 sam
           if(tr==2)            //quantize pitch
           {
             ds = rootm * (float)(log10(ds) - root);
-            ds = (float)pow(1.0594631, floor(ds + 0.5) + rootm * root);   
+            ds = (float)pow(1.0594631, floor(ds + 0.5) + rootm * root);
           }
         }
         l3 = l2;               //restart period measurement
       }
       l2=l1;                   //remember previous sample
     }
-  
+
     b = 0.00001f * (float)((rand() & 32767) - 16384);  //sibilance
     if(le>he) b *= s * n;                    //...or modulated breath noise
     b += s; s += ds; if(s>0.5f) s-=1.0f;     //badly aliased sawtooth!
@@ -319,5 +319,5 @@ void mdaVocInput::processReplacing(float **inputs, float **outputs, LvzInt32 sam
   if(fabs(he)>1.0e-10) henv = he; else henv=0.0f; //catch denormals
   if(fabs(l1)>1.0e-10) { lbuf0=l0; lbuf1=l1; lenv=le; } else { lbuf0 = lbuf1= lenv = 0.0f; }
   lbuf2=l2, lbuf3=l3;
-  if(tr) pstep=ds; 
+  if(tr) pstep=ds;
 }

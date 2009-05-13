@@ -1,15 +1,15 @@
 /* This file is part of Machina.
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * Machina is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
- * 
+ *
  * Machina is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
@@ -65,7 +65,7 @@ Node::random_edge()
 	SharedPtr<Edge> ret;
 	if (_edges.empty())
 		return ret;
-	
+
 	size_t i = rand() % _edges.size();
 
 	// FIXME: O(n) worst case :(
@@ -88,13 +88,13 @@ Node::edges_changed()
 
 	// Normalize edge probabilities if we're a selector
 	double prob_sum = 0;
-	
+
 	for (Edges::iterator i = _edges.begin(); i != _edges.end(); ++i)
 		prob_sum += (*i)->probability();
 
 	for (Edges::iterator i = _edges.begin(); i != _edges.end(); ++i)
 		(*i)->set_probability((*i)->probability() / prob_sum);
-	
+
 	_changed = true;
 }
 
@@ -106,7 +106,7 @@ Node::set_selector(bool yn)
 
 	if (yn)
 		edges_changed();
-	
+
 	_changed = true;
 }
 
@@ -131,13 +131,13 @@ void
 Node::enter(SharedPtr<MIDISink> sink, TimeStamp time)
 {
 	assert(!_is_active);
-	
+
 	_changed = true;
 	_is_active = true;
 	_enter_time = time;
 
 	cerr << "ENTERING " << this << endl;
-	
+
 	if (sink && _enter_action)
 		_enter_action->execute(sink, time);
 }
@@ -147,12 +147,12 @@ void
 Node::exit(SharedPtr<MIDISink> sink, TimeStamp time)
 {
 	assert(_is_active);
-	
+
 	cerr << "EXITING " << this << endl;
-	
+
 	if (sink && _exit_action)
 		_exit_action->execute(sink, time);
-	
+
 	_changed = true;
 	_is_active = false;
 	_enter_time = 0;
@@ -166,7 +166,7 @@ Node::add_edge(SharedPtr<Edge> edge)
 	for (Edges::const_iterator i = _edges.begin(); i != _edges.end(); ++i)
 		if ((*i)->head() == edge->head())
 			return;
-	
+
 	_edges.push_back(edge);
 	edges_changed();
 }
@@ -179,7 +179,7 @@ Node::remove_edge(SharedPtr<Edge> edge)
 	edges_changed();
 }
 
-	
+
 bool
 Node::connected_to(SharedPtr<Node> node)
 {
@@ -203,7 +203,7 @@ Node::remove_edges_to(SharedPtr<Node> node)
 
 		i = next;
 	}
-	
+
 	edges_changed();
 }
 
@@ -212,7 +212,7 @@ void
 Node::write_state(Redland::Model& model)
 {
 	using namespace Raul;
-	
+
 	if (!_id)
 		set_id(model.world().blank_id());
 
@@ -231,7 +231,7 @@ Node::write_state(Redland::Model& model)
 
 	if (_enter_action) {
 		_enter_action->write_state(model);
-		
+
 		model.add_statement(_id,
 				"machina:enterAction",
 				_enter_action->id());

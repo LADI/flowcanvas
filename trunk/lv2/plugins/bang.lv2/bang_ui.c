@@ -30,7 +30,7 @@ typedef struct {
 	LV2UI_Write_Function write_function;
 	GtkWidget*           button;
 } OSCBangUI;
- 
+
 
 void
 bang_ui_on_click(GtkWidget* widget, void* data)
@@ -53,7 +53,7 @@ bang_ui_instantiate(const struct _LV2UI_Descriptor* descriptor,
                         const LV2_Feature* const*   features)
 {
 	OSCBangUI* ui = (OSCBangUI*)malloc(sizeof(OSCBangUI));
-	
+
 	ui->button = gtk_button_new_with_label("Bang");
 	g_object_ref(ui->button);
 
@@ -67,7 +67,7 @@ bang_ui_instantiate(const struct _LV2UI_Descriptor* descriptor,
 
 	return (LV2UI_Handle)ui;
 }
-  
+
 void
 bang_ui_port_event(LV2UI_Handle ui,
                    uint32_t     port_index,

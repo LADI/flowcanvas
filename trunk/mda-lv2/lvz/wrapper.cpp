@@ -1,6 +1,6 @@
 /* LVZ - A C++ interface for writing LV2 plugins.
  * Copyright (C) 2008 Dave Robillard <http://drobilla.net>
- *  
+ *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option)
@@ -58,7 +58,7 @@ mda_connect_port(LV2_Handle instance, uint32_t port, void* data)
 
 	uint32_t num_params = plugin->effect->getNumParameters();
 	uint32_t num_inputs = plugin->effect->getNumInputs();
-	
+
 	if (port < num_params) {
 		plugin->control_buffers[port] = (float*)data;
 		if (data != NULL)
@@ -87,14 +87,14 @@ mda_instantiate(const LV2_Descriptor*    descriptor,
 	PLUGIN_CLASS* effect = new PLUGIN_CLASS(master_callback);
 	effect->setURI(URI_PREFIX PLUGIN_URI_SUFFIX);
 	effect->setSampleRate(rate);
-	
+
 	uint32_t num_params = effect->getNumParameters();
 	uint32_t num_inputs = effect->getNumInputs();
 	uint32_t num_outputs = effect->getNumOutputs();
-	
+
 	MDAPlugin* plugin = (MDAPlugin*)malloc(sizeof(MDAPlugin));
 	plugin->effect = effect;
-	
+
 	if (num_params > 0) {
 		plugin->controls = (float*)malloc(sizeof(float) * num_params);
 		plugin->control_buffers = (float**)malloc(sizeof(float*) * num_params);
@@ -114,7 +114,7 @@ mda_instantiate(const LV2_Descriptor*    descriptor,
 	} else {
 		plugin->inputs = NULL;
 	}
-	
+
 	if (num_outputs > 0) {
 		plugin->outputs = (float**)malloc(sizeof(float*) * num_outputs);
 		for (uint32_t i = 0; i < num_outputs; ++i)
@@ -122,7 +122,7 @@ mda_instantiate(const LV2_Descriptor*    descriptor,
 	} else {
 		plugin->outputs = NULL;
 	}
-	
+
 	return (LV2_Handle)plugin;
 }
 
@@ -131,7 +131,7 @@ static void
 mda_run(LV2_Handle instance, uint32_t sample_count)
 {
 	MDAPlugin* plugin = (MDAPlugin*)instance;
-	
+
 	for (int32_t i = 0; i < plugin->effect->getNumParameters(); ++i) {
 		float val = plugin->control_buffers[i][0];
 		if (val != plugin->controls[i]) {
@@ -139,7 +139,7 @@ mda_run(LV2_Handle instance, uint32_t sample_count)
 			plugin->controls[i] = val;
 		}
 	}
-	
+
 	plugin->effect->processReplacing(plugin->inputs, plugin->outputs, sample_count);
 }
 
@@ -162,7 +162,7 @@ mda_extension_data(const char* uri)
 		return NULL;
 	}
 }
-	
+
 
 static void
 mda_deactivate(LV2_Handle instance)

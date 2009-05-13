@@ -1,15 +1,15 @@
 /* Hz to AMS style V/Oct plugin.  Copyright (C) 2005 Dave Robillard.
- * 
+ *
  * This plugin is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option)
  * any later version.
- * 
+ *
  * This plugin is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
@@ -82,7 +82,7 @@ hzvoct_run_cr(LADSPA_Handle instance, unsigned long nframes)
 
 	plugin = (HzVoct*)instance;
 	log2inv = 1.0f/logf(2.0f);
-	
+
 	*plugin->output_buffer = logf(*plugin->input_buffer * eighth) * log2inv - offset;
 }
 
@@ -99,11 +99,11 @@ hzvoct_run_ar(LADSPA_Handle instance, unsigned long nframes)
 	const float   offset = 5.0313842; // + octave, ... -1, 0, 1 ...
 
 	plugin = (HzVoct*)instance;
-	log2inv = 1.0f/logf(2.0);	
+	log2inv = 1.0f/logf(2.0);
 
 	input = plugin->input_buffer;
 	output = plugin->output_buffer;
-	
+
 	// Inverse of the formula used in AMS's converter module (except the 1/8 part)
 	for (i = 0; i < nframes; i++)
 		*output++ = logf((*input++) * eighth) * log2inv - offset;

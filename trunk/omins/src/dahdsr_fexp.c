@@ -1,6 +1,6 @@
 /*
     dahdsr_fexp.c - A LADSPA plugin to generate DAHDSR envelopes
-                  exponential attack, decay and release version. 
+                  exponential attack, decay and release version.
     Copyright (C) 2005 Loki Davison, based on DAHDSR by Mike Rawes
 
     This program is free software; you can redistribute it and/or modify

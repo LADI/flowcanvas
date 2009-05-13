@@ -97,7 +97,7 @@ AEffGUIEditor::AEffGUIEditor (AudioEffect* effect)
 
     effect->setEditor (this);
 }
-	
+
 //-----------------------------------------------------------------------------
 AEffGUIEditor::~AEffGUIEditor ()
 {
@@ -1567,7 +1567,7 @@ CFrame::CFrame (const CRect &inSize, void *inSystemWindow, void *inEditor)
     pVisual  = 0;
     window   = 0;
 	gc       = 0;
-	
+
 	if (display == NULL)
 		display = XOpenDisplay(NULL);
 
@@ -1783,18 +1783,18 @@ bool CFrame::initFrame (void *systemWin)
     atom = XInternAtom (display, "_XEventProc", false);
     XChangeProperty (display, (Window)window, atom, atom, 32,
                      PropModeReplace, (unsigned char*)&data, 1);
-	
+
     XGCValues values;
     values.foreground = 1;
     gc = XCreateGC (display, (Window)window, GCForeground, &values);
-	
+
     // get the std colormap
     XWindowAttributes attr;
     XGetWindowAttributes (display, (Window) window, &attr);
     colormap = attr.colormap;
     pVisual  = attr.visual;
     depth    = attr.depth;
-	
+
     // init and load the fonts
     if (! gFontInit) {
         for (long i = 0; i < kNumStandardFonts; i++) {
@@ -2068,7 +2068,7 @@ void CFrame::idle ()
 
     if (!isDirty ())
         return;
-	
+
 	XdbeBeginIdiom(display);
 	XdbeSwapInfo swap_info;
 	swap_info.swap_window = window;
@@ -2080,7 +2080,7 @@ void CFrame::idle ()
     update (pContext);
 
     pContext->forget ();
-	
+
 	XdbeEndIdiom(display);
 }
 
@@ -2840,7 +2840,7 @@ void CViewContainer::redrawRect (CDrawContext* context, const CRect& rect)
             context->offset.v += off.y;
 
         	drawRect (context, _rect);
-            
+
 			// restore
             context->offsetScreen.h = save[0];
             context->offsetScreen.v = save[1];
@@ -3450,14 +3450,14 @@ CBitmap::CBitmap (long ID)
 #if DEBUG
     gNbCBitmap++;
 #endif
-    
+
 	pHandle = 0;
 	pngRead = NULL;
 	pngInfo = NULL;
 
 	bool found = false;
     long i = 0;
-    
+
 	const char* p = NULL;
 	while (pngResources[i].id != 0) {
         if (pngResources[i].id == resourceID) {
@@ -3469,7 +3469,7 @@ CBitmap::CBitmap (long ID)
 		}
 		++i;
 	}
-    
+
 	if (VSTGUI::bundlePath == NULL) {
 		std::cerr << "ERROR: No bundle path set, unable to load images" << std::endl;
 	} else {
@@ -3750,7 +3750,7 @@ bool CBitmap::openPng (const char* path)
 		fprintf(stderr, "Unable to open file %s\n", path);
 		return false;
 	}
-	
+
 	png_byte header[8];
 	fread(header, 1, 8, fp);
 	if (png_sig_cmp(header, 0, 8)) {
@@ -3763,7 +3763,7 @@ bool CBitmap::openPng (const char* path)
 		fprintf(stderr, "Unable to initialize libpng\n");
 		return false;
 	}
-    
+
 	pngInfo = png_create_info_struct(pngRead);
     if (!pngInfo) {
         png_destroy_read_struct(&pngRead, NULL, NULL);
@@ -3773,7 +3773,7 @@ bool CBitmap::openPng (const char* path)
 
 	png_init_io(pngRead, fp);
 	png_set_sig_bytes(pngRead, 8);
-	
+
 	png_read_info(pngRead, pngInfo);
 
 	width = pngInfo->width;
@@ -3804,21 +3804,21 @@ void* CBitmap::createPixmapFromPng (CDrawContext *pContext)
         return NULL;
 
 	assert(width > 0 && height > 0);
-	
+
 	png_byte** rows = (png_byte**)malloc(height * sizeof(png_byte*));
 	for (int i = 0; i < height; ++i)
 		rows[i] = (png_byte*)(malloc(pngInfo->width * sizeof(uint32_t)));
-	
+
 	png_read_image(pngRead, rows);
 
 	CFrame* frame = pContext->pFrame;
 
 	Pixmap p = XCreatePixmap(display, frame->getBackBuffer(),
 			pngInfo->width, pngInfo->height, 24);
-    
+
 	XGCValues values;
     values.foreground = 0xFFFFFFFF;
-    
+
 	// Draw
 	GC gc = XCreateGC (display, p, GCForeground, &values);
 	for (unsigned y = 0; y < pngInfo->height; y++) {
@@ -3832,7 +3832,7 @@ void* CBitmap::createPixmapFromPng (CDrawContext *pContext)
 		}
 	}
     XFreeGC (display, gc);
-	
+
 	closePng();
 
 	return (void*)p;

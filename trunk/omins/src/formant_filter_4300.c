@@ -4,17 +4,17 @@
  * Copyright (C) 2001 David Griffiths <dave@pawfal.org>
  *
  * Based on public domain code from alex@smartelectronix.com
- * 
+ *
  * This plugin is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option)
  * any later version.
- * 
+ *
  * This plugin is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
@@ -98,7 +98,7 @@ formant_activate(LADSPA_Handle instance)
 {
 	Formant* plugin = (Formant*)instance;
 	int i, j;
-	
+
 	for (i = 0; i < 5; ++i)
 		for (j = 0; j < 10; ++j)
 			plugin->memory[i][j] = 0.0;
@@ -138,12 +138,12 @@ formant_run_vc(LADSPA_Handle instance, unsigned long nframes)
 	LADSPA_Data  res;
 	LADSPA_Data  o[5];
 	size_t       n, v;
-	
+
 	for (n=0; n < nframes; ++n) {
 		vowel = plugin->vowel[0];
 		in = plugin->input[n];
 		out = plugin->output;
-		
+
 		for (v=0; v < 5; ++v) {
 			res = (float) (coeff[v][0] * (in * 0.1f) +
 			              coeff[v][1] * plugin->memory[v][0] +

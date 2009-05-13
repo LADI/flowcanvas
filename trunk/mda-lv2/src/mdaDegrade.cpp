@@ -18,11 +18,11 @@ mdaDegrade::mdaDegrade(audioMasterCallback audioMaster)	: AudioEffectX(audioMast
   fParam5 = (float)0.58; //non-lin
   fParam6 = (float)0.5; //level
 
-  setNumInputs(2);		  
-	setNumOutputs(2);		  
+  setNumInputs(2);
+	setNumOutputs(2);
 	setUniqueID("mdaDegrade");    // identify here
-	DECLARE_LVZ_DEPRECATED(canMono) ();				      
-	canProcessReplacing();	
+	DECLARE_LVZ_DEPRECATED(canMono) ();
+	canProcessReplacing();
 	strcpy(programName, "Degrade");
 
   buf0 = buf1 = buf2 = buf3 = buf4 = buf5 = buf6 = buf7 = buf8 = buf9 = 0.0f;
@@ -37,31 +37,31 @@ bool  mdaDegrade::getEffectName(char* name)    { strcpy(name, "Degrade"); return
 void mdaDegrade::setParameter(LvzInt32 index, float value)
 {
 	float f;
-  
+
   switch(index)
   {
     case 0: fParam1 = value; break;
     case 1: fParam2 = value; break;
     case 2: fParam3 = value; break;
     case 3: fParam4 = value; break;
-    case 4: fParam5 = value; break; 
+    case 4: fParam5 = value; break;
     case 5: fParam6 = value; break;
   }
   //calcs here
   if(fParam3>0.5) { f = fParam3 - 0.5f;  mode = 1.0f; }
              else { f = 0.5f - fParam3;  mode = 0.0f; }
-    
+
   tn = (int)exp(18.0f * f);
-    
+
     //tn = (int)(18.0 * fParam3 - 8.0); mode=1.f; }
     //         else { tn = (int)(10.0 - 18.0 * fParam3); mode=0.f; }
   tcount = 1;
   clp = (float)(pow(10.0,(-1.5 + 1.5 * fParam1)) );
   fo2 = filterFreq((float)pow(10.0f, 2.30104f + 2.f*fParam4));
   fi2 = (1.f-fo2); fi2=fi2*fi2; fi2=fi2*fi2;
-  float _g1 = (float)(pow(2.0,2.0 + int(fParam2*12.0))); 
+  float _g1 = (float)(pow(2.0,2.0 + int(fParam2*12.0)));
   g2 = (float)(1.0/(2.0 * _g1));
-  if(fParam3>0.5) g1 = -_g1/(float)tn; else g1= -_g1; 
+  if(fParam3>0.5) g1 = -_g1/(float)tn; else g1= -_g1;
   g3 = (float)(pow(10.0,2.0*fParam6 - 1.0));
   if(fParam5>0.5) { lin = (float)(pow(10.0,0.3 * (0.5 - fParam5))); lin2=lin; }
   else { lin = (float)pow(10.0,0.3 * (fParam5 - 0.5)); lin2=1.0; }
@@ -78,7 +78,7 @@ void mdaDegrade::suspend()
 float mdaDegrade::filterFreq(float hz)
 {
   float j, k, r=0.999f;
-  
+
   j = r * r - 1;
   k = (float)(2.f - 2.f * r * r * cos(0.647f * hz / getSampleRate() ));
   return (float)((sqrt(k*k - 4.f*j*j) - k) / (2.f*j));
@@ -164,18 +164,18 @@ void mdaDegrade::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
   float cl=clp, i2=fi2, o2=fo2;
   float b1=buf1, b2=buf2, b3=buf3, b4=buf4, b5=buf5;
   float b6=buf6, b7=buf7, b8=buf8, b9=buf9;
-  float gi=g1, go=g2, ga=g3, m=mode;  
-  int n=tn, t=tcount;   
-  
-  --in1;	
-	--in2;	
+  float gi=g1, go=g2, ga=g3, m=mode;
+  int n=tn, t=tcount;
+
+  --in1;
+	--in2;
 	--out1;
 	--out2;
 	while(--sampleFrames >= 0)
 	{
     c = out1[1];
 		d = out2[1]; //process from here...
-          
+
     b0 = (*++in1 + *++in2) + m * b0;
 
     if(t==n)
@@ -187,7 +187,7 @@ void mdaDegrade::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
       else
       { b5=-(float)pow(-b5,l); if(b5<-cl) b5=-cl; }
       b0=0;
-    } 
+    }
     t=t+1;
 
     b1 = i2 * (b5 * ga) + o2 * b1;
@@ -202,14 +202,14 @@ void mdaDegrade::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
     c += b9; // output
 		d += b9;
 
-    *++out1 = c;	
+    *++out1 = c;
 		*++out2 = d;
 	}
-  if(fabs(b1)<1.0e-10) 
+  if(fabs(b1)<1.0e-10)
   { buf1=0.f; buf2=0.f; buf3=0.f; buf4=0.f; buf6=0.f; buf7=0.f;
     buf8=0.f; buf9=0.f; buf0=0.f; buf5=0.f; }
-  else 
-  { buf1=b1; buf2=b2; buf3=b3; buf4=b4; buf6=b6; buf7=b7; 
+  else
+  { buf1=b1; buf2=b2; buf3=b3; buf4=b4; buf6=b6; buf7=b7;
     buf8=b8, buf9=b9; buf0=b0; buf5=b5; tcount=t; }
 }
 
@@ -223,11 +223,11 @@ void mdaDegrade::processReplacing(float **inputs, float **outputs, LvzInt32 samp
   float cl=clp, i2=fi2, o2=fo2;
   float b1=buf1, b2=buf2, b3=buf3, b4=buf4, b5=buf5;
   float b6=buf6, b7=buf7, b8=buf8, b9=buf9;
-  float gi=g1, go=g2, ga=g3, m=mode;  
-  int n=tn, t=tcount;   
-  
-	--in1;	
-	--in2;	
+  float gi=g1, go=g2, ga=g3, m=mode;
+  int n=tn, t=tcount;
+
+	--in1;
+	--in2;
 	--out1;
 	--out2;
 	while(--sampleFrames >= 0)
@@ -243,7 +243,7 @@ void mdaDegrade::processReplacing(float **inputs, float **outputs, LvzInt32 samp
       else
       { b5=-(float)pow(-b5,l); if(b5<-cl) b5=-cl; }
       b0=0;
-    } 
+    }
     t=t+1;
 
     b1 = i2 * (b5 * ga) + o2 * b1;
@@ -258,10 +258,10 @@ void mdaDegrade::processReplacing(float **inputs, float **outputs, LvzInt32 samp
 		*++out1 = b9;
 		*++out2 = b9;
 	}
-  if(fabs(b1)<1.0e-10) 
+  if(fabs(b1)<1.0e-10)
   { buf1=0.f; buf2=0.f; buf3=0.f; buf4=0.f; buf6=0.f; buf7=0.f;
     buf8=0.f; buf9=0.f; buf0=0.f; buf5=0.f; }
-  else 
-  { buf1=b1; buf2=b2; buf3=b3; buf4=b4; buf6=b6; buf7=b7; 
+  else
+  { buf1=b1; buf2=b2; buf3=b3; buf4=b4; buf6=b6; buf7=b7;
     buf8=b8, buf9=b9; buf0=b0; buf5=b5; tcount=t; }
 }

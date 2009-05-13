@@ -26,14 +26,14 @@ mdaAmbience::mdaAmbience(audioMasterCallback audioMaster) : AudioEffectX(audioMa
 
   fil = 0.0f;
   den = pos=0;
-  
-  setNumInputs(2);		  
-	setNumOutputs(2);		  
+
+  setNumInputs(2);
+	setNumOutputs(2);
 	setUniqueID("mdaAmb");    // identify here
-	DECLARE_LVZ_DEPRECATED(canMono) ();				      
-	canProcessReplacing();	
+	DECLARE_LVZ_DEPRECATED(canMono) ();
+	canProcessReplacing();
 	strcpy(programName, "Small Space Ambience");
-	
+
   suspend();		// flush buffer
   setParameter(0, 0.7f); //go and set initial values!
 }
@@ -41,7 +41,7 @@ mdaAmbience::mdaAmbience(audioMasterCallback audioMaster) : AudioEffectX(audioMa
 void mdaAmbience::setParameter(LvzInt32 index, float value)
 {
 	float tmp;
-  
+
   switch(index)
   {
     case 0: fParam0 = value; break;
@@ -54,7 +54,7 @@ void mdaAmbience::setParameter(LvzInt32 index, float value)
   damp = 0.05f + 0.9f * fParam1;
   tmp = (float)pow(10.0f, 2.0f * fParam3 - 1.0f);
   dry = tmp - fParam2 * fParam2 * tmp;
-  wet = (0.4f + 0.4f) * fParam2 * tmp;  
+  wet = (0.4f + 0.4f) * fParam2 * tmp;
 
   tmp = 0.025f + 2.665f * fParam0;
   if(size!=tmp) rdy=0;  //need to flush buffer
@@ -148,7 +148,7 @@ void mdaAmbience::process(float **inputs, float **outputs, LvzInt32 sampleFrames
 	float *in2 = inputs[1];
 	float *out1 = outputs[0];
 	float *out2 = outputs[1];
-	float a, b, c, d, r;	
+	float a, b, c, d, r;
 	float t, f=fil, fb=fbak, dmp=damp, y=dry, w=wet;
   long  p=pos, d1, d2, d3, d4;
 
@@ -159,14 +159,14 @@ void mdaAmbience::process(float **inputs, float **outputs, LvzInt32 sampleFrames
   d3 = (p + (long)(277 * size)) & 1023;
   d4 = (p + (long)(379 * size)) & 1023;
 
-  --in1;	
-	--in2;	
+  --in1;
+	--in2;
 	--out1;
 	--out2;
-	
+
   while(--sampleFrames >= 0)
 	{
-		a = *++in1; 
+		a = *++in1;
     b = *++in2;
 		c = out1[1];
 		d = out2[1]; //process from here...
@@ -183,7 +183,7 @@ void mdaAmbience::process(float **inputs, float **outputs, LvzInt32 sampleFrames
     r -= fb * t;
     *(buf2 + d2) = r; //allpass
     r += t;
-    
+
     t = *(buf3 + p);
     r -= fb * t;
     *(buf3 + d3) = r; //allpass
@@ -216,7 +216,7 @@ void mdaAmbience::processReplacing(float **inputs, float **outputs, LvzInt32 sam
 	float *in2 = inputs[1];
 	float *out1 = outputs[0];
 	float *out2 = outputs[1];
-	float a, b, r;	
+	float a, b, r;
   float t, f=fil, fb=fbak, dmp=damp, y=dry, w=wet;
   long  p=pos, d1, d2, d3, d4;
 
@@ -227,8 +227,8 @@ void mdaAmbience::processReplacing(float **inputs, float **outputs, LvzInt32 sam
   d3 = (p + (long)(277 * size)) & 1023;
   d4 = (p + (long)(379 * size)) & 1023;
 
-	--in1;	
-	--in2;	
+	--in1;
+	--in2;
 	--out1;
 	--out2;
 
@@ -249,7 +249,7 @@ void mdaAmbience::processReplacing(float **inputs, float **outputs, LvzInt32 sam
     r -= fb * t;
     *(buf2 + d2) = r; //allpass
     r += t;
-    
+
     t = *(buf3 + p);
     r -= fb * t;
     *(buf3 + d3) = r; //allpass
@@ -273,5 +273,5 @@ void mdaAmbience::processReplacing(float **inputs, float **outputs, LvzInt32 sam
 	}
   pos=p;
   if(fabs(f)>1.0e-10) { fil=f;  den=0; }  //catch denormals
-                 else { fil=0.0f;  if(den==0) { den=1;  suspend(); } } 
+                 else { fil=0.0f;  if(den==0) { den=1;  suspend(); } }
 }

@@ -1,6 +1,6 @@
 /* This file is part of Eugene
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * Eugene is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free
  * Software Foundation, either version 3 of the License, or (at your option)
@@ -39,7 +39,7 @@ public:
 
 	virtual boost::shared_ptr<Population>
 	initial_population(size_t gene_size, size_t pop_size) const;
-	
+
 #ifndef NDEBUG
 	bool assert_gene(const GeneType& g) const {
 		for (size_t i = 0; i < g.size(); ++i) {

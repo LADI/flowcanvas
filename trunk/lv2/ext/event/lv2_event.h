@@ -1,8 +1,8 @@
 /* lv2_event.h - C header file for the LV2 events extension.
- * 
+ *
  * Copyright (C) 2006-2007 Lars Luthman <lars.luthman@gmail.com>
  * Copyright (C) 2008 Dave Robillard <dave@drobilla.net>
- * 
+ *
  * This header is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation; either version 2 of the License, or
@@ -20,7 +20,7 @@
 
 #ifndef LV2_EVENT_H
 #define LV2_EVENT_H
- 
+
 #define LV2_EVENT_URI "http://lv2plug.in/ns/ext/event"
 #define LV2_EVENT_AUDIO_STAMP 0
 
@@ -76,7 +76,7 @@ typedef struct {
 	 * otherwise this is 1/(2^32) of an audio frame.
 	 */
 	uint32_t subframes;
-	
+
 	/** The type of this event, as a number which represents some URI
 	 * defining an event type.  This value MUST be some value previously
 	 * returned from a call to the uri_to_id function defined in the LV2
@@ -121,7 +121,7 @@ typedef struct {
  * |FRAMES |SUBFRMS|TYP|LEN|DATA..DATA..PAD|FRAMES | ...
  */
 typedef struct {
-	
+
 	/** The contents of the event buffer.  This may or may not reside in the
 	 * same block of memory as this header, plugins must not assume either.
 	 * The host guarantees this points to at least capacity bytes of allocated
@@ -201,14 +201,14 @@ typedef void* LV2_Event_Callback_Data;
  * and data pointed to an instance of this struct.
  */
 typedef struct {
-	
+
 	/** Opaque pointer to host data.
 	 *
 	 * The plugin MUST pass this to any call to functions in this struct.
 	 * Otherwise, it must not be interpreted in any way.
 	 */
 	LV2_Event_Callback_Data callback_data;
-	
+
 	/** Take a reference to a non-POD event.
 	 *
 	 * If a plugin receives an event with type 0, it means the event is a
@@ -231,7 +231,7 @@ typedef struct {
 	 */
 	uint32_t (*lv2_event_ref)(LV2_Event_Callback_Data callback_data,
 	                          LV2_Event*              event);
-	
+
 	/** Drop a reference to a non-POD event.
 	 *
 	 * If a plugin receives an event with type 0, it means the event is a

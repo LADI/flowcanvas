@@ -1,15 +1,15 @@
 /* This file is part of Machina.
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * Machina is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
- * 
+ *
  * Machina is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
@@ -33,7 +33,7 @@ using namespace std;
 
 namespace Machina {
 
-	
+
 Problem::Problem(TimeUnit unit, const std::string& target_midi, SharedPtr<Machine> seed)
 	: _unit(unit)
 	, _target(*this)
@@ -42,9 +42,9 @@ Problem::Problem(TimeUnit unit, const std::string& target_midi, SharedPtr<Machin
 	Raul::SMFReader smf;
 	const bool opened = smf.open(target_midi);
 	assert(opened);
-	
+
 	smf.seek_to_track(2); // FIXME: ?
-	
+
 	uint8_t  buf[4];
 	uint32_t ev_size;
 	uint32_t delta_time;
@@ -80,7 +80,7 @@ Problem::fitness(const Machine& const_machine) const
 	map<Machine*, float>::const_iterator cached = _fitness.find(&machine);
 	if (cached != _fitness.end())
 		return cached->second;
-	
+
 	SharedPtr<Evaluator> eval(new Evaluator(*this));
 
 	//machine.reset();
@@ -89,15 +89,15 @@ Problem::fitness(const Machine& const_machine) const
 	machine.set_sink(eval);
 
 	// FIXME: timing stuff here isn't right at all...
-	
+
 	static const unsigned ppqn = MACHINA_PPQN;
 	Raul::TimeSlice time(ppqn, ppqn, 120.0);
 	time.set_slice(TimeStamp(_unit, 0, 0), TimeDuration(_unit, 2 * ppqn));
-		
+
 	machine.run(time);
 	if (eval->n_notes() == 0)
 		return 0.0f; // bad dog
-	
+
 	TimeStamp end(_unit, time.start_ticks().ticks() + 2 * ppqn);
 	time.set_slice(end, TimeStamp(_unit, 0, 0));
 
@@ -109,7 +109,7 @@ Problem::fitness(const Machine& const_machine) const
 	}
 
 	eval->compute();
-	
+
 	// count
 #if 0
 	float f = 0;
@@ -123,12 +123,12 @@ Problem::fitness(const Machine& const_machine) const
 	}
 #endif
 	//cout << ")";
-	
+
 	// distance
 	//float f = distance(eval->_notes, _target._notes);
-	
+
 	float f = 0.0;
-	
+
 	for (Evaluator::Patterns::const_iterator i = eval->_patterns.begin(); i != eval->_patterns.end(); ++i) {
 		// Reward for matching patterns
 		if (_target._patterns.find(i->first) != _target._patterns.end()) {
@@ -142,7 +142,7 @@ Problem::fitness(const Machine& const_machine) const
 			f -= (i->second / (float)eval->_patterns.size() * (float)(invlen*invlen*invlen)) * 4;
 		}
 	}
-	
+
 	// Punish for missing patterns
 	for (Evaluator::Patterns::const_iterator i = _target._patterns.begin(); i != _target._patterns.end(); ++i) {
 		if (eval->_patterns.find(i->first) == _target._patterns.end()) {
@@ -156,7 +156,7 @@ Problem::fitness(const Machine& const_machine) const
 
 	return f;
 }
-	
+
 
 void
 Problem::Evaluator::write_event(Raul::TimeStamp time,
@@ -166,10 +166,10 @@ Problem::Evaluator::write_event(Raul::TimeStamp time,
 	if ((ev[0] & 0xF0) == MIDI_CMD_NOTE_ON) {
 
 		const uint8_t note = ev[1];
-		
+
 		if (_first_note == 0)
 			_first_note = note;
-		
+
 		/*++_note_frequency[note];
 		++n_notes();*/
 		//_notes.push_back(note);
@@ -193,7 +193,7 @@ Problem::Evaluator::write_event(Raul::TimeStamp time,
 
 		++_counts[note];
 		++_n_notes;
-		
+
 	}
 }
 
@@ -209,7 +209,7 @@ Problem::Evaluator::compute()
 		}
 	}*/
 }
-	
+
 
 boost::shared_ptr<Problem::Population>
 Problem::initial_population(size_t gene_size, size_t pop_size) const
@@ -262,7 +262,7 @@ Problem::initial_population(size_t gene_size, size_t pop_size) const
 				cur = head;
 			}
 		}
-		
+
 		ret->push_back(m);
 
 		/*cout << "initial # nodes: " << m.nodes().size();
@@ -279,10 +279,10 @@ Problem::distance(const std::vector<uint8_t>& source,
                   const std::vector<uint8_t>& target) const
 {
 	// Derived from http://www.merriampark.com/ldcpp.htm
-	
+
 	assert(source.size() < UINT16_MAX);
 	assert(target.size() < UINT16_MAX);
-	
+
 	// Step 1
 
 	const uint16_t n = source.size();

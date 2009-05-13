@@ -1,6 +1,6 @@
 /* This file is part of Eugene
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * Eugene is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free
  * Software Foundation, either version 3 of the License, or (at your option)
@@ -25,7 +25,7 @@ public:
 	Widget(Glib::RefPtr<Gnome::Glade::Xml> xml, const std::string& name) {
 		xml->get_widget(name.c_str(), _me);
 	}
-	
+
 	W*       get()              { return _me; }
 	const W* get() const        { return _me; }
 	W*       operator->()       { return _me; }

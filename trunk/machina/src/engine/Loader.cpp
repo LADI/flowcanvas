@@ -1,15 +1,15 @@
 /* This file is part of Machina.
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * Machina is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
- * 
+ *
  * Machina is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
@@ -76,7 +76,7 @@ Loader::load(const Glib::ustring& uri)
 	cout << "[Loader] Loading " << machine_uri << " from " << document_uri << endl;
 
 	machine = SharedPtr<Machine>(new Machine(TimeUnit::beats(MACHINA_PPQN)));
-	
+
 	typedef std::map<string, SharedPtr<Node> > Created;
 	Created created;
 
@@ -85,7 +85,7 @@ Loader::load(const Glib::ustring& uri)
 	/* Get initial nodes */
 
 	Query query = Query(_rdf_world, ustring(
-		"SELECT DISTINCT ?node ?duration WHERE {\n") + 
+		"SELECT DISTINCT ?node ?duration WHERE {\n") +
 		machine_uri + " :initialNode ?node .\n"
 		"?node          :duration    ?duration .\n"
 		"}\n");
@@ -118,14 +118,14 @@ Loader::load(const Glib::ustring& uri)
 			SharedPtr<Node> node(new Node(
 				TimeStamp(TimeUnit(TimeUnit::BEATS, MACHINA_PPQN), (double)(*i)["duration"]),
 				false));
-			machine->add_node(node); 
+			machine->add_node(node);
 			created[node_id] = node;
 		}
 	}
 
 
 	/* Find out which nodes are selectors */
-	
+
 	query = Query(_rdf_world, ustring(
 		"SELECT DISTINCT ?node WHERE {\n") +
 		machine_uri + " :node     ?node .\n"
@@ -184,7 +184,7 @@ Loader::load(const Glib::ustring& uri)
 
 	for (Query::Results::iterator i = results.begin(); i != results.end(); ++i) {
 		const char* src_uri = (*i)["src"];
-		const char* dst_uri = (*i)["dst"]; 
+		const char* dst_uri = (*i)["dst"];
 		float       prob    = (*i)["prob"];
 
 		Created::iterator src_i = created.find(src_uri);

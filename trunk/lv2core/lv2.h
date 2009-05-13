@@ -72,7 +72,7 @@ extern "C" {
  * by dlopen() and family. The file will provide a number of 'plugin
  * types' that can be used to instantiate actual plugins (sometimes known
  * as 'plugin instances') that can be connected together to perform tasks.
- * The host can access these plugin types using the lv2_descriptor() 
+ * The host can access these plugin types using the lv2_descriptor()
  * function.
  *
  * This API contains very limited error-handling.
@@ -92,23 +92,23 @@ extern "C" {
  * Extensions to this specification which add new functions MUST declare in
  * which of these classes the functions belong, or define new classes for them.
  * The rules that hosts must follow are these:
- * 
- *  - When a function from the Discovery class is running, no other 
+ *
+ *  - When a function from the Discovery class is running, no other
  *    functions in the same shared object file may run.
- *  - When a function from the Instantiation class is running for a plugin 
+ *  - When a function from the Instantiation class is running for a plugin
  *    instance, no other functions for that instance may run.
- *  - When a function is running for a plugin instance, no other 
+ *  - When a function is running for a plugin instance, no other
  *    function in the same class may run for that instance.
  *
  * Any simultaneous calls that are not explicitly forbidden by these rules
- * are allowed. For example, a host may call run() for two different plugin 
+ * are allowed. For example, a host may call run() for two different plugin
  * instances simultaneously.
  */
 
 
 /* ************************************************************************* */
 
-    
+
 /** Plugin Handle.
  *
  * This plugin handle indicates a particular instance of the plugin
@@ -122,7 +122,7 @@ typedef void * LV2_Handle;
 
 
 /** Feature data.
- * 
+ *
  * These are passed to a plugin's instantiate method to represent a special
  * feature the host has which the plugin may depend on.  This is to allow
  * extensions to the LV2 specification without causing any breakage.
@@ -152,10 +152,10 @@ typedef struct _LV2_Feature {
 
 
 /** Descriptor for a Type of Plugin.
- * 
+ *
  * This structure is used to describe a plugin type. It provides a number
  * of functions to instantiate it, link it to buffers and run it. */
-typedef struct _LV2_Descriptor { 
+typedef struct _LV2_Descriptor {
 
 	/** A globally unique, case-sensitive identifier for this plugin type.
 	 *
@@ -206,10 +206,10 @@ typedef struct _LV2_Descriptor {
 	 * Memory issues are managed by the host. The plugin must read/write
 	 * the data at these locations every time run() is called, data
 	 * present at the time of this connection call MUST NOT be
-	 * considered meaningful. 
+	 * considered meaningful.
 	 *
-	 * The host MUST NOT try to connect a data buffer to a port index 
-	 * that is not defined in the RDF data for the plugin. If it does, 
+	 * The host MUST NOT try to connect a data buffer to a port index
+	 * that is not defined in the RDF data for the plugin. If it does,
 	 * the plugin's behaviour is undefined.
 	 *
 	 * connect_port() may be called more than once for a plugin instance
@@ -230,7 +230,7 @@ typedef struct _LV2_Descriptor {
 	 * However, overlapped buffers or use of a single buffer for both
 	 * audio and control data may result in unexpected behaviour.
 	 *
-	 * If the plugin has the feature lv2:hardRTCapable then there are 
+	 * If the plugin has the feature lv2:hardRTCapable then there are
 	 * various things that the plugin MUST NOT do within the connect_port()
 	 * function (see lv2.ttl). */
 	void (*connect_port)(LV2_Handle instance,
@@ -239,7 +239,7 @@ typedef struct _LV2_Descriptor {
 
 	/** Function pointer that initialises a plugin instance and activates
 	 * it for use.
-	 * 
+	 *
 	 * This is separated from instantiate() to aid real-time support and so
 	 * that hosts can reinitialise a plugin instance by calling deactivate()
 	 * and then activate(). In this case the plugin instance must reset all
@@ -272,7 +272,7 @@ typedef struct _LV2_Descriptor {
 	 * the plugin instance may not be reused until activate() has been
 	 * called again.
 	 *
-	 * If the plugin has the feature lv2:hardRTCapable then there are 
+	 * If the plugin has the feature lv2:hardRTCapable then there are
 	 * various things that the plugin MUST NOT do within the run()
 	 * function (see lv2.ttl). */
 	void (*run)(LV2_Handle instance,
@@ -299,7 +299,7 @@ typedef struct _LV2_Descriptor {
 	 * of a plugin has been finished with it can be deleted using this
 	 * function. The instance handle passed ceases to be valid after
 	 * this call.
-	 * 
+	 *
 	 * If activate() was called for a plugin instance then a corresponding
 	 * call to deactivate() MUST be made before cleanup() is called.
 	 * Hosts MUST NOT call cleanup() unless instantiate() was previously
@@ -310,27 +310,27 @@ typedef struct _LV2_Descriptor {
 	 * a plugin defined by some extenion (e.g. a struct containing additional
 	 * function pointers).
 	 *
-	 * The actual type and meaning of the returned object MUST be specified 
+	 * The actual type and meaning of the returned object MUST be specified
 	 * precisely by the extension if it defines any extra data.  If a particular
 	 * extension does not define extra instance data, this function MUST return
 	 * NULL for that extension's URI.  If a plugin does not support any
 	 * extensions that define extra instance data, this function pointer may be
 	 * set to NULL rather than providing an empty function.
-	 * 
+	 *
 	 * The only parameter is the URI of the extension. The plugin MUST return
 	 * NULL if it does not support the extension, but hosts SHOULD NOT use this
 	 * as a discovery method (e.g. hosts should only call this function for
 	 * extensions known to be supported by the plugin from the data file).
 	 *
 	 * The host is never responsible for freeing the returned value.
-	 * 
+	 *
 	 * NOTE: This function should return a struct (likely containing function
 	 * pointers) and NOT a direct function pointer.  Standard C and C++ do not
 	 * allow type casts from void* to a function pointer type.  To provide
 	 * additional functions a struct should be returned containing the extra
 	 * function pointers (which is valid standard code, and a much better idea
 	 * for extensibility anyway). */
-	const void* (*extension_data)(const char * uri); 
+	const void* (*extension_data)(const char * uri);
 
 } LV2_Descriptor;
 
@@ -347,7 +347,7 @@ typedef struct _LV2_Descriptor {
  * plugin bundle subdirectories) that should be searched (in order)
  * for plugins.  It is expected that hosts will use a library to provide
  * this functionality.
- * 
+ *
  * A plugin programmer must include a function called "lv2_descriptor"
  * with the following function prototype within the shared object
  * file. This function will have C-style linkage (if you are using
@@ -367,7 +367,7 @@ const LV2_Descriptor * lv2_descriptor(uint32_t index);
 
 
 /** Datatype corresponding to the lv2_descriptor() function. */
-typedef const LV2_Descriptor * 
+typedef const LV2_Descriptor *
 (*LV2_Descriptor_Function)(uint32_t index);
 
 

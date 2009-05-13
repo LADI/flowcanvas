@@ -14,11 +14,11 @@ mdaDeEss::mdaDeEss(audioMasterCallback audioMaster)	: AudioEffectX(audioMaster, 
   fParam1 = (float)0.15f; //thresh
   fParam2 = (float)0.60f; //f
   fParam3 = (float)0.50f; //drive
-  setNumInputs(2);		  
-	setNumOutputs(2);		  
+  setNumInputs(2);
+	setNumOutputs(2);
 	setUniqueID("mdaDeEss");   //identify here
-	DECLARE_LVZ_DEPRECATED(canMono) ();				      
-	canProcessReplacing();	
+	DECLARE_LVZ_DEPRECATED(canMono) ();
+	canProcessReplacing();
 	strcpy(programName, "De-esser");
 
   env=0.f;
@@ -101,7 +101,7 @@ void mdaDeEss::getParameterLabel(LvzInt32 index, char *label)
   {
     case 0: strcpy(label, "dB"); break;
     case 1: strcpy(label, "Hz"); break;
-    case 2: strcpy(label, "dB"); break;  
+    case 2: strcpy(label, "dB"); break;
   }
 }
 
@@ -114,17 +114,17 @@ void mdaDeEss::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
 	float *in2 = inputs[1];
 	float *out1 = outputs[0];
 	float *out2 = outputs[1];
-	float a, b, c, d;	
+	float a, b, c, d;
   float f1=fbuf1, f2=fbuf2, tmp, fi=fil, fo=(1.f-fil);
   float at=att, re=rel, en=env, th=thr, g, gg=gai;
-  
-  --in1;	
-	--in2;	
+
+  --in1;
+	--in2;
 	--out1;
 	--out2;
 	while(--sampleFrames >= 0)
 	{
-		a = *++in1;		
+		a = *++in1;
 		b = *++in2;
     c = out1[1];
 		d = out2[1];
@@ -134,10 +134,10 @@ void mdaDeEss::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
     tmp -= f1;
     f2  = fo * f2 + fi * tmp;
     tmp = gg*(tmp - f2);        //extra HF gain
-    
+
     en=(tmp>en)? en+at*(tmp-en) : en*re;             //envelope
-    if(en>th) g=f1+f2+tmp*(th/en); else g=f1+f2+tmp; //limit 
-    
+    if(en>th) g=f1+f2+tmp*(th/en); else g=f1+f2+tmp; //limit
+
     c += g;
     d += g;
     *++out1 = c;
@@ -153,27 +153,27 @@ void mdaDeEss::processReplacing(float **inputs, float **outputs, LvzInt32 sample
 	float *in2 = inputs[1];
 	float *out1 = outputs[0];
 	float *out2 = outputs[1];
-	float a, b;	
+	float a, b;
   float f1=fbuf1, f2=fbuf2, tmp, fi=fil, fo=(1.f-fil);
   float at=att, re=rel, en=env, th=thr, g, gg=gai;
 
-	--in1;	
-	--in2;	
+	--in1;
+	--in2;
 	--out1;
 	--out2;
 	while(--sampleFrames >= 0)
 	{
-		a = *++in1;		
-		b = *++in2; 
-		
+		a = *++in1;
+		b = *++in2;
+
     tmp = 0.5f * (a + b);       //2nd order crossover
     f1  = fo * f1 + fi * tmp;
     tmp -= f1;
     f2  = fo * f2 + fi * tmp;
     tmp = gg*(tmp - f2);        //extra HF gain
-    
+
     en=(tmp>en)? en+at*(tmp-en) : en*re;             //envelope
-    if(en>th) g=f1+f2+tmp*(th/en); else g=f1+f2+tmp; //limit 
+    if(en>th) g=f1+f2+tmp*(th/en); else g=f1+f2+tmp; //limit
                 //brackets for full-band!!!
     *++out1 = g;
 		*++out2 = g;

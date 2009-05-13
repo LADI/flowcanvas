@@ -1,6 +1,6 @@
 /* This file is part of Eugene
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * Eugene is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free
  * Software Foundation, either version 3 of the License, or (at your option)
@@ -36,7 +36,7 @@ public:
 	virtual void set_mutation_probability(float p) {}
 	virtual void set_crossover_probability(float p) {}
 	virtual void set_num_elites(size_t n) {}
-	
+
 	virtual void iteration()          = 0;
 
 #ifdef GENE_PRINTING
@@ -47,13 +47,13 @@ public:
 
 	virtual float best_fitness() const = 0;
 	virtual float fitness_less_than(float a, float b) const = 0;
-	
+
 	inline int generation() const { return _generation; }
 	virtual int evaluations() const = 0;
-	
+
 	virtual bool optimum_known() { return false; }
 	virtual int32_t optimum() const { return 0; }
-	
+
 protected:
 	boost::detail::atomic_count _generation;
 };
@@ -87,22 +87,22 @@ public:
 	void print_best() const;
 	void print_population(std::ostream& str) const;
 	void print_elites() const;
-	
+
 	float best_fitness() const { return _problem->fitness(*_best.get()); }
-	
+
 	float fitness_less_than(float a, float b) const
 		{ return _problem->fitness_less_than(a, b); }
-	
+
 	bool optimum_known() { return _problem->optimum_known(); }
 	int32_t optimum() const { return _problem->optimum(); }
-	
+
 	int evaluations() const { return _selection->evaluations(); }
-	
+
 	boost::shared_ptr< Problem<G> >   problem()   const { return _problem; }
 	boost::shared_ptr< Selection<G> > selection() const { return _selection; }
 	boost::shared_ptr< Crossover<G> > crossover() const { return _crossover; }
 	boost::shared_ptr< Mutation<G> >  mutation()  const { return _mutation; }
-	
+
 	boost::shared_ptr<typename Problem<G>::Population> const population()
 		{ return _population; }
 
@@ -110,12 +110,12 @@ private:
 	typedef std::pair<typename Problem<G>::Population::const_iterator,
                       typename Problem<G>::Population::const_iterator>
 			GenePair;
-	
+
 	typedef std::list<G> Elites;
 
 	GenePair select_parents(const float total) const;
 	void     find_elites(boost::shared_ptr<typename Problem<G>::Population> population);
-	
+
 	boost::shared_ptr< Problem<G> >   _problem;
 	boost::shared_ptr< Selection<G> > _selection;
 	boost::shared_ptr< Crossover<G> > _crossover;

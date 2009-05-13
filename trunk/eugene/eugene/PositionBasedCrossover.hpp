@@ -1,6 +1,6 @@
 /* This file is part of Eugene
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * Eugene is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free
  * Software Foundation, either version 3 of the License, or (at your option)
@@ -35,7 +35,7 @@ struct PositionBasedCrossover : public Crossover<G> {
 		assert(parent.size() == child.size());
 
 		size_t child_write = 0;
-		
+
 		for (size_t i=0; i < parent.size(); ++i) {
 			while (child[child_write] < child.size())
 				if (child_write < child.size())
@@ -54,7 +54,7 @@ struct PositionBasedCrossover : public Crossover<G> {
 
 		G child_a(gene_size);
 		G child_b(gene_size);
-		
+
 		for (size_t i=0; i < gene_size; ++i) {
 			if (rand() % 2) {
 				child_a[i] = parent_1[i];

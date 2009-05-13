@@ -1,16 +1,16 @@
 /* LV2 OSC Messages Extension
  * Copyright (C) 2007 Dave Robillard
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -84,14 +84,14 @@ lv2_osc_arg_size(char type, const LV2_OSC_Argument* arg)
 	case 'i':
 	case 'f':
 		return 4;
-	
+
 	case 'h':
 	case 'd':
 		return 8;
 
 	case 's':
 		return lv2_osc_string_size(&arg->s);
-	
+
 	/*case 'S':
 		return lv2_osc_string_size(&arg->S);*/
 
@@ -143,14 +143,14 @@ lv2_osc_message_new(const char* path, const char* types, ...)
 
 	LV2_OSC_Event* result = malloc(sizeof(LV2_OSC_Event)
 			+ 4 + lv2_osc_string_size(path));
-	
+
 	const uint32_t path_size = lv2_osc_string_size(path);
 	result->data_size = path_size + 4; // 4 for types
 	result->argument_count = 0;
 	result->types_offset = lv2_osc_string_size(path) + 1;
 	(&result->data)[result->types_offset - 1] = ',';
 	(&result->data)[result->types_offset] = '\0';
-	
+
 	memcpy(&result->data, path, strlen(path) + 1);
 
 	return result;
@@ -158,7 +158,7 @@ lv2_osc_message_new(const char* path, const char* types, ...)
 
 
 /** Create a new LV2_OSC_Event from a raw OSC message.
- * 
+ *
  * If \a out_buf is NULL, new memory will be allocated.  Otherwise the returned
  * value will be equal to buf, unless there is insufficient space in which
  * case NULL is returned.
@@ -170,11 +170,11 @@ lv2_osc_message_from_raw(uint32_t out_buf_size,
                          void*    raw_msg)
 {
 	const uint32_t message_header_size = (sizeof(uint32_t) * 4);
-	
+
 	const uint32_t path_size  = lv2_osc_string_size((char*)raw_msg);
 	const uint32_t types_len  = strlen((char*)(raw_msg + path_size + 1));
 	uint32_t       index_size = types_len * sizeof(uint32_t);
-	
+
 	if (out_buf == NULL) {
 		out_buf_size = message_header_size + index_size + raw_msg_size;
 		out_buf = malloc((size_t)out_buf_size);
@@ -185,17 +185,17 @@ lv2_osc_message_from_raw(uint32_t out_buf_size,
 	LV2_OSC_Event* write_loc = (LV2_OSC_Event*)(out_buf);
 	write_loc->argument_count = types_len;
 	write_loc->data_size = index_size + raw_msg_size;
-	
+
 	// Copy raw message
 	memcpy(&write_loc->data + index_size, raw_msg, raw_msg_size);
 
 	write_loc->types_offset = index_size + path_size + 1;
 	const char* const types = lv2_osc_get_types(write_loc);
-	
+
 	// Calculate/Write index
 	uint32_t args_base_offset = write_loc->types_offset + lv2_osc_string_size(types) - 1;
 	uint32_t arg_offset = 0;
-	
+
 	for (uint32_t i=0; i < write_loc->argument_count; ++i) {
 		((uint32_t*)&write_loc->data)[i] = args_base_offset + arg_offset;
 		const LV2_OSC_Argument* const arg = (LV2_OSC_Argument*)(&write_loc->data + args_base_offset + arg_offset);
@@ -207,13 +207,13 @@ lv2_osc_message_from_raw(uint32_t out_buf_size,
 #endif
 			arg_offset += lv2_osc_arg_size(types[i], arg);
 	}
-	
+
 	/*printf("Index:\n");
 	for (uint32_t i=0; i < write_loc->argument_count; ++i) {
 		printf("%u ", ((uint32_t*)&write_loc->data)[i]);
 	}
 	printf("\n");
-	
+
 	printf("Data:\n");
 	for (uint32_t i=0; i < (write_loc->argument_count * 4) + size; ++i) {
 		printf("%3u", i % 10);
@@ -283,7 +283,7 @@ lv2_osc_buffer_append_message(LV2OSCBuffer* buf, LV2_OSC_Event* msg)
 	++buf->message_count;
 
 	buf->size += msg_size;
-	
+
 	return 0;
 }
 
@@ -299,7 +299,7 @@ lv2_osc_buffer_append(LV2OSCBuffer* buf, double time, const char* path, const ch
 	write_msg->types_offset = strlen(path) + 1;
 
 	memcpy(&write_msg->data, path, write_msg->types_offset);
-	
+
 	/*fprintf(stderr, "Append message:\n");
 	lv2_osc_message_print(write_msg);
 	fprintf(stderr, "\n");*/

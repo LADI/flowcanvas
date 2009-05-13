@@ -1,6 +1,6 @@
 /*
     dahdsr.so.c - A LADSPA plugin to generate DAHDSR envelopes
-                  linear attack, exponential decay and release version. 
+                  linear attack, exponential decay and release version.
     Copyright (C) 2005 Loki Davison, based on DAHDSR by Mike Rawes
 
     This program is free software; you can redistribute it and/or modify

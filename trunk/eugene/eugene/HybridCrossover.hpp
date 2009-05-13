@@ -1,6 +1,6 @@
 /* This file is part of Eugene
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * Eugene is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free
  * Software Foundation, either version 3 of the License, or (at your option)
@@ -45,14 +45,14 @@ public:
 			return; // bad user, no cookie
 
 		_crossovers[crossover_index].first = probability;
-		
+
 		if (probability == 1.0) {
 			for (size_t i=0; i < _crossovers.size(); ++i)
-				if (i != crossover_index) 
+				if (i != crossover_index)
 					_crossovers[i].first = 0.0f;
 		} else {
 			for (size_t i=0; i < _crossovers.size(); ++i)
-				if (i != crossover_index) 
+				if (i != crossover_index)
 					_crossovers[i].first -= delta * (_crossovers[i].first / others);
 		}
 	}
@@ -66,7 +66,7 @@ public:
 			if (flip <= accum)
 				return i->second->crossover(parent_1, parent_2);
 		}
-				
+
 		return _crossovers.back().second->crossover(parent_1, parent_2);
 	}
 

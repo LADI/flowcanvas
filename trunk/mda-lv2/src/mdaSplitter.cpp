@@ -34,19 +34,19 @@ mdaSplitter::mdaSplitter(audioMasterCallback audioMaster): AudioEffectX(audioMas
   setNumInputs(2);
   setNumOutputs(2);
   setUniqueID("mdaSplitter");  ///identify plug-in here
-	DECLARE_LVZ_DEPRECATED(canMono) ();				      
+	DECLARE_LVZ_DEPRECATED(canMono) ();
   canProcessReplacing();
 
   programs = new mdaSplitterProgram[numPrograms];
   setProgram(0);
-  
+
   ///differences from default program...
   programs[1].param[2] = 0.50f;
   programs[1].param[4] = 0.25f;
   strcpy(programs[1].name,"Pass Peaks Only");
   programs[2].param[0] = 0.60f;
   strcpy(programs[2].name,"Stereo Crossover");
-  
+
   suspend();
 }
 
@@ -75,7 +75,7 @@ void mdaSplitter::resume() ///update internal parameters...
   tmp = (long)(2.9f * param[4]);  //level switching
   if(tmp==0) ll = -1.0f;    //below
   if(tmp==1) level = 0.0f;  //all
-  
+
   pp = -1.0f;  //phase correction
   if(ff==ll) pp = 1.0f;
   if(ff==0.0f && ll==-1.0f) { ll *= -1.0f; }
@@ -122,10 +122,10 @@ void mdaSplitter::setProgram(LvzInt32 program)
 }
 
 
-void  mdaSplitter::setParameter(LvzInt32 index, float value) 
-{ 
+void  mdaSplitter::setParameter(LvzInt32 index, float value)
+{
   programs[curProgram].param[index] = param[index] = value; //bug was here!
-  resume(); 
+  resume();
 }
 
 
@@ -138,7 +138,7 @@ void mdaSplitter::getParameterName(LvzInt32 index, char *label)
 {
   switch(index)
   {
-    case  0: strcpy(label, "Mode"); break; 
+    case  0: strcpy(label, "Mode"); break;
     case  1: strcpy(label, "Freq"); break;
     case  2: strcpy(label, "Freq Mode"); break;
     case  3: strcpy(label, "Level"); break;
@@ -183,7 +183,7 @@ void mdaSplitter::getParameterLabel(LvzInt32 index, char *label)
   switch(index)
   {
     case  1: strcpy(label, "Hz"); break;
-    case  3: 
+    case  3:
     case  6: strcpy(label, "dB"); break;
     case  5: strcpy(label, "ms"); break;
     default: strcpy(label, "");
@@ -257,7 +257,7 @@ void mdaSplitter::processReplacing(float **inputs, float **outputs, LvzInt32 sam
   {
     a = *++in1;
     b = *++in2;
-    
+
     a0 += f * (a - a0 - a1);  //frequency split
     a1 += f * a0;
     aa = a1 + fx * a;

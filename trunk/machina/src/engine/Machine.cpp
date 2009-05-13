@@ -1,15 +1,15 @@
 /* This file is part of Machina.
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * Machina is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
- * 
+ *
  * Machina is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
@@ -38,7 +38,7 @@ Machine::Machine(TimeUnit unit)
 {
 }
 
-	
+
 /** Copy a Machine.
  *
  * Creates a deep copy which is the 'same' machine, but with
@@ -53,13 +53,13 @@ Machine::Machine(const Machine& copy)
 	, _sink(copy._sink)
 {
 	map< SharedPtr<Node>, SharedPtr<Node> > replacements;
-	
+
 	for (Nodes::const_iterator n = copy._nodes.begin(); n != copy._nodes.end(); ++n) {
 		SharedPtr<Machina::Node> node(new Machina::Node(*n->get()));
 		_nodes.push_back(node);
 		replacements[*n] = node;
 	}
-	
+
 	for (Nodes::const_iterator n = _nodes.begin(); n != _nodes.end(); ++n) {
 		for (Node::Edges::const_iterator e = (*n)->edges().begin(); e != (*n)->edges().end(); ++e) {
 			(*e)->set_tail(*n);
@@ -82,13 +82,13 @@ Machine::operator=(const Machine& other)
 	_nodes.clear();
 
 	map< SharedPtr<Node>, SharedPtr<Node> > replacements;
-	
+
 	for (Nodes::const_iterator n = other._nodes.begin(); n != other._nodes.end(); ++n) {
 		SharedPtr<Machina::Node> node(new Machina::Node(*n->get()));
 		_nodes.push_back(node);
 		replacements[*n] = node;
 	}
-	
+
 	for (Nodes::const_iterator n = _nodes.begin(); n != _nodes.end(); ++n) {
 		for (Node::Edges::const_iterator e = (*n)->edges().begin(); e != (*n)->edges().end(); ++e) {
 			(*e)->set_tail(*n);
@@ -111,7 +111,7 @@ Machine::set_sink(SharedPtr<Raul::MIDISink> sink)
 {
 	_sink = sink;
 }
-	
+
 
 /** Always returns a node, unless there are none */
 SharedPtr<Node>
@@ -119,7 +119,7 @@ Machine::random_node()
 {
 	if (_nodes.empty())
 		return SharedPtr<Node>();
-	
+
 	size_t i = rand() % _nodes.size();
 
 	// FIXME: O(n) worst case :(
@@ -136,7 +136,7 @@ SharedPtr<Edge>
 Machine::random_edge()
 {
 	SharedPtr<Node> tail = random_node();
-	
+
 	for (size_t i = 0; i < _nodes.size() && tail->edges().empty(); ++i)
 		tail = random_node();
 
@@ -156,7 +156,7 @@ void
 Machine::remove_node(SharedPtr<Node> node)
 {
 	_nodes.erase(_nodes.find(node));
-	
+
 	for (Nodes::const_iterator n = _nodes.begin(); n != _nodes.end(); ++n)
 		(*n)->remove_edges_to(node);
 }
@@ -176,7 +176,7 @@ Machine::reset(Raul::TimeStamp time)
 
 			assert(! node->is_active());
 		}
-	
+
 		for (size_t i=0; i < MAX_ACTIVE_NODES; ++i)
 			_active_nodes.at(i).reset();
 	}
@@ -190,12 +190,12 @@ Machine::reset(Raul::TimeStamp time)
  */
 SharedPtr<Node>
 Machine::earliest_node() const
-{	
+{
 	SharedPtr<Node> earliest;
-	
+
 	for (size_t i=0; i < MAX_ACTIVE_NODES; ++i) {
 		SharedPtr<Node> node = _active_nodes.at(i);
-		
+
 		if (node) {
 			assert(node->is_active());
 			if (!earliest || node->exit_time() < earliest->exit_time()) {
@@ -209,7 +209,7 @@ Machine::earliest_node() const
 
 
 /** Enter a state at the current _time.
- * 
+ *
  * Returns true if node was entered, or false if the maximum active nodes has been reached.
  */
 bool
@@ -250,7 +250,7 @@ Machine::exit_node(SharedPtr<Raul::MIDISink> sink, SharedPtr<Node> node)
 
 	// Activate successors to this node
 	// (that aren't aready active right now)
-	
+
 	if (node->is_selector()) {
 
 		const double rand_normal = rand() / (double)RAND_MAX; // [0, 1]
@@ -258,7 +258,7 @@ Machine::exit_node(SharedPtr<Raul::MIDISink> sink, SharedPtr<Node> node)
 
 		for (Node::Edges::const_iterator s = node->edges().begin();
 				s != node->edges().end(); ++s) {
-			
+
 			if (!(*s)->head()->is_active()
 					&& rand_normal > range_min
 					&& rand_normal < range_min + (*s)->probability()) {
@@ -293,7 +293,7 @@ Machine::exit_node(SharedPtr<Raul::MIDISink> sink, SharedPtr<Node> node)
 /** Run the machine for a (real) time slice.
  *
  * Returns the duration of time the machine actually ran.
- * 
+ *
  * Caller can check is_finished() to determine if the machine still has any
  * active states.  If not, time() will return the exact time stamp the
  * machine actually finished on (so it can be restarted immediately
@@ -317,10 +317,10 @@ Machine::run(const Raul::TimeSlice& time)
 		bool entered = false;
 		if ( ! _nodes.empty()) {
 			for (Nodes::const_iterator n = _nodes.begin(); n != _nodes.end(); ++n) {
-				
+
 				if ((*n)->is_active())
 					(*n)->exit(sink, _time);
-				
+
 				if ((*n)->is_initial()) {
 					if (enter_node(sink, (*n)))
 						entered = true;
@@ -333,7 +333,7 @@ Machine::run(const Raul::TimeSlice& time)
 			return TimeStamp(_time.unit(), 0, 0);
 		}
 	}
-	
+
 	TimeStamp this_time(_time.unit(), 0, 0);
 
 	while (true) {
@@ -363,7 +363,7 @@ Machine::run(const Raul::TimeSlice& time)
 		}
 
 	}
-	
+
 	//assert(this_time <= time.length_beats());
 	return this_time;
 }
@@ -394,7 +394,7 @@ Machine::write_state(Redland::Model& model)
 	size_t count = 0;
 
 	for (Nodes::const_iterator n = _nodes.begin(); n != _nodes.end(); ++n) {
-	
+
 		(*n)->write_state(model);
 
 		if ((*n)->is_initial()) {
@@ -411,12 +411,12 @@ Machine::write_state(Redland::Model& model)
 	count = 0;
 
 	for (Nodes::const_iterator n = _nodes.begin(); n != _nodes.end(); ++n) {
-		
+
 		for (Node::Edges::const_iterator e = (*n)->edges().begin();
 			e != (*n)->edges().end(); ++e) {
-			
+
 			(*e)->write_state(model);
-		
+
 			model.add_statement(model.base_uri(),
 				Redland::Node(model.world(), Redland::Node::RESOURCE, "machina:edge"),
 				(*e)->id());

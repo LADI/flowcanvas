@@ -1,6 +1,6 @@
 /* lv2_data_access.h - C header file for the LV2 Data Access extension.
  * Copyright (C) 2008 Dave Robillard <dave@drobilla.net>
- * 
+ *
  * This header is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation; either version 2 of the License, or
@@ -29,7 +29,7 @@
  * This extension defines a buffer format for ports that can take on
  * various types dynamically at runtime.
  */
-	
+
 
 /** The data field of the LV2_Feature for this extension.
  *
@@ -38,7 +38,7 @@
  * and data pointed to an instance of this struct.
  */
 typedef struct {
-	
+
 	/** Set the type of a polymorphic port.
 	 * If the plugin specifies constraints on port types, the host MUST NOT
 	 * call the run method until all port types have been set to a valid
@@ -57,7 +57,7 @@ typedef struct {
 	                     uint32_t   port,
 	                     uint32_t   type,
 	                     void*      type_data);
-	
+
 } LV2_Polymorphic_Feature;
 
 

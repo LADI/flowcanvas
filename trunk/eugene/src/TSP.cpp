@@ -1,6 +1,6 @@
 /* This file is part of Eugene
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * Eugene is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free
  * Software Foundation, either version 3 of the License, or (at your option)
@@ -25,8 +25,8 @@
 using namespace std;
 
 namespace Eugene {
-	
-	
+
+
 TSP::TSP(const std::string& filename)
 	: _filename(filename)
 {
@@ -56,31 +56,31 @@ TSP::TSP(const std::string& filename)
 				throw std::runtime_error(ss.str());
 			}
 		}
-		
+
 		++tokens;
 
 		City city;
 
 		ifs >> in; // x coordinate
 		city.first = in;
-		
+
 		if (ifs.eof())
 			throw std::runtime_error("Unexpected EOF");
 
 		ifs >> in; // y coordinate
 		city.second = in;
-		
+
 		++tokens;
-		
+
 		_cities.push_back(city);
 		++cities;
 	}
-	
+
 	_gene_size = cities;
 
 	cout << "Loaded " << cities << " cities" << endl;
 }
-	
+
 
 boost::shared_ptr<TSP::Population>
 TSP::initial_population(size_t gene_size, size_t pop_size) const
@@ -117,7 +117,7 @@ TSP::fitness(const GeneType& g) const
 		assert(g[i+1] < _cities.size());
 		d += distance(_cities[g[i]], _cities[g[i+1]]);
 	}
-	
+
 	d += distance(_cities[_cities.size()-1], _cities[0]);
 
 	return d;

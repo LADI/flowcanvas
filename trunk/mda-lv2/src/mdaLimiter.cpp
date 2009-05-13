@@ -9,7 +9,7 @@ AudioEffect *createEffectInstance(audioMasterCallback audioMaster)
 
 mdaLimiter::mdaLimiter(audioMasterCallback audioMaster)	: AudioEffectX(audioMaster, 1, 5)	// 1 program, 4 parameters
 {
-	fParam1 = (float)0.60; //thresh 		
+	fParam1 = (float)0.60; //thresh
   fParam2 = (float)0.60; //trim
   fParam3 = (float)0.15; //attack
   fParam4 = (float)0.50; //release
@@ -18,7 +18,7 @@ mdaLimiter::mdaLimiter(audioMasterCallback audioMaster)	: AudioEffectX(audioMast
   setNumInputs(2);		    // stereo in
 	setNumOutputs(2);		    // stereo out
 	setUniqueID("mdaLimiter");    // identify
-	DECLARE_LVZ_DEPRECATED(canMono) ();				      
+	DECLARE_LVZ_DEPRECATED(canMono) ();
 	canProcessReplacing();	// supports both accumulating and replacing output
 	strcpy(programName, "Limiter");	// default program name
 
@@ -120,7 +120,7 @@ void mdaLimiter::getParameterDisplay(LvzInt32 index, char *text)
     case 4: if(fParam5<0.5) strcpy(text, "HARD");
             else strcpy(text, "SOFT"); break;
   }
-	
+
 }
 
 void mdaLimiter::getParameterLabel(LvzInt32 index, char *label)
@@ -129,9 +129,9 @@ void mdaLimiter::getParameterLabel(LvzInt32 index, char *label)
   {
     case 0: strcpy(label, "dB"); break;
     case 1: strcpy(label, "dB"); break;
-    case 3: strcpy(label, "µs"); break; 
-    case 2: strcpy(label, "ms"); break; 
-    case 4: strcpy(label, ""); break; 
+    case 3: strcpy(label, "µs"); break;
+    case 2: strcpy(label, "ms"); break;
+    case 4: strcpy(label, ""); break;
   }
 }
 
@@ -145,15 +145,15 @@ void mdaLimiter::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
 	float *out1 = outputs[0];
 	float *out2 = outputs[1];
   float g, c, d, at, re, tr, th, lev, ol, or_;
-  
+
   th = thresh;
   g = gain;
   at = att;
   re = rel;
   tr = trim;
-  
-  --in1;	
-	--in2;	
+
+  --in1;
+	--in2;
 	--out1;
 	--out2;
 
@@ -172,7 +172,7 @@ void mdaLimiter::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
       c += (ol * tr * g);
       d += (or_ * tr * g);
 
-      *++out1 = c;	
+      *++out1 = c;
 		  *++out2 = d;
 	  }
   }
@@ -184,14 +184,14 @@ void mdaLimiter::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
       or_ = *++in2;
       c = out1[1];
       d = out2[1];
- 		  
+
       lev = (float)(0.5 * g * fabs(ol + or_));
-     
+
       if (lev > th)
       {
         g = g - (at * (lev - th));
       }
-      else 
+      else
       {
         g = g + (float)(re * (1.0 - g));
       }
@@ -199,7 +199,7 @@ void mdaLimiter::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
       c += (ol * tr * g);
       d += (or_ * tr * g);
 
-      *++out1 = c;	
+      *++out1 = c;
 		  *++out2 = d;
 	  }
   }
@@ -213,15 +213,15 @@ void mdaLimiter::processReplacing(float **inputs, float **outputs, LvzInt32 samp
 	float *out1 = outputs[0];
 	float *out2 = outputs[1];
 	float g, at, re, tr, th, lev, ol, or_;
-  
+
   th = thresh;
   g = gain;
   at = att;
   re = rel;
   tr = trim;
-  
-	--in1;	
-	--in2;	
+
+	--in1;
+	--in2;
 	--out1;
 	--out2;
   if(fParam5>0.5) //soft knee
@@ -234,8 +234,8 @@ void mdaLimiter::processReplacing(float **inputs, float **outputs, LvzInt32 samp
       lev = (float)(1.0 / (1.0 + th * fabs(ol + or_)));
       if(g>lev) { g=g-at*(g-lev); } else { g=g+re*(lev-g); }
 
-      *++out1 = (ol * tr * g);	
-		  *++out2 = (or_ * tr * g);	
+      *++out1 = (ol * tr * g);
+		  *++out2 = (or_ * tr * g);
 	  }
   }
   else
@@ -244,9 +244,9 @@ void mdaLimiter::processReplacing(float **inputs, float **outputs, LvzInt32 samp
 	  {
       ol = *++in1;
       or_ = *++in2;
-		  
+
       lev = (float)(0.5 * g * fabs(ol + or_));
-    
+
       if (lev > th)
       {
         g = g - (at * (lev - th));
@@ -256,8 +256,8 @@ void mdaLimiter::processReplacing(float **inputs, float **outputs, LvzInt32 samp
         g = g + (float)(re * (1.0 - g));
       }
 
-      *++out1 = (ol * tr * g);	
-		  *++out2 = (or_ * tr * g);	
+      *++out1 = (ol * tr * g);
+		  *++out2 = (or_ * tr * g);
 	  }
   }
   gain = g;

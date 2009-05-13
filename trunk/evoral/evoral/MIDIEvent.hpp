@@ -1,16 +1,16 @@
 /* This file is part of Evoral.
  * Copyright (C) 2008 Dave Robillard <http://drobilla.net>
  * Copyright (C) 2000-2008 Paul Davis
- * 
+ *
  * Evoral is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
- * 
+ *
  * Evoral is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
@@ -39,7 +39,7 @@ struct MIDIEvent : public Event<T> {
 	MIDIEvent(EventType type=0, T t=0, uint32_t s=0, uint8_t* b=NULL, bool alloc=false)
 		: Event<T>(type, t, s, b, alloc)
 	{}
-	
+
 	MIDIEvent(const Event<T>& copy, bool alloc)
 		: Event<T>(copy, alloc)
 	{}
@@ -48,7 +48,7 @@ struct MIDIEvent : public Event<T> {
 	/** Event from XML ala http://www.midi.org/dtds/MIDIEvents10.dtd
 	 */
 	MIDIEvent(const XMLNode& event);
-	
+
 	/** Event to XML ala http://www.midi.org/dtds/MIDIEvents10.dtd
 	 */
 	boost::shared_ptr<XMLNode> to_xml() const;

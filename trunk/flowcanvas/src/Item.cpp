@@ -1,15 +1,15 @@
 /* This file is part of FlowCanvas.
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * FlowCanvas is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
- * 
+ *
  * FlowCanvas is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
@@ -69,12 +69,12 @@ Item::on_event(GdkEvent* event)
 	static bool double_click = false;
 	static bool dragging = false;
 	double click_x, click_y;
-	
+
 	click_x = event->button.x;
 	click_y = event->button.y;
 
 	property_parent().get_value()->w2i(click_x, click_y);
-	
+
 	switch (event->type) {
 
 	case GDK_2BUTTON_PRESS:
@@ -99,7 +99,7 @@ Item::on_event(GdkEvent* event)
 			dragging = true;
 		}
 		break;
-	
+
 	case GDK_MOTION_NOTIFY:
 		if ((dragging && (event->motion.state & GDK_BUTTON1_MASK))) {
 			double new_x = click_x;
@@ -173,7 +173,7 @@ Item::on_click(GdkEventButton* event)
 			canvas->select_item(shared_from_this());
 		}
 	}
-	
+
 	if (event->button == 3 && popup_menu(event->button, event->time))
 		return;
 

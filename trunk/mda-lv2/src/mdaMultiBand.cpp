@@ -20,7 +20,7 @@ mdaMultiBand::mdaMultiBand(audioMasterCallback audioMaster)	: AudioEffectX(audio
   fParam7 = (float)0.45; //L trim     (2)
   fParam8 = (float)0.50; //M trim
   fParam9 = (float)0.50; //H trim
-  fParam10 = (float)0.22; //attack    (3) 
+  fParam10 = (float)0.22; //attack    (3)
   fParam11 = (float)0.602; //release   (4)
   fParam12 = (float)0.55; //width
   fParam13 = (float)0.40; //MS swap
@@ -33,36 +33,36 @@ mdaMultiBand::mdaMultiBand(audioMasterCallback audioMaster)	: AudioEffectX(audio
   fParam7 = (float)0.50; //L trim     (2)
   fParam8 = (float)0.50; //M trim
   fParam9 = (float)0.50; //H trim
-  fParam10 = (float)0.22; //attack    (3) 
+  fParam10 = (float)0.22; //attack    (3)
   fParam11 = (float)0.60; //release   (4)
   fParam12 = (float)0.50; //width
   fParam13 = (float)0.40; //MS swap*/
 
-  setNumInputs(2);		  
-	setNumOutputs(2);		  
+  setNumInputs(2);
+	setNumOutputs(2);
 	setUniqueID("mdaMultiBand");    // identify here
-	DECLARE_LVZ_DEPRECATED(canMono) ();				      
-	canProcessReplacing();	
+	DECLARE_LVZ_DEPRECATED(canMono) ();
+	canProcessReplacing();
 	strcpy(programName, "Multi-Band Compressor");
 
   //calcs here!
   gain1 = 1.0;
   driv1 = (float)pow(10.0,(2.5 * fParam4) - 1.0);
-  trim1 = (float)(0.5 + (4.0 - 2.0 * fParam10) * (fParam4 * fParam4 * fParam4)); 
+  trim1 = (float)(0.5 + (4.0 - 2.0 * fParam10) * (fParam4 * fParam4 * fParam4));
   trim1 = (float)(trim1 * pow(10.0, 2.0 * fParam7 - 1.0));
   att1 = (float)pow(10.0, -0.05 -(2.5 * fParam10));
   rel1 = (float)pow(10.0, -2.0 - (3.5 * fParam11));
 
   gain2 = 1.0;
   driv2 = (float)pow(10.0,(2.5 * fParam5) - 1.0);
-  trim2 = (float)(0.5 + (4.0 - 2.0 * fParam10) * (fParam5 * fParam5 * fParam5)); 
+  trim2 = (float)(0.5 + (4.0 - 2.0 * fParam10) * (fParam5 * fParam5 * fParam5));
   trim2 = (float)(trim2 * pow(10.0, 2.0 * fParam8 - 1.0));
   att2 = (float)pow(10.0, -0.05 -(2.0 * fParam10));
   rel2 = (float)pow(10.0, -2.0 - (3.0 * fParam11));
-  
+
   gain3 = 1.0;
   driv3 = (float)pow(10.0,(2.5 * fParam6) - 1.0);
-  trim3 = (float)(0.5 + (4.0 - 2.0 * fParam10) * (fParam6 * fParam6 * fParam6)); 
+  trim3 = (float)(0.5 + (4.0 - 2.0 * fParam10) * (fParam6 * fParam6 * fParam6));
   trim3 = (float)(trim3 * pow(10.0, 2.0 * fParam9 - 1.0));
   att3 = (float)pow(10.0, -0.05 -(1.5 * fParam10));
   rel3 = (float)pow(10.0, -2.0 - (2.5 * fParam11));
@@ -70,9 +70,9 @@ mdaMultiBand::mdaMultiBand(audioMasterCallback audioMaster)	: AudioEffectX(audio
   switch(int(fParam1*10.0))
   {
     case 0: trim2=0.0; trim3=0.0; slev=0.0; break;
-    case 1: 
+    case 1:
     case 2: trim1=0.0; trim3=0.0; slev=0.0; break;
-    case 3: 
+    case 3:
     case 4: trim1=0.0; trim2=0.0; slev=0.0; break;
     default: slev=fParam12; break;
   }
@@ -120,19 +120,19 @@ void mdaMultiBand::setParameter(LvzInt32 index, float value)
   }
   //calcs here
   driv1 = (float)pow(10.0,(2.5 * fParam4) - 1.0);
-  trim1 = (float)(0.5 + (4.0 - 2.0 * fParam10) * (fParam4 * fParam4 * fParam4)); 
+  trim1 = (float)(0.5 + (4.0 - 2.0 * fParam10) * (fParam4 * fParam4 * fParam4));
   trim1 = (float)(trim1 * pow(10.0, 2.0 * fParam7 - 1.0));
   att1 = (float)pow(10.0, -0.05 -(2.5 * fParam10));
   rel1 = (float)pow(10.0, -2.0 - (3.5 * fParam11));
 
   driv2 = (float)pow(10.0,(2.5 * fParam5) - 1.0);
-  trim2 = (float)(0.5 + (4.0 - 2.0 * fParam10) * (fParam5 * fParam5 * fParam5)); 
+  trim2 = (float)(0.5 + (4.0 - 2.0 * fParam10) * (fParam5 * fParam5 * fParam5));
   trim2 = (float)(trim2 * pow(10.0, 2.0 * fParam8 - 1.0));
   att2 = (float)pow(10.0, -0.05 -(2.0 * fParam10));
   rel2 = (float)pow(10.0, -2.0 - (3.0 * fParam11));
-  
+
   driv3 = (float)pow(10.0,(2.5 * fParam6) - 1.0);
-  trim3 = (float)(0.5 + (4.0 - 2.0 * fParam10) * (fParam6 * fParam6 * fParam6)); 
+  trim3 = (float)(0.5 + (4.0 - 2.0 * fParam10) * (fParam6 * fParam6 * fParam6));
   trim3 = (float)(trim3 * pow(10.0, 2.0 * fParam9 - 1.0));
   att3 = (float)pow(10.0, -0.05 -(1.5 * fParam10));
   rel3 = (float)pow(10.0, -2.0 - (2.5 * fParam11));
@@ -140,9 +140,9 @@ void mdaMultiBand::setParameter(LvzInt32 index, float value)
   switch(int(fParam1*10.0))
   {
     case 0: trim2=0.0; trim3=0.0; slev=0.0; break;
-    case 1: 
+    case 1:
     case 2: trim1=0.0; trim3=0.0; slev=0.0; break;
-    case 3: 
+    case 3:
     case 4: trim1=0.0; trim2=0.0; slev=0.0; break;
     default: slev=fParam12; break;
   }
@@ -205,7 +205,7 @@ void mdaMultiBand::getParameterDisplay(LvzInt32 index, char *text)
     case 0: switch(int(fParam1*10.0))
     { case 0: strcpy(text, "Low"); break;
     case 1: case 2: strcpy(text, "Mid"); break;
-    case 3: case 4: strcpy(text, "High"); break; 
+    case 3: case 4: strcpy(text, "High"); break;
      default: strcpy(text, "Output"); break; } break;
     case 1: long2string((long)(getSampleRate() * fi1 * (0.098 + 0.09*fi1 + 0.5*(float)pow(fi1,8.2f))), text); break;
     case 2: long2string((long)(getSampleRate() * fi2 * (0.015 + 0.15*fi2 + 0.9*(float)pow(fi2,8.2f))), text); break;
@@ -218,7 +218,7 @@ void mdaMultiBand::getParameterDisplay(LvzInt32 index, char *text)
     case 9: long2string((long)(-301030.1 / (getSampleRate() * log10(1.0 - att2))),text); break;
     case 10: long2string((long)(-301.0301 / (getSampleRate() * log10(1.0 - rel2))),text); break;
     case 11: long2string((long)(200.0 * fParam12), text); break;
-    case 12: if(mswap) strcpy(text, "S"); 
+    case 12: if(mswap) strcpy(text, "S");
                   else strcpy(text, "M"); break;
   }
 }
@@ -229,17 +229,17 @@ void mdaMultiBand::getParameterLabel(LvzInt32 index, char *label)
   {
     case 0: strcpy(label, ""); break;
     case 1: strcpy(label, "Hz"); break;
-    case 2: strcpy(label, "Hz"); break; 
-    case 3: strcpy(label, "dB"); break; 
-    case 4: strcpy(label, "dB"); break; 
-    case 5: strcpy(label, "dB"); break; 
-    case 6: strcpy(label, "dB"); break; 
-    case 7: strcpy(label, "dB"); break; 
-    case 8: strcpy(label, "dB"); break; 
-    case 9: strcpy(label, "µs"); break; 
-    case 10: strcpy(label, "ms"); break; 
-    case 11: strcpy(label, "% Width"); break; 
-    case 12: strcpy(label, ""); break; 
+    case 2: strcpy(label, "Hz"); break;
+    case 3: strcpy(label, "dB"); break;
+    case 4: strcpy(label, "dB"); break;
+    case 5: strcpy(label, "dB"); break;
+    case 6: strcpy(label, "dB"); break;
+    case 7: strcpy(label, "dB"); break;
+    case 8: strcpy(label, "dB"); break;
+    case 9: strcpy(label, "µs"); break;
+    case 10: strcpy(label, "ms"); break;
+    case 11: strcpy(label, "% Width"); break;
+    case 12: strcpy(label, ""); break;
   }
 }
 
@@ -252,20 +252,20 @@ void mdaMultiBand::process(float **inputs, float **outputs, LvzInt32 sampleFrame
 	float *in2 = inputs[1];
 	float *out1 = outputs[0];
 	float *out2 = outputs[1];
-	float a, b, c, d, l=fb3, m, h, s, sl=slev, tmp1, tmp2, tmp3;	
+	float a, b, c, d, l=fb3, m, h, s, sl=slev, tmp1, tmp2, tmp3;
   float f1i=fi1, f1o=fo1, f2i=fi2, f2o=fo2, b1=fb1, b2=fb2;
   float g1=gain1, d1=driv1, t1=trim1, a1=att1, r1=1.f - rel1;
   float g2=gain2, d2=driv2, t2=trim2, a2=att2, r2=1.f - rel2;
   float g3=gain3, d3=driv3, t3=trim3, a3=att3, r3=1.f - rel3;
   int ms=mswap;
 
-  --in1;	
-	--in2;	
+  --in1;
+	--in2;
 	--out1;
 	--out2;
 	while(--sampleFrames >= 0)
 	{
-		a = *++in1;		
+		a = *++in1;
 		b = *++in2;
     c = out1[1];
 		d = out2[1]; //process from here...
@@ -273,34 +273,34 @@ void mdaMultiBand::process(float **inputs, float **outputs, LvzInt32 sampleFrame
     b = (ms)? -b : b;
 
     s = (a - b) * sl; //keep stereo component for later
-    a += b;  
+    a += b;
     b2 = (f2i * a) + (f2o * b2); //crossovers
-    b1 = (f1i * b2) + (f1o * b1); 
+    b1 = (f1i * b2) + (f1o * b1);
     l = (f1i * b1) + (f1o * l);
     m=b2-l; h=a-b2;
 
     tmp1 = (l>0)? l : -l;  //l
     g1 = (tmp1>g1)? g1+a1*(tmp1-g1) : g1*r1;
-    tmp1 = 1.f / (1.f + d1 * g1); 
+    tmp1 = 1.f / (1.f + d1 * g1);
 
     tmp2 = (m>0)? m : -m;
     g2 = (tmp2>g2)? g2+a2*(tmp2-g2) : g2*r2;
-    tmp2 = 1.f / (1.f + d2 * g2); 
+    tmp2 = 1.f / (1.f + d2 * g2);
 
     tmp3 = (h>0)? h : -h;
     g3 = (tmp3>g3)? g3+a3*(tmp3-g3) : g3*r3;
-    tmp3 = 1.f / (1.f + d3 * g3); 
+    tmp3 = 1.f / (1.f + d3 * g3);
 
     a = (l*tmp3*t1) + (m*tmp2*t2) + (h*tmp3*t3);
 		c += a + s; // output
 		d += (ms)? s - a : a - s;
-		    
-    *++out1 = c;	
+
+    *++out1 = c;
 		*++out2 = d;
 	}
   gain1=(g1<1.0e-10)? 0.f : g1;
   gain2=(g2<1.0e-10)? 0.f : g2;
-  gain3=(g3<1.0e-10)? 0.f : g3;  // gain1=g1; gain2=g2; gain3=g3; 
+  gain3=(g3<1.0e-10)? 0.f : g3;  // gain1=g1; gain2=g2; gain3=g3;
   if(fabs(b1)<1.0e-10) { fb1=0.f; fb2=0.f; fb3=0.f; }
                   else { fb1=b1;  fb2=b2;  fb3=l;   }
 }
@@ -311,53 +311,53 @@ void mdaMultiBand::processReplacing(float **inputs, float **outputs, LvzInt32 sa
 	float *in2 = inputs[1];
 	float *out1 = outputs[0];
 	float *out2 = outputs[1];
-	float a, b, c, d, l=fb3, m, h, s, sl=slev, tmp1, tmp2, tmp3;	
+	float a, b, c, d, l=fb3, m, h, s, sl=slev, tmp1, tmp2, tmp3;
   float f1i=fi1, f1o=fo1, f2i=fi2, f2o=fo2, b1=fb1, b2=fb2;
   float g1=gain1, d1=driv1, t1=trim1, a1=att1, r1=1.f - rel1;
   float g2=gain2, d2=driv2, t2=trim2, a2=att2, r2=1.f - rel2;
   float g3=gain3, d3=driv3, t3=trim3, a3=att3, r3=1.f - rel3;
   int ms=mswap;
 
-	--in1;	
-	--in2;	
+	--in1;
+	--in2;
 	--out1;
 	--out2;
 	while(--sampleFrames >= 0)
 	{
-		a = *++in1;		
+		a = *++in1;
 		b = *++in2; //process from here...
-		
+
     b = (ms)? -b : b;
 
     s = (a - b) * sl; //keep stereo component for later
     a += b;
     b2 = (f2i * a) + (f2o * b2); //crossovers
-    b1 = (f1i * b2) + (f1o * b1); 
+    b1 = (f1i * b2) + (f1o * b1);
     l = (f1i * b1) + (f1o * l);
     m=b2-l; h=a-b2;
 
     tmp1 = (l>0)? l : -l;  //l
     g1 = (tmp1>g1)? g1+a1*(tmp1-g1) : g1*r1;
-    tmp1 = 1.f / (1.f + d1 * g1); 
+    tmp1 = 1.f / (1.f + d1 * g1);
 
     tmp2 = (m>0)? m : -m;
     g2 = (tmp2>g2)? g2+a2*(tmp2-g2) : g2*r2;
-    tmp2 = 1.f / (1.f + d2 * g2); 
+    tmp2 = 1.f / (1.f + d2 * g2);
 
     tmp3 = (h>0)? h : -h;
     g3 = (tmp3>g3)? g3+a3*(tmp3-g3) : g3*r3;
-    tmp3 = 1.f / (1.f + d3 * g3); 
-            
+    tmp3 = 1.f / (1.f + d3 * g3);
+
     a = (l*tmp3*t1) + (m*tmp2*t2) + (h*tmp3*t3);
 		c = a + s; // output
     d = (ms)? s - a : a - s;
-    
+
     *++out1 = c;
 		*++out2 = d;
 	}
   gain1=(g1<1.0e-10)? 0.f : g1;
   gain2=(g2<1.0e-10)? 0.f : g2;
-  gain3=(g3<1.0e-10)? 0.f : g3;  // gain1=g1; gain2=g2; gain3=g3; 
+  gain3=(g3<1.0e-10)? 0.f : g3;  // gain1=g1; gain2=g2; gain3=g3;
   if(fabs(b1)<1.0e-10) { fb1=0.f; fb2=0.f; fb3=0.f; }
                   else { fb1=b1;  fb2=b2;  fb3=l;   }
 }

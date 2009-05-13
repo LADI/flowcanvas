@@ -35,7 +35,7 @@ struct VOICE  //voice state
   long  pos;
   long  end;
   long  loop;
-  
+
   float env;  //envelope
   float dec;
 

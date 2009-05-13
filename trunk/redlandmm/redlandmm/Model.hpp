@@ -1,15 +1,15 @@
 /* This file is part of redlandmm.
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * redlandmm is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
- * 
+ *
  * redlandmm is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
@@ -42,21 +42,21 @@ public:
 
 	void        set_base_uri(const Glib::ustring& uri);
 	const Node& base_uri() const { return _base; }
-	
+
 	void  serialise_to_file_handle(FILE* fd);
 	void  serialise_to_file(const Glib::ustring& uri);
 	char* serialise_to_string();
-	
+
 	void add_statement(const Node& subject,
 	                   const Node& predicate,
-	                   const Node& object);   
-	
+	                   const Node& object);
+
 	void add_statement(const Node&        subject,
 	                   const std::string& predicate,
-	                   const Node&        object);   
-	
+	                   const Node&        object);
+
 	void add_statement(librdf_statement* statement);
-	
+
 	World& world() const { return _world; }
 
 	class Delta {
@@ -65,7 +65,7 @@ public:
 
 		void serialise(Model& model, const std::string& lang, const std::string& uri) const;
 		void apply(const Model& from, Model& to) const;
-	
+
 	private:
 		Model* _additions;
 		Model* _removals;

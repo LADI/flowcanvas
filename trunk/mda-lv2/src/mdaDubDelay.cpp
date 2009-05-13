@@ -27,15 +27,15 @@ mdaDubDelay::mdaDubDelay(audioMasterCallback audioMaster)	: AudioEffectX(audioMa
   phi  = 0.0f;
   dlbuf= 0.0f;
 
-  setNumInputs(2);		  
-	setNumOutputs(2);		  
+  setNumInputs(2);
+	setNumOutputs(2);
 	setUniqueID("mdaDubDelay");  //identify here
-	DECLARE_LVZ_DEPRECATED(canMono) ();				      
-	canProcessReplacing();	
+	DECLARE_LVZ_DEPRECATED(canMono) ();
+	canProcessReplacing();
 	strcpy(programName, "Dub Feedback Delay");
-	
+
   suspend();		//flush buffer
-  setParameter(0, 0.5); 
+  setParameter(0, 0.5);
 }
 
 bool  mdaDubDelay::getProductString(char* text) { strcpy(text, "MDA DubDelay"); return true; }
@@ -61,17 +61,17 @@ void mdaDubDelay::setParameter(LvzInt32 index, float value)
   ///CHANGED///del = fParam0 * fParam0 * fParam0 * (float)size;
   del = fParam0 * fParam0 * (float)size;
   mod = 0.049f * fParam3 * del;
-  
+
   fil = fParam2;
   if(fParam2>0.5f)  //simultaneously change crossover frequency & high/low mix
   {
-    fil = 0.5f * fil - 0.25f; 
+    fil = 0.5f * fil - 0.25f;
     lmix = -2.0f * fil;
     hmix = 1.0f;
   }
-  else 
-  { 
-    hmix = 2.0f * fil; 
+  else
+  {
+    hmix = 2.0f * fil;
     lmix = 1.0f - hmix;
   }
   fil = (float)exp(-6.2831853f * pow(10.0f, 2.2f + 4.5f * fil) / fs);
@@ -183,8 +183,8 @@ void mdaDubDelay::process(float **inputs, float **outputs, LvzInt32 sampleFrames
   float twopi=6.2831853f;
   long  i=ipos, l, s=size, k=0;
 
-	--in1;	
-	--in2;	
+	--in1;
+	--in2;
 	--out1;
 	--out2;
   while(--sampleFrames >= 0)
@@ -192,7 +192,7 @@ void mdaDubDelay::process(float **inputs, float **outputs, LvzInt32 sampleFrames
 		a = *++in1;
     b = *++in2;
 		c = out1[1];
-		d = out2[1]; 
+		d = out2[1];
 
     if(k==0) //update delay length at slower rate (could be improved!)
     {
@@ -203,33 +203,33 @@ void mdaDubDelay::process(float **inputs, float **outputs, LvzInt32 sampleFrames
     }
     k--;
     dl += ddl; //lin interp between points
- 
+
     i--; if(i<0) i=s;                         //delay positions
-    
+
     l = (long)dl;
     tmp = dl - (float)l; //remainder
     l += i; if(l>s) l-=(s+1);
-    
+
     ol = *(buffer + l);                       //delay output
-    
-    l++; if(l>s) l=0; 
+
+    l++; if(l>s) l=0;
     ol += tmp * (*(buffer + l) - ol); //lin interp
 
     tmp = a + fb * ol;                        //mix input (left only!) & feedback
 
     f0 = f * (f0 - tmp) + tmp;                //low-pass filter
     tmp = lx * f0 + hx * tmp;
-    
+
     g =(tmp<0.0f)? -tmp : tmp;                //simple limiter
     e *= r; if(g>e) e = g;
     if(e>1.0f) tmp /= e;
 
     *(buffer + i) = tmp;                      //delay input
-    
+
     ol *= w;                                  //wet
 
     *++out1 = c + y * a + ol;                 //dry
-		*++out2 = d + y * b + ol; 
+		*++out2 = d + y * b + ol;
 	}
   ipos = i;
   dlbuf=dl;
@@ -248,8 +248,8 @@ void mdaDubDelay::processReplacing(float **inputs, float **outputs, LvzInt32 sam
   float twopi=6.2831853f;
   long  i=ipos, l, s=size, k=0;
 
-	--in1;	
-	--in2;	
+	--in1;
+	--in2;
 	--out1;
 	--out2;
   while(--sampleFrames >= 0)
@@ -266,33 +266,33 @@ void mdaDubDelay::processReplacing(float **inputs, float **outputs, LvzInt32 sam
     }
     k--;
     dl += ddl; //lin interp between points
- 
+
     i--; if(i<0) i=s;                         //delay positions
-    
+
     l = (long)dl;
     tmp = dl - (float)l; //remainder
     l += i; if(l>s) l-=(s+1);
-    
+
     ol = *(buffer + l);                       //delay output
-    
-    l++; if(l>s) l=0; 
+
+    l++; if(l>s) l=0;
     ol += tmp * (*(buffer + l) - ol); //lin interp
 
     tmp = a + fb * ol;                        //mix input (left only!) & feedback
 
     f0 = f * (f0 - tmp) + tmp;                //low-pass filter
     tmp = lx * f0 + hx * tmp;
-    
+
     g =(tmp<0.0f)? -tmp : tmp;                //simple limiter
     e *= r; if(g>e) e = g;
     if(e>1.0f) tmp /= e;
 
     *(buffer + i) = tmp;                      //delay input
-    
+
     ol *= w;                                  //wet
 
     *++out1 = y * a + ol;                     //dry
-		*++out2 = y * b + ol; 
+		*++out2 = y * b + ol;
 	}
   ipos = i;
   dlbuf=dl;

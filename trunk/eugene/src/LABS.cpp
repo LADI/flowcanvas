@@ -1,6 +1,6 @@
 /* This file is part of Eugene
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * Eugene is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free
  * Software Foundation, either version 3 of the License, or (at your option)
@@ -25,8 +25,8 @@
 using namespace std;
 
 namespace Eugene {
-	
-	
+
+
 boost::shared_ptr<LABS::Population>
 LABS::initial_population(size_t gene_size, size_t pop_size) const
 {
@@ -42,7 +42,7 @@ LABS::initial_population(size_t gene_size, size_t pop_size) const
 
 		assert(assert_gene((*ret)[i]));
 	}
-	
+
 	return ret;
 }
 
@@ -51,7 +51,7 @@ float
 LABS::fitness(const GeneType& gene) const
 {
 	float f = 0.0f;
-		
+
 	for (size_t g = 1; g < gene.size(); ++g) {
 		int32_t cg = c_g(gene.size(), g, gene);
 		f += cg * cg;
@@ -59,7 +59,7 @@ LABS::fitness(const GeneType& gene) const
 
 	return f;
 }
-	
+
 
 float
 LABS::optimum() const

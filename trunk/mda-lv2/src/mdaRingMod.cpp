@@ -9,19 +9,19 @@ AudioEffect *createEffectInstance(audioMasterCallback audioMaster)
 
 mdaRingMod::mdaRingMod(audioMasterCallback audioMaster)	: AudioEffectX(audioMaster, 1, 3)	// 1 program, 3 parameter only
 {
-	fParam1 = (float)0.0625; //1kHz		
+	fParam1 = (float)0.0625; //1kHz
   fParam2 = (float)0.0;
   fParam3 = (float)0.0;
-	fPhi = 0.0;			
+	fPhi = 0.0;
 	twoPi = (float)6.2831853;
-  fdPhi = (float)(twoPi * 100.0 * (fParam2 + (160.0 * fParam1))/ getSampleRate()); 
+  fdPhi = (float)(twoPi * 100.0 * (fParam2 + (160.0 * fParam1))/ getSampleRate());
   ffb = 0.f;
   fprev = 0.f;
 
   setNumInputs(2);		    // stereo in
 	setNumOutputs(2);		    // stereo out
 	setUniqueID("mdaRingMod");    // identify
-	DECLARE_LVZ_DEPRECATED(canMono) ();				      
+	DECLARE_LVZ_DEPRECATED(canMono) ();
 	canProcessReplacing();	// supports both accumulating and replacing output
 	strcpy(programName, "Ring Modulator");	// default program name
 }
@@ -91,7 +91,7 @@ void mdaRingMod::getParameterDisplay(LvzInt32 index, char *text)
     case 1: long2string((long)(100. * fParam2), text); break;
     case 2: long2string((long)(100. * fParam3), text); break;
   }
-	
+
 }
 
 void mdaRingMod::getParameterLabel(LvzInt32 index, char *label)
@@ -120,7 +120,7 @@ void mdaRingMod::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
   dp = fdPhi;
   fb = ffb;
   fp = fprev;
-  
+
   --in1;	// pre-decrement so we can use pre-increment in the loop
 	--in2;	// this is because pre-increment is fast on power pc
 	--out1;
@@ -129,19 +129,19 @@ void mdaRingMod::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
 	{
 		a = *++in1;		// try to do load operations first...
 		b = *++in2;
-		
+
     g = (float)sin(p);              //instantaneous gain
     p = (float)fmod( p + dp, tp );   //oscillator phase
-     
+
     c = out1[1];	// get output, as we need to accumulate
 		d = out2[1];
-		
+
     fp =  (fb * fp + a) * g;
     fp2 = (fb * fp + b) * g;
-    
+
     c += fp;		// accumulate to output buss
 		d += fp2;
-		    
+
     *++out1 = c;	// ...and store operations at the end,
 		*++out2 = d;	// as this uses the cache efficiently.
 	}
@@ -155,7 +155,7 @@ void mdaRingMod::processReplacing(float **inputs, float **outputs, LvzInt32 samp
 	float *in2 = inputs[1];
 	float *out1 = outputs[0];
 	float *out2 = outputs[1];
-	float a, b, c, d, g;	
+	float a, b, c, d, g;
   float p, dp, tp = twoPi, fb, fp, fp2;
 
   p = fPhi;
@@ -164,25 +164,25 @@ void mdaRingMod::processReplacing(float **inputs, float **outputs, LvzInt32 samp
   fp = fprev;
 
 	--in1;
-	--in2;	
+	--in2;
 	--out1;
 	--out2;
 	while(--sampleFrames >= 0)
 	{
-		a = *++in1;		
+		a = *++in1;
 		b = *++in2;
-		
+
     g = (float)sin(p);
     p = (float)fmod( p + dp, tp );
 
     fp = (fb * fp + a) * g;
     fp2 = (fb * fp + b) * g;
 
-		c = fp;		
+		c = fp;
 		d = fp2;
 
-    *++out1 = c;	
-		*++out2 = d;	
+    *++out1 = c;
+		*++out2 = d;
 	}
   fPhi = p;
   fprev = fp;

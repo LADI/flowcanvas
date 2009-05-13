@@ -1,6 +1,6 @@
 /* lv2_data_access.h - C header file for the LV2 Data Access extension.
  * Copyright (C) 2008 Dave Robillard <dave@drobilla.net>
- * 
+ *
  * This header is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation; either version 2 of the License, or
@@ -29,7 +29,7 @@
  * This extension defines a method for (e.g.) plugin UIs to have (possibly
  * marshalled) access to the extension_data function on a plugin instance.
  */
-	
+
 
 /** The data field of the LV2_Feature for this extension.
  *
@@ -38,7 +38,7 @@
  * and data pointed to an instance of this struct.
  */
 typedef struct {
-	
+
 	/** A pointer to a method the UI can call to get data (of a type specified
 	 * by some other extension) from the plugin.
 	 *

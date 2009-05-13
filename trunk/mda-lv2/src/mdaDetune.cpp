@@ -34,7 +34,7 @@ mdaDetune::mdaDetune(audioMasterCallback audioMaster): AudioEffectX(audioMaster,
   setNumInputs(2);
   setNumOutputs(2);
   setUniqueID("mdaDetune");  ///identify mdaDetune-in here
-	DECLARE_LVZ_DEPRECATED(canMono) ();				      
+	DECLARE_LVZ_DEPRECATED(canMono) ();
   canProcessReplacing();
 
   ///initialise...
@@ -44,7 +44,7 @@ mdaDetune::mdaDetune(audioMasterCallback audioMaster): AudioEffectX(audioMaster,
 
   programs = new mdaDetuneProgram[numPrograms];
   setProgram(0);
-  
+
   ///differences from default program...
   programs[1].param[0] = 0.20f;
   programs[3].param[0] = 0.90f;
@@ -60,7 +60,7 @@ mdaDetune::mdaDetune(audioMasterCallback audioMaster): AudioEffectX(audioMaster,
 void mdaDetune::resume() ///update internal parameters...
 {
   long tmp;
-  
+
   semi = 3.0f * param[0] * param[0] * param[0];
   dpos2 = (float)pow(1.0594631f, semi);
   dpos1 = 1.0f / dpos2;
@@ -111,7 +111,7 @@ void mdaDetune::setProgram(LvzInt32 program)
 
 
 void  mdaDetune::setParameter(LvzInt32 index, float value)
-{ 
+{
   programs[curProgram].param[index] = param[index] = value; //bug was here!
   resume();
 }
@@ -189,7 +189,7 @@ void mdaDetune::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
     c += y * a;
     d += y * b;
 
-    --p0 &= l;     
+    --p0 &= l;
     *(buf + p0) = w * (a + b);      //input
 
     p1 -= d1;
@@ -262,7 +262,7 @@ void mdaDetune::processReplacing(float **inputs, float **outputs, LvzInt32 sampl
     c = y * a;
     d = y * b;
 
-    --p0 &= l;     
+    --p0 &= l;
     *(buf + p0) = w * (a + b);      //input
 
     p1 -= d1;

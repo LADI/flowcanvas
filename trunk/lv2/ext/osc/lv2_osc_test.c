@@ -35,15 +35,15 @@ main()
 	int ret = lv2_osc_buffer_append_message(buf, msg);
 	if (ret)
 		fprintf(stderr, "Message append failed: %s", strerror(ret));
-	
+
 	lo_message lo_msg_2 = lo_message_new();
 	lo_message_add_string(lo_msg_2, "Another message");
-	
+
 	raw_msg = lo_message_serialise(lo_msg_2, "/baz", NULL, &raw_msg_size);
-	
+
 	msg = lv2_osc_message_from_raw(0.0, 0, NULL, raw_msg_size, raw_msg);
 	assert(msg);
-	
+
 	ret = lv2_osc_buffer_append_message(buf, msg);
 	if (ret)
 		fprintf(stderr, "Message append failed: %s", strerror(ret));

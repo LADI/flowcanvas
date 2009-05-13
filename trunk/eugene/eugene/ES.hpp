@@ -1,6 +1,6 @@
 /* This file is part of Eugene
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * Eugene is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free
  * Software Foundation, either version 3 of the License, or (at your option)
@@ -41,21 +41,21 @@ public:
 
 	void print_best() const;
 	void print_population(std::ostream& str) const;
-	
+
 	float best_fitness() const { return _problem->fitness(*_best.get()); }
-	
+
 	float fitness_less_than(float a, float b) const
 		{ return _problem->fitness_less_than(a, b); }
-	
+
 	bool optimum_known() { return _problem->optimum_known(); }
 	int32_t optimum() const { return _problem->optimum(); }
-	
+
 	int evaluations() const { return _selection->evaluations(); }
-	
+
 	boost::shared_ptr< Problem<G> >   problem()   const { return _problem; }
 	boost::shared_ptr< Selection<G> > selection() const { return _selection; }
 	boost::shared_ptr< Mutation<G> >  mutation()  const { return _mutation; }
-	
+
 	boost::shared_ptr<typename Problem<G>::Population> const population()
 		{ return _population; }
 
@@ -63,9 +63,9 @@ private:
 	typedef std::pair<typename Problem<G>::Population::const_iterator,
                       typename Problem<G>::Population::const_iterator>
 			GenePair;
-	
+
 	GenePair select_parents(const float total) const;
-	
+
 	boost::shared_ptr< Problem<G> >    _problem;
 	boost::shared_ptr< Selection<G> >  _selection;
 	boost::shared_ptr< ESMutation<G> > _mutation;

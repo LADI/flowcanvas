@@ -1,15 +1,15 @@
 /* This file is part of FlowCanvas.
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * FlowCanvas is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
- * 
+ *
  * FlowCanvas is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
@@ -26,7 +26,7 @@
 #include "flowcanvas/Item.hpp"
 
 namespace FlowCanvas {
-	
+
 class Canvas;
 
 
@@ -45,24 +45,24 @@ public:
 	       bool                      show_port_labels = true);
 
 	virtual ~Module();
-	
+
 	const PortVector& ports()  const { return _ports; }
-	
+
 	inline boost::shared_ptr<Port> get_port(const std::string& name) const;
-	
+
 	void                    add_port(boost::shared_ptr<Port> port);
 	void                    remove_port(boost::shared_ptr<Port> port);
 	boost::shared_ptr<Port> port_at(double x, double y);
 
 	void zoom(double z);
 	void resize();
-	
+
 	bool show_port_labels(bool b) { return _show_port_labels; }
 	void set_show_port_labels(bool b);
 
 	virtual void move(double dx, double dy);
 	virtual void move_to(double x, double y);
-	
+
 	virtual void set_name(const std::string& n);
 
 	double border_width() const { return _border_width; }
@@ -70,7 +70,7 @@ public:
 
 	void select_tick();
 	void set_selected(bool b);
-	
+
 	void set_highlighted(bool b);
 	void set_border_color(uint32_t c);
 	void set_base_color(uint32_t c);
@@ -79,13 +79,13 @@ public:
 	void set_icon(const Glib::RefPtr<Gdk::Pixbuf>& icon);
 
 	size_t num_ports() const { return _ports.size(); }
-			
+
 	double empty_port_breadth() const;
 	double empty_port_depth() const;
 
 protected:
 	virtual bool on_event(GdkEvent* ev);
-	
+
 	virtual void set_width(double w);
 	virtual void set_height(double h);
 
@@ -93,9 +93,9 @@ protected:
 	void measure_ports();
 	void resize_horiz();
 	void resize_vert();
-	
+
 	void port_renamed() { _port_renamed = true; }
-	
+
 	void embed(Gtk::Container* widget);
 
 	double _border_width;
@@ -121,14 +121,14 @@ protected:
 
 private:
 	friend class Canvas;
-	
+
 	struct PortComparator {
 		PortComparator(const std::string& name) : _name(name) {}
 		inline bool operator()(const boost::shared_ptr<Port> port)
 			{ return (port && port->name() == _name); }
 		const std::string& _name;
 	};
-	
+
 	void embed_size_request(Gtk::Requisition* req, bool force);
 };
 

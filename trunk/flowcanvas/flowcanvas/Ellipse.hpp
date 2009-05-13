@@ -1,15 +1,15 @@
 /* This file is part of FlowCanvas.
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * FlowCanvas is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
- * 
+ *
  * FlowCanvas is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
@@ -27,7 +27,7 @@
 #include "flowcanvas/Item.hpp"
 
 namespace FlowCanvas {
-	
+
 class Canvas;
 
 
@@ -50,11 +50,11 @@ public:
 	        bool                      show_title = true);
 
 	virtual ~Ellipse();
-	
+
 	Gnome::Art::Point src_connection_point() {
 		return Gnome::Art::Point(property_x(), property_y());
 	}
-	
+
 	virtual Gnome::Art::Point dst_connection_point(const Gnome::Art::Point& src);
 	virtual Gnome::Art::Point connection_point_vector(double dx, double dy);
 
@@ -64,17 +64,17 @@ public:
 
 	void zoom(double z);
 	void resize();
-	
+
 	virtual void move(double dx, double dy);
 	virtual void move_to(double x, double y);
 
 	virtual void load_location()  {}
 	virtual void store_location() {}
-	
+
 	virtual void set_name(const std::string& n);
 
 	void set_width(double w);
-	
+
 	void set_height(double h);
 
 	double border_width() const { return _border_width; }
@@ -82,7 +82,7 @@ public:
 
 	void select_tick();
 	void set_selected(bool b);
-	
+
 	void set_highlighted(bool b);
 	void set_border_color(uint32_t c);
 	void set_base_color(uint32_t c);

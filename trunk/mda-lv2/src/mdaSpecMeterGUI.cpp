@@ -105,7 +105,7 @@ CDraw::draw(CDrawContext * pContext)
 
 	/*
 	pContext->setFillColor(kGreenCColor);
-	
+
 	p = x2pix(Lmin);
 	block(p - 3, 10, p - 1, 18);
 	pContext->fillRect(block);
@@ -124,10 +124,10 @@ CDraw::draw(CDrawContext * pContext)
 	p = x2pix(Lpeak);
 	if (p > 454)
 		p = 454;
-	
+
 	block = CRect(r - 1, 10, p - 1, 18);
 	pContext->fillRect(block);
-	
+
 	block = CRect(p - 1, 10, 478, 18);
 	if (p < 454)
 		pContext->fillRect(block);
@@ -135,14 +135,14 @@ CDraw::draw(CDrawContext * pContext)
 	r = x22pix(Rrms);
 	if (r > 454)
 		r = 454;
-	
+
 	p = x2pix(Rpeak);
 	if (p > 454)
 		p = 454;
-	
+
 	block = CRect(r - 1, 18, p - 1, 26);
 	pContext->fillRect(block);
-	
+
 	block = CRect(p - 1, 18, 478, 26);
 	if (p < 454)
 		pContext->fillRect(block);

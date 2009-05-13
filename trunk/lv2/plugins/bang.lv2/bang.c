@@ -41,7 +41,7 @@ bang_instantiate(const LV2_Descriptor*    descriptor,
                      const LV2_Feature*const* features)
 {
 	Bang* plugin = (Bang*)malloc(sizeof(Bang));
-	
+
 	plugin->input_buffer = NULL;
 	plugin->output_buffer = NULL;
 
@@ -54,7 +54,7 @@ bang_cleanup(LV2_Handle instance)
 {
 	free(instance);
 }
-	
+
 
 static LV2MessageContext bang_message_context_data;
 
@@ -102,12 +102,12 @@ bang_message_run(LV2_Handle instance, const void* valid_inputs, void* valid_outp
 			lv2_buffer_append(plugin->output_buffer, in->time, "/bang", NULL);
 
 		}
-		
+
 		lv2_contexts_set_output_valid(valid_outputs, 1);
 		return true;
-	
+
 	} else {
-		
+
 		lv2_contexts_unset_output_valid(valid_outputs, 1);
 		return false;
 
@@ -116,7 +116,7 @@ bang_message_run(LV2_Handle instance, const void* valid_inputs, void* valid_outp
 	return false;
 }
 
-	
+
 static void
 bang_run(LV2_Handle instance, uint32_t nframes)
 {

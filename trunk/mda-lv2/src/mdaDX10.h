@@ -29,7 +29,7 @@ private:
 struct VOICE  //voice state
 {
   float env;  //carrier envelope
-  float dmod; //modulator oscillator 
+  float dmod; //modulator oscillator
   float mod0;
   float mod1;
   float menv; //modulator envelope
@@ -80,9 +80,9 @@ public:
 private:
 	void update();  //my parameter update
   void noteOn(long note, long velocity);
-  void fillpatch(long p, const char *name, 
-                 float p0,  float p1,  float p2,  float p3,  float p4,  float p5, 
-                 float p6,  float p7,  float p8,  float p9,  float p10, float p11, 
+  void fillpatch(long p, const char *name,
+                 float p0,  float p1,  float p2,  float p3,  float p4,  float p5,
+                 float p6,  float p7,  float p8,  float p9,  float p10, float p11,
                  float p12, float p13, float p14, float p15);
 
   float param[NPARAMS];

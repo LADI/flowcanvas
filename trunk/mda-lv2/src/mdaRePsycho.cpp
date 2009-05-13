@@ -22,11 +22,11 @@ mdaRePsycho::mdaRePsycho(audioMasterCallback audioMaster)	: AudioEffectX(audioMa
 	buffer = new float[size];
   buffer2 = new float[size];
 
-  setNumInputs(2);		  
-	setNumOutputs(2);		  
+  setNumInputs(2);
+	setNumOutputs(2);
 	setUniqueID("mdaRePsycho");    // identify here
-	DECLARE_LVZ_DEPRECATED(canMono) ();				      
-	canProcessReplacing();	
+	DECLARE_LVZ_DEPRECATED(canMono) ();
+	canProcessReplacing();
 	strcpy(programName, "Re-PsYcHo!");
 	suspend();		// flush buffer
 
@@ -36,12 +36,12 @@ mdaRePsycho::mdaRePsycho(audioMasterCallback audioMaster)	: AudioEffectX(audioMa
   dtim = 441 + int(0.5 * size * fParam5);
   fil = 0.0;
   thr = (float)pow(10.0,(1.5 * fParam1) - 1.5);
-  
-  if(fParam2>0.5) 
+
+  if(fParam2>0.5)
   { env = (float)(1.0 + 0.003 * pow(fParam2 - 0.5,5.0)); }
   else
   { env = (float)(1.0 + 0.025 * pow(fParam2 - 0.5,5.0)); }
-  
+
   tun = (float)(((int(fParam3 * 24.0) - 24.0) + (fParam6 - 1.0)) / 24.0);
   tun = (float)pow(10.0, 0.60206 * tun);
   wet = (float)(0.5 * sqrt(fParam4));
@@ -67,17 +67,17 @@ void mdaRePsycho::setParameter(LvzInt32 index, float value)
   //calcs here
   dtim = 441 + int(0.5 * size * fParam5);
   thr = (float)pow(10.0,(1.5 * fParam1) - 1.5);
-  
-  if(fParam2>0.5) 
+
+  if(fParam2>0.5)
   { env = (float)(1.0 + 0.003 * pow(fParam2 - 0.5,5.0)); }
   else
   { env = (float)(1.0 + 0.025 * pow(fParam2 - 0.5,5.0)); }
-  
-  //if(fParam2>0.5) 
+
+  //if(fParam2>0.5)
   //{ env = (float)(1.0 + 0.01 * (fParam2 - 0.5)); }
   //else
   //{ env = (float)(1.0 + 0.01 * (fParam2 - 0.5)); }
-  
+
   tun = (float)(((int(fParam3 * 24.0) - 24.0) + (fParam6 - 1.0)) / 24.0);
   tun = (float)pow(10.0, 0.60206 * tun);
   wet = (float)(0.5 * sqrt(fParam4));
@@ -161,11 +161,11 @@ void mdaRePsycho::getParameterLabel(LvzInt32 index, char *label)
   {
     case 0: strcpy(label, "semi"); break;
     case 1: strcpy(label, "cent"); break;
-    case 2: strcpy(label, "%"); break; 
-    case 3: strcpy(label, "dB"); break; 
-    case 4: strcpy(label, "ms"); break; 
-    case 5: strcpy(label, "%"); break; 
-    case 6: strcpy(label, ""); break; 
+    case 2: strcpy(label, "%"); break;
+    case 3: strcpy(label, "dB"); break;
+    case 4: strcpy(label, "ms"); break;
+    case 5: strcpy(label, "%"); break;
+    case 6: strcpy(label, ""); break;
   }
 }
 
@@ -178,14 +178,14 @@ void mdaRePsycho::process(float **inputs, float **outputs, LvzInt32 sampleFrames
 	float *in2 = inputs[1];
 	float *out1 = outputs[0];
 	float *out2 = outputs[1];
-	float a, b, c, d;	
+	float a, b, c, d;
   float we=wet, dr=dry, tu=tun, en=env;
   float ga=gai, x=0.0f, x2=0.0f, xx=buf, xx2=buf2;
   float it1, it2;
   long ti=tim, dti=dtim, of1, of2;
-  
-  --in1;	
-	--in2;	
+
+  --in1;
+	--in2;
 	--out1;
 	--out2;
 
@@ -194,12 +194,12 @@ void mdaRePsycho::process(float **inputs, float **outputs, LvzInt32 sampleFrames
     we=(float)(we*2.0);
     while(--sampleFrames >= 0)
 	  {
-		  a = *++in1;		
+		  a = *++in1;
 		  b = *++in2;
-		  
+
       c = out1[1];
 		  d = out2[1]; //process from here...
-  
+
       if ((a+b > thr) && (ti > dti)) //trigger
       {
         ga = 1.0;
@@ -207,7 +207,7 @@ void mdaRePsycho::process(float **inputs, float **outputs, LvzInt32 sampleFrames
       }
 
       if (ti<22050) //play out
-      {  
+      {
         if(ti<80) //fade in
         {
           if(ti==0) { xx=x; xx2=x2; }
@@ -216,9 +216,9 @@ void mdaRePsycho::process(float **inputs, float **outputs, LvzInt32 sampleFrames
           *(buffer2 + ti) = b;
           x = *(buffer + int(ti * tu));
           x2 = *(buffer2 + int(ti * tu));
-        
-          x = (float)(xx * (1.0 - (0.0125 * ti)) + (x * 0.0125 * ti)); 
-          x2 = (float)(xx2 * (1.0 - (0.0125 * ti)) + (x2 * 0.0125 * ti)); 
+
+          x = (float)(xx * (1.0 - (0.0125 * ti)) + (x * 0.0125 * ti));
+          x2 = (float)(xx2 * (1.0 - (0.0125 * ti)) + (x2 * 0.0125 * ti));
         }
         else
         {
@@ -240,11 +240,11 @@ void mdaRePsycho::process(float **inputs, float **outputs, LvzInt32 sampleFrames
       {
         ga = 0;
       }
-        
+
 		  c += (a * dr) + (x * ga * we); // output
 		  d += (b * dr) + (x2 * ga * we);
-		      
-      *++out1 = c;	
+
+      *++out1 = c;
 		  *++out2 = d;
 	  }
   }
@@ -252,12 +252,12 @@ void mdaRePsycho::process(float **inputs, float **outputs, LvzInt32 sampleFrames
   {
     while(--sampleFrames >= 0)
 	  {
-		  a = *++in1;		
+		  a = *++in1;
 		  b = *++in2;
-		  
+
       c = out1[1];
 		  d = out2[1]; //process from here...
-  
+
       if ((a+b > thr) && (ti > dti)) //trigger
       {
         ga = 1.0;
@@ -265,14 +265,14 @@ void mdaRePsycho::process(float **inputs, float **outputs, LvzInt32 sampleFrames
       }
 
       if (ti<22050) //play out
-      {  
+      {
         if(ti<80) //fade in
         {
           if(ti==0) xx = x;
 
           *(buffer + ti) = (a + b);
           x = *(buffer + int(ti * tu));
-        
+
           x = (float)(xx * (1.0 - (0.0125 * ti)) + (x * 0.0125 * ti));
         }
         else
@@ -289,11 +289,11 @@ void mdaRePsycho::process(float **inputs, float **outputs, LvzInt32 sampleFrames
       {
         ga = 0;
       }
-        
+
 		  c += (a * dr) + (x * ga * we); // output
 		  d += (b * dr) + (x * ga * we);
-		      
-      *++out1 = c;	
+
+      *++out1 = c;
 		  *++out2 = d;
 	  }
   }
@@ -309,14 +309,14 @@ void mdaRePsycho::processReplacing(float **inputs, float **outputs, LvzInt32 sam
 	float *in2 = inputs[1];
 	float *out1 = outputs[0];
 	float *out2 = outputs[1];
-	float a, b, c, d;	
+	float a, b, c, d;
   float we=wet, dr=dry, tu=tun, en=env;
   float ga=gai, x=0.0f, x2=0.0f, xx=buf, xx2=buf2;
   float it1, it2;
   long ti=tim, dti=dtim, of1, of2;
 
-	--in1;	
-	--in2;	
+	--in1;
+	--in2;
 	--out1;
 	--out2;
 
@@ -325,9 +325,9 @@ void mdaRePsycho::processReplacing(float **inputs, float **outputs, LvzInt32 sam
     we=(float)(we*2.0);
     while(--sampleFrames >= 0)
 	  {
-		  a = *++in1;		
+		  a = *++in1;
 		  b = *++in2; //process from here...
-		  
+
       if ((a+b > thr) && (ti > dti)) //trigger
       {
         ga = 1.0;
@@ -335,7 +335,7 @@ void mdaRePsycho::processReplacing(float **inputs, float **outputs, LvzInt32 sam
       }
 
       if (ti<22050) //play out
-      {  
+      {
         if(ti<80) //fade in
         {
           if(ti==0) { xx=x; xx2=x2; }
@@ -344,9 +344,9 @@ void mdaRePsycho::processReplacing(float **inputs, float **outputs, LvzInt32 sam
           *(buffer2 + ti) = b;
           x = *(buffer + int(ti * tu));
           x2 = *(buffer2 + int(ti * tu));
-        
-          x = (float)(xx * (1.0 - (0.0125 * ti)) + (x * 0.0125 * ti)); 
-          x2 = (float)(xx2 * (1.0 - (0.0125 * ti)) + (x2 * 0.0125 * ti)); 
+
+          x = (float)(xx * (1.0 - (0.0125 * ti)) + (x * 0.0125 * ti));
+          x2 = (float)(xx2 * (1.0 - (0.0125 * ti)) + (x2 * 0.0125 * ti));
         }
         else
         {
@@ -368,10 +368,10 @@ void mdaRePsycho::processReplacing(float **inputs, float **outputs, LvzInt32 sam
       {
         ga = 0;
       }
-    
+
 		  c = (a * dr) + (x * ga * we); // output
 		  d = (b * dr) + (x2 * ga * we);
-		      
+
       *++out1 = c;
 		  *++out2 = d;
 	  }
@@ -380,9 +380,9 @@ void mdaRePsycho::processReplacing(float **inputs, float **outputs, LvzInt32 sam
   {
 	  while(--sampleFrames >= 0)
 	  {
-		  a = *++in1;		
+		  a = *++in1;
 		  b = *++in2; //process from here...
-		  
+
       if ((a+b > thr) && (ti > dti)) //trigger
       {
         ga = 1.0;
@@ -390,14 +390,14 @@ void mdaRePsycho::processReplacing(float **inputs, float **outputs, LvzInt32 sam
       }
 
       if (ti<22050) //play out
-      {  
+      {
         if(ti<80) //fade in
         {
           if(ti==0) xx = x;
 
           *(buffer + ti) = (a + b);
           x = *(buffer + int(ti * tu));
-        
+
           x = (float)(xx * (1.0 - (0.0125 * ti)) + (x * 0.0125 * ti));
         }
         else
@@ -414,10 +414,10 @@ void mdaRePsycho::processReplacing(float **inputs, float **outputs, LvzInt32 sam
       {
         ga = 0;
       }
-    
+
 		  c = (a * dr) + (x * ga * we); // output
 		  d = (b * dr) + (x * ga * we);
-		      
+
       *++out1 = c;
 		  *++out2 = d;
 	  }

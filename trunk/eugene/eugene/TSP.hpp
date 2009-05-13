@@ -1,6 +1,6 @@
 /* This file is part of Eugene
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * Eugene is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free
  * Software Foundation, either version 3 of the License, or (at your option)
@@ -39,10 +39,10 @@ public:
 
 	typedef std::pair<uint32_t,uint32_t> City;
 	typedef std::vector<City>            Cities;
-	
+
 	virtual boost::shared_ptr<Population>
 	initial_population(size_t gene_size, size_t pop_size) const;
-	
+
 	const Cities& cities() const { return _cities; }
 
 #ifndef NDEBUG
@@ -50,7 +50,7 @@ public:
 		for (typename G::const_iterator i=l; i != r; ++i)
 			std::cout << *i << ",";
 	}*/
-	
+
 	bool assert_gene(const GeneType& g) const {
 		std::set<GeneType::value_type> values;
 		for (GeneType::const_iterator i = g.begin(); i != g.end(); ++i) {

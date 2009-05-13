@@ -1,6 +1,6 @@
 /* This file is part of Eugene
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * Eugene is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free
  * Software Foundation, either version 3 of the License, or (at your option)
@@ -38,7 +38,7 @@ public:
 
 		G child_a(gene_size, value_limits.max(), value_limits.max());
 		G child_b(gene_size, value_limits.max(), value_limits.max());
-	
+
 		const size_t rand_1 = rand() % gene_size;
 		size_t rand_2 = rand() % gene_size;
 		while (rand_2 == rand_1)
@@ -46,7 +46,7 @@ public:
 
 		const size_t cut_a = std::min(rand_1, rand_2);
 		const size_t cut_b = std::max(rand_1, rand_2);
-		
+
 		// Copy a chunk from parent1->child_a && parent2->child_b
 		for (size_t i=cut_a; i <= cut_b; ++i)
 			child_a[i] = parent_1[i];
@@ -59,7 +59,7 @@ public:
 		// Fill in the rest with cities in order from the other parent
 		fill_in_order(parent_2, child_a, left, right);
 		fill_in_order(parent_1, child_b, left, right);
-		
+
 		return make_pair(*(G*)&child_a, *(G*)&child_b);
 	}
 
@@ -77,7 +77,7 @@ private:
 				child[right] = parent[parent_read];
 				right = (right + 1) % parent.size();
 			}
-			
+
 			parent_read = (parent_read + 1) % parent.size();
 		}
 	}

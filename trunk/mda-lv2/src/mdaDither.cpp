@@ -21,13 +21,13 @@ mdaDither::mdaDither(audioMasterCallback audioMaster)	: AudioEffectX(audioMaster
   sh1 = sh2 = sh3 = sh4 = 0.0f;
   rnd1 = rnd3 = 0;
 
-  setNumInputs(2);		  
-	setNumOutputs(2);		  
+  setNumInputs(2);
+	setNumOutputs(2);
 	setUniqueID("mdaDither");    // identify here
-	DECLARE_LVZ_DEPRECATED(canMono) ();				      
-	canProcessReplacing();	
+	DECLARE_LVZ_DEPRECATED(canMono) ();
+	canProcessReplacing();
 	strcpy(programName, "Dither & Noise Shaping");
-	
+
   setParameter(0, 0.5f);
 }
 
@@ -47,7 +47,7 @@ void mdaDither::setParameter(LvzInt32 index, float value)
  }
   //calcs here
   gain = 1.0f;
-  bits = 8.0f + 2.0f * (float)floor(8.9f * fParam0); 
+  bits = 8.0f + 2.0f * (float)floor(8.9f * fParam0);
 
   if(fParam4>0.1f) //zoom to 6 bit & fade out audio
   {
@@ -55,16 +55,16 @@ void mdaDither::setParameter(LvzInt32 index, float value)
     gain = (1.0f - fParam4); gain*=gain;
   }
   else wlen = (float)pow(2.0f, bits - 1.0f); //word length in quanta
-  
-  //Using WaveLab 2.01 (unity gain) as a reference: 
+
+  //Using WaveLab 2.01 (unity gain) as a reference:
   //  16-bit output is (int)floor(floating_point_value*32768.0f)
-  
+
   offs = (4.0f * fParam3 - 1.5f) / wlen; //DC offset (plus 0.5 to round dither not truncate)
   dith = 2.0f * fParam2 / (wlen * (float)32767);
   shap=0.0f;
 
   switch((long)(fParam1*3.9)) //dither mode
-  {  
+  {
      case 0: dith = 0.0f; break; //off
      case 3: shap = 0.5f; break; //noise shaping
     default: break; //tri, hp-tri
@@ -134,7 +134,7 @@ void mdaDither::getParameterDisplay(LvzInt32 index, char *text)
             } break;
     case 2: float2strng(4.0f * fParam2, text); break;
     case 3: float2strng(4.0f * fParam3 - 2.0f, text); break;
-    case 4: if(fParam4>0.1f) 
+    case 4: if(fParam4>0.1f)
             if(gain<0.0001f) strcpy(text, "-80");
                         else long2string((long)(20.0 * log10(gain)), text);
                         else strcpy(text, "OFF"); break;
@@ -171,14 +171,14 @@ void mdaDither::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
   long  m=1;                                     //dither mode
   if((long)(fParam1 * 3.9f)==1) m=0;             //what is the fastest if(?)
 
-  --in1;	
-	--in2;	
+  --in1;
+	--in2;
 	--out1;
 	--out2;
-	
+
   while(--sampleFrames >= 0)
 	{
-		a = *++in1; 
+		a = *++in1;
     b = *++in2;
 		c = out1[1];
 		d = out2[1];
@@ -186,12 +186,12 @@ void mdaDither::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
     r2=r1; r4=r3;
     if(m==0) { r4=rand() & 0x7FFF; r2=(r4 & 0x7F)<<8; }
                r1=rand() & 0x7FFF; r3=(r1 & 0x7F)<<8;
-    
+
     a  = g * a + sl * (s1 + s1 - s2);
     aa = a + o + dl * (float)(r1 - r2);
     if(aa<0.0f) aa-=wi;
     aa = wi * (float)(long)(w * aa);
-    s2 = s1;                            
+    s2 = s1;
     s1 = a - aa;
 
     b  = g * b + sl * (s3 + s3 - s4);
@@ -204,7 +204,7 @@ void mdaDither::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
     *++out1 = c + aa;
 		*++out2 = d + bb;
 	}
-  
+
   sh1=s1; sh2=s2; sh3=s3; sh4=s4;
   rnd1=r1; rnd3=r3;
 }
@@ -224,8 +224,8 @@ void mdaDither::processReplacing(float **inputs, float **outputs, LvzInt32 sampl
   long  m=1;                                     //dither mode
   if((long)(fParam1 * 3.9f)==1) m=0;             //what is the fastest if(?)
 
-	--in1;	
-	--in2;	
+	--in1;
+	--in2;
 	--out1;
 	--out2;
 
@@ -237,12 +237,12 @@ void mdaDither::processReplacing(float **inputs, float **outputs, LvzInt32 sampl
     r2=r1; r4=r3; //HP-TRI dither (also used when noise shaping)
     if(m==0) { r4=rand() & 0x7FFF; r2=(r4 & 0x7F)<<8; } //TRI dither
                r1=rand() & 0x7FFF; r3=(r1 & 0x7F)<<8;   //Assumes RAND_MAX=32767?
-    
+
     a  = g * a + sl * (s1 + s1 - s2);    //target level + error feedback
-    aa = a + o + dl * (float)(r1 - r2);  //             + offset + dither 
+    aa = a + o + dl * (float)(r1 - r2);  //             + offset + dither
     if(aa<0.0f) aa-=wi;                 //(long) truncates towards zero!
-    aa = wi * (float)(long)(w * aa);    //truncate 
-    s2 = s1;                            
+    aa = wi * (float)(long)(w * aa);    //truncate
+    s2 = s1;
     s1 = a - aa;                        //error feedback: 2nd order noise shaping
 
     b  = g * b + sl * (s3 + s3 - s4);
@@ -255,7 +255,7 @@ void mdaDither::processReplacing(float **inputs, float **outputs, LvzInt32 sampl
     *++out1 = aa;
 		*++out2 = bb;
 	}
-  
+
   sh1=s1; sh2=s2; sh3=s3; sh4=s4; //doesn't actually matter if these are
   rnd1=r1; rnd3=r3;               //saved or not as effect is so small !
 }

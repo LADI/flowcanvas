@@ -23,15 +23,15 @@ mdaDelay::mdaDelay(audioMasterCallback audioMaster)	: AudioEffectX(audioMaster, 
   ipos = 0;
   fil0 = 0.0f;
 
-  setNumInputs(2);		  
-	setNumOutputs(2);		  
+  setNumInputs(2);
+	setNumOutputs(2);
 	setUniqueID("mdaDelay");  //identify here
-	DECLARE_LVZ_DEPRECATED(canMono) ();				      
-	canProcessReplacing();	
+	DECLARE_LVZ_DEPRECATED(canMono) ();
+	canProcessReplacing();
 	strcpy(programName, "Delay");
-	
+
   suspend();		//flush buffer
-  setParameter(0, 0.5); 
+  setParameter(0, 0.5);
 }
 
 bool  mdaDelay::getProductString(char* text) { strcpy(text, "MDA Delay"); return true; }
@@ -54,7 +54,7 @@ void mdaDelay::setParameter(LvzInt32 index, float value)
   //calcs here
   ldel = (long)(size * fParam0 * fParam0);
   if(ldel<4) ldel=4;
-  
+
   switch(int(fParam1 * 17.9f)) //fixed left/right ratios
   {
     case  17: tmp = 0.5000f; break;
@@ -76,13 +76,13 @@ void mdaDelay::setParameter(LvzInt32 index, float value)
 
   if(fParam3>0.5f)  //simultaneously change crossover frequency & high/low mix
   {
-    fil = 0.5f * fil - 0.25f; 
+    fil = 0.5f * fil - 0.25f;
     lmix = -2.0f * fil;
     hmix = 1.0f;
   }
-  else 
-  { 
-    hmix = 2.0f * fil; 
+  else
+  {
+    hmix = 2.0f * fil;
     lmix = 1.0f - hmix;
   }
   fil = (float)exp(-6.2831853f * pow(10.0f, 2.2f + 4.5f * fil) / getSampleRate());
@@ -187,33 +187,33 @@ void mdaDelay::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
   l = (i + ldel) % (s + 1);
   r = (i + rdel) % (s + 1);
 
-  --in1;	
-	--in2;	
+  --in1;
+	--in2;
 	--out1;
 	--out2;
   while(--sampleFrames >= 0)
 	{
-		a = *++in1; 
+		a = *++in1;
     b = *++in2;
 		c = out1[1];
-		d = out2[1]; 
+		d = out2[1];
 
     ol = *(buffer + l);
     or_ = *(buffer + r);
-    
-    tmp = w * (a + b) + fb * (ol + or_); 
-    f0 = f * (f0 - tmp) + tmp;   
-    *(buffer + i) = lx * f0 + hx * tmp; 
+
+    tmp = w * (a + b) + fb * (ol + or_);
+    f0 = f * (f0 - tmp) + tmp;
+    *(buffer + i) = lx * f0 + hx * tmp;
 
     i--; if(i<0) i=s;
     l--; if(l<0) l=s;
     r--; if(r<0) r=s;
 
-    *++out1 = c + y * a + ol; 
-		*++out2 = d + y * b + or_; 
+    *++out1 = c + y * a + ol;
+		*++out2 = d + y * b + or_;
 	}
   ipos = i;
-  if(fabs(f0)<1.0e-10) fil0=0.0f; else fil0=f0; 
+  if(fabs(f0)<1.0e-10) fil0=0.0f; else fil0=f0;
 }
 
 void mdaDelay::processReplacing(float **inputs, float **outputs, LvzInt32 sampleFrames)
@@ -229,8 +229,8 @@ void mdaDelay::processReplacing(float **inputs, float **outputs, LvzInt32 sample
   l = (i + ldel) % (s + 1);
   r = (i + rdel) % (s + 1);
 
-	--in1;	
-	--in2;	
+	--in1;
+	--in2;
 	--out1;
 	--out2;
   while(--sampleFrames >= 0)
@@ -240,7 +240,7 @@ void mdaDelay::processReplacing(float **inputs, float **outputs, LvzInt32 sample
 
     ol = *(buffer + l); //delay outputs
     or_ = *(buffer + r);
-    
+
     tmp = w * (a + b) + fb * (ol + or_); //mix input & feedback
     f0 = f * (f0 - tmp) + tmp;    //low-pass filter
     *(buffer + i) = lx * f0 + hx * tmp; //delay input
@@ -250,7 +250,7 @@ void mdaDelay::processReplacing(float **inputs, float **outputs, LvzInt32 sample
     r--; if(r<0) r=s;
 
     *++out1 = y * a + ol; //mix wet & dry
-		*++out2 = y * b + or_; 
+		*++out2 = y * b + or_;
 	}
   ipos = i;
   if(fabs(f0)<1.0e-10) fil0=0.0f; else fil0=f0; //trap denormals

@@ -1,6 +1,6 @@
 /* This file is part of Eugene
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * Eugene is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free
  * Software Foundation, either version 3 of the License, or (at your option)
@@ -46,7 +46,7 @@
 
 using namespace std;
 using namespace Eugene;
-		
+
 
 template <typename G>
 void
@@ -106,10 +106,10 @@ main(int argc, char** argv)
 			 << "       " << argv[0] << " --crossover"    << endl
 			 << "       " << argv[0] << " --labs N P M [ 1 | 2 | U ] [ G | L ] L [--quiet]"   << endl
 			 << "       " << argv[0] << " --sphere P"    << endl;
-		
+
 		return -1;
 	}
-	
+
 	size_t population_size      = 1000;
 	float  mutation_probability = 0.1;
 
@@ -119,7 +119,7 @@ main(int argc, char** argv)
 
 	if (mode == LABS) {
 		quiet = (argc > 8);
-		
+
 		if (!quiet)
 			cout << "Problem size: " << argv[2] << endl;
 
@@ -147,7 +147,7 @@ main(int argc, char** argv)
 
 	if (limit == 0 && !quiet)
 		cout << "(Press enter to terminate)" << endl;
-	
+
 	GA* ga = NULL;
 
 	// 1) a)
@@ -162,7 +162,7 @@ main(int argc, char** argv)
 		boost::shared_ptr< Mutation<SimpleMax::GeneType> > m(
 				new RandomMutation<SimpleMax::GeneType>(0, 1));
 		ga = new OneMaxGA(p, s, c, m, 50, population_size, 5, mutation_probability, 1.0);
-	
+
 	// 1) b)
 	} else if (mode == SIMPLE_MAX) {
 		typedef GAImpl<SimpleMax::GeneType> SimpleMaxGA;
@@ -178,7 +178,7 @@ main(int argc, char** argv)
 
 	} else if (mode == TSP) {
 		typedef GAImpl<TSP::GeneType> TSPGA;
-		
+
 		boost::shared_ptr< Problem<Eugene::TSP::GeneType> > p(new Eugene::TSP(argv[2]));
 		boost::shared_ptr< Selection<TSP::GeneType> > s(
 				new TournamentSelection<TSP::GeneType>(p, 4, 0.8));
@@ -189,7 +189,7 @@ main(int argc, char** argv)
 		boost::shared_ptr< Mutation<TSP::GeneType> > m(
 				new SwapAlleleMutation<TSP::GeneType>());
 		ga = new TSPGA(p, s, c, m, p->gene_size(), population_size, 5, mutation_probability, 1.0);
-	
+
 	} else if (mode == LABS) {
 		typedef GAImpl<LABS::GeneType> LABSGA;
 
@@ -226,7 +226,7 @@ main(int argc, char** argv)
 				//new FlipRangeMutation<LABS::GeneType>());
 				new FlipRandomMutation<LABS::GeneType>());
 		ga = new LABSGA(p, s, c, m, p->gene_size(), population_size, 3, mutation_probability, 0.8);
-	
+
 	} else if (mode == SPHERE) {
 		typedef ESImpl<Sphere::GeneType> SphereES;
 
@@ -247,7 +247,7 @@ main(int argc, char** argv)
 		cout << endl << "Enter parent 2: ";
 		getline(cin, p2_str);
 		cout << endl;*/
-		
+
 		boost::shared_ptr< Problem<Eugene::TSP::GeneType> > p(new Eugene::TSP());
 
 		string p1_str = "0 2 4 6 8 1 3 5 7 9";
@@ -261,7 +261,7 @@ main(int argc, char** argv)
 			p1.push_back(val);
 		}
 		assert(p->assert_gene(p1));
-		
+
 		TSP::GeneType p2(0);
 		std::istringstream p2_ss(p2_str);
 		while (!p2_ss.eof()) {
@@ -270,7 +270,7 @@ main(int argc, char** argv)
 			p2.push_back(val);
 		}
 		assert(p->assert_gene(p2));
-		
+
 		std::pair<TSP::GeneType,TSP::GeneType> children
 			= make_pair(TSP::GeneType(0), TSP::GeneType(0));
 
@@ -279,7 +279,7 @@ main(int argc, char** argv)
 				new OnePointCrossover<SimpleMax::GeneType>());
 		children = c->crossover(p1, p2);
 		print_children(children);
-		
+
 		cout << endl << "Partially mapped:" << endl;
 		c = boost::shared_ptr< Crossover<SimpleMax::GeneType> >(
 				new PartiallyMappedCrossover<SimpleMax::GeneType>());
@@ -287,7 +287,7 @@ main(int argc, char** argv)
 		print_children(children);
 		assert(p->assert_gene(children.first));
 		assert(p->assert_gene(children.second));
-		
+
 		cout << endl << "Order based:" << endl;
 		c = boost::shared_ptr< Crossover<SimpleMax::GeneType> >(
 				new OrderCrossover<SimpleMax::GeneType>());
@@ -295,7 +295,7 @@ main(int argc, char** argv)
 		print_children(children);
 		assert(p->assert_gene(children.first));
 		assert(p->assert_gene(children.second));
-		
+
 		cout << endl << "Position based:" << endl;
 		c = boost::shared_ptr< Crossover<SimpleMax::GeneType> >(
 				new PositionBasedCrossover<SimpleMax::GeneType>());
@@ -310,7 +310,7 @@ main(int argc, char** argv)
 		cerr << "Unknown mode.  Exiting." << endl;
 		return -1;
 	}
-		
+
 	assert(ga);
 
 	float best_fitness = ga->best_fitness();
@@ -367,8 +367,8 @@ main(int argc, char** argv)
 
 	//cout << "Final Elites:" << endl;
 	//ga->print_elites();
-	
+
 	delete ga;
-		
+
 	return 0;
 }

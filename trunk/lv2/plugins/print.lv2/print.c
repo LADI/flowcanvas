@@ -42,7 +42,7 @@ osc_print_instantiate(const LV2_Descriptor*    descriptor,
                       const LV2_Feature*const* features)
 {
 	Print* plugin = (Print*)malloc(sizeof(Print));
-	
+
 	plugin->input_buffer = NULL;
 
 	return (LV2_Handle)plugin;
@@ -54,7 +54,7 @@ osc_print_cleanup(LV2_Handle instance)
 {
 	free(instance);
 }
-	
+
 
 static LV2MessageContext osc_print_message_context_data;
 
@@ -92,10 +92,10 @@ osc_print_message_run(LV2_Handle instance, const void* valid_inputs, void* valid
 
 		//for (uint32_t i=0; i < plugin->input_buffer->event_count; ++i)
 		//	lv2_osc_message_print(lv2_osc_buffer_get_message(plugin->input_buffer, i));
-		
+
 		lv2_contexts_set_port_valid(valid_outputs, 0);
 		return true;
-	
+
 	} else {
 		lv2_contexts_unset_port_valid(valid_outputs, 0);
 		return false;

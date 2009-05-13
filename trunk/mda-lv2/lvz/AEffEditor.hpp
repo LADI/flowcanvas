@@ -16,10 +16,10 @@ public:
 
 	virtual void idle() {}
 	virtual void postUpdate() {}
-	
+
 	virtual const char* getURI()       { return URI; }
 	virtual void setURI(const char* u) { URI = u; }
-	
+
 	virtual const char* getPluginURI()              { return pluginURI; }
 	virtual void        setPluginURI(const char* u) { pluginURI = u; }
 

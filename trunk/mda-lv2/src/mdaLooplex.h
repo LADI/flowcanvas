@@ -57,9 +57,9 @@ public:
 	virtual LvzInt32 canDo (char* text);
 
 	virtual LvzInt32 getNumMidiInputChannels ()  { return 1; }
-	
+
   void idle();
-  
+
 private:
 	void update();  //my parameter update
 

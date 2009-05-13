@@ -1,6 +1,6 @@
 /* This file is part of Eugene
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * Eugene is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free
  * Software Foundation, either version 3 of the License, or (at your option)
@@ -45,14 +45,14 @@ public:
 			return; // bad user, no cookie
 
 		_mutations[mutation_index].first = probability;
-		
+
 		if (probability == 1.0) {
 			for (size_t i=0; i < _mutations.size(); ++i)
-				if (i != mutation_index) 
+				if (i != mutation_index)
 					_mutations[i].first = 0.0f;
 		} else {
 			for (size_t i=0; i < _mutations.size(); ++i)
-				if (i != mutation_index) 
+				if (i != mutation_index)
 					_mutations[i].first -= delta * (_mutations[i].first / others);
 		}
 	}
@@ -68,7 +68,7 @@ public:
 				return;
 			}
 		}
-				
+
 		_mutations.back().second->mutate(gene);
 	}
 

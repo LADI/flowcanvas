@@ -13,24 +13,24 @@ mdaShepard::mdaShepard(audioMasterCallback audioMaster)	: AudioEffectX(audioMast
 {
   double x, a, twopi=6.2831853;
   int i;
-  
+
   //inits here!
   fParam0 = 0.20f; //mode
   fParam1 = 0.70f; //rate
   fParam2 = 0.50f; //level
 
   max = 512;
-	buf1 = new float[max]; 
-	buf2 = new float[max]; 
-  
-  setNumInputs(2);		  
-	setNumOutputs(2);		  
-	setUniqueID("mdaShepard");    // 
-	DECLARE_LVZ_DEPRECATED(canMono) ();				      
-	canProcessReplacing();	
+	buf1 = new float[max];
+	buf2 = new float[max];
+
+  setNumInputs(2);
+	setNumOutputs(2);
+	setUniqueID("mdaShepard");    //
+	DECLARE_LVZ_DEPRECATED(canMono) ();
+	canProcessReplacing();
 	strcpy(programName, "Shepard Tone Generator");
 
-  for(max=0; max<511; max++)   
+  for(max=0; max<511; max++)
   {
     pos = (float)(twopi * max / 511.f); //generate wavetables
     x=0.0;
@@ -46,8 +46,8 @@ mdaShepard::mdaShepard(audioMasterCallback audioMaster)	: AudioEffectX(audioMast
   }
   *(buf1 + 511) = 0.f;
   *(buf2 + 511) = 0.f; //wrap end for interpolation
-  pos=0.f; 
-  rate=1.f; 
+  pos=0.f;
+  rate=1.f;
 
   setParameter(0, 0.2f); //go and set initial values!
 }
@@ -122,7 +122,7 @@ void mdaShepard::getParameterDisplay(LvzInt32 index, char *text)
 	switch(index)
   {
     case 0: switch(mode)
-            { 
+            {
               case 0: strcpy(text, "TONES"); break;
               case 1: strcpy(text, "RING MOD"); break;
               case 2: strcpy(text, "TONES+IN"); break;
@@ -155,8 +155,8 @@ void mdaShepard::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
   float r=rate, dr=drate, o=out, p=pos, di;
   long x=max, m=mode, i1, i2;
 
-	--in1;	
-	--in2;	
+	--in1;
+	--in2;
 	--out1;
 	--out2;
 
@@ -164,23 +164,23 @@ void mdaShepard::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
 	{
 		a = *++in1 + *++in2;
 		c = out1[1];
-		d = out2[1]; 
+		d = out2[1];
 
-    r *= dr; 
-    if(r>2.f) 
-    { 
-      r *= 0.5f; 
+    r *= dr;
+    if(r>2.f)
+    {
+      r *= 0.5f;
       p *= 0.5f;
     }
-    else if(r<1.f) 
+    else if(r<1.f)
     {
       r *= 2.f;
       p *= 2.f; if(p>x)p-=x;
     }
-    
-    p += r; 
+
+    p += r;
     if(p>x) p -= x;
-    
+
     i1 = int(p); //interpolate position
     i2 = i1 + 1;
     di = (float)i2 - p;
@@ -190,7 +190,7 @@ void mdaShepard::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
     b *= o / r;
 
     if(m>0) { if(m==2) b += 0.5f*a; else b *= a; } //ring mod or add
-    
+
     *++out1 = c + b;
 		*++out2 = c + b;
 	}
@@ -207,8 +207,8 @@ void mdaShepard::processReplacing(float **inputs, float **outputs, LvzInt32 samp
   float r=rate, dr=drate, o=out, p=pos, di;
   long x=max, m=mode, i1, i2;
 
-	--in1;	
-	--in2;	
+	--in1;
+	--in2;
 	--out1;
 	--out2;
 
@@ -216,21 +216,21 @@ void mdaShepard::processReplacing(float **inputs, float **outputs, LvzInt32 samp
 	{
 		a = *++in1 + *++in2;
 
-    r *= dr; 
-    if(r>2.f) 
-    { 
-      r *= 0.5f; 
+    r *= dr;
+    if(r>2.f)
+    {
+      r *= 0.5f;
       p *= 0.5f;
     }
-    else if(r<1.f) 
+    else if(r<1.f)
     {
       r *= 2.f;
       p *= 2.f; if(p>x)p-=x;
     }
-    
-    p += r; 
+
+    p += r;
     if(p>x) p -= x;
-    
+
     i1 = int(p); //interpolate position
     i2 = i1 + 1;
     di = (float)i2 - p;
@@ -240,7 +240,7 @@ void mdaShepard::processReplacing(float **inputs, float **outputs, LvzInt32 samp
     b *= o / r;
 
     if(m>0) { if(m==2) b += 0.5f*a; else b *= a; } //ring mod or add
-    
+
     *++out1 = b;
 		*++out2 = b;
 	}

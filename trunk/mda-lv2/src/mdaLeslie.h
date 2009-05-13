@@ -9,9 +9,9 @@ public:
 	mdaLeslieProgram();
 	~mdaLeslieProgram() {}
 
-private:	
+private:
 	friend class mdaLeslie;
-	float fParam1, fParam3, fParam4, fParam5, fParam6; 
+	float fParam1, fParam3, fParam4, fParam5, fParam6;
   float fParam7, fParam9, fParam2, fParam8;
 	char name[24];
 };
@@ -55,13 +55,13 @@ protected:
   float filo; //crossover filter coeff
   float fbuf1, fbuf2; //filter buffers
   float twopi; //speed, target, momentum, phase, width, ampmod, freqmod...
-  float hspd, hset, hmom, hphi, hwid, hlev, hdep; 
+  float hspd, hset, hmom, hphi, hwid, hlev, hdep;
   float lspd, lset, lmom, lphi, lwid, llev, gain;
   float *hbuf;  //HF delay buffer
 	long size, hpos; //buffer length & pointer
-  
+
   float chp, dchp, clp, dclp, shp, dshp, slp, dslp;
-  
+
 	char programName[32];
 };
 

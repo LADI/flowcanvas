@@ -1,15 +1,15 @@
 /* This file is part of Machina.
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * Machina is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
- * 
+ *
  * Machina is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
@@ -38,11 +38,11 @@ public:
 
 	boost::shared_ptr<MachinaCanvas>   canvas() { return _canvas; }
 	boost::shared_ptr<Machina::Engine> engine() { return _engine; }
-	
+
 	SharedPtr<Raul::Maid> maid() { return _maid; }
-	
+
 	Gtk::Window* window() { return _main_window; }
-	
+
 	void attach();
 	void quit() { _main_window->hide(); }
 
@@ -90,7 +90,7 @@ protected:
 
 	string _save_uri;
 	string _target_filename;
-	
+
 	Raul::TimeUnit _unit;
 
 	boost::shared_ptr<MachinaCanvas>   _canvas;
@@ -100,7 +100,7 @@ protected:
 	SharedPtr<Machina::Evolver> _evolver;
 
 	Gtk::Main* _gtk_main;
-	
+
 	Gtk::Window*           _main_window;
 	Gtk::Dialog*           _help_dialog;
 	Gtk::AboutDialog*      _about_window;

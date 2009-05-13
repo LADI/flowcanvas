@@ -1,6 +1,6 @@
 /* This file is part of Eugene
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * Eugene is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free
  * Software Foundation, either version 3 of the License, or (at your option)
@@ -43,7 +43,7 @@ struct TournamentSelection : public Selection<G> {
 
 		return make_pair(parent_1, parent_2);
 	}
-	
+
 	typename Problem<G>::Population::iterator
 	select_parent(shared_ptr<typename Problem<G>::Population> pop) const
 	{
@@ -57,7 +57,7 @@ struct TournamentSelection : public Selection<G> {
 
 			players.push_back(index);
 		}
-		
+
 		if ((rand() / (float)RAND_MAX) < _p) {
 			typename Problem<G>::Population::iterator ret = pop->begin() + players[0];
 			for (size_t i=1; i < _n; ++i) {

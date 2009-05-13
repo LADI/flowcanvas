@@ -28,7 +28,7 @@ main()
 {
 	uint64_t flags = 0;
 	print_flags(&flags);
-	
+
 	lv2_contexts_set_port_valid(&flags, 16);
 	print_flags(&flags);
 	for (int i = 0; i < NUM_PORTS; ++i) {
@@ -38,7 +38,7 @@ main()
 			TEST_ASSERT(!lv2_contexts_port_is_valid(&flags, i));
 		}
 	}
-	
+
 	lv2_contexts_set_port_valid(&flags, 46);
 	lv2_contexts_set_port_valid(&flags, 0);
 	print_flags(&flags);
@@ -49,7 +49,7 @@ main()
 			TEST_ASSERT(!lv2_contexts_port_is_valid(&flags, i));
 		}
 	}
-	
+
 	lv2_contexts_unset_port_valid(&flags, 16);
 	print_flags(&flags);
 	for (int i = 0; i < NUM_PORTS; ++i) {

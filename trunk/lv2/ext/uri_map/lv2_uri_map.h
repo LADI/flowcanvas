@@ -1,7 +1,7 @@
 /* lv2_uri_map.h - C header file for the LV2 URI Map extension.
- * 
+ *
  * Copyright (C) 2008 Dave Robillard <dave@drobilla.net>
- * 
+ *
  * This header is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
  * by the Free Software Foundation; either version 2 of the License, or
@@ -36,7 +36,7 @@
  * comparison.  This allows the extensibility of RDF with the performance of
  * integers (or centrally defined enumerations).
  */
-	
+
 
 /** Opaque pointer to host data. */
 typedef void* LV2_URI_Map_Callback_Data;
@@ -49,14 +49,14 @@ typedef void* LV2_URI_Map_Callback_Data;
  * and data pointed to an instance of this struct.
  */
 typedef struct {
-	
+
 	/** Opaque pointer to host data.
 	 *
 	 * The plugin MUST pass this to any call to functions in this struct.
 	 * Otherwise, it must not be interpreted in any way.
 	 */
 	LV2_URI_Map_Callback_Data callback_data;
-	
+
 	/** Get the numeric ID of a URI from the host.
 	 *
 	 * @param callback_data Must be the callback_data member of this struct.

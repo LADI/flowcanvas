@@ -1,15 +1,15 @@
 /* This file is part of Machina.
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * Machina is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
- * 
+ *
  * Machina is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
@@ -103,7 +103,7 @@ MachineBuilder::connect_nodes(SharedPtr<Machine> m,
 		delay_node->add_edge(SharedPtr<Edge>(new Edge(delay_node, head)));
 		m->add_node(delay_node);
 	}
-	
+
 	return delay_node;
 }
 
@@ -120,7 +120,7 @@ MachineBuilder::event(Raul::TimeStamp time_offset,
 		return;
 
 	if ((buf[0] & 0xF0) == MIDI_CMD_NOTE_ON) {
-		
+
 		SharedPtr<Node> node(new Node(TimeStamp(unit)));
 		node->set_enter_action(SharedPtr<Action>(new MidiAction(ev_size, buf)));
 
@@ -159,7 +159,7 @@ MachineBuilder::event(Raul::TimeStamp time_offset,
 		_active_nodes.push_back(node);
 
 	} else if ((buf[0] & 0xF0) == MIDI_CMD_NOTE_OFF) {
-		
+
 		for (ActiveList::iterator i = _active_nodes.begin(); i != _active_nodes.end(); ++i) {
 			SharedPtr<MidiAction> action = PtrCast<MidiAction>((*i)->enter_action());
 			if (!action)
@@ -202,7 +202,7 @@ MachineBuilder::event(Raul::TimeStamp time_offset,
 
 					// Just monophonic
 					} else {
-						
+
 						// Trim useless delay node if possible (these appear after poly sections)
 						if (is_delay_node(_connect_node) && _connect_node->duration().is_zero()
 								&& _connect_node->edges().size() == 1
@@ -223,7 +223,7 @@ MachineBuilder::event(Raul::TimeStamp time_offset,
 							_connect_node = resolved;
 							_machine->add_node(resolved);
 						}
-					} 
+					}
 
 				// Polyphonic, add this state to poly list
 				} else {
@@ -231,7 +231,7 @@ MachineBuilder::event(Raul::TimeStamp time_offset,
 					_connect_node = resolved;
 					_connect_node_end_time = t;
 				}
-					
+
 				if (resolved->is_active())
 					resolved->exit(SharedPtr<Raul::MIDISink>(), t);
 
@@ -240,7 +240,7 @@ MachineBuilder::event(Raul::TimeStamp time_offset,
 				break;
 			}
 		}
-		
+
 	}
 }
 
@@ -273,7 +273,7 @@ MachineBuilder::resolve()
 	}
 
 	// Add initial note if necessary
-	if (_machine->nodes().size() > 0 
+	if (_machine->nodes().size() > 0
 			&& _machine->nodes().find(_initial_node) == _machine->nodes().end())
 		_machine->add_node(_initial_node);
 

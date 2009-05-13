@@ -1,15 +1,15 @@
 /* Comparison plugin.  Copyright (C) 2005 Thorsten Wilms.
- * 
+ *
  * This plugin is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option)
  * any later version.
- * 
+ *
  * This plugin is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
@@ -105,7 +105,7 @@ comp_run_ac(LADSPA_Handle instance, unsigned long nframes)
 	LADSPA_Data* const       a_larger = plugin->a_larger_buffer;
 	LADSPA_Data* const       equal    = plugin->equal_buffer;
 	unsigned long i;
-	
+
 	for (i = 0; i < nframes; i++) {
 		equal[i]    = (a[i] == b) ? 1.0  : 0.0;
 		larger[i]   = (a[i] > b)  ? a[i] : b;
@@ -126,7 +126,7 @@ comp_run_aa(LADSPA_Handle instance, unsigned long nframes)
 	LADSPA_Data* const       a_larger = plugin->a_larger_buffer;
 	LADSPA_Data* const       equal    = plugin->equal_buffer;
 	unsigned long i;
-	
+
 	for (i = 0; i < nframes; i++) {
 		equal[i]    = (a[i] == b[i]) ? 1.0  : 0.0;
 		larger[i]   = (a[i] > b[i])  ? a[i] : b[i];

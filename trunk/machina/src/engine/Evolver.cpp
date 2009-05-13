@@ -1,15 +1,15 @@
 /* This file is part of Machina.
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * Machina is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
- * 
+ *
  * Machina is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
@@ -33,9 +33,9 @@ namespace Machina {
 Evolver::Evolver(TimeUnit unit, const string& target_midi, SharedPtr<Machine> seed)
 	: _problem(new Problem(unit, target_midi, seed))
 	, _seed_fitness(-FLT_MAX)
-{	
+{
 	SharedPtr<Eugene::HybridMutation<Machine> > m(new HybridMutation<Machine>());
-	
+
 	m->append_mutation(1/6.0f, boost::shared_ptr< Eugene::Mutation<Machine> >(
 			new Mutation::Compress()));
 	m->append_mutation(1/6.0f, boost::shared_ptr< Eugene::Mutation<Machine> >(
@@ -58,7 +58,7 @@ Evolver::Evolver(TimeUnit unit, const string& target_midi, SharedPtr<Machine> se
 	_ga = SharedPtr<MachinaGA>(new MachinaGA(_problem, s, crossover, m,
 				20, 20, 2, 1.0, 0.0));
 }
-	
+
 
 void
 Evolver::seed(SharedPtr<Machine> parent)
@@ -68,7 +68,7 @@ Evolver::seed(SharedPtr<Machine> parent)
 	_problem->seed(parent);
 	_seed_fitness = _problem->fitness(*parent.get());
 }
-	
+
 
 void
 Evolver::_run()
@@ -85,7 +85,7 @@ Evolver::_run()
 		_ga->iteration();
 
 		float new_best = _ga->best_fitness();
-	
+
 		/*cout << _problem->fitness_less(old_best, *_ga->best().get()) << endl;
 		cout << "best: " << _ga->best().get() << endl;
 		cout << "best fitness: " << _problem->fitness(*_ga->best().get()) << endl;
@@ -98,7 +98,7 @@ Evolver::_run()
 			old_best = new_best;
 			cout << "*** NEW BEST: " << new_best << endl;
 		}
-		
+
 		//cout << "}" << endl;
 	}
 }

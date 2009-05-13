@@ -1,15 +1,15 @@
 /* This file is part of Raul.
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * Raul is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
- * 
+ *
  * Raul is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
@@ -41,7 +41,7 @@ JackDriver::JackDriver()
 }
 
 
-JackDriver::~JackDriver() 
+JackDriver::~JackDriver()
 {
 	detach();
 }
@@ -50,12 +50,12 @@ JackDriver::~JackDriver()
 /** Connect to Jack.
  */
 void
-JackDriver::attach(const string& client_name, string server_name) 
+JackDriver::attach(const string& client_name, string server_name)
 {
 	// Already connected
 	if (_client)
 		return;
-	
+
 	jack_set_error_function(error_cb);
 
 	if (server_name.length() > 0)
@@ -75,7 +75,7 @@ JackDriver::attach(const string& client_name, string server_name)
 		jack_set_buffer_size_callback(_client, jack_buffer_size_cb, this);
 		jack_set_xrun_callback(_client, jack_xrun_cb, this);
 		jack_set_process_callback(_client, jack_process_cb, this);
-	
+
 		//_is_dirty = true;
 		_buffer_size = jack_get_buffer_size(_client);
 		}
@@ -83,7 +83,7 @@ JackDriver::attach(const string& client_name, string server_name)
 
 
 void
-JackDriver::detach() 
+JackDriver::detach()
 {
 	if (_client) {
 		deactivate();
@@ -120,17 +120,17 @@ JackDriver::deactivate()
 
 
 void
-JackDriver::jack_port_registration_cb(jack_port_id_t /*port_id*/, int /*registered*/, void* /*jack_driver*/) 
+JackDriver::jack_port_registration_cb(jack_port_id_t /*port_id*/, int /*registered*/, void* /*jack_driver*/)
 {
 	/* whatever. */
 }
 
 
 int
-JackDriver::jack_graph_order_cb(void* jack_driver) 
+JackDriver::jack_graph_order_cb(void* jack_driver)
 {
 	JackDriver* me = reinterpret_cast<JackDriver*>(jack_driver);
-	
+
 	assert(me);
 	me->on_graph_order_changed();
 
@@ -142,7 +142,7 @@ int
 JackDriver::jack_xrun_cb(void* jack_driver)
 {
 	JackDriver* me = reinterpret_cast<JackDriver*>(jack_driver);
-	
+
 	assert(me);
 
 	me->_xruns++;
@@ -150,16 +150,16 @@ JackDriver::jack_xrun_cb(void* jack_driver)
 	me->reset_delay();
 
 	me->on_xrun();
-	
+
 	return 0;
 }
 
 
 int
-JackDriver::jack_buffer_size_cb(jack_nframes_t buffer_size, void* jack_driver) 
+JackDriver::jack_buffer_size_cb(jack_nframes_t buffer_size, void* jack_driver)
 {
 	JackDriver* me = reinterpret_cast<JackDriver*>(jack_driver);
-	
+
 	assert(me);
 	me->reset_xruns();
 	me->reset_delay();
@@ -169,16 +169,16 @@ JackDriver::jack_buffer_size_cb(jack_nframes_t buffer_size, void* jack_driver)
 	return 0;
 }
 
-	
+
 int
 JackDriver::jack_process_cb(jack_nframes_t nframes, void* jack_driver)
 {
 	JackDriver* me = reinterpret_cast<JackDriver*>(jack_driver);
-	
+
 	assert(me);
 
 	me->on_process(nframes);
-	
+
 	return 0;
 }
 
@@ -234,7 +234,7 @@ JackDriver::set_buffer_size(jack_nframes_t size)
 		_buffer_size = size;
 		return true;
 	}
-	
+
 	if (jack_set_buffer_size(_client, size)) {
 		//_app->status_message("[JACK] ERROR: Unable to set buffer size");
 		return false;

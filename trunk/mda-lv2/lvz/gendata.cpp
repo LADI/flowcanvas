@@ -1,6 +1,6 @@
 /* LVZ - A C++ interface for writing LV2 plugins.
  * Copyright (C) 2008 Dave Robillard <http://drobilla.net>
- *  
+ *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option)
@@ -47,19 +47,19 @@ Manifest manifest;
 typedef std::map<string, Record> GUIManifest;
 GUIManifest gui_manifest;
 
-	
+
 string
 symbolify(const char* name)
 {
 	string str(name);
-	
+
 	// Like This -> Like_This
 	for (size_t i=0; i < str.length(); ++i)
 		if (str[i] == ' ')
 			str[i] = '_';
 
 	str[0] = std::tolower(str[0]);
-	
+
 	// LikeThis -> like_this
 	for (size_t i=1; i < str.length(); ++i)
 		if (str[i] >= 'A' && str[i] <= 'Z'
@@ -69,7 +69,7 @@ symbolify(const char* name)
 				&& (!(str[i-1] == 'F' && str[i] == 'X'))
 				&& (!(str[i-1] == 'D' && str[i] == 'C')))
 			str = str.substr(0, i) + '_' + str.substr(i);
-	
+
 	// To lowercase, and skip invalids
 	for (size_t i=1; i < str.length(); ) {
 		if (std::isalpha(str[i]) || std::isdigit(str[i])) {
@@ -82,7 +82,7 @@ symbolify(const char* name)
 			str = str.substr(0, i) + str.substr(i+1);
 		}
 	}
-	
+
 	return str;
 }
 
@@ -92,10 +92,10 @@ write_plugin(AudioEffectX* effect, const string& lib_file_name)
 {
 	const string base_name = lib_file_name.substr(0, lib_file_name.find_last_of("."));
 	const string data_file_name = base_name + ".ttl";
-	
+
 	fstream os(data_file_name.c_str(), ios::out);
 	effect->getProductString(name_buf);
-	
+
 	os << "@prefix : <http://lv2plug.in/ns/lv2core#> ." << endl;
 	os << "@prefix doap: <http://usefulinc.com/ns/doap#> ." << endl << endl;
 	os << "<" << effect->getURI() << ">" << endl;
@@ -108,12 +108,12 @@ write_plugin(AudioEffectX* effect, const string& lib_file_name)
 	uint32_t num_audio_ins  = effect->getNumInputs();
 	uint32_t num_audio_outs = effect->getNumOutputs();
 	uint32_t num_ports      = num_params + num_audio_ins + num_audio_outs;
-		
+
 	if (num_ports > 0)
 		os << " ;" << endl << "\t:port [" << endl;
 	else
 		os << " ." << endl;
-	
+
 	uint32_t idx = 0;
 
 	for (uint32_t i = idx; i < num_params; ++i, ++idx) {
@@ -135,7 +135,7 @@ write_plugin(AudioEffectX* effect, const string& lib_file_name)
 		os << "\t\t:name \"Input " << i+1 << "\" ;" << endl;
 		os << ((idx == num_ports - 1) ? "\t] ." : "\t] , [") << endl;
 	}
-	
+
 	for (uint32_t i = 0; i < num_audio_outs; ++i, ++idx) {
 		os << "\t\ta :OutputPort, :AudioPort ;" << endl;
 		os << "\t\t:index " << idx << " ;" << endl;
@@ -154,7 +154,7 @@ write_plugin(AudioEffectX* effect, const string& lib_file_name)
 	}
 }
 
-	
+
 void
 write_gui(AEffEditor* gui, const string& lib_file_name)
 {
@@ -191,7 +191,7 @@ write_manifest(ostream& os)
 			os << ";" << endl << "\tuiext:ui <" << *j << "> ";
 		os << "." << endl << endl;
 	}
-	
+
 	for (GUIManifest::iterator i = gui_manifest.begin(); i != gui_manifest.end(); ++i) {
 		Record& r = i->second;
 		os << "<" << i->first << "> a uiext:GtkUI ;" << endl;
@@ -212,15 +212,15 @@ main(int argc, char** argv)
 		cout << "A manifest of the plugins found is written to stdout" << endl;
 		return 1;
 	}
-	
+
 	typedef AudioEffectX* (*new_effect_func)();
 	typedef AEffEditor* (*new_gui_func)();
 	typedef AudioEffectX* (*plugin_uri_func)();
 
 	new_effect_func constructor     = NULL;
 	new_gui_func    gui_constructor = NULL;
-	AudioEffectX*   effect          = NULL; 
-	AEffEditor*     gui             = NULL; 
+	AudioEffectX*   effect          = NULL;
+	AEffEditor*     gui             = NULL;
 
 	for (int i = 1; i < argc; ++i) {
 		void* handle = dlopen(argv[i], RTLD_LAZY);
@@ -233,28 +233,28 @@ main(int argc, char** argv)
 		size_t last_slash = lib_path.find_last_of("/");
 		if (last_slash != string::npos)
 			lib_path = lib_path.substr(last_slash + 1);
-		
+
 		constructor = (new_effect_func)dlsym(handle, "lvz_new_audioeffectx");
 		if (constructor != NULL) {
 			effect = constructor();
 			write_plugin(effect, lib_path);
 		}
-		
+
 		gui_constructor = (new_gui_func)dlsym(handle, "lvz_new_aeffeditor");
 		if (gui_constructor != NULL) {
 			gui = gui_constructor();
 			write_gui(gui, lib_path);
 		}
-		
+
 		if (constructor == NULL && gui_constructor == NULL) {
 			cerr << "ERROR: " << argv[i] << ": not an LVZ plugin library, ignoring" << endl;
 		}
-			
+
 		dlclose(handle);
 	}
 
 	write_manifest(cout);
-	
+
 	return 0;
 }
 

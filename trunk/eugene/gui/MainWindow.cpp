@@ -1,6 +1,6 @@
 /* This file is part of Eugene
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * Eugene is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free
  * Software Foundation, either version 3 of the License, or (at your option)
@@ -81,7 +81,7 @@ MainWindow::MainWindow()
 	injection_scale->set_value(0.0f);
 	order_scale->set_value(0.8f);
 	position_based_scale->set_value(0.1f);
-	
+
 	single_point_scale->signal_value_changed().connect(sigc::bind(sigc::mem_fun(this,
 			&MainWindow::gtk_on_crossover_changed), 0, single_point_scale.get()));
 	partially_mapped_scale->signal_value_changed().connect(sigc::bind(sigc::mem_fun(this,
@@ -92,7 +92,7 @@ MainWindow::MainWindow()
 			&MainWindow::gtk_on_crossover_changed), 3, order_scale.get()));
 	position_based_scale->signal_value_changed().connect(sigc::bind(sigc::mem_fun(this,
 			&MainWindow::gtk_on_crossover_changed), 4, position_based_scale.get()));
-	
+
 	float crossover_probabilities[] = {
 		single_point_scale->get_value(),
 		partially_mapped_scale->get_value(),
@@ -100,9 +100,9 @@ MainWindow::MainWindow()
 		order_scale->get_value(),
 		position_based_scale->get_value()
 	};
-	
+
 	_crossover = shared_ptr< HybridCrossover<TSP::GeneType> >(new HybridCrossover<TSP::GeneType>());
-	
+
 	_crossover->append_crossover(crossover_probabilities[0], shared_ptr< Crossover<TSP::GeneType> >(
 			new OnePointCrossover<TSP::GeneType>()));
 
@@ -111,13 +111,13 @@ MainWindow::MainWindow()
 
 	_crossover->append_crossover(crossover_probabilities[2], shared_ptr< Crossover<TSP::GeneType> >(
 			new InjectionCrossover<TSP::GeneType>()));
-	
+
 	_crossover->append_crossover(crossover_probabilities[3], shared_ptr< Crossover<TSP::GeneType> >(
 			new OrderCrossover<TSP::GeneType>()));
-	
+
 	_crossover->append_crossover(crossover_probabilities[4], shared_ptr< Crossover<TSP::GeneType> >(
 			new PositionBasedCrossover<TSP::GeneType>()));
-	
+
 	float mutation_probabilities[] = {
 		reverse_scale->get_value(),
 		swap_range_scale->get_value(),
@@ -125,7 +125,7 @@ MainWindow::MainWindow()
 		//random_flip_scale->get_value(),
 		permute_gene_scale->get_value(),
 	};
-	
+
 	reverse_scale->signal_value_changed().connect(sigc::bind(sigc::mem_fun(this,
 			&MainWindow::gtk_on_mutation_changed), 0, reverse_scale.get()));
 	swap_range_scale->signal_value_changed().connect(sigc::bind(sigc::mem_fun(this,
@@ -136,12 +136,12 @@ MainWindow::MainWindow()
 			&MainWindow::gtk_on_mutation_changed), 2, random_flip_scale.get()));*/
 	permute_gene_scale->signal_value_changed().connect(sigc::bind(sigc::mem_fun(this,
 			&MainWindow::gtk_on_mutation_changed), 3, permute_gene_scale.get()));
-	
+
 	_mutation = shared_ptr< HybridMutation<TSP::GeneType> >(new HybridMutation<TSP::GeneType>());
-	
+
 	_mutation->append_mutation(mutation_probabilities[0], shared_ptr< Mutation<TSP::GeneType> >(
 			new ReverseMutation<TSP::GeneType>()));
-	
+
 	_mutation->append_mutation(mutation_probabilities[1], shared_ptr< Mutation<TSP::GeneType> >(
 			new SwapRangeMutation<TSP::GeneType>()));
 
@@ -150,10 +150,10 @@ MainWindow::MainWindow()
 
 	/*_mutation->append_mutation(mutation_probabilities[3], shared_ptr< Mutation<TSP::GeneType> >(
 			new RandomMutation<TSP::GeneType>(0, 1)));*/
-	
+
 	_mutation->append_mutation(mutation_probabilities[3], shared_ptr< Mutation<TSP::GeneType> >(
 			new PermuteMutation<TSP::GeneType>()));
-	
+
 	position_based_scale->signal_value_changed().connect(sigc::bind(sigc::mem_fun(this,
 			&MainWindow::gtk_on_crossover_changed), 4, position_based_scale.get()));
 
@@ -162,19 +162,19 @@ MainWindow::MainWindow()
 
 	mutation_scale->signal_value_changed().connect(sigc::mem_fun(this,
 			&MainWindow::gtk_on_mutation_probability_changed));
-	
+
 	crossover_probability_scale->signal_value_changed().connect(sigc::mem_fun(this,
 			&MainWindow::gtk_on_crossover_probability_changed));
-	
+
 	selection_combo->signal_changed().connect(sigc::mem_fun(this,
 			&MainWindow::gtk_on_selection_changed));
 
 	stop_button->signal_clicked().connect(sigc::mem_fun(this, &MainWindow::gtk_on_stop));
 	execute_button->signal_clicked().connect(sigc::mem_fun(this, &MainWindow::gtk_on_execute));
-	
+
 	open_menuitem->signal_activate().connect(sigc::mem_fun(this, &MainWindow::gtk_on_open));
 	about_menuitem->signal_activate().connect(sigc::mem_fun(this, &MainWindow::gtk_on_about));
-	
+
 	main_win->show_all();
 }
 
@@ -196,7 +196,7 @@ void
 MainWindow::gtk_on_crossover_changed(size_t index, const Gtk::Scale* scale)
 {
 	_crossover->set_probability(index, scale->get_value());
-	
+
 	// FIXME: pattern alert
 	single_point_scale->set_value(_crossover->crossovers()[0].first);
 	partially_mapped_scale->set_value(_crossover->crossovers()[1].first);
@@ -217,7 +217,7 @@ MainWindow::gtk_on_mutation_changed(size_t index, const Gtk::Scale* scale)
 	enable_signal = false;
 
 	_mutation->set_probability(index, scale->get_value());
-	
+
 	// FIXME: pattern alert
 	reverse_scale->set_value(_mutation->mutations()[0].first);
 	swap_range_scale->set_value(_mutation->mutations()[1].first);
@@ -227,7 +227,7 @@ MainWindow::gtk_on_mutation_changed(size_t index, const Gtk::Scale* scale)
 
 	enable_signal = true;
 }
-	
+
 
 void
 MainWindow::gtk_on_mutation_probability_changed()
@@ -252,7 +252,7 @@ MainWindow::gtk_on_num_elites_changed()
 		_ga->set_num_elites(elites_spin->get_value());
 }
 
-	
+
 void
 MainWindow::gtk_on_selection_changed()
 {
@@ -304,7 +304,7 @@ MainWindow::gtk_on_execute()
 	shared_ptr< Problem<TSP::GeneType> > p = _problem;
 	//shared_ptr< Problem<TSP::GeneType> > p(new TSP("../data/berlin52.txt"));
 	//shared_ptr< Problem<TSP::GeneType> > p(new TSP("../data/square.txt"));
-	
+
 	shared_ptr< Selection<TSP::GeneType> > s;
 
 	switch (selection_combo->get_active_row_number()) {
@@ -321,11 +321,11 @@ MainWindow::gtk_on_execute()
 				new TournamentSelection<TSP::GeneType>(p, trial_size, selection_probability));
 		break;
 	}
-		
+
 	_ga = shared_ptr<TSPGA>(new TSPGA(p, s, _crossover, _mutation,
 			p->gene_size(), population_size, num_elites,
 			mutation_probability, crossover_probability));
-	
+
 	Glib::Thread::create(
 			sigc::mem_fun(this, &MainWindow::ga_run),
 			1024, false, true, Glib::THREAD_PRIORITY_NORMAL);
@@ -346,7 +346,7 @@ MainWindow::gtk_on_open()
 {
 	Gtk::FileChooserDialog* dialog = new Gtk::FileChooserDialog(
 		*main_win, "Load Problem", Gtk::FILE_CHOOSER_ACTION_OPEN);
-	
+
 	dialog->add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
 	dialog->add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_OK);
 
@@ -370,7 +370,7 @@ MainWindow::gtk_on_about()
 	about_dialog->run();
 	about_dialog->hide();
 }
-	
+
 
 bool
 MainWindow::gtk_iteration()
@@ -395,7 +395,7 @@ MainWindow::gtk_iteration()
 	ostringstream gen_ss;
 	gen_ss << _ga->generation();
 	generation_label->set_text(gen_ss.str());
-	
+
 	shared_ptr<TSPGA> tspga = dynamic_pointer_cast<TSPGA>(_ga);
 	assert(tspga);
 
@@ -412,7 +412,7 @@ MainWindow::gtk_iteration()
 
 		_best = best;
 	}
-	
+
 	return true;
 }
 

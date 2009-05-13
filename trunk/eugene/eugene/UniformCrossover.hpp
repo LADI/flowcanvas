@@ -1,6 +1,6 @@
 /* This file is part of Eugene
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * Eugene is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free
  * Software Foundation, either version 3 of the License, or (at your option)
@@ -26,12 +26,12 @@ template <typename G>
 struct UniformCrossover : public Crossover<G> {
 	std::pair<G,G> crossover(const G& parent_1, const G& parent_2) {
 		assert(parent_1.size() == parent_2.size());
-		
+
 		const size_t size = parent_1.size();
-		
+
 		G child_a(size);
 		G child_b(size);
-		
+
 		for (size_t i = 0; i < size; ++i) {
 			if (rand() % 2) {
 				child_a[i] = parent_1[i];
@@ -41,7 +41,7 @@ struct UniformCrossover : public Crossover<G> {
 				child_b[i] = parent_1[i];
 			}
 		}
-		
+
 		assert(child_a.size() == parent_1.size());
 		assert(child_a.size() == child_b.size());
 

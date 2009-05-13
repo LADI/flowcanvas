@@ -76,7 +76,7 @@ public:
 
 
 IdleList::IdleList(mdaLooplex *effect, IdleList *next) : effect(effect), next(next), remove(false)
-{ 
+{
   if(effect && !timer) //start timer
   {
     #if WIN32
@@ -125,12 +125,12 @@ mdaLooplex::mdaLooplex(audioMasterCallback audioMaster) : AudioEffectX(audioMast
 
   programs = new mdaLooplexProgram[NPROGS];
 	if(programs) setProgram(0);
-		
+
   setUniqueID("mdaLoopLex");
 
   if(audioMaster)
 	{
-		setNumInputs(NOUTS);				
+		setNumInputs(NOUTS);
 		setNumOutputs(NOUTS);
 		canProcessReplacing();
     //needIdle(); idle is broken in VST2.4
@@ -138,16 +138,16 @@ mdaLooplex::mdaLooplex(audioMasterCallback audioMaster) : AudioEffectX(audioMast
 
   update();
 	suspend();
-  
+
   idleList.next = new IdleList(this, idleList.next); //add to idle list, start timer if not running...
 }
 
 
 void mdaLooplex::update()  //parameter change
 {
-  if(fabs(param[1] - oldParam1) > 0.1f) 
+  if(fabs(param[1] - oldParam1) > 0.1f)
   {
-    oldParam1 = param[1]; 
+    oldParam1 = param[1];
     if(fabs(oldParam0 - param[0]) > 0.01f)
     {
       oldParam0 = param[0];
@@ -156,22 +156,22 @@ void mdaLooplex::update()  //parameter change
   }
 
   if(param[2] > 0.5f && oldParam2 < 0.5f)
-  { 
+  {
     if(recreq == 0) recreq = 1;
     oldParam2 = param[2];
   }
   if(param[2] < 0.5f && oldParam2 > 0.5f)
-  { 
+  {
     if(recreq == 1) recreq = 0;
-    oldParam2 = param[2];  
+    oldParam2 = param[2];
   }
 
   in_mix = 2.0f * param[3] * param[3];
-  
+
   in_pan = param[4];
-  
+
   feedback = param[5];
-  
+
   out_mix = 0.000030517578f * param[6] * param[6];
 }
 
@@ -184,7 +184,7 @@ void mdaLooplex::setSampleRate(float sampleRate)
 
 
 void mdaLooplex::resume()
-{	  
+{
   //should reset position here...
   bufpos = 0;
 
@@ -198,7 +198,7 @@ void mdaLooplex::idle()
   if(bypassed)
   {
     if(busy) return; //only do once per bypass
-    busy = 1; 
+    busy = 1;
 
     bufmax = 2 * (long)Fs * (long)(10.5f + 190.0f * param[0]);
     if(buffer) delete [] buffer;
@@ -214,20 +214,20 @@ mdaLooplex::~mdaLooplex ()  //destroy any buffers...
 {
   for(IdleList *item=idleList.next; item; item=item->next)  //remove from idle list, stop timer if last item
   {
-    if(item->effect == this) 
-    { 
+    if(item->effect == this)
+    {
       item->remove = true;
       #if _WIN32 //and stop timer in case our last instance is about to unload
         TimerCallback(0, 0, 0, 0);
       #else
         TimerCallback(0, 0);
       #endif
-      break; 
+      break;
     }
   }
 
   if(programs) delete [] programs;
-  
+
   if(buffer)
   {
     FILE *fp; //dump loop to file
@@ -236,7 +236,7 @@ mdaLooplex::~mdaLooplex ()  //destroy any buffers...
     {
       char wh[44];
       memcpy(wh, "RIFF____WAVEfmt \20\0\0\0\1\0\2\0________\4\0\20\0data____", 44);
-  
+
       long l = 36 + buflen * 2;
       wh[4] = (char)(l & 0xFF);  l >>= 8;
       wh[5] = (char)(l & 0xFF);  l >>= 8;
@@ -260,7 +260,7 @@ mdaLooplex::~mdaLooplex ()  //destroy any buffers...
       wh[41] = (char)(l & 0xFF);  l >>= 8;
       wh[42] = (char)(l & 0xFF);  l >>= 8;
       wh[43] = (char)(l & 0xFF);
-      
+
       fwrite(wh, 1, 44, fp);
 
       #if __BIG_ENDIAN__
@@ -276,7 +276,7 @@ mdaLooplex::~mdaLooplex ()  //destroy any buffers...
           c++;
         }
       #endif
-      
+
       fwrite(buffer, sizeof(short), buflen, fp);
       fclose(fp);
     }
@@ -365,13 +365,13 @@ void mdaLooplex::getParameterName(LvzInt32 index, char *label)
 void mdaLooplex::getParameterDisplay(LvzInt32 index, char *text)
 {
 	char string[16];
-  
+
   switch(index)
   {
     case  0: sprintf(string, "%4d s", (int)(10.5f + 190.0f * param[index])); break; //10 to 200 sec
 
     case  1: sprintf(string, "%5.1f MB", (float)bufmax / 524288.0f); break;
-  
+
     case  2: if(recreq) strcpy(string, "RECORD"); else strcpy(string, "MONITOR"); break;
 
     case  3:
@@ -381,9 +381,9 @@ void mdaLooplex::getParameterDisplay(LvzInt32 index, char *text)
     case  5: if(param[index] < 0.01f) strcpy(string, "OFF");
              else sprintf(string, "%.1f dB", 20.0f * log10(param[index])); break;
 
-    case  4: if(param[index] < 0.505f) 
+    case  4: if(param[index] < 0.505f)
              {
-               if(param[index] > 0.495f) strcpy(string, "C"); else 
+               if(param[index] > 0.495f) strcpy(string, "C"); else
                  sprintf(string, "L%.0f", 100.0f - 200.0f * param[index]);
              }
              else sprintf(string, "R%.0f", 200.0f * param[index] - 100.0f); break;
@@ -423,7 +423,7 @@ void mdaLooplex::processReplacing(float **inputs, float **outputs, LvzInt32 samp
   float l, r, dl, dr, d0 = 0.0f, d1;
   float imix = in_mix, ipan = in_pan, omix = out_mix, fb = feedback * modwhl;
   long x;
-  
+
   if((bypassed = bypass)) return;
 
   while(frame<sampleFrames)
@@ -454,7 +454,7 @@ void mdaLooplex::processReplacing(float **inputs, float **outputs, LvzInt32 samp
         #else
           d0 = 0.000061f * (float)((rand() & 32767) - 16384);
 		#endif
-	  
+
         //left delay
         dl = fb * (float)buffer[bufpos];
         if(recreq)
@@ -467,20 +467,20 @@ void mdaLooplex::processReplacing(float **inputs, float **outputs, LvzInt32 samp
 
         //right delay
         dr = fb * (float)buffer[bufpos];
-        if(recreq)        
+        if(recreq)
         {
           x = (long)(32768.0f * r + dr - d0 + d1 + 100000.5f) - 100000;
           if(x > 32767) x = 32767; else if(x < -32768) x = -32768;
           buffer[bufpos] = (short)x;
         }
         bufpos++;
-  
+
         //looping
         if(bufpos >= bufmax)
-        { 
+        {
           buflen = bufmax;
           bufpos -= buflen;
-          status = 2; 
+          status = 2;
         }
         else
         {
@@ -518,13 +518,13 @@ void mdaLooplex::processReplacing(float **inputs, float **outputs, LvzInt32 samp
 LvzInt32 mdaLooplex::processEvents(LvzEvents* ev)
 {
   long npos=0;
-  
+
   for (long i=0; i<ev->numEvents; i++)
 	{
 		if((ev->events[i])->type != kLvzMidiType) continue;
 		LvzMidiEvent* event = (LvzMidiEvent*)ev->events[i];
 		char* midiData = event->midiData;
-		
+
     switch(midiData[0] & 0xf0) //status byte (all channels)
     {
       case 0x80: //note off
@@ -566,14 +566,14 @@ LvzInt32 mdaLooplex::processEvents(LvzEvents* ev)
             break;
 
           default:  //all notes off
-            if(midiData[1]>0x7A) 
+            if(midiData[1]>0x7A)
             {
 
             }
             break;
         }
         break;
-      
+
       default: break;
     }
 

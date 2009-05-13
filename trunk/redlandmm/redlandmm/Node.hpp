@@ -1,15 +1,15 @@
 /* This file is part of redlandmm.
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * redlandmm is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
- * 
+ *
  * redlandmm is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
@@ -51,10 +51,10 @@ public:
 	Type type() const { return ((_c_obj) ? (Type)librdf_node_get_type(_c_obj) : UNKNOWN); }
 
 	World* world() const { return _world; }
-	
+
 	librdf_node* get_node() const { return _c_obj; }
 	librdf_uri*  get_uri()  const { return librdf_node_get_uri(_c_obj); }
-	
+
 	bool is_valid() const { return type() != UNKNOWN; }
 
 	inline operator const char*() const { return to_c_string(); }
@@ -70,20 +70,20 @@ public:
 	inline bool operator==(const Node& other) const {
 		return librdf_node_equals(_c_obj, other._c_obj);
 	}
-	
+
 	const char* to_c_string() const;
 	std::string to_string() const;
 
 	Glib::ustring to_turtle_token() const;
 
 	bool is_resource() const;
-	
+
 	bool is_int() const;
 	int  to_int() const;
 
 	bool  is_float() const;
 	float to_float() const;
-	
+
 
 	bool is_bool() const;
 	bool to_bool() const;

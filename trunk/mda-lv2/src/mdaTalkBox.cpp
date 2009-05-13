@@ -53,7 +53,7 @@ mdaTalkBox::mdaTalkBox(audioMasterCallback audioMaster): AudioEffectX(audioMaste
 
     setProgram(0);
   }
-  
+
   suspend();
 }
 
@@ -66,12 +66,12 @@ void mdaTalkBox::resume() ///update internal parameters...
   float fs = getSampleRate();
   if(fs <  8000.0f) fs =  8000.0f;
   if(fs > 96000.0f) fs = 96000.0f;
-  
+
   swap = (param[2] > 0.5f)? 1 : 0;
 
   long n = (long)(0.01633f * fs);
   if(n > BUF_MAX) n = BUF_MAX;
-  
+
   //O = (long)(0.0005f * fs);
   O = (long)((0.0001f + 0.0004f * param[3]) * fs);
 
@@ -129,10 +129,10 @@ void mdaTalkBox::setProgram(LvzInt32 program)
 }
 
 
-void  mdaTalkBox::setParameter(LvzInt32 index, float value) 
-{ 
+void  mdaTalkBox::setParameter(LvzInt32 index, float value)
+{
   programs[curProgram].param[index] = param[index] = value; //bug was here!
-  resume(); 
+  resume();
 }
 
 float mdaTalkBox::getParameter(LvzInt32 index) { return param[index]; }
@@ -160,7 +160,7 @@ void mdaTalkBox::getParameterDisplay(LvzInt32 index, char *text)
   switch(index)
   {
     case 2: if(swap) strcpy(string, "LEFT"); else strcpy(string, "RIGHT"); break;
-    
+
     case 3: sprintf(string, "%4.0f", 5.0f + 95.0f * param[index] * param[index]); break;
 
     default: sprintf(string, "%4.0f %%", 200.0f * param[index]);
@@ -211,7 +211,7 @@ void mdaTalkBox::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
     dr = o;
 
     p = d0 + h0 *  x; d0 = d1;  d1 = x  - h0 * p;
-    q = d2 + h1 * d4; d2 = d3;  d3 = d4 - h1 * q;  
+    q = d2 + h1 * d4; d2 = d3;  d3 = d4 - h1 * q;
     d4 = x;
     x = p + q;
 
@@ -220,7 +220,7 @@ void mdaTalkBox::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
       K = 0;
 
       car0[p0] = car1[p1] = x; //carrier input
-    
+
       x = o - e;  e = o;  //6dB/oct pre-emphasis
 
       w = window[p0]; fx = buf0[p0] * w;  buf0[p0] = x * w;  //50% overlapping hanning windows
@@ -231,7 +231,7 @@ void mdaTalkBox::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
     }
 
     p = u0 + h0 * fx; u0 = u1;  u1 = fx - h0 * p;
-    q = u2 + h1 * u4; u2 = u3;  u3 = u4 - h1 * q;  
+    q = u2 + h1 * u4; u2 = u3;  u3 = u4 - h1 * q;
     u4 = fx;
     x = p + q;
 
@@ -281,7 +281,7 @@ void mdaTalkBox::processReplacing(float **inputs, float **outputs, LvzInt32 samp
     dr = o;
 
     p = d0 + h0 *  x; d0 = d1;  d1 = x  - h0 * p;
-    q = d2 + h1 * d4; d2 = d3;  d3 = d4 - h1 * q;  
+    q = d2 + h1 * d4; d2 = d3;  d3 = d4 - h1 * q;
     d4 = x;
     x = p + q;
 
@@ -290,7 +290,7 @@ void mdaTalkBox::processReplacing(float **inputs, float **outputs, LvzInt32 samp
       K = 0;
 
       car0[p0] = car1[p1] = x; //carrier input
-    
+
       x = o - e;  e = o;  //6dB/oct pre-emphasis
 
       w = window[p0]; fx = buf0[p0] * w;  buf0[p0] = x * w;  //50% overlapping hanning windows
@@ -301,7 +301,7 @@ void mdaTalkBox::processReplacing(float **inputs, float **outputs, LvzInt32 samp
     }
 
     p = u0 + h0 * fx; u0 = u1;  u1 = fx - h0 * p;
-    q = u2 + h1 * u4; u2 = u3;  u3 = u4 - h1 * q;  
+    q = u2 + h1 * u4; u2 = u3;  u3 = u4 - h1 * q;
     u4 = fx;
     x = p + q;
 
@@ -338,20 +338,20 @@ void mdaTalkBox::lpc(float *buf, float *car, long n, long o)
   r[0] *= 1.001f;  //stability fix
 
   float min = 0.00001f;
-  if(r[0] < min) { for(i=0; i<n; i++) buf[i] = 0.0f; return; } 
+  if(r[0] < min) { for(i=0; i<n; i++) buf[i] = 0.0f; return; }
 
   lpc_durbin(r, o, k, &G);  //calc reflection coeffs
 
-  for(i=0; i<=o; i++) 
+  for(i=0; i<=o; i++)
   {
     if(k[i] > 0.995f) k[i] = 0.995f; else if(k[i] < -0.995f) k[i] = -.995f;
   }
-  
+
   for(i=0; i<n; i++)
   {
     x = G * car[i];
     for(j=o; j>0; j--)  //lattice filter
-    { 
+    {
       x -= k[j] * z[j-1];
       z[j] = z[j-1] + k[j] * x;
     }
@@ -364,24 +364,24 @@ void mdaTalkBox::lpc_durbin(float *r, int p, float *k, float *g)
 {
   int i, j;
   float a[ORD_MAX], at[ORD_MAX], e=r[0];
-    
+
   for(i=0; i<=p; i++) a[i] = at[i] = 0.0f; //probably don't need to clear at[] or k[]
 
-  for(i=1; i<=p; i++) 
+  for(i=1; i<=p; i++)
   {
     k[i] = -r[i];
 
-    for(j=1; j<i; j++) 
-    { 
+    for(j=1; j<i; j++)
+    {
       at[j] = a[j];
-      k[i] -= a[j] * r[i-j]; 
+      k[i] -= a[j] * r[i-j];
     }
     if(fabs(e) < 1.0e-20f) { e = 0.0f;  break; }
     k[i] /= e;
-    
+
     a[i] = k[i];
     for(j=1; j<i; j++) a[j] = at[j] + k[i] * at[i-j];
-    
+
     e *= 1.0f - k[i] * k[i];
   }
 

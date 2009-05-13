@@ -17,13 +17,13 @@ mdaImage::mdaImage(audioMasterCallback audioMaster)	: AudioEffectX(audioMaster, 
   fParam5 = 0.5f; //balance
   fParam6 = 0.5f; //output
 
-  setNumInputs(2);		  
-	setNumOutputs(2);		  
+  setNumInputs(2);
+	setNumOutputs(2);
 	setUniqueID("mdaImage");    // identify here
-	DECLARE_LVZ_DEPRECATED(canMono) ();				      
-	canProcessReplacing();	
+	DECLARE_LVZ_DEPRECATED(canMono) ();
+	canProcessReplacing();
 	strcpy(programName, "Stereo Image / MS Matrix");
-	
+
   setParameter(0, 0.6f); //go and set initial values!
 }
 
@@ -72,9 +72,9 @@ void mdaImage::setParameter(LvzInt32 index, float value)
 
     case 2: //LR->LR
       g *= 0.5f;
-      l2l = g * (c * (2.f - b) + w * (2.f - k)); 
-      r2l = g * (c * (2.f - b) - w * (2.f - k)); 
-      l2r = g * (c * b - w * k); 
+      l2l = g * (c * (2.f - b) + w * (2.f - k));
+      r2l = g * (c * (2.f - b) - w * (2.f - k));
+      l2r = g * (c * b - w * k);
       r2r = g * (c * b + w * k);
       break;
 
@@ -82,7 +82,7 @@ void mdaImage::setParameter(LvzInt32 index, float value)
       g *= 0.5f;
       l2l =  g * (2.f - b) * (2.f - k);
       r2l =  g * (2.f - b) * k;
-      l2r = -g * b * (2.f - k); 
+      l2r = -g * b * (2.f - k);
       r2r =  g * b * k;
       break;
   }
@@ -143,7 +143,7 @@ void mdaImage::getParameterDisplay(LvzInt32 index, char *text)
 	switch(index)
   {
     case 0: switch(int(fParam1*3.9))
-            { 
+            {
               case 0: strcpy(text, "SM->LR"); break;
               case 1: strcpy(text, "MS->LR"); break;
               case 2: strcpy(text, "LR->LR"); break;
@@ -180,24 +180,24 @@ void mdaImage::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
 	float *in2 = inputs[1];
 	float *out1 = outputs[0];
 	float *out2 = outputs[1];
-	float a, b, c, d, ll=l2l, lr=l2r, rl=r2l, rr=r2r;	
+	float a, b, c, d, ll=l2l, lr=l2r, rl=r2l, rr=r2r;
 
-  --in1;	
-	--in2;	
+  --in1;
+	--in2;
 	--out1;
 	--out2;
-	
+
   while(--sampleFrames >= 0)
 	{
-		a = *++in1; 
+		a = *++in1;
     b = *++in2;
 		c = out1[1];
 		d = out2[1]; //process from here...
 
     d += rr*b + lr*a;
-    c += ll*a + rl*b; 
+    c += ll*a + rl*b;
 
-    *++out1 = c;	
+    *++out1 = c;
 		*++out2 = d;
 	}
 }
@@ -208,22 +208,22 @@ void mdaImage::processReplacing(float **inputs, float **outputs, LvzInt32 sample
 	float *in2 = inputs[1];
 	float *out1 = outputs[0];
 	float *out2 = outputs[1];
-	float a, b, c, d, ll=l2l, lr=l2r, rl=r2l, rr=r2r;	
+	float a, b, c, d, ll=l2l, lr=l2r, rl=r2l, rr=r2r;
 
-	--in1;	
-	--in2;	
+	--in1;
+	--in2;
 	--out1;
 	--out2;
 
   while(--sampleFrames >= 0)
 	{
-		a = *++in1; 
+		a = *++in1;
     b = *++in2;
 
-    d = rr*b + lr*a; 
+    d = rr*b + lr*a;
     c = ll*a + rl*b;
 
-    *++out1 = c;	
+    *++out1 = c;
 		*++out2 = d;
 	}
 }

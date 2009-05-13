@@ -20,7 +20,7 @@ mdaDX10::mdaDX10(audioMasterCallback audioMaster) : AudioEffectX(audioMaster, NP
 {
   long i=0;
   Fs = 44100.0f;
-  
+
   programs = new mdaDX10Program[NPROGS];
 	if(programs)
   {                                //Att     Dec     Rel   | Rat C   Rat F   Att     Dec     Sus     Rel     Vel   | Vib     Oct     Fine    Rich    Thru    LFO
@@ -56,22 +56,22 @@ mdaDX10::mdaDX10(audioMasterCallback audioMaster) : AudioEffectX(audioMaster, NP
     fillpatch(i++, "Harmonics",      0.000f, 0.500f, 0.500f, 0.280f, 0.000f, 0.330f, 0.200f, 0.000f, 0.700f, 0.500f, 0.000f, 0.500f, 0.500f, 0.151f, 0.079f, 0.500f);
     fillpatch(i++, "Scratch",        0.000f, 0.500f, 0.000f, 0.000f, 0.240f, 0.580f, 0.630f, 0.000f, 0.000f, 0.500f, 0.000f, 0.600f, 0.500f, 0.816f, 0.243f, 0.500f);
     fillpatch(i++, "Syn Tom",        0.000f, 0.355f, 0.350f, 0.000f, 0.105f, 0.000f, 0.000f, 0.200f, 0.500f, 0.500f, 0.000f, 0.645f, 0.500f, 1.000f, 0.296f, 0.500f);
-  
+
     setProgram(0);
   }
-		
+
   setUniqueID("mdaDX10");
 
   if(audioMaster)
 	{
-		setNumInputs(0);				
+		setNumInputs(0);
 		setNumOutputs(NOUTS);
 		canProcessReplacing();
 		isSynth();
 	}
 
  	//initialise...
-  for(i=0; i<NVOICES; i++) 
+  for(i=0; i<NVOICES; i++)
   {
     voice[i].env = 0.0f;
     voice[i].car = voice[i].dcar = 0.0f;
@@ -98,9 +98,9 @@ void mdaDX10::update()  //parameter change //if multitimbral would have to move 
 
   rati = param[3];
   rati = (float)floor(40.1f * rati * rati);
-  if(param[4]<0.5f) 
+  if(param[4]<0.5f)
     ratf = 0.2f * param[4] * param[4];
-  else 
+  else
     switch((long)(8.9f * param[4]))
     {
       case  4: ratf = 0.25f;       break;
@@ -118,7 +118,7 @@ void mdaDX10::update()  //parameter change //if multitimbral would have to move 
   vibrato = 0.001f * param[10] * param[10];
 
   catt = 1.0f - (float)exp(-ifs * exp(8.0 - 8.0 * param[0]));
-  if(param[1]>0.98f) cdec = 1.0f; else 
+  if(param[1]>0.98f) cdec = 1.0f; else
   cdec =        (float)exp(-ifs * exp(5.0 - 8.0 * param[1]));
   crel =        (float)exp(-ifs * exp(5.0 - 5.0 * param[2]));
   mdec = 1.0f - (float)exp(-ifs * exp(6.0 - 7.0 * param[6]));
@@ -139,7 +139,7 @@ void mdaDX10::setSampleRate(float rate)
 
 
 void mdaDX10::resume()
-{	
+{
   DECLARE_LVZ_DEPRECATED (wantEvents) ();
   lfo0 = 0.0f;
   lfo1 = 1.0f; //reset LFO phase
@@ -171,9 +171,9 @@ void mdaDX10::setParameter(LvzInt32 index, float value)
 }
 
 
-void mdaDX10::fillpatch(long p, const char *name, 
-                     float p0,  float p1,  float p2,  float p3,  float p4,  float p5, 
-                     float p6,  float p7,  float p8,  float p9,  float p10, float p11, 
+void mdaDX10::fillpatch(long p, const char *name,
+                     float p0,  float p1,  float p2,  float p3,  float p4,  float p5,
+                     float p6,  float p7,  float p8,  float p9,  float p10, float p11,
                      float p12, float p13, float p14, float p15)
 {
   strcpy(programs[p].name, name);
@@ -267,7 +267,7 @@ void mdaDX10::getParameterName(LvzInt32 index, char *label)
 void mdaDX10::getParameterDisplay(LvzInt32 index, char *text)
 {
 	char string[16];
-  
+
   switch(index)
   {
     case  3: sprintf(string, "%.0f", rati); break;
@@ -303,10 +303,10 @@ void mdaDX10::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
 	long event=0, frame=0, frames, v;
   float o, x, e, mw=MW, w=rich, m=modmix;
   long k=K;
-  
+
   if(activevoices>0 || notes[event]<sampleFrames) //detect & bypass completely empty blocks
-  {    
-    while(frame<sampleFrames)  
+  {
+    while(frame<sampleFrames)
     {
       frames = notes[event++];
       if(frames>sampleFrames) frames = sampleFrames;
@@ -336,14 +336,14 @@ void mdaDX10::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
 
             x = V->dmod * V->mod0 - V->mod1; //could add more modulator blocks like
             V->mod1 = V->mod0;               //this for a wider range of FM sounds
-            V->mod0 = x;    
+            V->mod0 = x;
             V->menv += V->mdec * (V->mlev - V->menv);
 
             x = V->car + V->dcar + x * V->menv + mw; //carrier phase
             while(x >  1.0f) x -= 2.0f;  //wrap phase
             while(x < -1.0f) x += 2.0f;
             V->car = x;
-            o += V->cenv * (m * V->mod1 + (x + x * x * x * (w * x * x - 1.0f - w))); 
+            o += V->cenv * (m * V->mod1 + (x + x * x * x * (w * x * x - 1.0f - w)));
           }      //amp env //mod thru-mix //5th-order sine approximation
           V++;
         }
@@ -358,7 +358,7 @@ void mdaDX10::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
         noteOn(note, vel);
       }
     }
-  
+
     activevoices = NVOICES;
     for(v=0; v<NVOICES; v++)
     {
@@ -383,10 +383,10 @@ void mdaDX10::processReplacing(float **inputs, float **outputs, LvzInt32 sampleF
 	long event=0, frame=0, frames, v;
   float o, x, e, mw=MW, w=rich, m=modmix;
   long k=K;
-  
+
   if(activevoices>0 || notes[event]<sampleFrames) //detect & bypass completely empty blocks
-  {    
-    while(frame<sampleFrames)  
+  {
+    while(frame<sampleFrames)
     {
       frames = notes[event++];
       if(frames>sampleFrames) frames = sampleFrames;
@@ -416,19 +416,19 @@ void mdaDX10::processReplacing(float **inputs, float **outputs, LvzInt32 sampleF
 
             x = V->dmod * V->mod0 - V->mod1; //could add more modulator blocks like
             V->mod1 = V->mod0;               //this for a wider range of FM sounds
-            V->mod0 = x;    
+            V->mod0 = x;
             V->menv += V->mdec * (V->mlev - V->menv);
 
             x = V->car + V->dcar + x * V->menv + mw; //carrier phase
             while(x >  1.0f) x -= 2.0f;  //wrap phase
             while(x < -1.0f) x += 2.0f;
             V->car = x;
-            o += V->cenv * (m * V->mod1 + (x + x * x * x * (w * x * x - 1.0f - w))); 
+            o += V->cenv * (m * V->mod1 + (x + x * x * x * (w * x * x - 1.0f - w)));
           }      //amp env //mod thru-mix //5th-order sine approximation
 
          ///  xx = x * x;
          ///  x + x + x * xx * (xx - 3.0f);
-              
+
           V++;
         }
         *out1++ = o;
@@ -442,7 +442,7 @@ void mdaDX10::processReplacing(float **inputs, float **outputs, LvzInt32 sampleF
         noteOn(note, vel);
       }
     }
-  
+
     activevoices = NVOICES;
     for(v=0; v<NVOICES; v++)
     {
@@ -471,8 +471,8 @@ void mdaDX10::noteOn(long note, long velocity)
 {
   float l = 1.0f;
   long  v, vl=0;
-  
-  if(velocity>0) 
+
+  if(velocity>0)
   {
     for(v=0; v<NVOICES; v++)  //find quietest voice
     {
@@ -492,7 +492,7 @@ void mdaDX10::noteOn(long note, long velocity)
 
     voice[vl].dmod = ratio * voice[vl].dcar; //sine oscillator
     voice[vl].mod0 = 0.0f;
-    voice[vl].mod1 = (float)sin(voice[vl].dmod); 
+    voice[vl].mod1 = (float)sin(voice[vl].dmod);
     voice[vl].dmod = 2.0f * (float)cos(voice[vl].dmod);
                      //scale volume with richness
     voice[vl].env  = (1.5f - param[13]) * volume * (velocity + 10);
@@ -521,13 +521,13 @@ void mdaDX10::noteOn(long note, long velocity)
 LvzInt32 mdaDX10::processEvents(LvzEvents* ev)
 {
   long npos=0;
-  
+
   for (long i=0; i<ev->numEvents; i++)
 	{
 		if((ev->events[i])->type != kLvzMidiType) continue;
 		LvzMidiEvent* event = (LvzMidiEvent*)ev->events[i];
 		char* midiData = event->midiData;
-		
+
     switch(midiData[0] & 0xf0) //status byte (all channels)
     {
       case 0x80: //note off
@@ -548,11 +548,11 @@ LvzInt32 mdaDX10::processEvents(LvzEvents* ev)
           case 0x01:  //mod wheel
             modwhl = 0.00000005f * (float)(midiData[2] * midiData[2]);
             break;
-          
+
           case 0x07:  //volume
             volume = 0.00000035f * (float)(midiData[2] * midiData[2]);
             break;
-         
+
           case 0x40:  //sustain
             sustain = midiData[2] & 0x40;
             if(sustain==0)
@@ -564,8 +564,8 @@ LvzInt32 mdaDX10::processEvents(LvzEvents* ev)
             break;
 
           default:  //all notes off
-            if(midiData[1]>0x7A) 
-            {  
+            if(midiData[1]>0x7A)
+            {
               for(long v=0; v<NVOICES; v++) voice[v].cdec=0.99f;
               sustain = 0;
             }
@@ -576,13 +576,13 @@ LvzInt32 mdaDX10::processEvents(LvzEvents* ev)
       case 0xC0: //program change
         if(midiData[1]<NPROGS) setProgram(midiData[1]);
         break;
-      
+
       case 0xE0: //pitch bend
         pbend = (float)(midiData[1] + 128 * midiData[2] - 8192);
-        if(pbend>0.0f) pbend = 1.0f + 0.000014951f * pbend; 
-                  else pbend = 1.0f + 0.000013318f * pbend; 
+        if(pbend>0.0f) pbend = 1.0f + 0.000014951f * pbend;
+                  else pbend = 1.0f + 0.000013318f * pbend;
         break;
-      
+
       default: break;
     }
 

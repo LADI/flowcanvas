@@ -1,15 +1,15 @@
 /* This file is part of Machina.
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * Machina is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
- * 
+ *
  * Machina is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
@@ -37,7 +37,7 @@ Compress::mutate(Machine& machine)
 	for (Machine::Nodes::iterator i = machine.nodes().begin(); i != machine.nodes().end() ;) {
 		Machine::Nodes::iterator next = i;
 		++next;
-		
+
 		if ((*i)->edges().empty())
 			machine.remove_node(*i);
 
@@ -54,7 +54,7 @@ AddNode::mutate(Machine& machine)
 	// Create random node
 	SharedPtr<Node> node(new Node(machine.time().unit()));
 	node->set_selector(true);
-	
+
 	SharedPtr<Node> note_node = machine.random_node();
 	if (!note_node)
 		return;
@@ -68,12 +68,12 @@ AddNode::mutate(Machine& machine)
 	node->set_enter_action(ActionFactory::note_on(note));
 	node->set_exit_action(ActionFactory::note_off(note));
 	machine.add_node(node);
-	
+
 	// Insert after some node
 	SharedPtr<Node> tail = machine.random_node();
 	if (tail && tail != node/* && !node->connected_to(tail)*/)
 		tail->add_edge(boost::shared_ptr<Edge>(new Edge(tail, node)));
-	
+
 	// Insert before some other node
 	SharedPtr<Node> head = machine.random_node();
 	if (head && head != node/* && !head->connected_to(node)*/)
@@ -91,7 +91,7 @@ RemoveNode::mutate(Machine& machine)
 		machine.remove_node(node);
 }
 
-	
+
 void
 AdjustNode::mutate(Machine& machine)
 {
@@ -110,12 +110,12 @@ AdjustNode::mutate(Machine& machine)
 	}
 }
 
-	
+
 void
 SwapNodes::mutate(Machine& machine)
 {
 	//cout << "SWAP NODE" << endl;
-	
+
 	if (machine.nodes().size() <= 1)
 		return;
 
@@ -165,7 +165,7 @@ RemoveEdge::mutate(Machine& machine)
 		tail->remove_edge(tail->random_edge());
 }
 
-	
+
 void
 AdjustEdge::mutate(Machine& machine)
 {

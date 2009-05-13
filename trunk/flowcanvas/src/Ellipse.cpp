@@ -1,15 +1,15 @@
 /* This file is part of FlowCanvas.
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * FlowCanvas is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
- * 
+ *
  * FlowCanvas is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
@@ -62,7 +62,7 @@ Ellipse::Ellipse(boost::shared_ptr<Canvas> canvas,
 	_ellipse.property_fill_color_rgba() = ELLIPSE_FILL_COLOUR;
 	_ellipse.property_outline_color_rgba() = ELLIPSE_OUTLINE_COLOUR;
 	_border_color = ELLIPSE_OUTLINE_COLOUR;
-	
+
 	if (canvas->property_aa())
 		set_border_width(0.5);
 	else
@@ -163,7 +163,7 @@ Ellipse::set_selected(bool selected)
 	boost::shared_ptr<Canvas> canvas = _canvas.lock();
 	if (!canvas)
 		return;
-		
+
 	if (selected) {
 		_ellipse.property_outline_color_rgba() = ELLIPSE_HILITE_OUTLINE_COLOUR;
 		_ellipse.property_dash() = canvas->select_dash();
@@ -239,12 +239,12 @@ Ellipse::move(double dx, double dy)
 
 	double new_x = property_x() + dx;
 	double new_y = property_y() + dy;
-	
+
 	if (new_x < 0)
 		dx = property_x() * -1;
 	else if (new_x + _width > canvas->width())
 		dx = canvas->width() - property_x() - _width;
-	
+
 	if (new_y < 0)
 		dy = property_y() * -1;
 	else if (new_y + _height > canvas->height())
@@ -275,7 +275,7 @@ Ellipse::move_to(double x, double y)
 	if (y < 0) y = 0;
 	if (x + _width > canvas->width()) x = canvas->width() - _width - 1;
 	if (y + _height > canvas->height()) y = canvas->height() - _height - 1;
-		
+
 	assert(x >= 0);
 	assert(x + _width < canvas->width());
 	assert(y >= 0);
@@ -318,7 +318,7 @@ Ellipse::resize()
 #if 0
 	double widest_in = 0.0;
 	double widest_out = 0.0;
-	
+
 	// The amount of space between a port edge and the module edge (on the
 	// side that the port isn't right on the edge).
 	double hor_pad = 5.0;
@@ -326,7 +326,7 @@ Ellipse::resize()
 		hor_pad = 15.0; // leave more room for a mouse target for dragging
 
 	boost::shared_ptr<Port> p;
-	
+
 	// Find widest in/out ports
 	for (PortVector::iterator i = _ports.begin(); i != _ports.end(); ++i) {
 		p = (*i);
@@ -336,10 +336,10 @@ Ellipse::resize()
 		else if (p->is_output() && p->width() > widest_out)
 			widest_out = p->width();
 	}
-	
+
 	// Make sure module is wide enough for ports
 	set_width(std::max(widest_in, widest_out) + hor_pad + border_width()*2.0);
-	
+
 	// Make sure module is wide enough for title
 	if (_title_visible && _label.property_text_width() + 8.0 > _width)
 		set_width(_label.property_text_width() + 8.0);
@@ -357,9 +357,9 @@ Ellipse::resize()
 		h += 0.5;
 
 	set_height(h);
-	
+
 	// Move ports to appropriate locations
-	
+
 	double y;
 	int i = 0;
 	for (PortVector::iterator pi = _ports.begin(); pi != _ports.end(); ++pi, ++i) {
@@ -405,7 +405,7 @@ Ellipse::add_connection(boost::shared_ptr<Connection> c)
 	raise_to_top();
 }
 
-	
+
 void
 Ellipse::set_border_color(uint32_t c)
 {

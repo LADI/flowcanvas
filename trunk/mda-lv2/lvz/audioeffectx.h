@@ -1,6 +1,6 @@
 /* LVZ - A C++ interface for writing LV2 plugins.
  * Copyright (C) 2008 Dave Robillard <http://drobilla.net>
- *  
+ *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2 of the License, or (at your option)
@@ -36,7 +36,7 @@
 typedef int16_t LvzInt16;
 typedef int32_t LvzInt32;
 typedef int (*audioMasterCallback)(int, int ver, int, int, int, int);
-	 
+
 class AEffEditor;
 
 struct VstFileSelect {
@@ -87,7 +87,7 @@ class AudioEffect {
 public:
 	AudioEffect() : editor(NULL) {}
 	virtual ~AudioEffect() {}
-	
+
 	virtual void  setParameter(LvzInt32 index, float value) = 0;
 	virtual void  setParameterAutomated(LvzInt32 index, float value) {}
 	virtual float getParameter(LvzInt32 index)              = 0;
@@ -113,14 +113,14 @@ public:
 	{
 		cEffect.flags = 0;
 	}
-	
+
 	virtual void process         (float **inputs, float **outputs, LvzInt32 nframes) = 0;
 	virtual void processReplacing(float **inputs, float **outputs, LvzInt32 nframes) = 0;
 
 	virtual const char*  getURI()           { return URI; }
 	virtual const char*  getUniqueID()      { return uniqueID; }
 	virtual float        getSampleRate()    { return sampleRate; }
-	virtual LvzInt32     getNumInputs()     { return numInputs; }		  
+	virtual LvzInt32     getNumInputs()     { return numInputs; }
 	virtual LvzInt32     getNumOutputs()    { return numOutputs; }
 	virtual LvzInt32     getNumParameters() { return numParams; }
 

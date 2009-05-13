@@ -1,15 +1,15 @@
 /* This file is part of Machina.
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * Machina is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
- * 
+ *
  * Machina is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
@@ -52,7 +52,7 @@ SMFDriver::learn(const string& filename, unsigned track, double q, Raul::TimeDur
 	SharedPtr<Machine> m(new Machine(max_duration.unit()));
 	SharedPtr<MachineBuilder> builder = SharedPtr<MachineBuilder>(new MachineBuilder(m, q));
 	Raul::SMFReader reader;
-	
+
 	if (!reader.open(filename)) {
 		cerr << "Unable to open MIDI file " << filename << endl;
 		return SharedPtr<Machine>();
@@ -82,7 +82,7 @@ SMFDriver::learn(const string& filename, double q, Raul::TimeStamp max_duration)
 	SharedPtr<Machine> m(new Machine(max_duration.unit()));
 	SharedPtr<MachineBuilder> builder = SharedPtr<MachineBuilder>(new MachineBuilder(m, q));
 	Raul::SMFReader reader;
-	
+
 	if (!reader.open(filename)) {
 		cerr << "Unable to open MIDI file " << filename << endl;
 		return SharedPtr<Machine>();
@@ -112,11 +112,11 @@ SMFDriver::learn_track(SharedPtr<MachineBuilder> builder,
 	const bool found_track = reader.seek_to_track(track);
 	if (!found_track)
 		return;
-	
+
 	uint8_t  buf[4];
 	uint32_t ev_size;
 	uint32_t ev_delta_time;
-	
+
 	uint64_t t = 0;
 	double   unquantized_t = 0;
 

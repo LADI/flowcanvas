@@ -1,6 +1,6 @@
 /* This file is part of Eugene
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * Eugene is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free
  * Software Foundation, either version 3 of the License, or (at your option)
@@ -33,7 +33,7 @@ struct GeneImpl : public std::vector<A>, public Gene
 {
 	/** Don't reserve or initialise */
 	//GeneImpl() : std::vector<A>() {}
-	
+
 	/** Reserve, don't initialise */
 	GeneImpl(size_t gene_size) : std::vector<A>(gene_size, 12345) {}
 
@@ -44,7 +44,7 @@ struct GeneImpl : public std::vector<A>, public Gene
 		for (size_t i=0; i < size; ++i)
 			(*this)[i] = rand() % (max - min + 1) + min;
 	}
-	
+
 	inline bool operator==(const GeneImpl<A>& other) const {
 		for (size_t i=0; i < this->size(); ++i)
 			if ((*this)[i] != other[i])
@@ -52,7 +52,7 @@ struct GeneImpl : public std::vector<A>, public Gene
 
 		return true;
 	}
-	
+
 	inline bool operator<(const GeneImpl<A>& other) const {
 		for (size_t i=0; i < this->size(); ++i)
 			if ((*this)[i] < other[i])

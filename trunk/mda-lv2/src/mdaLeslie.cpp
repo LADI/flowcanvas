@@ -25,7 +25,7 @@ mdaLeslieProgram::mdaLeslieProgram()
   strcpy(name, "Leslie Simulator");
 }
 
-mdaLeslie::mdaLeslie(audioMasterCallback audioMaster)	: AudioEffectX(audioMaster, 3, 9)	// programs, parameters 
+mdaLeslie::mdaLeslie(audioMasterCallback audioMaster)	: AudioEffectX(audioMaster, 3, 9)	// programs, parameters
 {
 	fParam1 = 0.66f;
   fParam7 = 0.50f;
@@ -41,16 +41,16 @@ mdaLeslie::mdaLeslie(audioMasterCallback audioMaster)	: AudioEffectX(audioMaster
 	hbuf = new float[size];
   fbuf1 = fbuf2 = 0.0f;
   twopi = 6.2831853f;
-  
-  setNumInputs(2);		  
-	setNumOutputs(2);		  
-	setUniqueID("mdaLeslie");  // identify here
-	DECLARE_LVZ_DEPRECATED(canMono) ();				      
-	canProcessReplacing();	
-	suspend();		
 
-  programs = new mdaLeslieProgram[numPrograms]; 
-  if(programs) 
+  setNumInputs(2);
+	setNumOutputs(2);
+	setUniqueID("mdaLeslie");  // identify here
+	DECLARE_LVZ_DEPRECATED(canMono) ();
+	canProcessReplacing();
+	suspend();
+
+  programs = new mdaLeslieProgram[numPrograms];
+  if(programs)
   {
     programs[1].fParam1 = 0.33f;
     programs[1].fParam5 = 0.75f;
@@ -66,7 +66,7 @@ mdaLeslie::mdaLeslie(audioMasterCallback audioMaster)	: AudioEffectX(audioMaster
   chp = dchp = clp = dclp = shp = dshp = slp = dslp = 0.0f;
 
   lspd = 0.0f; hspd = 0.0f;
-  lphi = 0.0f; hphi = 1.6f; 
+  lphi = 0.0f; hphi = 1.6f;
   setParameter(0, 0.66f);
 }
 
@@ -76,7 +76,7 @@ bool  mdaLeslie::getEffectName(char* name)    { strcpy(name, "Leslie"); return t
 
 void mdaLeslie::setParameter(LvzInt32 index, float value)
 {
-  
+
   float ifs = 1.0f / getSampleRate();
   float spd = twopi * ifs * 2.0f * fParam8;
 
@@ -96,25 +96,25 @@ void mdaLeslie::setParameter(LvzInt32 index, float value)
   filo = 1.f - (float)pow(10.0f, fParam3 * (2.27f - 0.54f * fParam3) - 1.92f);
 
   if(fParam1<0.50f)
-  {  
+  {
      if(fParam1<0.1f) //stop
-     { 
+     {
        lset = 0.00f; hset = 0.00f;
-       lmom = 0.12f; hmom = 0.10f; 
+       lmom = 0.12f; hmom = 0.10f;
      }
      else //low speed
-     { 
+     {
        lset = 0.49f; hset = 0.66f;
        lmom = 0.27f; hmom = 0.18f;
      }
   }
   else //high speed
-  {  
+  {
     lset = 5.31f; hset = 6.40f;
     lmom = 0.14f; hmom = 0.09f;
   }
   hmom = (float)pow(10.0f, -ifs / hmom);
-  lmom = (float)pow(10.0f, -ifs / lmom); 
+  lmom = (float)pow(10.0f, -ifs / lmom);
   hset *= spd;
   lset *= spd;
 
@@ -129,23 +129,23 @@ void mdaLeslie::setParameter(LvzInt32 index, float value)
 mdaLeslie::~mdaLeslie()
 {
   if(hbuf) delete [] hbuf;
-  if(programs) delete [] programs; 
+  if(programs) delete [] programs;
 }
 
-void mdaLeslie::setProgram(LvzInt32 program) 
+void mdaLeslie::setProgram(LvzInt32 program)
 {
 	mdaLeslieProgram *p = &programs[program];
 
 	curProgram = program;
-	setParameter(0, p->fParam1);	
-	setParameter(1, p->fParam7);	
-	setParameter(2, p->fParam9);	
-	setParameter(3, p->fParam4);	
-	setParameter(4, p->fParam5);	
+	setParameter(0, p->fParam1);
+	setParameter(1, p->fParam7);
+	setParameter(2, p->fParam9);
+	setParameter(3, p->fParam4);
+	setParameter(4, p->fParam5);
 	setParameter(5, p->fParam6);
-	setParameter(6, p->fParam3);	
+	setParameter(6, p->fParam3);
 	setParameter(7, p->fParam2);
-	setParameter(8, p->fParam8);	
+	setParameter(8, p->fParam8);
   setProgramName(p->name);
 }
 
@@ -206,18 +206,18 @@ void mdaLeslie::getParameterDisplay(LvzInt32 index, char *text)
 {
 	switch(index)
   {
-    case 0: 
-      if(fParam1<0.5f) 
-      { 
-        if(fParam1 < 0.1f) strcpy(text, "STOP"); 
+    case 0:
+      if(fParam1<0.5f)
+      {
+        if(fParam1 < 0.1f) strcpy(text, "STOP");
                       else strcpy(text, "SLOW");
-      }               else strcpy(text, "FAST");  break;   
+      }               else strcpy(text, "FAST");  break;
     case 1: long2string((long)(100 * fParam7), text); break;
     case 2: long2string((long)(100 * fParam9), text); break;
     case 3: long2string((long)(100 * fParam4), text); break;
     case 4: long2string((long)(100 * fParam5), text); break;
     case 5: long2string((long)(100 * fParam6), text); break;
-    case 6: long2string((long)(10*int((float)pow(10.0f,1.179f + fParam3))), text); break; 
+    case 6: long2string((long)(10*int((float)pow(10.0f,1.179f + fParam3))), text); break;
     case 7: long2string((long)(40 * fParam2 - 20), text); break;
     case 8: long2string((long)(200 * fParam8), text); break;
   }
@@ -242,7 +242,7 @@ void mdaLeslie::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
 	float *in2 = inputs[1];
 	float *out1 = outputs[0];
 	float *out2 = outputs[1];
-	float a, c, d, g=gain, h, l;	
+	float a, c, d, g=gain, h, l;
   float fo=filo, fb1=fbuf1, fb2=fbuf2;
   float hl=hlev, hs=hspd, ht, hm=hmom, hp=hphi, hw=hwid, hd=hdep;
   float ll=llev, ls=lspd, lt, lm=lmom, lp=lphi, lw=lwid;
@@ -257,40 +257,40 @@ void mdaLeslie::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
   shp = (float)sin(hp);
   slp = (float)sin(lp);
 
-  --in1;	
-	--in2;	
+  --in1;
+	--in2;
 	--out1;
 	--out2;
 	while(--sampleFrames >= 0)
 	{
-		a = *++in1 + *++in2; 
+		a = *++in1 + *++in2;
     c = out1[1];
 		d = out2[1]; //see processReplacing() for comments
 
-    if(k) k--; else 
+    if(k) k--; else
     {
-      ls = (lm * ls) + lt; 
+      ls = (lm * ls) + lt;
       hs = (hm * hs) + ht;
       lp += k1 * ls;
       hp += k1 * hs;
-                          
+
       dchp = (float)cos(hp + k1*hs);
-      dchp = k0 * (dchp * dchp * dchp - chp); 
+      dchp = k0 * (dchp * dchp * dchp - chp);
       dclp = k0 * ((float)cos(lp + k1*ls) - clp);
       dshp = k0 * ((float)sin(hp + k1*hs) - shp);
       dslp = k0 * ((float)sin(lp + k1*ls) - slp);
-      
+
       k=(long)k1;
     }
 
     fb1 = fo * (fb1 - a) + a;
-    fb2 = fo * (fb2 - fb1) + fb1;  
+    fb2 = fo * (fb2 - fb1) + fb1;
     h = (g - hl * chp) * (a - fb2);
     l = (g - ll * clp) * fb2;
 
-    if(hps>0) hps--; else hps=200; 
+    if(hps>0) hps--; else hps=200;
     hint = hps + hd * (1.0f + chp);
-    hdd = (int)hint; 
+    hdd = (int)hint;
     hint = hint - hdd;
     hdd2 = hdd + 1;
     if(hdd>199) { if(hdd>200) hdd -= 201; hdd2 -= 201; }
@@ -319,8 +319,8 @@ void mdaLeslie::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
   hpos = hps;
   lphi = (float)fmod(lp+(k1-k)*ls,twopi);
   hphi = (float)fmod(hp+(k1-k)*hs,twopi);
-  if(fabs(fb1)>1.0e-10) fbuf1=fb1; else fbuf1=0.f; 
-  if(fabs(fb2)>1.0e-10) fbuf2=fb2; else fbuf2=0.f; 
+  if(fabs(fb1)>1.0e-10) fbuf1=fb1; else fbuf1=0.f;
+  if(fabs(fb2)>1.0e-10) fbuf2=fb2; else fbuf2=0.f;
 }
 
 void mdaLeslie::processReplacing(float **inputs, float **outputs, LvzInt32 sampleFrames)
@@ -329,7 +329,7 @@ void mdaLeslie::processReplacing(float **inputs, float **outputs, LvzInt32 sampl
 	float *in2 = inputs[1];
 	float *out1 = outputs[0];
 	float *out2 = outputs[1];
-	float a, c, d, g=gain, h, l;	
+	float a, c, d, g=gain, h, l;
   float fo=filo, fb1=fbuf1, fb2=fbuf2;
   float hl=hlev, hs=hspd, ht, hm=hmom, hp=hphi, hw=hwid, hd=hdep;
   float ll=llev, ls=lspd, lt, lm=lmom, lp=lphi, lw=lwid;
@@ -344,8 +344,8 @@ void mdaLeslie::processReplacing(float **inputs, float **outputs, LvzInt32 sampl
   shp = (float)sin(hp);
   slp = (float)sin(lp);
 
-	--in1;	
-	--in2;	
+	--in1;
+	--in2;
 	--out1;
 	--out2;
 	while(--sampleFrames >= 0)
@@ -358,24 +358,24 @@ void mdaLeslie::processReplacing(float **inputs, float **outputs, LvzInt32 sampl
       hs = (hm * hs) + ht;
       lp += k1 * ls;
       hp += k1 * hs;
-                           
+
       dchp = (float)cos(hp + k1*hs);
       dchp = k0 * (dchp * dchp * dchp - chp); //sin^3 level mod
       dclp = k0 * ((float)cos(lp + k1*ls) - clp);
       dshp = k0 * ((float)sin(hp + k1*hs) - shp);
       dslp = k0 * ((float)sin(lp + k1*ls) - slp);
-      
+
       k=(long)k1;
     }
 
     fb1 = fo * (fb1 - a) + a; //crossover
-    fb2 = fo * (fb2 - fb1) + fb1;  
+    fb2 = fo * (fb2 - fb1) + fb1;
     h = (g - hl * chp) * (a - fb2); //volume
     l = (g - ll * clp) * fb2;
 
     if(hps>0) hps--; else hps=200;  //delay input pos
-    hint = hps + hd * (1.0f + chp); //delay output pos 
-    hdd = (int)hint; 
+    hint = hps + hd * (1.0f + chp); //delay output pos
+    hdd = (int)hint;
     hint = hint - hdd; //linear intrpolation
     hdd2 = hdd + 1;
     if(hdd>199) { if(hdd>200) hdd -= 201; hdd2 -= 201; }
@@ -384,7 +384,7 @@ void mdaLeslie::processReplacing(float **inputs, float **outputs, LvzInt32 sampl
     a = *(hbuf + hdd);
     h += a + hint * ( *(hbuf + hdd2) - a); //delay output
 
-    c = l + h; 
+    c = l + h;
     d = l + h;
     h *= hw * shp;
     l *= lw * slp;
@@ -405,5 +405,5 @@ void mdaLeslie::processReplacing(float **inputs, float **outputs, LvzInt32 sampl
   lphi = (float)fmod(lp+(k1-k)*ls,twopi);
   hphi = (float)fmod(hp+(k1-k)*hs,twopi);
   if(fabs(fb1)>1.0e-10) fbuf1=fb1; else fbuf1=0.0f; //catch denormals
-  if(fabs(fb2)>1.0e-10) fbuf2=fb2; else fbuf2=0.0f; 
+  if(fabs(fb2)>1.0e-10) fbuf2=fb2; else fbuf2=0.0f;
 }

@@ -1,15 +1,15 @@
 /* This file is part of Machina.
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * Machina is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
- * 
+ *
  * Machina is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
@@ -90,7 +90,7 @@ MachinaGUI::MachinaGUI(SharedPtr<Machina::Engine> engine)
 	xml->get_widget("add_edge_but", _add_edge_button);
 	xml->get_widget("remove_edge_but", _remove_edge_button);
 	xml->get_widget("adjust_edge_but", _adjust_edge_button);
-	
+
 	_canvas_scrolledwindow->add(*_canvas);
 	_canvas_scrolledwindow->signal_event().connect(sigc::mem_fun(this,
 				&MachinaGUI::scrolled_window_event));
@@ -99,14 +99,14 @@ MachinaGUI::MachinaGUI(SharedPtr<Machina::Engine> engine)
 
 	_canvas_scrolledwindow->property_hadjustment().get_value()->set_step_increment(10);
 	_canvas_scrolledwindow->property_vadjustment().get_value()->set_step_increment(10);
-	
+
 	_record_button->signal_toggled().connect(sigc::mem_fun(this, &MachinaGUI::record_toggled));
 	_stop_button->signal_clicked().connect(sigc::mem_fun(this, &MachinaGUI::stop_clicked));
 	_play_button->signal_toggled().connect(sigc::mem_fun(this, &MachinaGUI::play_toggled));
 
 	_zoom_normal_button->signal_clicked().connect(sigc::bind(
 		sigc::mem_fun(this, &MachinaGUI::zoom), 1.0));
-	
+
 	_zoom_full_button->signal_clicked().connect(
 		sigc::mem_fun(_canvas.get(), &MachinaCanvas::zoom_full));
 
@@ -141,7 +141,7 @@ MachinaGUI::MachinaGUI(SharedPtr<Machina::Engine> engine)
 		sigc::mem_fun(this, &MachinaGUI::quantize_changed));
 	_quantize_spinbutton->signal_changed().connect(
 		sigc::mem_fun(this, &MachinaGUI::quantize_changed));
-	
+
 	_mutate_button->signal_clicked().connect(sigc::bind(
 		sigc::mem_fun(this, &MachinaGUI::random_mutation), SharedPtr<Machine>()));
 	_compress_button->signal_clicked().connect(sigc::hide_return(sigc::bind(
@@ -160,7 +160,7 @@ MachinaGUI::MachinaGUI(SharedPtr<Machina::Engine> engine)
 		sigc::mem_fun(this, &MachinaGUI::mutate), SharedPtr<Machine>(), 6));
 
 	connect_widgets();
-		
+
 	_canvas->show();
 
 	_main_window->present();
@@ -175,10 +175,10 @@ MachinaGUI::MachinaGUI(SharedPtr<Machina::Engine> engine)
 			sigc::mem_fun(_maid.get(), &Raul::Maid::cleanup),
 			true),
 		1000);
-	
+
 	// Idle callback to update node states
 	Glib::signal_timeout().connect(sigc::mem_fun(this, &MachinaGUI::idle_callback), 100);
-	
+
 #ifdef HAVE_EUGENE
 	_load_target_button->signal_clicked().connect(sigc::mem_fun(this, &MachinaGUI::load_target_clicked));
 	_evolve_button->signal_clicked().connect(sigc::mem_fun(this, &MachinaGUI::evolve_toggled));
@@ -187,19 +187,19 @@ MachinaGUI::MachinaGUI(SharedPtr<Machina::Engine> engine)
 	_evolve_button->set_sensitive(false);
 	_load_target_button->set_sensitive(false);
 #endif
-	
+
 	_canvas->build(engine->machine(), _menu_view_labels->get_active());
 }
 
 
-MachinaGUI::~MachinaGUI() 
+MachinaGUI::~MachinaGUI()
 {
 }
 
 
 #ifdef HAVE_EUGENE
 bool
-MachinaGUI::evolve_callback() 
+MachinaGUI::evolve_callback()
 {
 	if (_evolve) {
 		if (_evolver->improvement()) {
@@ -214,7 +214,7 @@ MachinaGUI::evolve_callback()
 
 
 bool
-MachinaGUI::idle_callback() 
+MachinaGUI::idle_callback()
 {
 	const bool show_labels = _menu_view_labels->get_active();
 
@@ -233,7 +233,7 @@ MachinaGUI::scrolled_window_event(GdkEvent* event)
 {
 	if (event->type == GDK_KEY_PRESS) {
 		if (event->key.keyval == GDK_Delete) {
-			
+
 			ItemList selection = _canvas->selected_items();
 			_canvas->clear_selection();
 
@@ -249,7 +249,7 @@ MachinaGUI::scrolled_window_event(GdkEvent* event)
 			return true;
 		}
 	}
-	
+
 	return false;
 }
 
@@ -269,7 +269,7 @@ MachinaGUI::load_target_clicked()
 	dialog.set_local_only(false);
 	dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
 	dialog.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_OK);
-	
+
 	Gtk::FileFilter filt;
 	filt.add_pattern("*.mid");
 	filt.set_name("MIDI Files");
@@ -404,20 +404,20 @@ using namespace std;
 
 
 void
-MachinaGUI::menu_file_quit() 
+MachinaGUI::menu_file_quit()
 {
 	_main_window->hide();
 }
 
 
 void
-MachinaGUI::menu_file_open() 
+MachinaGUI::menu_file_open()
 {
 	Gtk::FileChooserDialog dialog(*_main_window, "Open Machine", Gtk::FILE_CHOOSER_ACTION_OPEN);
 	dialog.set_local_only(false);
 	dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
 	dialog.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_OK);
-	
+
 	Gtk::FileFilter filt;
 	filt.add_pattern("*.machina.ttl");
 	filt.set_name("Machina Machines (Turtle/RDF)");
@@ -437,14 +437,14 @@ MachinaGUI::menu_file_open()
 
 
 void
-MachinaGUI::menu_file_save() 
+MachinaGUI::menu_file_save()
 {
 	if (_save_uri == "" || _save_uri.substr(0, 5) != "file:") {
 		menu_file_save_as();
 	} else {
 		if (!raptor_uri_uri_string_is_file_uri((const unsigned char*)_save_uri.c_str()))
 			menu_file_save_as();
-		
+
 		Redland::Model model(_engine->rdf_world());
 		model.set_base_uri(_save_uri);
 		_engine->machine()->write_state(model);
@@ -454,31 +454,31 @@ MachinaGUI::menu_file_save()
 
 
 void
-MachinaGUI::menu_file_save_as() 
+MachinaGUI::menu_file_save_as()
 {
 	Gtk::FileChooserDialog dialog(*_main_window, "Save Machine",
 			Gtk::FILE_CHOOSER_ACTION_SAVE);
-	
+
 	dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
-	dialog.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_OK);	
-	
+	dialog.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_OK);
+
 	if (_save_uri.length() > 0)
 		dialog.set_uri(_save_uri);
-	
+
 	const int result = dialog.run();
-	
+
 	assert(result == Gtk::RESPONSE_OK
 			|| result == Gtk::RESPONSE_CANCEL
 			|| result == Gtk::RESPONSE_NONE);
-	
-	if (result == Gtk::RESPONSE_OK) {	
+
+	if (result == Gtk::RESPONSE_OK) {
 		string filename = dialog.get_filename();
 
 		if (filename.length() < 13 || filename.substr(filename.length()-12) != ".machina.ttl")
 			filename += ".machina.ttl";
 
 		Glib::ustring uri = Glib::filename_to_uri(filename);
-			
+
 		bool confirm = false;
 		std::fstream fin;
 		fin.open(filename.c_str(), std::ios::in);
@@ -495,7 +495,7 @@ MachinaGUI::menu_file_save_as()
 			confirm = true;
 		}
 		fin.close();
-		
+
 		if (confirm) {
 			Redland::Model model(_engine->rdf_world());
 			_save_uri = uri;
@@ -514,12 +514,12 @@ MachinaGUI::menu_import_midi()
 			Gtk::FILE_CHOOSER_ACTION_OPEN);
 	dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
 	dialog.add_button(Gtk::Stock::OPEN, Gtk::RESPONSE_OK);
-	
+
 	Gtk::FileFilter filt;
 	filt.add_pattern("*.mid");
 	filt.set_name("MIDI Files");
 	dialog.set_filter(filt);
-	
+
 	Gtk::HBox* extra_widget = Gtk::manage(new Gtk::HBox());
 	Gtk::SpinButton* length_sb = Gtk::manage(new Gtk::SpinButton());
 	length_sb->set_increments(1, 10);
@@ -527,21 +527,21 @@ MachinaGUI::menu_import_midi()
 	length_sb->set_value(0);
 	extra_widget->pack_start(*Gtk::manage(new Gtk::Label("")), true, true);
 	extra_widget->pack_start(*Gtk::manage(new Gtk::Label("Maximum Length (0 = unlimited): ")), false, false);
-	extra_widget->pack_start(*length_sb, false, false); 
+	extra_widget->pack_start(*length_sb, false, false);
 	dialog.set_extra_widget(*extra_widget);
 	extra_widget->show_all();
-	
+
 
 	const int result = dialog.run();
 
 	if (result == Gtk::RESPONSE_OK) {
 		SharedPtr<Machina::SMFDriver> file_driver(new Machina::SMFDriver());
-		
+
 		double length_dbl = length_sb->get_value_as_int();
 		Raul::TimeStamp length(_unit, length_dbl);
 
 		SharedPtr<Machina::Machine> machine = file_driver->learn(dialog.get_filename(), 0.0, length);
-		
+
 		if (machine) {
 			dialog.hide();
 			machine->activate();
@@ -552,7 +552,7 @@ MachinaGUI::menu_import_midi()
 			Gtk::MessageDialog msg_dialog(dialog, "Error loading MIDI file",
 					false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
 			msg_dialog.run();
-		} 
+		}
 	}
 }
 
@@ -564,7 +564,7 @@ MachinaGUI::menu_export_midi()
 			Gtk::FILE_CHOOSER_ACTION_SAVE);
 	dialog.add_button(Gtk::Stock::CANCEL, Gtk::RESPONSE_CANCEL);
 	dialog.add_button(Gtk::Stock::SAVE, Gtk::RESPONSE_OK);
-	
+
 	Gtk::FileFilter filt;
 	filt.add_pattern("*.mid");
 	filt.set_name("MIDI Files");
@@ -616,7 +616,7 @@ void
 MachinaGUI::show_labels_toggled()
 {
 	const bool show = _menu_view_labels->get_active();
-	
+
 	for (ItemList::iterator i = _canvas->items().begin(); i != _canvas->items().end(); ++i) {
 		const SharedPtr<NodeView> nv = PtrCast<NodeView>(*i);
 		if (nv)
@@ -633,7 +633,7 @@ MachinaGUI::show_labels_toggled()
 
 
 void
-MachinaGUI::menu_help_about() 
+MachinaGUI::menu_help_about()
 {
 	_about_window->set_transient_for(*_main_window);
 	_about_window->show();
@@ -641,7 +641,7 @@ MachinaGUI::menu_help_about()
 
 
 void
-MachinaGUI::menu_help_help() 
+MachinaGUI::menu_help_help()
 {
 	_help_dialog->set_transient_for(*_main_window);
 	_help_dialog->run();

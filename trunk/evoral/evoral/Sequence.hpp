@@ -1,16 +1,16 @@
 /* This file is part of Evoral.
  * Copyright (C) 2008 Dave Robillard <http://drobilla.net>
  * Copyright (C) 2000-2008 Paul Davis
- * 
+ *
  * Evoral is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
- * 
+ *
  * Evoral is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
@@ -58,11 +58,11 @@ public:
 /** This is a higher level view of events, with separate representations for
  * notes (instead of just unassociated note on/off events) and controller data.
  * Controller data is represented as a list of time-stamped float values. */
-template<typename T> 
+template<typename T>
 class Sequence : virtual public ControlSet {
 public:
 	Sequence(const TypeMap& type_map, size_t size=0);
-	
+
 	bool read_locked() { return _read_iter.locked(); }
 
 	void write_lock();
@@ -87,7 +87,7 @@ public:
 
 	/** Resizes vector if necessary (NOT realtime safe) */
 	void append(const Event<T>& ev);
-	
+
 	inline const boost::shared_ptr< const Note<T> > note_at(unsigned i) const { return _notes[i]; }
 	inline const boost::shared_ptr< Note<T> >       note_at(unsigned i)       { return _notes[i]; }
 
@@ -95,14 +95,14 @@ public:
 	inline bool   empty()   const { return _notes.size() == 0 && ControlSet::empty(); }
 
 	inline static bool note_time_comparator(const boost::shared_ptr< const Note<T> >& a,
-	                                        const boost::shared_ptr< const Note<T> >& b) { 
+	                                        const boost::shared_ptr< const Note<T> >& b) {
 		return a->time() < b->time();
 	}
 
 	struct LaterNoteEndComparator {
 		typedef const Note<T>* value_type;
 		inline bool operator()(const boost::shared_ptr< const Note<T> > a,
-		                       const boost::shared_ptr< const Note<T> > b) const { 
+		                       const boost::shared_ptr< const Note<T> > b) const {
 			return a->end_time() > b->end_time();
 		}
 	};
@@ -127,7 +127,7 @@ public:
 		const const_iterator& operator++(); // prefix only
 		bool operator==(const const_iterator& other) const;
 		bool operator!=(const const_iterator& other) const { return ! operator==(other); }
-		
+
 		const_iterator& operator=(const const_iterator& other);
 
 	private:
@@ -140,7 +140,7 @@ public:
 		                             std::deque< boost::shared_ptr< Note<T> > >,
 		                             LaterNoteEndComparator >
 			ActiveNotes;
-		
+
 		mutable ActiveNotes _active_notes;
 
 		typedef std::vector<ControlIterator> ControlIterators;
@@ -151,36 +151,36 @@ public:
 		ControlIterators               _control_iters;
 		ControlIterators::iterator     _control_iter;
 	};
-	
+
 	const_iterator        begin(T t=0) const { return const_iterator(*this, t); }
 	const const_iterator& end()        const { return _end_iter; }
-	
+
 	void read_seek(T t)    { _read_iter = begin(t); }
 	T    read_time() const { return _read_iter.valid() ? _read_iter->time() : 0.0; }
 
 	bool control_to_midi_event(boost::shared_ptr< Event<T> >& ev,
 	                           const ControlIterator&         iter) const;
-	
+
 	bool edited() const      { return _edited; }
 	void set_edited(bool yn) { _edited = yn; }
 
 #ifndef NDEBUG
 	bool is_sorted() const;
 #endif
-	
+
 	void add_note_unlocked(const boost::shared_ptr< Note<T> > note);
 	void remove_note_unlocked(const boost::shared_ptr< const Note<T> > note);
-	
+
 	uint8_t lowest_note()  const { return _lowest_note; }
 	uint8_t highest_note() const { return _highest_note; }
-	
+
 protected:
 	mutable const_iterator _read_iter;
 	bool                   _edited;
 
 private:
 	friend class const_iterator;
-	
+
 	void append_note_on_unlocked(uint8_t chan, T time, uint8_t note, uint8_t velocity);
 	void append_note_off_unlocked(uint8_t chan, T time, uint8_t note);
 	void append_control_unlocked(const Parameter& param, T time, double value);
@@ -188,13 +188,13 @@ private:
 	mutable Glib::RWLock _lock;
 
 	const TypeMap& _type_map;
-	
+
 	Notes _notes;
-	
+
 	typedef std::vector<size_t> WriteNotes;
 	WriteNotes _write_notes[16];
 	bool       _writing;
-	
+
 	typedef std::vector< boost::shared_ptr<const ControlList> > ControlLists;
 	ControlLists _dirty_controls;
 

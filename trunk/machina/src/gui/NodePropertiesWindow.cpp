@@ -1,15 +1,15 @@
 /* This file is part of Machina.
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * Machina is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
- * 
+ *
  * Machina is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
@@ -70,7 +70,7 @@ NodePropertiesWindow::apply_clicked()
 	_node->set_changed();
 }
 
-	
+
 void
 NodePropertiesWindow::cancel_clicked()
 {
@@ -79,7 +79,7 @@ NodePropertiesWindow::cancel_clicked()
 	_instance = NULL;
 }
 
-	
+
 void
 NodePropertiesWindow::ok_clicked()
 {
@@ -114,7 +114,7 @@ NodePropertiesWindow::present(Gtk::Window* parent, SharedPtr<Machina::Node> node
 		Glib::RefPtr<Gnome::Glade::Xml> xml = GladeXml::create();
 
 		xml->get_widget_derived("node_properties_dialog", _instance);
-	
+
 		if (parent)
 			_instance->set_transient_for(*parent);
 	}

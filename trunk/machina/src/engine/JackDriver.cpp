@@ -1,15 +1,15 @@
 /* This file is part of Machina.
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * Machina is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
- * 
+ *
  * Machina is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
@@ -58,12 +58,12 @@ JackDriver::attach(const std::string& client_name)
 	if (jack_client()) {
 
 		//_cycle_time.set_tick_rate(1/(double)sample_rate());
-		
+
 		_input_port = jack_port_register(jack_client(),
 			"in",
 			JACK_DEFAULT_MIDI_TYPE, JackPortIsInput,
 			0);
-		
+
 		if (!_input_port)
 			std:: cerr << "WARNING: Failed to create MIDI input port." << std::endl;
 
@@ -71,7 +71,7 @@ JackDriver::attach(const std::string& client_name)
 			"out",
 			JACK_DEFAULT_MIDI_TYPE, JackPortIsOutput,
 			0);
-		
+
 		if (!_output_port)
 			std::cerr << "WARNING: Failed to create MIDI output port." << std::endl;
 
@@ -93,7 +93,7 @@ JackDriver::detach()
 		jack_port_unregister(jack_client(), _input_port);
 		_input_port = NULL;
 	}
-	
+
 	if (_output_port) {
 		jack_port_unregister(jack_client(), _output_port);
 		_output_port = NULL;
@@ -109,7 +109,7 @@ JackDriver::set_machine(SharedPtr<Machine> machine)
 		return;
 
 	cout << "DRIVER MACHINE: " << machine.get() << endl;
-	SharedPtr<Machine> last_machine = _last_machine; // Keep a reference 
+	SharedPtr<Machine> last_machine = _last_machine; // Keep a reference
 	_machine_changed.reset(0);
 	assert(!last_machine.unique());
 	_machine = machine;
@@ -136,7 +136,7 @@ JackDriver::process_input(SharedPtr<Machine> machine, const TimeSlice& time)
 		for (jack_nframes_t i=0; i < event_count; ++i) {
 			jack_midi_event_t ev;
 			jack_midi_event_get(&ev, jack_buffer, i);
-		
+
 			_recorder->write(_record_time + TimeStamp(_record_time.unit(), ev.time, 0),
 					ev.size, ev.buffer);
 		}
@@ -165,9 +165,9 @@ JackDriver::process_input(SharedPtr<Machine> machine, const TimeSlice& time)
 				}
 
 			} else if (ev.buffer[0] == 0x80) {
-				
+
 				const SharedPtr<LearnRequest> learn = machine->pending_learn();
-				
+
 				if (learn) {
 					if (learn->started()) {
 						learn->exit_action()->set_event(ev.size, ev.buffer);
@@ -193,7 +193,7 @@ JackDriver::write_event(Raul::TimeStamp time,
 		return;
 
 	if (_cycle_time.beats_to_ticks(time) + _cycle_time.offset_ticks() < _cycle_time.start_ticks()) {
-		std::cerr << "ERROR: Missed event by " 
+		std::cerr << "ERROR: Missed event by "
 			<< _cycle_time.start_ticks()
 				- (_cycle_time.beats_to_ticks(time) + _cycle_time.offset_ticks())
 			<< " ticks"
@@ -262,14 +262,14 @@ JackDriver::on_process(jack_nframes_t nframes)
 		}
 		_machine_changed.post(); // Signal we're done with it
 	}
-	
+
 	if (!machine) {
 		_last_machine = machine;
 		return;
 	}
-	
+
 	machine->set_sink(shared_from_this());
-	
+
 	if (_recording.get())
 		_record_time += length_beats;
 
@@ -296,13 +296,13 @@ JackDriver::on_process(jack_nframes_t nframes)
 		} else if (machine->is_finished()) {
 			const TimeStamp finish_offset = _cycle_time.offset_ticks() + run_dur_frames;
 			assert(finish_offset < length_ticks);
-			
+
 			machine->reset(machine->time());
 
 			_cycle_time.set_slice(TimeStamp(_frames_unit, 0, 0),
 			                      TimeDuration(_frames_unit, nframes - finish_offset.ticks()));
 			_cycle_time.set_offset(finish_offset);
-		
+
 		// Machine ran for entire cycle
 		} else {
 			if (machine->is_finished()) {
@@ -323,7 +323,7 @@ end:
 	/* Remember the last machine run, in case a switch happens and
 	 * we need to finalize it next cycle. */
 	_last_machine = machine;
-	
+
 	if (_stop.pending()) {
 		_cycle_time.set_slice(TimeStamp(_frames_unit, 0, 0),
 		                      TimeStamp(_frames_unit, 0, 0));

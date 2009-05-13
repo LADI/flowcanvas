@@ -1,15 +1,15 @@
 /* This file is part of FlowCanvas.
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * FlowCanvas is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
- * 
+ *
  * FlowCanvas is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
@@ -123,7 +123,7 @@ Module::on_event(GdkEvent* event)
 	}
 
 	bool ret = Item::on_event(event);
-	
+
 	if (event->type == GDK_ENTER_NOTIFY)
 		for (PortVector::iterator p = _ports.begin(); p != _ports.end(); ++p)
 			(*p)->raise_connections();
@@ -254,7 +254,7 @@ Module::port_at(double x, double y)
 		if (x > port->property_x() && x < port->property_x() + port->width()
 				&& y > port->property_y() && y < port->property_y() + port->height()) {
 			return port;
-		} 
+		}
 	}
 
 	return boost::shared_ptr<Port>();
@@ -268,7 +268,7 @@ Module::remove_port(boost::shared_ptr<Port> port)
 
 	if (i != _ports.end()) {
 		_ports.erase(i);
-		
+
 		// Find new widest input or output, if necessary
 		if (port->is_input() && port->width() >= _widest_input) {
 			_widest_input = 0;
@@ -340,12 +340,12 @@ Module::move(double dx, double dy)
 
 	double new_x = property_x() + dx;
 	double new_y = property_y() + dy;
-	
+
 	if (new_x < 0)
 		dx = property_x() * -1;
 	else if (new_x + _width > canvas->width())
 		dx = canvas->width() - property_x() - _width;
-	
+
 	if (new_y < 0)
 		dy = property_y() * -1;
 	else if (new_y + _height > canvas->height())
@@ -378,7 +378,7 @@ Module::move_to(double x, double y)
 	if (y < 0) y = 0;
 	if (x + _width > canvas->width()) x = canvas->width() - _width - 1;
 	if (y + _height > canvas->height()) y = canvas->height() - _height - 1;
-		
+
 	assert(x >= 0);
 	assert(y >= 0);
 
@@ -390,10 +390,10 @@ Module::move_to(double x, double y)
 
 	property_x() = x;
 	property_y() = y;
-	
+
 	// Actually move (stupid gnomecanvas)
 	move(0, 0);
-	
+
 	// Update any connection line positions
 	for (PortVector::iterator p = _ports.begin(); p != _ports.end(); ++p)
 		(*p)->move_connections();
@@ -428,19 +428,19 @@ Module::add_port(boost::shared_ptr<Port> p)
 	PortVector::const_iterator i = std::find(_ports.begin(), _ports.end(), p);
 	if (i != _ports.end()) // already added
 		return;            // so do nothing
-		
+
 	if (p->is_input() && p->natural_width() > _widest_input)
 		_widest_input = p->width();
 	else if (p->is_output() && p->natural_width() > _widest_output)
 		_widest_output = p->width();
-	
+
 	_ports.push_back(p);
-	
+
 	boost::shared_ptr<Canvas> canvas = _canvas.lock();
 	if (canvas)
 		p->signal_event().connect(
 			sigc::bind(sigc::mem_fun(canvas.get(), &Canvas::port_event), p));
-	
+
 	p->signal_renamed.connect(sigc::mem_fun(this, &Module::port_renamed));
 }
 
@@ -480,7 +480,7 @@ Module::embed(Gtk::Container* widget)
 				sigc::mem_fun(this, &Module::embed_size_request), false));
 }
 
-	
+
 void
 Module::embed_size_request(Gtk::Requisition* r, bool force)
 {
@@ -489,7 +489,7 @@ Module::embed_size_request(Gtk::Requisition* r, bool force)
 
 	_embed_width = r->width;
 	_embed_height = r->height;
-	
+
 	resize();
 
 	Gtk::Allocation allocation;
@@ -556,15 +556,15 @@ Module::resize_horiz()
 	// The amount of space between a port edge and the module edge (on the
 	// side that the port isn't right on the edge).
 	const double hor_pad = (_title_visible ? 10.0 : 20.0);
-	
+
 	double width = (_title_visible ? _title_width + 10.0 : 1.0);
-	
+
 	if (_icon_box)
 		width += _icon_size + 2;
 
 	// Title is wide, put inputs and outputs beside each other
 	bool horiz = (_widest_input + _widest_output + 10.0 < std::max(width, _embed_width));
-	
+
 	// Fit ports to module (or vice-versa)
 	double widest_in  = _widest_input;
 	double widest_out = _widest_output;
@@ -578,7 +578,7 @@ Module::resize_horiz()
 
 	double above_w   = std::max(width, widest + hor_pad);
 	double between_w = std::max(width, widest_in + widest_out + _embed_width);
-	
+
 	above_w = std::max(above_w, _embed_width);
 
 	// Basic height contains title, icon
@@ -598,10 +598,10 @@ Module::resize_horiz()
 
 	//double between_h = std::max(above_h, _embed_height);
 	above_h += _embed_height;
-	
+
 	/*cerr << above_w << "x" << above_h << "(" << above_w * above_h << ") ? "
 			<< between_w << "x" << between_h << "(" << between_w * between_h << ")" << endl;*/
-	
+
 	// Decide where to place embedded widget if necessary)
 	enum { BETWEEN, ABOVE } embed_pos = ABOVE;
 	//if (above_w * above_h >= between_w * between_h) // minimize area
@@ -624,15 +624,15 @@ Module::resize_horiz()
 	}
 
 	width += _border_width * 2.0;
-	
+
 	// Actually set width and height
 	set_width(width);
-	
+
 	// Offset ports below embedded widget
 	if (embed_pos == ABOVE) {
 		header_height += _embed_height;
 	}
-	
+
 	// Move ports to appropriate locations
 	int i = 0;
 	bool last_was_input = false;
@@ -659,10 +659,10 @@ Module::resize_horiz()
 			p->property_y() = y;
 			last_was_input = false;
 		}
-		
+
 		(*pi)->move_connections();
 	}
-	
+
 	if (_ports.empty())
 		h += header_height;
 
@@ -699,10 +699,10 @@ Module::resize_vert()
 	double width = (_title_visible
 		? _canvas_title.property_text_width() + 10.0
 		: 1.0);
-	
+
 	if (_icon_box)
 		width += _icon_size + 2;
-	
+
 	double height = 4.0;
 	if (_show_port_labels) {
 		if (_title_visible)
@@ -738,12 +738,12 @@ Module::resize_vert()
 			p->property_y() = height - p->height() + 0.5;
 			last_was_input = false;
 		}
-		
+
 		(*pi)->move_connections();
 	}
-	
+
 	x += MODULE_EMPTY_PORT_BREADTH;
-	
+
 	if (x > width - 2.0)
 		width = x + 2.0;
 
@@ -786,7 +786,7 @@ Module::fit_canvas()
 	if (canvas) {
 		double canvas_width = canvas->width();
 		double canvas_height = canvas->height();
-	
+
 		canvas_width = max(canvas_width, property_x() + _width + 5.0);
 		canvas_height = max(canvas_height, property_y() + _height + 5.0);
 
@@ -803,7 +803,7 @@ Module::select_tick()
 		_module_box.property_dash() = canvas->select_dash();
 }
 
-	
+
 void
 Module::set_border_color(uint32_t c)
 {

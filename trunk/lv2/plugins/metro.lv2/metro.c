@@ -64,7 +64,7 @@ osc_metro_instantiate(const LV2_Descriptor*    descriptor,
                       const LV2_Feature*const* features)
 {
 	OSCMetro* plugin = (OSCMetro*)malloc(sizeof(OSCMetro));
-	
+
 	plugin->sample_rate            = rate;
 	plugin->frames_since_last_tick = 0;
 	plugin->input_sync             = NULL;
@@ -88,10 +88,10 @@ osc_metro_run(LV2_Handle instance, uint32_t sample_count)
 	if (plugin->input_sync->event_count > 0) {
 
 		/*const LV2_Event* sync_msg = lv2_osc_buffer_get_message(plugin->input_sync, 0);
-		
+
 		if (plugin->output_bang)
 			lv2_osc_buffer_append(plugin->output_bang, sync_msg->time, "/bang", NULL);
-		
+
 		plugin->frames_since_last_tick = sample_count - sync_msg->time;*/
 
 	} else if (plugin->frames_since_last_tick > frames_per_beat) {

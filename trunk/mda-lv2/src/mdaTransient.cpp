@@ -7,9 +7,9 @@ AudioEffect *createEffectInstance(audioMasterCallback audioMaster)
   return new mdaTransient(audioMaster);
 }
 
-mdaTransient::mdaTransient(audioMasterCallback audioMaster)	: AudioEffectX(audioMaster, 1, 6)	
+mdaTransient::mdaTransient(audioMasterCallback audioMaster)	: AudioEffectX(audioMaster, 1, 6)
 {
-	fParam1 = (float)0.50; //attack 		
+	fParam1 = (float)0.50; //attack
   fParam2 = (float)0.50; //release
   fParam3 = (float)0.50; //output
   fParam4 = (float)0.49; //filter
@@ -19,7 +19,7 @@ mdaTransient::mdaTransient(audioMasterCallback audioMaster)	: AudioEffectX(audio
   setNumInputs(2);		    // stereo in
 	setNumOutputs(2);		    // stereo out
 	setUniqueID("mdaTransient");    // identify
-	DECLARE_LVZ_DEPRECATED(canMono) ();				      
+	DECLARE_LVZ_DEPRECATED(canMono) ();
 	canProcessReplacing();	// supports both accumulating and replacing output
 	strcpy(programName, "Transient Processor");	// default program name
 
@@ -71,8 +71,8 @@ void mdaTransient::setParameter(LvzInt32 index, float value)
     filx = 0.f;
   }
 
-  if(fParam1>0.5) 
-  {  
+  if(fParam1>0.5)
+  {
     att1 = (float)pow(10.0, -1.5);
     att2 = (float)pow(10.0, 1.0 - 5.0 * fParam1);
   }
@@ -139,7 +139,7 @@ void mdaTransient::getParameterDisplay(LvzInt32 index, char *text)
     case 4: long2string((long)(100*fParam5),text); break;
     case 5: long2string((long)(100*fParam6),text); break;
   }
-	
+
 }
 
 void mdaTransient::getParameterLabel(LvzInt32 index, char *label)
@@ -147,11 +147,11 @@ void mdaTransient::getParameterLabel(LvzInt32 index, char *label)
 	switch(index)
   {
     case 0: strcpy(label, "%"); break;
-    case 1: strcpy(label, "%"); break; 
+    case 1: strcpy(label, "%"); break;
     case 2: strcpy(label, "dB"); break;
-    case 3: strcpy(label, "Lo <> Hi"); break; 
-    case 4: strcpy(label, "%"); break; 
-    case 5: strcpy(label, "%"); break; 
+    case 3: strcpy(label, "Lo <> Hi"); break;
+    case 4: strcpy(label, "%"); break;
+    case 5: strcpy(label, "%"); break;
   }
 }
 
@@ -165,38 +165,38 @@ void mdaTransient::process(float **inputs, float **outputs, LvzInt32 sampleFrame
 	float *out1 = outputs[0];
 	float *out2 = outputs[1];
 	float a, b, c, d, e, f, g, i;
-  float e1=env1, e2=env2, e3=env3, e4=env4, y=dry; 
+  float e1=env1, e2=env2, e3=env3, e4=env4, y=dry;
   float a1=att1, a2=att2, r12=rel12, a34=att34, r3=rel3, r4=rel4;
   float fi=fili, fo=filo, fx=filx, fb1=fbuf1, fb2=fbuf2;
 
-  --in1;	
-	--in2;	
+  --in1;
+	--in2;
 	--out1;
 	--out2;
 
  	while(--sampleFrames >= 0)
 	{
-    a = *++in1;   
+    a = *++in1;
     b = *++in2;
     c = out1[1];
     d = out1[2];
-		
-    fb1 = fo*fb1 + fi*a;  
-    fb2 = fo*fb2 + fi*b; 
+
+    fb1 = fo*fb1 + fi*a;
+    fb2 = fo*fb2 + fi*b;
     e = fb1 + fx*a;
     f = fb2 + fx*b;
 
-    i = a + b; i = (i>0)? i : -i; 
+    i = a + b; i = (i>0)? i : -i;
     e1 = (i>e1)? e1 + a1 * (i-e1) : e1 * r12;
     e2 = (i>e2)? e2 + a2 * (i-e2) : e2 * r12;
     e3 = (i>e3)? e3 + a34 * (i-e3) : e3 * r3;
     e4 = (i>e4)? e4 + a34 * (i-e4) : e4 * r4;
     g = (e1 - e2 + e3 - e4);
 
-    *++out1 = c + y * (a + e * g);	
-		*++out2 = d + y * (b + f * g);	
+    *++out1 = c + y * (a + e * g);
+		*++out2 = d + y * (b + f * g);
 	}
-  if(e1<1.0e-10) { env1=0.f; env2=0.f; env3=0.f; env4=0.f; fbuf1=0.f; fbuf2=0.f; } 
+  if(e1<1.0e-10) { env1=0.f; env2=0.f; env3=0.f; env4=0.f; fbuf1=0.f; fbuf2=0.f; }
             else { env1=e1;  env2=e2;  env3=e3;  env4=e4;  fbuf1=fb1; fbuf2=fb2; }
 }
 
@@ -207,12 +207,12 @@ void mdaTransient::processReplacing(float **inputs, float **outputs, LvzInt32 sa
 	float *out1 = outputs[0];
 	float *out2 = outputs[1];
 	float a, b, e, f, g, i;
-  float e1=env1, e2=env2, e3=env3, e4=env4, y=dry; 
+  float e1=env1, e2=env2, e3=env3, e4=env4, y=dry;
   float a1=att1, a2=att2, r12=rel12, a34=att34, r3=rel3, r4=rel4;
   float fi=fili, fo=filo, fx=filx, fb1=fbuf1, fb2=fbuf2;
-  
-	--in1;	
-	--in2;	
+
+	--in1;
+	--in2;
 	--out1;
 	--out2;
 
@@ -220,22 +220,22 @@ void mdaTransient::processReplacing(float **inputs, float **outputs, LvzInt32 sa
 	{
     a = *++in1;
     b = *++in2;
-		
-    fb1 = fo*fb1 + fi*a;  
-    fb2 = fo*fb2 + fi*b; 
-    e = fb1 + fx*a;       
+
+    fb1 = fo*fb1 + fi*a;
+    fb2 = fo*fb2 + fi*b;
+    e = fb1 + fx*a;
     f = fb2 + fx*b;
 
-    i = a + b; i = (i>0)? i : -i; 
+    i = a + b; i = (i>0)? i : -i;
     e1 = (i>e1)? e1 + a1 * (i-e1) : e1 * r12;
     e2 = (i>e2)? e2 + a2 * (i-e2) : e2 * r12;
     e3 = (i>e3)? e3 + a34 * (i-e3) : e3 * r3;
     e4 = (i>e4)? e4 + a34 * (i-e4) : e4 * r4;
     g = (e1 - e2 + e3 - e4);
 
-    *++out1 = y * (a + e * g);	
-		*++out2 = y * (b + f * g);	
+    *++out1 = y * (a + e * g);
+		*++out2 = y * (b + f * g);
 	}
-  if(e1<1.0e-10) { env1=0.f; env2=0.f; env3=0.f; env4=0.f; fbuf1=0.f; fbuf2=0.f; } 
+  if(e1<1.0e-10) { env1=0.f; env2=0.f; env3=0.f; env4=0.f; fbuf1=0.f; fbuf2=0.f; }
             else { env1=e1;  env2=e2;  env3=e3;  env4=e4;  fbuf1=fb1; fbuf2=fb2; }
 }

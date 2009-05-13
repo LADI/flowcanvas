@@ -1,8 +1,8 @@
 /*
     adenv.c - A LADSPA plugin to generate percussive (i.e no sustain time), linear AD envelopes.
-    This one takes in levels to make  filter sweeps/etc easier. 
-                 
-    Copyright (C) 2005 Loki Davison 
+    This one takes in levels to make  filter sweeps/etc easier.
+
+    Copyright (C) 2005 Loki Davison
     based of DADSR by Mike Rawes
 
     This program is free software; you can redistribute it and/or modify

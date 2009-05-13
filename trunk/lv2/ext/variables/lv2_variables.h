@@ -44,8 +44,8 @@ extern "C" {
  * values can be stored in the same file as the plugin's definition) or
  * network transmission/control.
  */
-  
-  
+
+
 /** An LV2 Plugin Variable */
 typedef struct _LV2Var_Variable* LV2Var_Variable;
 
@@ -53,7 +53,7 @@ static const char* lv2var_variable_key(const LV2Var_Variable var);
 static const char* lv2var_variable_type(const LV2Var_Variable var);
 static const char* lv2var_variable_value(const LV2Var_Variable var);
 
-  
+
 
 /** Plugin extension data for plugin variables.
  *
@@ -62,7 +62,7 @@ static const char* lv2var_variable_value(const LV2Var_Variable var);
  * http://drobilla.net/ns/lv2/variables
  */
 typedef struct _LV2Var_Descriptor {
-	
+
 	/** Get the value of a plugin variable (O(log(n), non-blocking).
 	 *
 	 * @param key_uri  Key of variable to look up
@@ -75,8 +75,8 @@ typedef struct _LV2Var_Descriptor {
 	int32_t (*get_value)(const char*  key_uri,
 	                     const char** type_uri,
 	                     const char** value);
-	
-	
+
+
 	/** Set a plugin variable to a typed literal value (O(log(n), allocates memory).
 	 *
 	 * Note that this function is NOT realtime safe.
@@ -95,8 +95,8 @@ typedef struct _LV2Var_Descriptor {
 	void (*set_value)(const char* key_uri,
 	                  const char* type_uri,
 	                  const char* value);
-	
-	
+
+
 	/** Unset (erase) a variable (O(log(n), deallocates memory).
 	 *
 	 * Note that this function is NOT realtime safe.
@@ -104,14 +104,14 @@ typedef struct _LV2Var_Descriptor {
 	 * @param key Key of variable to erase
 	 */
 	void (*unset)(const char* key_uri);
-	
-	
+
+
 	/** Clear (erase) all set variables (O(1), deallocates memory).
 	 *
 	 * Note that this function is NOT realtime safe.
 	 */
 	void (*clear)();
-	
+
 
 	/** Get all variables of a plugin (O(log(n), allocates memory).
 	 *
@@ -132,7 +132,7 @@ typedef struct _LV2Var_Descriptor {
 	 */
 	int32_t (*get_variable)(const char*             key_uri,
 	                        const LV2Var_Variable** variable);
-	
+
 } LV2Var_Descriptor;
 
 

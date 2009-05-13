@@ -24,8 +24,8 @@ mdaVocoderProgram::mdaVocoderProgram() ///default program settings
   param[3] = 0.40f;  //hi band
   param[4] = 0.16f;  //envelope
   param[5] = 0.55f;  //filter q
-  param[6] = 0.6667f;//freq range       
-  param[7] = 0.33f;  //num bands       
+  param[6] = 0.6667f;//freq range
+  param[7] = 0.33f;  //num bands
   strcpy(name, "Vocoder");
 }
 
@@ -34,13 +34,13 @@ mdaVocoder::mdaVocoder(audioMasterCallback audioMaster): AudioEffectX(audioMaste
 {
   setNumInputs(2);
   setNumOutputs(2);
-  setUniqueID("mdaVocoder");  ///identify plug-in here 
+  setUniqueID("mdaVocoder");  ///identify plug-in here
   //canMono();
   canProcessReplacing();
 
   programs = new mdaVocoderProgram[numPrograms];
   setProgram(0);
-  
+
   ///differences from default program...
   programs[1].param[7] = 0.66f;
   strcpy(programs[1].name,"16 Band Vocoder");
@@ -72,12 +72,12 @@ void mdaVocoder::resume() ///update internal parameters...
 
   swap = 1; if(param[0]>0.5f) swap = 0;
   gain = (float)pow(10.0f, 2.0f * param[1] - 3.0f * param[5] - 2.0f);
-  
+
   thru = (float)pow(10.0f, 0.5f + 2.0f * param[1]);
   high =  param[3] * param[3] * param[3] * thru;
   thru *= param[2] * param[2] * param[2];
-  
-  if(param[7]<0.5f) 
+
+  if(param[7]<0.5f)
   {
     nbnd=8;
     re=0.003f;
@@ -89,7 +89,7 @@ void mdaVocoder::resume() ///update internal parameters...
     f[6][2] = 390.0f;
     f[7][2] = 190.0f;
   }
-  else 
+  else
   {
     nbnd=16;
     re=0.0015f;
@@ -117,10 +117,10 @@ void mdaVocoder::resume() ///update internal parameters...
   else
   {
     f[0][12] = (float)pow(10.0, -1.7 - 2.7f * param[4]); //envelope speed
-    
+
     rr = 0.022f / (float)nbnd; //minimum proportional to frequency to stop distortion
-    for(i=1;i<nbnd;i++) 
-    {                   
+    for(i=1;i<nbnd;i++)
+    {
       f[i][12] = (float)(0.025 - rr * (double)i);
       if(f[0][12] < f[i][12]) f[i][12] = f[0][12];
     }
@@ -128,7 +128,7 @@ void mdaVocoder::resume() ///update internal parameters...
   }
 
   rr = 1.0 - pow(10.0f, -1.0f - 1.2f * param[5]);
-  sh = (float)pow(2.0f, 3.0f * param[6] - 1.0f); //filter bank range shift 
+  sh = (float)pow(2.0f, 3.0f * param[6] - 1.0f); //filter bank range shift
 
   for(i=1;i<nbnd;i++)
   {
@@ -147,7 +147,7 @@ void mdaVocoder::resume() ///update internal parameters...
 void mdaVocoder::suspend() ///clear any buffers...
 {
   long i, j;
-  
+
   for(i=0; i<nbnd; i++) for(j=3; j<12; j++) f[i][j] = 0.0f; //zero band filters and envelopes
   kout = 0.0f;
   kval = 0;
@@ -236,27 +236,27 @@ void mdaVocoder::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
   float *out2 = outputs[1];
   float a, b, c, d, o=0.0f, aa, bb, oo=kout, g=gain, ht=thru, hh=high, tmp;
   long i, k=kval, sw=swap, nb=nbnd;
-  
+
   --in1;
   --in2;
   --out1;
   --out2;
   while(--sampleFrames >= 0)
   {
-    a = *++in1; //speech  
+    a = *++in1; //speech
     b = *++in2; //synth
     c = out1[1];
     d = out2[1];
     if(sw==0) { tmp=a; a=b; b=tmp; } //swap channels
- 
+
     tmp = a - f[0][7]; //integrate modulator for HF band and filter bank pre-emphasis
     f[0][7] = a;
     a = tmp;
-     
+
     if(tmp<0.0f) tmp = -tmp;
     f[0][11] -= f[0][12] * (f[0][11] - tmp);      //high band envelope
     o = f[0][11] * (ht * a + hh * (b - f[0][3])); //high band + high thru
-    
+
     f[0][3] = b; //integrate carrier for HF band
 
     if(++k & 0x1) //this block runs at half sample rate
@@ -264,8 +264,8 @@ void mdaVocoder::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
       oo = 0.0f;
       aa = a + f[0][9] - f[0][8] - f[0][8];  //apply zeros here instead of in each reson
                f[0][9] = f[0][8];  f[0][8] = a;
-      bb = b + f[0][5] - f[0][4] - f[0][4]; 
-               f[0][5] = f[0][4];  f[0][4] = b; 
+      bb = b + f[0][5] - f[0][4] - f[0][4];
+               f[0][5] = f[0][4];  f[0][4] = b;
 
       for(i=1; i<nb; i++) //filter bank: 4th-order band pass
       {
@@ -282,7 +282,7 @@ void mdaVocoder::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
         tmp += f[i][2] * f[i][9] + f[i][1] * f[i][10];
         f[i][10] = f[i][9];
         f[i][9] = tmp;
-        
+
         if(tmp<0.0f) tmp = -tmp;
         f[i][11] -= f[i][12] * (f[i][11] - tmp);
         oo += f[i][5] * f[i][11];
@@ -294,14 +294,14 @@ void mdaVocoder::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
     *++out2 = d + o;
   }
 
-  kout = oo;  
+  kout = oo;
   kval = k & 0x1;
   if(fabs(f[0][11])<1.0e-10) f[0][11] = 0.0f; //catch HF envelope denormal
 
-  for(i=1;i<nb;i++) 
-    if(fabs(f[i][3])<1.0e-10 || fabs(f[i][7])<1.0e-10) 
+  for(i=1;i<nb;i++)
+    if(fabs(f[i][3])<1.0e-10 || fabs(f[i][7])<1.0e-10)
       for(k=3; k<12; k++) f[i][k] = 0.0f; //catch reson & envelope denormals
-        
+
   if(fabs(o)>10.0f) suspend(); //catch instability
 }
 
@@ -314,25 +314,25 @@ void mdaVocoder::processReplacing(float **inputs, float **outputs, LvzInt32 samp
   float *out2 = outputs[1];
   float a, b, o=0.0f, aa, bb, oo=kout, g=gain, ht=thru, hh=high, tmp;
   long i, k=kval, sw=swap, nb=nbnd;
-  
+
   --in1;
   --in2;
   --out1;
   --out2;
   while(--sampleFrames >= 0)
   {
-    a = *++in1; //speech  
+    a = *++in1; //speech
     b = *++in2; //synth
     if(sw==0) { tmp=a; a=b; b=tmp; } //swap channels
- 
+
     tmp = a - f[0][7]; //integrate modulator for HF band and filter bank pre-emphasis
     f[0][7] = a;
     a = tmp;
-     
+
     if(tmp<0.0f) tmp = -tmp;
     f[0][11] -= f[0][12] * (f[0][11] - tmp);      //high band envelope
     o = f[0][11] * (ht * a + hh * (b - f[0][3])); //high band + high thru
-    
+
     f[0][3] = b; //integrate carrier for HF band
 
     if(++k & 0x1) //this block runs at half sample rate
@@ -340,8 +340,8 @@ void mdaVocoder::processReplacing(float **inputs, float **outputs, LvzInt32 samp
       oo = 0.0f;
       aa = a + f[0][9] - f[0][8] - f[0][8];  //apply zeros here instead of in each reson
                f[0][9] = f[0][8];  f[0][8] = a;
-      bb = b + f[0][5] - f[0][4] - f[0][4]; 
-               f[0][5] = f[0][4];  f[0][4] = b; 
+      bb = b + f[0][5] - f[0][4] - f[0][4];
+               f[0][5] = f[0][4];  f[0][4] = b;
 
       for(i=1; i<nb; i++) //filter bank: 4th-order band pass
       {
@@ -358,7 +358,7 @@ void mdaVocoder::processReplacing(float **inputs, float **outputs, LvzInt32 samp
         tmp += f[i][2] * f[i][9] + f[i][1] * f[i][10];
         f[i][10] = f[i][9];
         f[i][9] = tmp;
-        
+
         if(tmp<0.0f) tmp = -tmp;
         f[i][11] -= f[i][12] * (f[i][11] - tmp);
         oo += f[i][5] * f[i][11];
@@ -370,12 +370,12 @@ void mdaVocoder::processReplacing(float **inputs, float **outputs, LvzInt32 samp
     *++out2 = o;
   }
 
-  kout = oo;  
+  kout = oo;
   kval = k & 0x1;
   if(fabs(f[0][11])<1.0e-10) f[0][11] = 0.0f; //catch HF envelope denormal
 
-  for(i=1;i<nb;i++) 
-    if(fabs(f[i][3])<1.0e-10 || fabs(f[i][7])<1.0e-10) 
+  for(i=1;i<nb;i++)
+    if(fabs(f[i][3])<1.0e-10 || fabs(f[i][7])<1.0e-10)
       for(k=3; k<12; k++) f[i][k] = 0.0f; //catch reson & envelope denormals
 
   if(fabs(o)>10.0f) suspend(); //catch instability

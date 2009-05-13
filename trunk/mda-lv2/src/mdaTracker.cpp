@@ -20,11 +20,11 @@ mdaTracker::mdaTracker(audioMasterCallback audioMaster)	: AudioEffectX(audioMast
   fParam7 = (float)0.50; //Trigger dB
   fParam8 = (float)0.50; //Output
 
-  setNumInputs(2);		  
-	setNumOutputs(2);		  
+  setNumInputs(2);
+	setNumOutputs(2);
 	setUniqueID("mdaTracker");    // identify here
-	DECLARE_LVZ_DEPRECATED(canMono) ();				      
-	canProcessReplacing();	
+	DECLARE_LVZ_DEPRECATED(canMono) ();
+	canProcessReplacing();
 	strcpy(programName, "Pitch Tracker");
 
   dphi = 100.f/getSampleRate(); //initial pitch
@@ -43,13 +43,13 @@ void mdaTracker::setParameter(LvzInt32 index, float value)
     case 1: fParam2 = value; break;
     case 2: fParam3 = value; break;
     case 3: fParam4 = value; break;
-    case 4: fParam5 = value; break; 
+    case 4: fParam5 = value; break;
     case 5: fParam6 = value; break;
     case 6: fParam7 = value; break;
     case 7: fParam8 = value; break;
   }
   //calcs here
-  mode = int(fParam1*4.9); 
+  mode = int(fParam1*4.9);
   fo = filterFreq(50.f); fi = (1.f - fo)*(1.f - fo);
   ddphi = fParam4 * fParam4;
   thr = (float)pow(10.0, 3.0*fParam7 - 3.8);
@@ -86,7 +86,7 @@ void mdaTracker::suspend()
 float mdaTracker::filterFreq(float hz)
 {
   float j, k, r=0.999f;
-  
+
   j = r * r - 1;
   k = (float)(2.f - 2.f * r * r * cos(0.647f * hz / getSampleRate() ));
   return (float)((sqrt(k*k - 4.f*j*j) - k) / (2.f*j));
@@ -188,9 +188,9 @@ void mdaTracker::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
   float we=wet, dr=dry, bo=bold, r1=res1, r2=res2, b3=buf3, b4=buf4;
   float sw=saw, dsw=dsaw, dy=dyn, e=env, re=rel;
   long  m=max, n=num, s=sig, mn=min, mo=mode;
-  
-	--in1;	
-	--in2;	
+
+	--in1;
+	--in2;
 	--out1;
 	--out2;
 	while(--sampleFrames >= 0)
@@ -204,33 +204,33 @@ void mdaTracker::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
     tmp = (x>0.f)? x : -x; //dynamics envelope
     e = (tmp>e)? 0.5f*(tmp + e) : e * re;
 
-    b1 = o*b1 + i*x; 
+    b1 = o*b1 + i*x;
     b2 = o*b2 + b1; //low-pass filter
-    
+
     if(b2>t) //if >thresh
-    {  
+    {
       if(s<1) //and was <thresh
       {
         if(n<mn) //not long ago
         {
           tmp2 = b2 / (b2 - bo); //update period
-          tmp = trans*twopi/(n + dn - tmp2); 
-          dp = dp + ddp * (tmp - dp); 
+          tmp = trans*twopi/(n + dn - tmp2);
+          dp = dp + ddp * (tmp - dp);
           dn = tmp2;
           dsw = 0.3183098f * dp;
-          if(mode==4) 
+          if(mode==4)
           {
             r1 = (float)cos(4.f*dp); //resonator
             r2 = (float)sin(4.f*dp);
-          }  
+          }
         }
         n=0; //restart period measurement
       }
       s=1;
     }
-    else 
+    else
     {
-      if(n>m) s=0; //now <thresh 
+      if(n>m) s=0; //now <thresh
     }
     n++;
     bo=b2;
@@ -238,26 +238,26 @@ void mdaTracker::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
     p = (float)fmod(p+dp,twopi);
   	switch(mo)
     { //sine
-      case 0: x=(float)sin(p); break; 
+      case 0: x=(float)sin(p); break;
       //square
-      case 1: x=(sin(p)>0.f)? 0.5f : -0.5f; break; 
+      case 1: x=(sin(p)>0.f)? 0.5f : -0.5f; break;
       //saw
-      case 2: sw = (float)fmod(sw+dsw,2.0f); x = sw - 1.f; break; 
+      case 2: sw = (float)fmod(sw+dsw,2.0f); x = sw - 1.f; break;
       //ring
-      case 3: x *= (float)sin(p); break; 
+      case 3: x *= (float)sin(p); break;
       //filt
-      case 4: x += (b3 * r1) - (b4 * r2); 
-              b4 = 0.996f * ((b3 * r2) + (b4 * r1)); 
-              b3 = 0.996f * x; break; 
-    }    
-    x *= (we + dy * e); 
+      case 4: x += (b3 * r1) - (b4 * r2);
+              b4 = 0.996f * ((b3 * r2) + (b4 * r1));
+              b3 = 0.996f * x; break;
+    }
+    x *= (we + dy * e);
 		*++out1 = c + dr*a + x;
 		*++out2 = d + dr*b + x;
 	}
-  if(fabs(b1)<1.0e-10) {buf1=0.f; buf2=0.f; buf3=0.f; buf4=0.f; } 
+  if(fabs(b1)<1.0e-10) {buf1=0.f; buf2=0.f; buf3=0.f; buf4=0.f; }
   else {buf1=b1; buf2=b2; buf3=b3; buf4=b4;}
   phi=p; dphi=dp; sig=s; bold=bo;
-  num=(n>100000)? 100000: n; 
+  num=(n>100000)? 100000: n;
   env=e; saw=sw; dsaw=dsw; res1=r1; res2=r2;
 }
 
@@ -272,9 +272,9 @@ void mdaTracker::processReplacing(float **inputs, float **outputs, LvzInt32 samp
   float we=wet, dr=dry, bo=bold, r1=res1, r2=res2, b3=buf3, b4=buf4;
   float sw=saw, dsw=dsaw, dy=dyn, e=env, re=rel;
   long  m=max, n=num, s=sig, mn=min, mo=mode;
-  
-	--in1;	
-	--in2;	
+
+	--in1;
+	--in2;
 	--out1;
 	--out2;
 	while(--sampleFrames >= 0)
@@ -286,33 +286,33 @@ void mdaTracker::processReplacing(float **inputs, float **outputs, LvzInt32 samp
     tmp = (x>0.f)? x : -x; //dynamics envelope
     e = (tmp>e)? 0.5f*(tmp + e) : e * re;
 
-    b1 = o*b1 + i*x; 
+    b1 = o*b1 + i*x;
     b2 = o*b2 + b1; //low-pass filter
-    
+
     if(b2>t) //if >thresh
-    {  
+    {
       if(s<1) //and was <thresh
       {
         if(n<mn) //not long ago
         {
           tmp2 = b2 / (b2 - bo); //update period
-          tmp = trans*twopi/(n + dn - tmp2); 
-          dp = dp + ddp * (tmp - dp); 
+          tmp = trans*twopi/(n + dn - tmp2);
+          dp = dp + ddp * (tmp - dp);
           dn = tmp2;
           dsw = 0.3183098f * dp;
-          if(mode==4) 
+          if(mode==4)
           {
             r1 = (float)cos(4.f*dp); //resonator
             r2 = (float)sin(4.f*dp);
-          }  
+          }
         }
         n=0; //restart period measurement
       }
       s=1;
     }
-    else 
+    else
     {
-      if(n>m) s=0; //now <thresh 
+      if(n>m) s=0; //now <thresh
     }
     n++;
     bo=b2;
@@ -320,25 +320,25 @@ void mdaTracker::processReplacing(float **inputs, float **outputs, LvzInt32 samp
     p = (float)fmod(p+dp,twopi);
   	switch(mo)
     { //sine
-      case 0: x=(float)sin(p); break; 
+      case 0: x=(float)sin(p); break;
       //square
-      case 1: x=(sin(p)>0.f)? 0.5f : -0.5f; break; 
+      case 1: x=(sin(p)>0.f)? 0.5f : -0.5f; break;
       //saw
-      case 2: sw = (float)fmod(sw+dsw,2.0f); x = sw - 1.f; break; 
+      case 2: sw = (float)fmod(sw+dsw,2.0f); x = sw - 1.f; break;
       //ring
-      case 3: x *= (float)sin(p); break; 
+      case 3: x *= (float)sin(p); break;
       //filt
-      case 4: x += (b3 * r1) - (b4 * r2); 
-              b4 = 0.996f * ((b3 * r2) + (b4 * r1)); 
-              b3 = 0.996f * x; break; 
-    }    
-    x *= (we + dy * e); 
+      case 4: x += (b3 * r1) - (b4 * r2);
+              b4 = 0.996f * ((b3 * r2) + (b4 * r1));
+              b3 = 0.996f * x; break;
+    }
+    x *= (we + dy * e);
 		*++out1 = a;//dr*a + x;
 		*++out2 = dr*b + x;
 	}
-  if(fabs(b1)<1.0e-10) {buf1=0.f; buf2=0.f; buf3=0.f; buf4=0.f; } 
+  if(fabs(b1)<1.0e-10) {buf1=0.f; buf2=0.f; buf3=0.f; buf4=0.f; }
   else {buf1=b1; buf2=b2; buf3=b3; buf4=b4;}
   phi=p; dphi=dp; sig=s; bold=bo;
-  num=(n>100000)? 100000: n; 
+  num=(n>100000)? 100000: n;
   env=e; saw=sw; dsaw=dsw; res1=r1; res2=r2;
 }

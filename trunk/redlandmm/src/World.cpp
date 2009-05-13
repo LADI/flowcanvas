@@ -1,15 +1,15 @@
 /* This file is part of redlandmm.
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * redlandmm is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
- * 
+ *
  * redlandmm is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
@@ -44,7 +44,7 @@ World::World()
 	_c_obj = librdf_new_world();
 	assert(_c_obj);
 	librdf_world_open(_c_obj);
-	
+
 	add_prefix("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#");
 }
 
@@ -92,7 +92,7 @@ Node
 World::blank_id(const string base_name)
 {
 	string name;
-	
+
 	if (base_name != "" && base_name != "b") {
 		name = base_name;
 		for (unsigned i = 2; _blank_ids.find(name) != _blank_ids.end(); ++i) {

@@ -8,9 +8,9 @@ AudioEffect *createEffectInstance(audioMasterCallback audioMaster)
   return new mdaTestTone(audioMaster);
 }
 
-mdaTestTone::mdaTestTone(audioMasterCallback audioMaster)	: AudioEffectX(audioMaster, 1, 8)	
+mdaTestTone::mdaTestTone(audioMasterCallback audioMaster)	: AudioEffectX(audioMaster, 1, 8)
 {
-  fParam0 = 0.47f; //mode 
+  fParam0 = 0.47f; //mode
   fParam1 = 0.71f; //level dB
   fParam2 = 0.50f; //pan dB
   fParam3 = 0.57f; //freq1 B
@@ -19,15 +19,15 @@ mdaTestTone::mdaTestTone(audioMasterCallback audioMaster)	: AudioEffectX(audioMa
   fParam6 = 0.30f; //sweep ms
   fParam7 = 1.00f; //cal dBFS
 
-  setNumInputs(2);		    
-	setNumOutputs(2);		    
-	setUniqueID("mdaTestTone");    
-	DECLARE_LVZ_DEPRECATED(canMono) ();				      
+  setNumInputs(2);
+	setNumOutputs(2);
+	setUniqueID("mdaTestTone");
+	DECLARE_LVZ_DEPRECATED(canMono) ();
 	canProcessReplacing();
 	strcpy(programName, "Signal Generator");
-  
+
   updateTx = updateRx;
-  
+
   suspend();
   setParameter(6, 0.f);
 }
@@ -65,12 +65,12 @@ void mdaTestTone::setParameter(LvzInt32 index, float value)
   {
     case 0: fParam0 = value; break;
     case 1: fParam1 = value; break;
-    case 2: fParam2 = value; break; 
+    case 2: fParam2 = value; break;
     case 3: fParam3 = value; break;
     case 4: fParam4 = value; break;
-    case 6: fParam5 = value; break; 
-    case 5: fParam6 = value; break; 
-    case 7: fParam7 = value; break; 
+    case 6: fParam5 = value; break;
+    case 5: fParam6 = value; break;
+    case 7: fParam7 = value; break;
   }
 
 
@@ -122,10 +122,10 @@ void mdaTestTone::setParameter(LvzInt32 index, float value)
 void mdaTestTone::update()
 {
   updateRx = updateTx;
-  
+
   float f, df, twopi=6.2831853f;
 
-  //calcs here!	
+  //calcs here!
   mode = int(8.9 * fParam0);
   left = 0.05f * (float)int(60.f*fParam1);
   left = (float)pow(10.0f, left - 3.f);
@@ -143,9 +143,9 @@ void mdaTestTone::update()
     else if(fParam7>0.88) cal = -0.02000001f;
     else if(fParam7>0.84) cal = -0.1f;
     else cal = -0.2f;
-    
-    calx = (float)pow(10.0f, 0.05f*cal); 
-    left*=calx; right*=calx; 
+
+    calx = (float)pow(10.0f, 0.05f*cal);
+    left*=calx; right*=calx;
     calx = 0.f;
   }
   else //output level calibrate
@@ -153,7 +153,7 @@ void mdaTestTone::update()
     cal = (float)int(25.f*fParam7 - 21.1f);
     calx = cal;
   }
-  
+
   df=0.f;
   if(fParam4>0.6) df = 1.25f*fParam4 - 0.75f;
   if(fParam4<0.4) df = 1.25f*fParam4 - 0.50f;
@@ -169,11 +169,11 @@ void mdaTestTone::update()
                 break;
 
         case 1: //no frequency display
-        case 2: 
-        case 3: 
+        case 2:
+        case 3:
         case 4: strcpy(disp1, "--");
                 strcpy(disp2, "--"); break;
-        
+
         case 5: //sine
                 f = 13.f + (float)floor(30.f*fParam3);
                 iso2string(f, disp1); //iso band freq
@@ -181,8 +181,8 @@ void mdaTestTone::update()
                 float2strng(f, disp2); //Hz
                 dphi=twopi*f/getSampleRate();
                 break;
-        
-        case 6: //log sweep & step        
+
+        case 6: //log sweep & step
         case 7: sw = 13.f + (float)floor(30.f*fParam3);
                 swx = 13.f + (float)floor(30.f*fParam4);
                 iso2string(sw, disp1); //start freq
@@ -191,8 +191,8 @@ void mdaTestTone::update()
                 if(mode==7) swx += 1.f;
                 swd = (swx-sw) / (len*getSampleRate());
                 swt= 2 * (long)getSampleRate();
-                break; 
-        
+                break;
+
         case 8: //lin sweep
                 sw = 200.f * (float)floor(100.f*fParam3);
                 swx = 200.f * (float)floor(100.f*fParam4);
@@ -203,7 +203,7 @@ void mdaTestTone::update()
                 swx = twopi*swx/getSampleRate();
                 swd = (swx-sw) / (len*getSampleRate());
                 swt= 2 * (long)getSampleRate();
-                break; 
+                break;
   }
   thru = (float)pow(10.0f, (0.05f * (float)int(40.f*fParam5)) - 2.f);
   if(fParam5==0.0f) thru=0.0f;
@@ -236,13 +236,13 @@ void mdaTestTone::midi2string(float n, char *text)
     case  8: t[p++]='G'; t[p++]='#'; break;
     case  9: t[p++]='A';             break;
     case 10: t[p++]='A'; t[p++]='#'; break;
-    default: t[p++]='B';             
-  }    
-  
+    default: t[p++]='B';
+  }
+
   if(o<0) { t[p++]='-'; o = -o; }
   t[p++]= 48 + (o%10);
-  
-  t[p]=0; 
+
+  t[p]=0;
   strcpy(text, t);
 }
 
@@ -254,7 +254,7 @@ void mdaTestTone::iso2string(float b, char *text)
     case 14: strcpy(text, "25 Hz"); break;
     case 15: strcpy(text, "31 Hz"); break;
     case 16: strcpy(text, "40 Hz"); break;
-    case 17: strcpy(text, "50 Hz"); break; 
+    case 17: strcpy(text, "50 Hz"); break;
     case 18: strcpy(text, "63 Hz"); break;
     case 19: strcpy(text, "80 Hz"); break;
     case 20: strcpy(text, "100 Hz"); break;
@@ -322,7 +322,7 @@ void mdaTestTone::getParameterDisplay(LvzInt32 index, char *text)
 {
 	switch(index)
   {
-    case 0: 
+    case 0:
       switch(mode)
       {
         case 0: strcpy(text, "MIDI #"); break;
@@ -332,8 +332,8 @@ void mdaTestTone::getParameterDisplay(LvzInt32 index, char *text)
         case 4: strcpy(text, "---"); break;
         case 5: strcpy(text, "SINE"); break;
         case 6: strcpy(text, "LOG SWP."); break;
-        case 7: strcpy(text, "LOG STEP"); break; 
-        case 8: strcpy(text, "LIN SWP."); break; 
+        case 7: strcpy(text, "LOG STEP"); break;
+        case 8: strcpy(text, "LIN SWP."); break;
       } break;
     case 1: long2string((long)(int(60.f * fParam1) - 60.0 - calx), text); break;
     case 2: if(fParam2>0.3f)
@@ -370,7 +370,7 @@ void mdaTestTone::getParameterLabel(LvzInt32 index, char *label)
 void mdaTestTone::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
 {
 	if(updateRx != updateTx) update();
-  
+
   float *in1 = inputs[0];
 	float *in2 = inputs[1];
 	float *out1 = outputs[0];
@@ -382,28 +382,28 @@ void mdaTestTone::process(float **inputs, float **outputs, LvzInt32 sampleFrames
   long st=swt;
   int m=mode;
 
-	--in1;	
+	--in1;
 	--in2;
 	--out1;
 	--out2;
 	while(--sampleFrames >= 0)
 	{
-		a = *++in1;	
+		a = *++in1;
 		b = *++in2;
-    c = out1[1]; 
+    c = out1[1];
     d = out2[1];
-		
+
   	switch(m)
     {
       case 1: if(st>0) { st--; x=0.f; } else //impulse
-              { 
-                x=1.f; 
+              {
+                x=1.f;
                 st=(long)(len*getSampleRate());
               }
               break;
-      
+
       case 2: //noise
-    #if WIN32  
+    #if WIN32
       case 3: x = (float)(rand() - 16384); //for RAND_MAX = 32767
     #else //mac/gcc
       case 3: x = (float)((rand() & 0x7FFF) - 16384);
@@ -417,17 +417,17 @@ void mdaTestTone::process(float **inputs, float **outputs, LvzInt32 sampleFrames
                  z4 = 0.620f * z4 + 0.108990f * x;
                  z5 = 0.250f * z5 + 0.255784f * x;
                  x = z0 + z1 + z2 + z3 + z4 + z5;
-              } 
+              }
               break;
 
       case 4: x=0.f; break; //mute
-    
+
       case 0: //tones
       case 5:
-      case 9: ph = (float)fmod(ph+dph,twopi); 
-              x = (float)sin(ph); 
+      case 9: ph = (float)fmod(ph+dph,twopi);
+              x = (float)sin(ph);
               break;
- 
+
       case 6: //log sweep & step
       case 7: if(st>0) { st--; ph=0.f; } else
               {
@@ -436,9 +436,9 @@ void mdaTestTone::process(float **inputs, float **outputs, LvzInt32 sampleFrames
                 else dph = fsc * (float)pow(10.0f, 0.1f * s);
                 x = (float)sin(ph);
                 ph = (float)fmod(ph+dph,twopi);
-                if(s>sx) { l=0.f; r=0.f; } 
+                if(s>sx) { l=0.f; r=0.f; }
               }
-              break; 
+              break;
 
       case 8: //lin sweep
               if(st>0) { st--; ph=0.f; } else
@@ -446,14 +446,14 @@ void mdaTestTone::process(float **inputs, float **outputs, LvzInt32 sampleFrames
                 s += ds;
                 x = (float)sin(ph);
                 ph = (float)fmod(ph+s,twopi);
-                if(s>sx) { l=0.f; r=0.f; } 
-              } 
-              break; 
+                if(s>sx) { l=0.f; r=0.f; }
+              }
+              break;
     }
     *++out1 = c + t*a + l*x;
 		*++out2 = d + t*b + r*x;
 	}
-  zz0=z0; zz1=z1; zz2=z2; zz3=z3, zz4=z4; zz5=z5; 
+  zz0=z0; zz1=z1; zz2=z2; zz3=z3, zz4=z4; zz5=z5;
   phi=ph; sw=s; swt=st;
   if(s>sx) setParameter(0, fParam0); //retrigger sweep
 }
@@ -473,26 +473,26 @@ void mdaTestTone::processReplacing(float **inputs, float **outputs, LvzInt32 sam
   long st=swt;
   int m=mode;
 
-	--in1;	
+	--in1;
 	--in2;
 	--out1;
 	--out2;
 	while(--sampleFrames >= 0)
 	{
-		a = *++in1;	
+		a = *++in1;
 		b = *++in2;
-		
+
   	switch(m)
     {
       case 1: if(st>0) { st--; x=0.f; } else //impulse
-              { 
-                x=1.f; 
+              {
+                x=1.f;
                 st=(long)(len*getSampleRate());
               }
               break;
-      
+
       case 2: //noise
-    #if WIN32  
+    #if WIN32
       case 3: x = (float)(rand() - 16384); //for RAND_MAX = 32767
     #else //mac/gcc
       case 3: x = (float)((rand() & 0x7FFF) - 16384);
@@ -506,17 +506,17 @@ void mdaTestTone::processReplacing(float **inputs, float **outputs, LvzInt32 sam
                  z4 = 0.620f * z4 + 0.108990f * x;
                  z5 = 0.250f * z5 + 0.255784f * x;
                  x = z0 + z1 + z2 + z3 + z4 + z5;
-              } 
+              }
               break;
 
       case 4: x=0.f; break; //mute
-    
+
       case 0: //tones
       case 5:
-      case 9: ph = (float)fmod(ph+dph,twopi); 
-              x = (float)sin(ph); 
+      case 9: ph = (float)fmod(ph+dph,twopi);
+              x = (float)sin(ph);
               break;
- 
+
       case 6: //log sweep & step
       case 7: if(st>0) { st--; ph=0.f; } else
               {
@@ -525,9 +525,9 @@ void mdaTestTone::processReplacing(float **inputs, float **outputs, LvzInt32 sam
                 else dph = fsc * (float)pow(10.0f, 0.1f * s);
                 x = (float)sin(ph);
                 ph = (float)fmod(ph+dph,twopi);
-                if(s>sx) { l=0.f; r=0.f; } 
+                if(s>sx) { l=0.f; r=0.f; }
               }
-              break; 
+              break;
 
       case 8: //lin sweep
               if(st>0) { st--; ph=0.f; } else
@@ -535,15 +535,15 @@ void mdaTestTone::processReplacing(float **inputs, float **outputs, LvzInt32 sam
                 s += ds;
                 x = (float)sin(ph);
                 ph = (float)fmod(ph+s,twopi);
-                if(s>sx) { l=0.f; r=0.f; } 
-              } 
-              break; 
+                if(s>sx) { l=0.f; r=0.f; }
+              }
+              break;
     }
 
     *++out1 = t*a + l*x;
 		*++out2 = t*b + r*x;
 	}
-  zz0=z0; zz1=z1; zz2=z2; zz3=z3, zz4=z4; zz5=z5; 
+  zz0=z0; zz1=z1; zz2=z2; zz3=z3, zz4=z4; zz5=z5;
   phi=ph; sw=s; swt=st;
   if(s>sx) setParameter(0, fParam0); //retrigger sweep
 }

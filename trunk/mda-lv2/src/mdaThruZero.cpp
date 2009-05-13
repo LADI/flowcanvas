@@ -32,12 +32,12 @@ mdaThruZero::mdaThruZero(audioMasterCallback audioMaster): AudioEffectX(audioMas
   setNumInputs(2);
   setNumOutputs(2);
   setUniqueID("mdaThruZero");  ///identify plug-in here
-	DECLARE_LVZ_DEPRECATED(canMono) ();				      
+	DECLARE_LVZ_DEPRECATED(canMono) ();
   canProcessReplacing();
 
   programs = new mdaThruZeroProgram[numPrograms]; ///////////////TODO: programs
   setProgram(0);
-  
+
   ///differences from default program...
   programs[1].param[0] = 0.50f;
   programs[1].param[1] = 0.20f;
@@ -56,7 +56,7 @@ mdaThruZero::mdaThruZero(audioMasterCallback audioMaster): AudioEffectX(audioMas
   strcpy(programs[3].name,"Mad Modulator");
 
 
-  
+
   ///initialise...
   bufpos  = 0;
   buffer  = new float[BUFMAX];
@@ -76,7 +76,7 @@ void mdaThruZero::resume() ///update internal parameters...
   dep = 2000.0f * param[1] * param[1];
   dem = dep - dep * param[4];
   dep -= dem;
-  
+
   wet = param[2];
   dry = 1.f - wet;
   if(param[0]<0.01f) { rat=0.0f; phi=(float)0.0f; }
@@ -111,10 +111,10 @@ void mdaThruZero::setProgram(LvzInt32 program)
 }
 
 
-void  mdaThruZero::setParameter(LvzInt32 index, float value) 
-{ 
+void  mdaThruZero::setParameter(LvzInt32 index, float value)
+{
   if(index==3) phi=0.0f; //reset cycle
-  param[index] = value; resume(); 
+  param[index] = value; resume();
 }
 
 
@@ -142,7 +142,7 @@ void mdaThruZero::getParameterDisplay(LvzInt32 index, char *text)
 
   switch(index)
   {
-    case  0: if(param[0]<0.01f) strcpy (string, "-"); 
+    case  0: if(param[0]<0.01f) strcpy (string, "-");
              else sprintf(string, "%.2f", (float)pow(10.0f ,2.0f - 3.0f * param[index])); break;
     case  1: sprintf(string, "%.2f", 1000.f * dep / getSampleRate()); break;
     case  3: sprintf(string, "%.0f", 200.0f * param[index] - 100.0f); break;
@@ -198,25 +198,25 @@ void mdaThruZero::processReplacing(float **inputs, float **outputs, LvzInt32 sam
   float *in2 = inputs[1];
   float *out1 = outputs[0];
   float *out2 = outputs[1];
-	float a, b, f=fb, f1=fb1, f2=fb2, ph=phi;	
+	float a, b, f=fb, f1=fb1, f2=fb2, ph=phi;
   float ra=rat, de=dep, we=wet, dr=dry, ds=deps, dm=dem;
   long  tmp, tmpi, bp=bufpos;
   float tmpf, dpt;
-  
-	--in1;	
-	--in2;	
+
+	--in1;
+	--in2;
 	--out1;
 	--out2;
 	while(--sampleFrames >= 0)
 	{
-		a = *++in1;		
-		b = *++in2; 
-		
-    ph += ra; 
+		a = *++in1;
+		b = *++in2;
+
+    ph += ra;
     if(ph>1.0f) ph -= 2.0f;
-    
+
     bp--; bp &= 0x7FF;
-    *(buffer  + bp) = a + f * f1; 
+    *(buffer  + bp) = a + f * f1;
     *(buffer2 + bp) = b + f * f2;
 
     //ds = 0.995f * (ds - de) + de;          //smoothed depth change ...try inc not mult
@@ -224,14 +224,14 @@ void mdaThruZero::processReplacing(float **inputs, float **outputs, LvzInt32 sam
     tmp  = int(tmpf);
     tmpf -= tmp;
     tmp = (tmp + bp) & 0x7FF;
-    tmpi = (tmp + 1) & 0x7FF; 
-        
+    tmpi = (tmp + 1) & 0x7FF;
+
     f1 = *(buffer  + tmp);  //try adding a constant to reduce denormalling
     f2 = *(buffer2 + tmp);
     f1 = tmpf * (*(buffer  + tmpi) - f1) + f1; //linear interpolation
     f2 = tmpf * (*(buffer2 + tmpi) - f2) + f2;
 
-    a = a * dr - f1 * we; 
+    a = a * dr - f1 * we;
 		b = b * dr - f2 * we;
 
     *++out1 = a;

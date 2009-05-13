@@ -1,15 +1,15 @@
 /* This file is part of Machina.
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * Machina is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
- * 
+ *
  * Machina is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
@@ -24,7 +24,7 @@
 #include "raul/WeakPtr.hpp"
 #include "raul/List.hpp"
 #include "raul/TimeSlice.hpp"
-#include "redlandmm/Model.hpp" 
+#include "redlandmm/Model.hpp"
 #include "types.hpp"
 #include "LearnRequest.hpp"
 #include "Node.hpp"
@@ -43,11 +43,11 @@ public:
 
 	// Kluge to appease Eugene
 	bool operator==(const Machine& other) { return false; }
-	
+
 	// Main context
 	void activate()   { _is_activated = true; }
 	void deactivate() { _is_activated = false; }
-	
+
 	bool is_empty()     { return _nodes.empty(); }
 	bool is_finished()  { return _is_finished; }
 	bool is_activated() { return _is_activated; }
@@ -61,7 +61,7 @@ public:
 	// Audio context
 	void         reset(Raul::TimeStamp time);
 	TimeDuration run(const Raul::TimeSlice& time);
-	
+
 	// Any context
 	inline Raul::TimeStamp time() const { return _time; }
 
@@ -76,9 +76,9 @@ public:
 	SharedPtr<Edge> random_edge();
 
 	void set_sink(SharedPtr<Raul::MIDISink> sink);
-	
+
 private:
-	
+
 	// Audio context
 	SharedPtr<Node> earliest_node() const;
 	bool enter_node(SharedPtr<Raul::MIDISink> sink, SharedPtr<Node> node);

@@ -1,6 +1,6 @@
 /* This file is part of Eugene
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * Eugene is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free
  * Software Foundation, either version 3 of the License, or (at your option)
@@ -133,7 +133,7 @@ void
 GAImpl<G>::iteration()
 {
 	++_generation;
-	
+
 	_selection->prepare(_population);
 
 	// Crossover
@@ -141,10 +141,10 @@ GAImpl<G>::iteration()
 			new typename Problem<G>::Population());
 
 	new_population->reserve(_population->size());
-	
+
 	// Elitism
 	new_population->insert(new_population->begin(), _elites.begin(), _elites.end());
-	
+
 	#pragma omp parallel
 	while (new_population->size() < _population->size()) {
 		const pair<typename Problem<G>::Population::const_iterator,
@@ -205,7 +205,7 @@ void
 GAImpl<G>::print_best() const
 {
 	_problem->print_gene(*_best.get());
-}		
+}
 
 
 template <typename G>
@@ -214,7 +214,7 @@ GAImpl<G>::print_population(ostream& str) const
 {
 	for (typename Problem<G>::Population::const_iterator i = _population->begin(); i != _population->end(); ++i)
 		_problem->print_gene(*i, str);
-}		
+}
 
 
 template <typename G>
@@ -223,7 +223,7 @@ GAImpl<G>::print_elites() const
 {
 	for (typename Elites::const_iterator i = _elites.begin(); i != _elites.end(); ++i)
 		_problem->print_gene(*i);
-}		
+}
 
 #endif
 

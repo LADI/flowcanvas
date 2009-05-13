@@ -1,15 +1,15 @@
 /* This file is part of redlandmm.
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * redlandmm is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
- * 
+ *
  * redlandmm is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
@@ -41,7 +41,7 @@ Model::Model(World& world)
 	: _world(world)
 	, _base(world, Node::RESOURCE, ".")
 	, _serialiser(NULL)
-{ 
+{
 	Glib::Mutex::Lock lock(world.mutex());
 	_storage = librdf_new_storage(_world.world(), "trees", NULL, NULL);
 	if (!_storage)
@@ -64,7 +64,7 @@ Model::Model(World& world, const Glib::ustring& data_uri, Glib::ustring base_uri
 	_c_obj = librdf_new_model(_world.world(), _storage, NULL);
 
 	librdf_uri* uri = librdf_new_uri(world.world(), (const unsigned char*)data_uri.c_str());
-	
+
 	if (uri) {
 		librdf_parser* parser = librdf_new_parser(world.world(), "guess", NULL, NULL);
 		// FIXME: locale kludges to work around librdf bug
@@ -77,7 +77,7 @@ Model::Model(World& world, const Glib::ustring& data_uri, Glib::ustring base_uri
 	} else {
 		cerr << "Unable to create URI " << data_uri << endl;
 	}
-	
+
 	if (uri)
 		librdf_free_uri(uri);
 
@@ -128,7 +128,7 @@ Model::set_base_uri(const Glib::ustring& uri)
 {
 	if (uri == "")
 		return;
-	
+
 	Glib::Mutex::Lock lock(_world.mutex());
 
 	assert(uri.find(":") != string::npos);
@@ -147,12 +147,12 @@ Model::setup_prefixes()
 		librdf_serializer_set_namespace(_serialiser,
 			librdf_new_uri(_world.world(), U(i->second.c_str())), i->first.c_str());
 	}
-	
+
 	/* Don't write @base directive */
 	librdf_serializer_set_feature(_serialiser,
 			librdf_new_uri(_world.world(), U("http://feature.librdf.org/raptor-writeBaseURI")),
 			Node(_world, Node::LITERAL, "0").get_node());
-	
+
 	/* Write relative URIs wherever possible */
 	librdf_serializer_set_feature(_serialiser,
 			librdf_new_uri(_world.world(), U("http://feature.librdf.org/raptor-relativeURIs")),
@@ -170,7 +170,7 @@ Model::serialise_to_file_handle(FILE* fd)
 	Glib::Mutex::Lock lock(_world.mutex());
 
 	_serialiser = librdf_new_serializer(_world.world(), RDF_LANG, NULL, NULL);
-	
+
 	setup_prefixes();
 	librdf_serializer_serialize_model_to_file_handle(
             _serialiser, fd, _base.get_uri(), _c_obj);
@@ -245,18 +245,18 @@ Model::add_statement(const Node& subject,
 
 	librdf_statement* triple = librdf_new_statement_from_nodes(_world.world(),
 			subject.get_node(), predicate.get_node(), object.get_node());
-	
+
 	librdf_model_add_statement(_c_obj, triple);
 }
 
-	
+
 void
 Model::add_statement(const Node&   subject,
                      const string& predicate_id,
                      const Node&   object)
 {
 	Glib::Mutex::Lock lock(_world.mutex());
-	
+
 	if (!object.get_node()) {
 		cerr << "WARNING: Object node is nil, statement skipped" << endl;
 		return;
@@ -268,7 +268,7 @@ Model::add_statement(const Node&   subject,
 
 	librdf_statement* triple = librdf_new_statement_from_nodes(_world.world(),
 			subject.get_node(), predicate, object.get_node());
-	
+
 	librdf_model_add_statement(_c_obj, triple);
 }
 
@@ -292,7 +292,7 @@ Model::Delta::Delta(const Model& from, const Model& to)
 	assert(from.world().c_obj() == to.world().c_obj());
 	librdf_model* a = from._c_obj;
 	librdf_model* b = to._c_obj;
-	
+
 	// Statement is in a but not in b: deletion
 	for (librdf_stream* s = librdf_model_as_stream(a);
 			!librdf_stream_end(s); librdf_stream_next(s)) {
@@ -300,7 +300,7 @@ Model::Delta::Delta(const Model& from, const Model& to)
 		if (!librdf_model_contains_statement(b, t))
 			_removals->add_statement(t);
 	}
-	
+
 	// Statement is in b but not in a: insertion
 	for (librdf_stream* s = librdf_model_as_stream(b);
 			!librdf_stream_end(s); librdf_stream_next(s)) {
@@ -386,12 +386,12 @@ Model::Delta::serialise(Model& model, const std::string& lang, const std::string
 	World& world = _additions->world();
 	Node root(world, Node::RESOURCE, ".");
 	world.add_prefix("cs", NS_CS);
-	
+
 	ChangeSets changes;
-	
+
 	serialise_changes(world, model, changes, true, root,
 			librdf_model_as_stream(_additions->c_obj()));
-	
+
 	serialise_changes(world, model, changes, false, root,
 			librdf_model_as_stream(_removals->c_obj()));
 }

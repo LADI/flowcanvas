@@ -1,16 +1,16 @@
 /* This file is part of Evoral.
  * Copyright (C) 2008 Dave Robillard <http://drobilla.net>
  * Copyright (C) 2000-2008 Paul Davis
- * 
+ *
  * Evoral is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
- * 
+ *
  * Evoral is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
@@ -95,7 +95,7 @@ Sequence<T>::const_iterator::const_iterator(const Sequence<T>& seq, T t)
 	ControlIterator earliest_control(boost::shared_ptr<ControlList>(), DBL_MAX, 0.0);
 
 	_control_iters.reserve(seq._controls.size());
-	
+
 	// find the earliest control event available
 	for (Controls::const_iterator i = seq._controls.begin(); i != seq._controls.end(); ++i) {
 		debugout << "Iterator: control: " << seq._type_map.to_symbol(i->first) << endl;
@@ -180,10 +180,10 @@ Sequence<T>::const_iterator::operator++()
 	if (_is_end) {
 		throw std::logic_error("Attempt to iterate past end of Sequence");
 	}
-	
+
 	debugout << "Iterator ++" << endl;
 	assert(_event->buffer() && _event->size() > 0);
-	
+
 	const MIDIEvent<T>& ev = *((MIDIEvent<T>*)_event.get());
 
 	//debugout << "const_iterator::operator++: " << _event->to_string() << endl;
@@ -297,7 +297,7 @@ Sequence<T>::const_iterator::operator=(const const_iterator& other)
 	_control_iters = other._control_iters;
 	size_t index   = other._control_iter - other._control_iters.begin();
 	_control_iter  = _control_iters.begin() + index;
-	
+
 	if (!_is_end && other._event) {
 		if (_event) {
 			*_event = *other._event.get();
@@ -361,15 +361,15 @@ Sequence<T>::read(EventSink<T>& dst, timestamp_t start, timedur_t nframes, times
 		assert(_read_iter->buffer());
 		dst.write(_read_iter->time() + offset,
 		          _read_iter->event_type(),
-		          _read_iter->size(), 
+		          _read_iter->size(),
 		          _read_iter->buffer());
-		
+
 		 debugout << this << " read event type " << _read_iter->event_type()
 			 << " @ " << _read_iter->time() << " : ";
 		 for (size_t i = 0; i < _read_iter->size(); ++i)
 			 debugout << hex << (int)_read_iter->buffer()[i];
 		 debugout << endl;
-		
+
 		++_read_iter;
 		++read_events;
 	}
@@ -391,7 +391,7 @@ Sequence<T>::control_to_midi_event(boost::shared_ptr< Event<T> >& ev, const Cont
 	if (!ev) {
 		ev = boost::shared_ptr< Event<T> >(new Event<T>(event_type, 0, 3, NULL, true));
 	}
-	
+
 	uint8_t midi_type = _type_map.parameter_midi_type(iter.list->parameter());
 	ev->set_event_type(_type_map.midi_event_type(midi_type));
 	switch (midi_type) {
@@ -400,7 +400,7 @@ Sequence<T>::control_to_midi_event(boost::shared_ptr< Event<T> >& ev, const Cont
 		assert(iter.list->parameter().channel() < 16);
 		assert(iter.list->parameter().id() <= INT8_MAX);
 		assert(iter.y <= INT8_MAX);
-		
+
 		ev->time() = iter.x;
 		ev->realloc(3);
 		ev->buffer()[0] = MIDI_CMD_CONTROL + iter.list->parameter().channel();
@@ -412,7 +412,7 @@ Sequence<T>::control_to_midi_event(boost::shared_ptr< Event<T> >& ev, const Cont
 		assert(iter.list.get());
 		assert(iter.list->parameter().channel() < 16);
 		assert(iter.y <= INT8_MAX);
-		
+
 		ev->time() = iter.x;
 		ev->realloc(2);
 		ev->buffer()[0] = MIDI_CMD_PGM_CHANGE + iter.list->parameter().channel();
@@ -423,7 +423,7 @@ Sequence<T>::control_to_midi_event(boost::shared_ptr< Event<T> >& ev, const Cont
 		assert(iter.list.get());
 		assert(iter.list->parameter().channel() < 16);
 		assert(iter.y < (1<<14));
-		
+
 		ev->time() = iter.x;
 		ev->realloc(3);
 		ev->buffer()[0] = MIDI_CMD_BENDER + iter.list->parameter().channel();
@@ -480,7 +480,7 @@ Sequence<T>::start_write()
 	_writing = true;
 	for (int i = 0; i < 16; ++i)
 		_write_notes[i].clear();
-	
+
 	_dirty_controls.clear();
 	write_unlock();
 }
@@ -524,7 +524,7 @@ Sequence<T>::end_write(bool delete_stuck)
 	for (ControlLists::const_iterator i = _dirty_controls.begin(); i != _dirty_controls.end(); ++i) {
 		(*i)->mark_dirty();
 	}
-	
+
 	_writing = false;
 	write_unlock();
 }
@@ -541,7 +541,7 @@ Sequence<T>::append(const Event<T>& event)
 {
 	write_lock();
 	_edited = true;
-	
+
 	const MIDIEvent<T>& ev = (const MIDIEvent<T>&)event;
 
 	assert(_notes.empty() || ev.time() >= _notes.back()->time());

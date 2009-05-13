@@ -21,17 +21,17 @@ mdaStereo::mdaStereo(audioMasterCallback audioMaster)	: AudioEffectX(audioMaster
   bufpos = 0;
 	buffer = new float[size];
 
-  setNumInputs(2);		  
-	setNumOutputs(2);		  
+  setNumInputs(2);
+	setNumOutputs(2);
 	setUniqueID("mdaStereo");    // identify here
-	DECLARE_LVZ_DEPRECATED(canMono) ();				      
-	canProcessReplacing();	
+	DECLARE_LVZ_DEPRECATED(canMono) ();
+	canProcessReplacing();
 	strcpy(programName, "Stereo Simulator");
 	suspend();		// flush buffer
 
   //calcs here!
   phi=0;
-  dphi=(float)(3.141 * pow(10.0,-2.0 + 3.0 * fParam5) / getSampleRate()); 
+  dphi=(float)(3.141 * pow(10.0,-2.0 + 3.0 * fParam5) / getSampleRate());
   mod=(float)(2100.0 * pow(fParam4, 2));
 
   if(fParam1<0.5)
@@ -82,7 +82,7 @@ void mdaStereo::setParameter(LvzInt32 index, float value)
     case 4: fParam5 = value; break;
   }
   //calcs here
-  dphi=(float)(3.141 * pow(10.0,-2.0 + 3.0 * fParam5) / getSampleRate()); 
+  dphi=(float)(3.141 * pow(10.0,-2.0 + 3.0 * fParam5) / getSampleRate());
   mod=(float)(2100.0 * pow(fParam4, 2));
 
   if(fParam1<0.5)
@@ -187,9 +187,9 @@ void mdaStereo::getParameterLabel(LvzInt32 index, char *label)
     case 0: if(fParam1<0.5) { strcpy(label, "Haas"); }
             else { strcpy(label, "Comb"); } break;
     case 1: strcpy(label, "ms"); break;
-    case 2: strcpy(label, ""); break; 
-    case 3: strcpy(label, "ms"); break; 
-    case 4: strcpy(label, "sec"); break; 
+    case 2: strcpy(label, ""); break;
+    case 3: strcpy(label, "ms"); break;
+    case 4: strcpy(label, "sec"); break;
   }
 }
 
@@ -202,32 +202,32 @@ void mdaStereo::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
 	float *in2 = inputs[1];
 	float *out1 = outputs[0];
 	float *out2 = outputs[1];
-	float a, b, c, d;	
+	float a, b, c, d;
   float li, ld, ri, rd, del, ph=phi, dph=dphi, mo=mod;
   long  tmp, bp = bufpos;
-  
+
   li = fli;
   ld = fld;
   ri = fri;
   rd = frd;
   del = fdel;
-    
-  --in1;	
-	--in2;	
+
+  --in1;
+	--in2;
 	--out1;
 	--out2;
-  
+
   if(mo>0.f) //modulated delay
   {
  	  while(--sampleFrames >= 0)
 	  {
 		  a = *++in1 + *++in2; //sum to mono
-		  
+
       c = out1[1];
 		  d = out2[1]; //process from here...
-          
+
       *(buffer + bp) = a; //write
-    
+
       tmp = (bp + (int)(del + fabs(mo * sin(ph)) ) ) % 4410;
       b = *(buffer + tmp);
       c += (a * li) - (b * ld); // output
@@ -237,21 +237,21 @@ void mdaStereo::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
 
       ph = ph + dph;
 
-      *++out1 = c;	
+      *++out1 = c;
 		  *++out2 = d;
 	  }
   }
   else
-  {   
+  {
     while(--sampleFrames >= 0)
 	  {
 		  a = *++in1 + *++in2; //sum to mono
-		  
+
       c = out1[1];
 		  d = out2[1]; //process from here...
-          
+
       *(buffer + bp) = a; //write
-    
+
       tmp = (bp + (int)(del) ) % 4410;
       b = *(buffer + tmp);
       c += (a * li) - (b * ld); // output
@@ -259,7 +259,7 @@ void mdaStereo::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
 
       bp = (bp - 1); if(bp < 0) bp = 4410; //buffer position
 
-      *++out1 = c;	
+      *++out1 = c;
 		  *++out2 = d;
 	  }
   }
@@ -273,18 +273,18 @@ void mdaStereo::processReplacing(float **inputs, float **outputs, LvzInt32 sampl
 	float *in2 = inputs[1];
 	float *out1 = outputs[0];
 	float *out2 = outputs[1];
-	float a, b, c, d;	
+	float a, b, c, d;
   float li, ld, ri, rd, del, ph=phi, dph=dphi, mo=mod;
   long tmp, bp = bufpos;
-  
+
   li = fli;
   ld = fld;
   ri = fri;
   rd = frd;
   del = fdel;
-    
-	--in1;	
-	--in2;	
+
+	--in1;
+	--in2;
 	--out1;
 	--out2;
 	if(mo>0.f) //modulated delay
@@ -292,16 +292,16 @@ void mdaStereo::processReplacing(float **inputs, float **outputs, LvzInt32 sampl
     while(--sampleFrames >= 0)
 	  {
 		  a = *++in1 + *++in2; //sum to mono
-		  
+
       *(buffer + bp) = a; //write
       tmp = (bp + (int)(del + fabs(mo * sin(ph)) ) ) % 4410;
       b = *(buffer + tmp);
 
 		  c = (a * li) - (b * ld); // output
 		  d = (a * ri) - (b * rd);
-		      
+
       bp = (bp - 1); if(bp < 0) bp = 4410; //buffer position
-      
+
       ph = ph + dph;
 
       *++out1 = c;
@@ -313,14 +313,14 @@ void mdaStereo::processReplacing(float **inputs, float **outputs, LvzInt32 sampl
     while(--sampleFrames >= 0)
 	  {
 		  a = *++in1 + *++in2; //sum to mono
-		  
+
       *(buffer + bp) = a; //write
       tmp = (bp + (int)(del) ) % 4410;
       b = *(buffer + tmp);
 
 		  c = (a * li) - (b * ld); // output
 		  d = (a * ri) - (b * rd);
-		      
+
       bp = (bp - 1); if(bp < 0) bp = 4410; //buffer position
 
       *++out1 = c;

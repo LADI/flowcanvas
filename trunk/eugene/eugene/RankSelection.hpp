@@ -1,6 +1,6 @@
 /* This file is part of Eugene
  * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ *
  * Eugene is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free
  * Software Foundation, either version 3 of the License, or (at your option)
@@ -30,7 +30,7 @@ struct RankSelection : public Selection<G> {
 		: Selection<G>(problem)
 		, _p(p)
 	{}
-	
+
 	void prepare(shared_ptr<typename Problem<G>::Population> pop) const {
 		GeneFitnessComparator<G> cmp(*(Selection<G>::_problem).get());
 		sort(pop->begin(), pop->end(), cmp);
@@ -56,7 +56,7 @@ struct RankSelection : public Selection<G> {
 
 		for (size_t i = 0; i < pop->size(); ++i) {
 			accum += powf(_p, (float)i);
-		
+
 			if (result.first == pop->end() && accum >= spin_1) {
 				result.first = pop->begin() + i;
 				if (result.second != pop->end())
