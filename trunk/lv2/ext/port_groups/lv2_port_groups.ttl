@@ -1,0 +1,235 @@
+# LV2 Port Groups Extension
+# PROVISIONAL
+# Copyright (C) 2009 Dave Robillard <dave@drobilla.net>
+#
+# Permission is hereby granted, free of charge, to any person obtaining a
+# copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+# OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+# ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+# OTHER DEALINGS IN THE SOFTWARE.
+
+@prefix :     <http://lv2plug.in/ns/dev/port-groups#> .
+@prefix lv2:  <http://lv2plug.in/ns/lv2core#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema> .
+@prefix doap: <http://usefulinc.com/ns/doap#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+
+<http://lv2plug.in/ns/dev/port-groups> a lv2:Specification ;
+	doap:license <http://usefulinc.com/doap/licenses/mit> ;
+	doap:name    "LV2 Port Groups" ;
+	rdfs:comment "Defines groupings of LV2 ports into multi-channel streams" ;
+	doap:maintainer [
+		a foaf:Person ;
+		foaf:name     "Dave Robillard" ;
+		foaf:homepage <http://drobilla.net/> ;
+		rdfs:seeAlso  <http://drobilla.net/drobilla.rdf>
+	] .
+
+
+## Core Classes / Properties
+
+:Group a rdfs:Class ;
+    rdfs:label   "LV2 Port Group" ;
+    rdfs:comment """
+A grouping of ports that can be logically considered a "stream", e.g.
+two audio ports in a group forming a stereo stream.  Both inputs and
+outputs can form a group, which allows describing to the host which
+outputs correspond to which inputs.  In this case, outputs with a given
+role correspond to the inputs in the same group with that role (though
+the output and input roles of a group do not necessarily match).
+""" .
+
+:mainGroup a rdf:Property ;
+	rdfs:domain  lv2:Plugin ;
+	rdfs:range   :Group ;
+    rdfs:label   "Main port group" ;
+    rdfs:comment """
+Indicates that this port group should be considered the "main" inputs/outputs
+of the plugin, e.g. a stereo effect has a "main" group with 2 inputs and 2
+outputs.  A plugin MUST have at most one :mainGroup property.
+""" .
+
+:inGroup a rdf:Property ;
+	rdfs:domain  lv2:Port ;
+	rdfs:range   :Group ;
+    rdfs:label   "In port group" ;
+    rdfs:comment """
+Indicates that this port is a part of a group of ports on the plugin.
+Ports that have a meaningful "role" that may be useful to hosts SHOULD
+also have a :role property, otherwise ports in the group have no meaningful
+order.""" .
+
+:Role a rdfs:Class ;
+    rdfs:label   "Port role" ;
+    rdfs:comment """
+The role of a port with respect to its plugin or group.
+
+If the port is a member of a group (has an :inGroup property) the
+role is relevant with respect to that group.  Otherwise the role
+is relevant with respect to the plugin.
+""" .
+
+:hasRole a rdf:Property ;
+	rdfs:domain  lv2:Port ;
+	rdfs:range   :Role ;
+    rdfs:label   "Has role" ;
+    rdfs:comment """
+Indicates that this port has a particular role with respect to its enclosing
+plugin or group (whichever is smaller).  A port may have several roles if it
+makes sense to do so; some roles may forbid this or define more specific
+restrictions.
+""" .
+
+:Configuration a rdfs:Class ;
+    rdfs:label      "Configuration" ;
+    rdfs:comment    """
+The role of a port with respect to its plugin or group.
+
+If the port is a member of a group (has an :inGroup property) the
+role is relevant with respect to that group.  Otherwise the role
+is relevant with respect to the plugin.
+""" .
+
+
+## Standard Roles
+#
+# These can be used to describe stereo, 3.0, 4.0, 5.1, 6.1, 7.1, and more.
+
+:left a :Role ;
+	rdfs:label "Left" ;
+	rdfs:comment "A port with this role MUST NOT also have the role :right" .
+
+:right a :Role ;
+	rdfs:label "Right" ;
+	rdfs:comment "A port with this role MUST NOT also have the role :left" .
+
+:center a :Role ;
+	rdfs:label "Center" ;
+	rdfs:comment """
+The 'center' along the :left to :right axis.
+Alone, it indicates the port is in the exact center of :left and :right.
+It may also be combined with :left or :right to describe positions in-between,
+describing 5 positions along the :left to :right axis:
+
+ left (L), center-left (CL), center (C), center-right (CR), right (R)
+""" .
+
+:front a :Role ;
+	rdfs:label "Front" ;
+	rdfs:comment "A port with this role MUST NOT also have the role :back" .
+
+:back a :Role ;
+	rdfs:label "Back" ;
+	rdfs:comment "A port with this role MUST NOT also have the role :front" .
+
+:side a :Role ;
+	rdfs:label "Side" ;
+	rdfs:comment """
+The 'center' along the :front to :back axis.
+This may be combined with :front to :back in the same way :center may be
+combined with :left and :right, though no common audio setups require this.
+""" .
+
+:sub a :Role ;
+	rdfs:label "Sub" ;
+	rdfs:comment """
+A subwoofer, or "low frequency effects" (LFE) channel.
+This role may be associated with a position using other roles,
+but is usually used alone to designate a non-positional sub channel.
+""" .
+
+
+## Standard Groups 
+#
+# Plugins may either use these groups directly, or define their own groups
+# which MAY be rdfs:subClassOf these groups.  If a group is a subclass of
+# another group G, it must have at least the ports required by G, and any
+# other ports in the group MUST be lv2:connectionOptional.
+
+:Mono a :Group ;
+	rdfs:label "Mono" ;
+	rdfs:comment """A group with:
+ * 1 :center
+""" .
+
+:Stereo a :Group ;
+	rdfs:label "Stereo" ;
+	rdfs:comment """A group with:
+ * 1 :left
+ * 1 :right
+""" .
+
+:FourPointZero a :Group ;
+	rdfs:label "4.0 Surround" ;
+	rdfs:comment """4.0 Surround (Quadraphonic), a group with:
+ * 1 :front :left
+ * 1 :front :right
+ * 1 :rear  :left
+ * 1 :rear  :right
+""" .
+
+:FivePointOne a :Group ;
+	rdfs:label "5.1 Surround" ;
+	rdfs:comment """5.1 Surround (3-2 stereo), a group with:
+ * 1 :front :left
+ * 1 :front :right
+ * 1 :front :center (:front may be omitted)
+ * 1 :rear  :left
+ * 1 :rear  :right
+ * 1 :sub
+""" .
+
+:SixPointOne a :Group ;
+	rdfs:label "6.1 Surround" ;
+	rdfs:comment """6.1 Surround, a group with:
+ * 1 :front :left
+ * 1 :front :right
+ * 1 :front :center
+ * 1 :side  :left
+ * 1 :side  :right
+ * 1 :rear  :center
+ * 1 :sub
+""" .
+
+:SevenPointOne a :Group ;
+	rdfs:label "7.1 Surround" ;
+	rdfs:comment """7.1 Surround, a group with:
+ * 1 :front :left
+ * 1 :front :right
+ * 1 :front :center
+ * 1 :side  :left
+ * 1 :side  :right
+ * 1 :rear  :left
+ * 1 :rear  :right
+ * 1 :sub
+""" .
+
+:SevenPointOneWide a :Group ;
+	rdfs:label "7.1 Surround (Wide)" ;
+	rdfs:comment """7.1 Surround (Wide), a group with:
+ * 1 :front :left
+ * 1 :front :left :center
+ * 1 :front :center
+ * 1 :front :right :center
+ * 1 :front :right
+ * 1 :rear  :left
+ * 1 :rear  :right
+ * 1 :sub
+""" .
+
+
