@@ -95,16 +95,6 @@ makes sense to do so; some roles may forbid this or define more specific
 restrictions.
 """ .
 
-:Configuration a rdfs:Class ;
-    rdfs:label      "Configuration" ;
-    rdfs:comment    """
-The role of a port with respect to its plugin or group.
-
-If the port is a member of a group (has an :inGroup property) the
-role is relevant with respect to that group.  Otherwise the role
-is relevant with respect to the plugin.
-""" .
-
 
 ## Standard Roles
 #
