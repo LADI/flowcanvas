@@ -1,6 +1,8 @@
 # LV2 Port Groups Extension
 # PROVISIONAL
 # Copyright (C) 2009 Dave Robillard <dave@drobilla.net>
+# Based on <http://ll-plugins.nongnu.org/lv2/ext/portgroups#>
+# by Lars Luthman
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -20,7 +22,7 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-@prefix :     <http://lv2plug.in/ns/dev/port-groups#> .
+@prefix pg:   <http://lv2plug.in/ns/dev/port-groups#> .
 @prefix lv2:  <http://lv2plug.in/ns/lv2core#> .
 @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
@@ -31,11 +33,16 @@
 
 <http://lv2plug.in/ns/dev/port-groups> a lv2:Specification ;
 	doap:license <http://usefulinc.com/doap/licenses/mit> ;
-	doap:name    "LV2 Port Groups" ;
-	rdfs:comment "Defines groupings of LV2 ports into multi-channel streams" ;
+	doap:name	"LV2 Port Groups" ;
+	rdfs:comment "Defines meaningful groupings of LV2 ports" ;
+	doap:developer [
+		a foaf:Person ;
+		foaf:name	 "Lars Luthman" ;
+		foaf:mbox     <mailto:lars.luthman@gmail.com>
+	] ;
 	doap:maintainer [
 		a foaf:Person ;
-		foaf:name     "Dave Robillard" ;
+		foaf:name	 "Dave Robillard" ;
 		foaf:homepage <http://drobilla.net/> ;
 		rdfs:seeAlso  <http://drobilla.net/drobilla.rdf>
 	] .
@@ -43,9 +50,9 @@
 
 ## Core Classes / Properties
 
-:Group a rdfs:Class ;
-    rdfs:label   "LV2 Port Group" ;
-    rdfs:comment """
+pg:Group a rdfs:Class ;
+	rdfs:label   "LV2 Port Group" ;
+	rdfs:comment """
 A grouping of ports that can be logically considered a "stream", e.g.
 two audio ports in a group forming a stereo stream.  Both inputs and
 outputs can form a group, which allows describing to the host which
@@ -54,29 +61,58 @@ role correspond to the inputs in the same group with that role (though
 the output and input roles of a group do not necessarily match).
 """ .
 
-:mainGroup a rdf:Property ;
-	rdfs:domain  lv2:Plugin ;
-	rdfs:range   :Group ;
-    rdfs:label   "Main port group" ;
-    rdfs:comment """
-Indicates that this port group should be considered the "main" inputs/outputs
-of the plugin, e.g. a stereo effect has a "main" group with 2 inputs and 2
-outputs.  A plugin MUST have at most one :mainGroup property.
+pg:requiredRole a rdf:Property ;
+	rdfs:domain  pg:Group ;
+	rdfs:range   lv2:Port ;
+	rdfs:label   "Has port with role" ;
+	rdfs:comment """
+Indicates that a group always has a port with a particular role.
 """ .
 
-:inGroup a rdf:Property ;
+pg:optionalRole a rdf:Property ;
+	rdfs:domain  pg:Group ;
+	rdfs:range   lv2:Port ;
+	rdfs:label   "May have port with role" ;
+	rdfs:comment """
+Indicates that a group may have a port with a particular role.
+""" .
+
+pg:sideChainOf a rdf:Property ;
+	rdfs:domain  pg:Group ;
+	rdfs:range   pg:Group ;
+	rdfs:label   "Side-chain of" ;
+	rdfs:comment """
+Indicates that this port group should be considered a "side chain" of some
+other group.  The precise definition of "side chain" depends on the plugin,
+but in general this group should be considered a modifier to some other
+group, rather than an independent input itself.
+""" .
+
+pg:mainGroup a rdf:Property ;
+	rdfs:domain  lv2:Plugin ;
+	rdfs:range   pg:Group ;
+	rdfs:label   "Main port group" ;
+	rdfs:comment """
+Indicates that this port group should be considered the "main" inputs/outputs
+of the plugin, e.g. a stereo effect has a "main" group with 2 inputs and 2
+outputs.  A plugin MUST NOT have more than one :mainGroup property.  High-level
+hosts that simply want to insert an plugin in a given stream should use
+this property to determine where the plugin 'fits'.
+""" .
+
+pg:inGroup a rdf:Property ;
 	rdfs:domain  lv2:Port ;
-	rdfs:range   :Group ;
-    rdfs:label   "In port group" ;
-    rdfs:comment """
+	rdfs:range   pg:Group ;
+	rdfs:label   "In port group" ;
+	rdfs:comment """
 Indicates that this port is a part of a group of ports on the plugin.
 Ports that have a meaningful "role" that may be useful to hosts SHOULD
 also have a :role property, otherwise ports in the group have no meaningful
 order.""" .
 
-:Role a rdfs:Class ;
-    rdfs:label   "Port role" ;
-    rdfs:comment """
+pg:Role a rdfs:Class ;
+	rdfs:label   "Port role" ;
+	rdfs:comment """
 The role of a port with respect to its plugin or group.
 
 If the port is a member of a group (has an :inGroup property) the
@@ -84,142 +120,231 @@ role is relevant with respect to that group.  Otherwise the role
 is relevant with respect to the plugin.
 """ .
 
-:hasRole a rdf:Property ;
+pg:hasRole a rdf:Property ;
 	rdfs:domain  lv2:Port ;
-	rdfs:range   :Role ;
-    rdfs:label   "Has role" ;
-    rdfs:comment """
+	rdfs:range   pg:Role ;
+	rdfs:label   "Has role" ;
+	rdfs:comment """
 Indicates that this port has a particular role with respect to its enclosing
 plugin or group (whichever is smaller).  A port may have several roles if it
-makes sense to do so; some roles may forbid this or define more specific
-restrictions.
+makes sense to do so (though some Role or Group definition may forbid this).
 """ .
 
 
 ## Standard Roles
-#
-# These can be used to describe stereo, 3.0, 4.0, 5.1, 6.1, 7.1, and more.
 
-:left a :Role ;
-	rdfs:label "Left" ;
-	rdfs:comment "A port with this role MUST NOT also have the role :right" .
-
-:right a :Role ;
-	rdfs:label "Right" ;
-	rdfs:comment "A port with this role MUST NOT also have the role :left" .
-
-:center a :Role ;
-	rdfs:label "Center" ;
-	rdfs:comment """
-The 'center' along the :left to :right axis.
-Alone, it indicates the port is in the exact center of :left and :right.
-It may also be combined with :left or :right to describe positions in-between,
-describing 5 positions along the :left to :right axis:
-
- left (L), center-left (CL), center (C), center-right (CR), right (R)
-""" .
-
-:front a :Role ;
-	rdfs:label "Front" ;
-	rdfs:comment "A port with this role MUST NOT also have the role :back" .
-
-:back a :Role ;
-	rdfs:label "Back" ;
-	rdfs:comment "A port with this role MUST NOT also have the role :front" .
-
-:side a :Role ;
-	rdfs:label "Side" ;
-	rdfs:comment """
-The 'center' along the :front to :back axis.
-This may be combined with :front to :back in the same way :center may be
-combined with :left and :right, though no common audio setups require this.
-""" .
-
-:sub a :Role ;
-	rdfs:label "Sub" ;
-	rdfs:comment """
-A subwoofer, or "low frequency effects" (LFE) channel.
-This role may be associated with a position using other roles,
-but is usually used alone to designate a non-positional sub channel.
-""" .
+pg:leftChannel          a pg:Role ; rdfs:label "Left" .
+pg:rightChannel         a pg:Role ; rdfs:label "Right" .
+pg:centerChannel        a pg:Role ; rdfs:label "Center" .
+pg:sideChannel          a pg:Role ; rdfs:label "Side" .
+pg:surroundChannel      a pg:Role ; rdfs:label "Surround" .
+pg:leftSurroundChannel  a pg:Role ; rdfs:label "Left Surround" .
+pg:rightSurroundChannel a pg:Role ; rdfs:label "Right Surround" .
+pg:leftRearChannel      a pg:Role ; rdfs:label "Left Rear" .
+pg:rightRearChannel     a pg:Role ; rdfs:label "Right Rear" .
+pg:subChannel           a pg:Role ; rdfs:label "Sub (LFE)" .
+pg:amplitude            a pg:Role ; rdfs:label "Amplitude" .
+pg:attack               a pg:Role ; rdfs:label "Attach" .
+pg:cutoffFrequency      a pg:Role ; rdfs:label "Cutoff Frequency" .
+pg:decay                a pg:Role ; rdfs:label "Decay" .
+pg:delay                a pg:Role ; rdfs:label "Delay" .
+pg:frequency            a pg:Role ; rdfs:label "Frequency" .
+pg:hold                 a pg:Role ; rdfs:label "Hold" .
+pg:pulseWidth           a pg:Role ; rdfs:label "Pulse Width" .
+pg:ratio                a pg:Role ; rdfs:label "Ratio" .
+pg:release              a pg:Role ; rdfs:label "Release" .
+pg:resonance            a pg:Role ; rdfs:label "Resonance" .
+pg:sustain              a pg:Role ; rdfs:label "Sustain" .
+pg:threshold            a pg:Role ; rdfs:label "Threshold" .
+pg:waveform             a pg:Role ; rdfs:label "Waveform" .
 
 
 ## Standard Groups 
-#
-# Plugins may either use these groups directly, or define their own groups
-# which MAY be rdfs:subClassOf these groups.  If a group is a subclass of
-# another group G, it must have at least the ports required by G, and any
-# other ports in the group MUST be lv2:connectionOptional.
 
-:Mono a :Group ;
+pg:MonoGroup a pg:Group ;
 	rdfs:label "Mono" ;
-	rdfs:comment """A group with:
- * 1 :center
-""" .
+	pg:hasPort pg:centerChannel .
 
-:Stereo a :Group ;
+pg:StereoGroup a pg:Group ;
 	rdfs:label "Stereo" ;
-	rdfs:comment """A group with:
- * 1 :left
- * 1 :right
-""" .
+	pg:hasPort pg:leftChannel ;
+	pg:hasPort pg:rightChannel .
 
-:FourPointZero a :Group ;
-	rdfs:label "4.0 Surround" ;
-	rdfs:comment """4.0 Surround (Quadraphonic), a group with:
- * 1 :front :left
- * 1 :front :right
- * 1 :rear  :left
- * 1 :rear  :right
-""" .
+pg:MidSideGroup a pg:Group ;
+	rdfs:label "Mid-Side Stereo" ;
+	pg:hasPort pg:centerChannel ;
+	pg:hasPort pg:sideChannel .
 
-:FivePointOne a :Group ;
-	rdfs:label "5.1 Surround" ;
-	rdfs:comment """5.1 Surround (3-2 stereo), a group with:
- * 1 :front :left
- * 1 :front :right
- * 1 :front :center (:front may be omitted)
- * 1 :rear  :left
- * 1 :rear  :right
- * 1 :sub
-""" .
+pg:ThreePointZeroGroup a pg:Group ;
+	rdfs:label "3.0 Surround" ;
+	pg:hasPort pg:leftChannel ;
+	pg:hasPort pg:rightChannel ;
+	pg:hasPort pg:surroundChannel .
 
-:SixPointOne a :Group ;
+pg:FourPointZeroGroup a pg:Group ;
+	rdfs:label "4.0 Surround (Quadraphonic)" ;
+	pg:hasPort pg:leftChannel ;
+	pg:hasPort pg:rightChannel ;
+	pg:hasPort pg:centerChannel ;
+	pg:hasPort pg:surroundChannel .
+
+pg:FivePointZeroGroup a pg:Group ;
+	rdfs:label "5.0 Surround (3-2 stereo)" ;
+	pg:hasPort pg:leftChannel ;
+	pg:hasPort pg:rightChannel ;
+	pg:hasPort pg:centerChannel ;
+	pg:hasPort pg:leftSurroundChannel ;
+	pg:hasPort pg:rightSurroundChannel .
+
+pg:FivePointOneGroup a pg:Group ;
+	rdfs:label "5.1 Surround (3-2 stereo)" ;
+	pg:hasPort pg:leftChannel ;
+	pg:hasPort pg:rightChannel ;
+	pg:hasPort pg:centerChannel ;
+	pg:hasPort pg:leftSurroundChannel ;
+	pg:hasPort pg:rightSurroundChannel ;
+	pg:hasPort pg:lfeChannel .
+
+pg:SixPointOneGroup a pg:Group ;
 	rdfs:label "6.1 Surround" ;
-	rdfs:comment """6.1 Surround, a group with:
- * 1 :front :left
- * 1 :front :right
- * 1 :front :center
- * 1 :side  :left
- * 1 :side  :right
- * 1 :rear  :center
- * 1 :sub
-""" .
+	pg:hasPort pg:leftChannel ;
+	pg:hasPort pg:rightChannel ;
+	pg:hasPort pg:centerChannel ;
+	pg:hasPort pg:leftSurroundChannel ;
+	pg:hasPort pg:rightSurroundChannel ;
+	pg:hasPort pg:centerRearChannel ;
+	pg:hasPort pg:lfeChannel .
 
-:SevenPointOne a :Group ;
+pg:SevenPointOneGroup a pg:Group ;
 	rdfs:label "7.1 Surround" ;
-	rdfs:comment """7.1 Surround, a group with:
- * 1 :front :left
- * 1 :front :right
- * 1 :front :center
- * 1 :side  :left
- * 1 :side  :right
- * 1 :rear  :left
- * 1 :rear  :right
- * 1 :sub
-""" .
+	pg:hasPort pg:leftChannel ;
+	pg:hasPort pg:rightChannel ;
+	pg:hasPort pg:centerChannel ;
+	pg:hasPort pg:leftSurroundChannel ;
+	pg:hasPort pg:rightSurroundChannel ;
+	pg:hasPort pg:leftRearChannel ;
+	pg:hasPort pg:rightRearChannel ;
+	pg:hasPort pg:lfeChannel .
 
-:SevenPointOneWide a :Group ;
-	rdfs:label "7.1 Surround (Wide)" ;
-	rdfs:comment """7.1 Surround (Wide), a group with:
- * 1 :front :left
- * 1 :front :left :center
- * 1 :front :center
- * 1 :front :right :center
- * 1 :front :right
- * 1 :rear  :left
- * 1 :rear  :right
- * 1 :sub
-""" .
+pg:AmbisonicBH1V0Group a pg:Group ;
+	rdfs:label "Ambisonic B stream of horizontal order 1 and vertical order 0." ;
+	pg:hasPort pg:wChannel ;
+	pg:hasPort pg:xChannel ;
+	pg:hasPort pg:yChannel .
 
+pg:AmbisonicBH1V1Group a pg:Group ;
+	rdfs:label "Ambisonic B stream of horizontal order 1 and vertical order 1." ;
+	pg:hasPort pg:wChannel ;
+	pg:hasPort pg:xChannel ;
+	pg:hasPort pg:yChannel ;
+	pg:hasPort pg:zChannel .
+
+pg:AmbisonicBH2V0Group a pg:Group ;
+	rdfs:label "Ambisonic B stream of horizontal order 2 and vertical order 0." ;
+	pg:hasPort pg:wChannel ;
+	pg:hasPort pg:xChannel ;
+	pg:hasPort pg:yChannel ;
+	pg:hasPort pg:uChannel ;
+	pg:hasPort pg:vChannel .
+
+pg:AmbisonicBH2V1Group a pg:Group ;
+	rdfs:label "Ambisonic B stream of horizontal order 2 and vertical order 1." ;
+	pg:hasPort pg:wChannel ;
+	pg:hasPort pg:xChannel ;
+	pg:hasPort pg:yChannel ;
+	pg:hasPort pg:zChannel ;
+	pg:hasPort pg:uChannel ;
+	pg:hasPort pg:vChannel .
+
+pg:AmbisonicBH2V2Group a pg:Group ;
+	rdfs:label "Ambisonic B stream of horizontal order 2 and vertical order 2." ;
+	pg:hasPort pg:wChannel ;
+	pg:hasPort pg:xChannel ;
+	pg:hasPort pg:yChannel ;
+	pg:hasPort pg:zChannel ;
+	pg:hasPort pg:rChannel ;
+	pg:hasPort pg:sChannel ;
+	pg:hasPort pg:tChannel ;
+	pg:hasPort pg:uChannel ;
+	pg:hasPort pg:vChannel .
+
+pg:AmbisonicBH3V0Group a pg:Group ;
+	rdfs:label "Ambisonic B stream of horizontal order 3 and vertical order 0." ;
+	pg:hasPort pg:wChannel ;
+	pg:hasPort pg:xChannel ;
+	pg:hasPort pg:yChannel ;
+	pg:hasPort pg:uChannel ;
+	pg:hasPort pg:vChannel ;
+	pg:hasPort pg:pChannel ;
+	pg:hasPort pg:qChannel .
+
+pg:AmbisonicBH3V1Group a pg:Group ;
+	rdfs:label "Ambisonic B stream of horizontal order 3 and vertical order 1." ;
+	pg:hasPort pg:wChannel ;
+	pg:hasPort pg:xChannel ;
+	pg:hasPort pg:yChannel ;
+	pg:hasPort pg:zChannel ;
+	pg:hasPort pg:uChannel ;
+	pg:hasPort pg:vChannel ;
+	pg:hasPort pg:pChannel ;
+	pg:hasPort pg:qChannel .
+
+pg:AmbisonicBH3V2Group a pg:Group ;
+	rdfs:label "Ambisonic B stream of horizontal order 3 and vertical order 2." ;
+	pg:hasPort pg:wChannel ;
+	pg:hasPort pg:xChannel ;
+	pg:hasPort pg:yChannel ;
+	pg:hasPort pg:zChannel ;
+	pg:hasPort pg:rChannel ;
+	pg:hasPort pg:sChannel ;
+	pg:hasPort pg:tChannel ;
+	pg:hasPort pg:uChannel ;
+	pg:hasPort pg:vChannel ;
+	pg:hasPort pg:pChannel ;
+	pg:hasPort pg:qChannel .
+
+pg:AmbisonicBH3V3Group a pg:Group ;
+	rdfs:label "Ambisonic B stream of horizontal order 3 and vertical order 3." ;
+	pg:hasPort pg:wChannel ;
+	pg:hasPort pg:xChannel ;
+	pg:hasPort pg:yChannel ;
+	pg:hasPort pg:zChannel ;
+	pg:hasPort pg:rChannel ;
+	pg:hasPort pg:sChannel ;
+	pg:hasPort pg:tChannel ;
+	pg:hasPort pg:uChannel ;
+	pg:hasPort pg:vChannel ;
+	pg:hasPort pg:kChannel ;
+	pg:hasPort pg:lChannel ;
+	pg:hasPort pg:mChannel ;
+	pg:hasPort pg:nChannel ;
+	pg:hasPort pg:oChannel ;
+	pg:hasPort pg:pChannel ;
+	pg:hasPort pg:qChannel .
+
+pg:EnvelopeControlGroup a pg:Group ;
+	rdfs:label "The controls for an envelope." ;
+	pg:mayHavePort pg:delay ;
+	pg:mayHavePort pg:attack ;
+	pg:mayHavePort pg:hold ;
+	pg:mayHavePort pg:decay ;
+	pg:mayHavePort pg:sustain ;
+	pg:mayHavePort pg:release .
+
+pg:OscillatorControlGroup a pg:Group ;
+	rdfs:label "The controls for an oscillator." ;
+	pg:mayHavePort pg:frequency ;
+	pg:mayHavePort pg:amplitude ;
+	pg:mayHavePort pg:waveform ;
+	pg:mayHavePort pg:pulseWidth .
+
+pg:FilterControlGroup
+	rdfs:label "The controls for a filter." ;
+	pg:mayHavePort pg:cutoffFrequency ;
+	pg:mayHavePort pg:resonance .
+
+pg:CompressorControlGroup
+	rdfs:label "The controls for a compressor." ;
+	pg:mayHavePort pg:threshold ;
+	pg:mayHavePort pg:ratio .
 
