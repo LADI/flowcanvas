@@ -76,7 +76,8 @@ ns_list = { "http://www.w3.org/1999/02/22-rdf-syntax-ns#"   : "rdf",
             "http://purl.org/rss/1.0/modules/content/"      : "content", 
             "http://www.w3.org/2003/01/geo/wgs84_pos#"      : "geo",
             "http://www.w3.org/2004/02/skos/core#"          : "skos",
-            "http://lv2plug.in/ns/lv2core#"                 : "lv2"
+            "http://lv2plug.in/ns/lv2core#"                 : "lv2",
+            "http://usefulinc.com/ns/doap#"                 : "doap"
           }
 
 rdf = RDF.NS('http://www.w3.org/1999/02/22-rdf-syntax-ns#')
@@ -84,6 +85,7 @@ rdfs = RDF.NS('http://www.w3.org/2000/01/rdf-schema#')
 owl = RDF.NS('http://www.w3.org/2002/07/owl#')
 vs = RDF.NS('http://www.w3.org/2003/06/sw-vocab-status/ns#')
 lv2 = RDF.NS('http://lv2plug.in/ns/lv2core#')
+doap = RDF.NS('http://usefulinc.com/ns/doap#')
 
 termdir = './doc' #TODO
 
@@ -367,12 +369,13 @@ def docTerms(category, list, m):
                 term = spec_ns[t]
                 curie = "%s:%s" % (nspre, t)
         
-        doc += """<div class="specterm" id="term_%s">\n<h3>%s: %s</h3>\n""" % (t, category, curie)
         try:
             term_uri = term.uri
         except:
             term_uri = term
-        doc += """<p style="font-family:monospace; font-size:0.em;">URI: <a href="%s">%s</a></p>""" % (term_uri, term_uri)
+        
+        doc += """<div class="specterm" id="term_%s">\n<h3>%s: <a href="%s">%s</a></h3>\n""" % (t, category, term_uri, curie)
+
         label, comment = get_rdfs(m, term)    
         status = get_status(m, term)
         doc += "<p><em>%s</em></p>" % label
@@ -521,6 +524,13 @@ def specInformation(m, ns):
 
     return classlist, proplist
 
+def specProperty(m, subject, predicate):
+    "Return the rdfs:comment of the spec."
+    for c in m.find_statements(RDF.Statement(None, predicate, None)):
+        if str(c.subject.uri) == str(subject):
+            return str(c.object)
+    return ''
+
 def getInstances(model, classes, properties):
     """
     Extract all resources instanced in the ontology
@@ -607,12 +617,13 @@ def specgen(specloc, template, instances=False, mode="spec"):
     template += ("<!-- generated from %s by %s at %s -->" %
         (os.path.basename(specloc), os.path.basename(sys.argv[0]), time.strftime('%X %x %Z')))
 
-    template = template.replace('@NAME@', 'LV2 Port Groups')
+    template = template.replace('@NAME@', specProperty(m, spec_url, doap.name))
     template = template.replace('@URI@', spec_url)
     template = template.replace('@PREFIX@', spec_pre)
     template = template.replace('@BASE@', spec_ns_str)
     template = template.replace('@FILENAME@', os.path.basename(specloc))
     template = template.replace('@MAIL@', 'devel@lists.lv2plug.in')
+    template = template.replace('@COMMENT@', specProperty(m, spec_url, rdfs.comment))
     
     return template
 
