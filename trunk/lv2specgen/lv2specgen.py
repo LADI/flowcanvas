@@ -71,7 +71,6 @@ ns_list = { "http://www.w3.org/1999/02/22-rdf-syntax-ns#"   : "rdf",
             "http://xmlns.com/foaf/0.1/"                    : "foaf", 
             "http://purl.org/dc/elements/1.1/"              : "dc",
             "http://purl.org/dc/terms/"                     : "dct",
-            "http://usefulinc.com/ns/doap#"                 : "doap",
             "http://www.w3.org/2003/06/sw-vocab-status/ns#" : "status",
             "http://purl.org/rss/1.0/modules/content/"      : "content", 
             "http://www.w3.org/2003/01/geo/wgs84_pos#"      : "geo",
@@ -86,6 +85,7 @@ owl = RDF.NS('http://www.w3.org/2002/07/owl#')
 vs = RDF.NS('http://www.w3.org/2003/06/sw-vocab-status/ns#')
 lv2 = RDF.NS('http://lv2plug.in/ns/lv2core#')
 doap = RDF.NS('http://usefulinc.com/ns/doap#')
+foaf = RDF.NS('http://xmlns.com/foaf/0.1/')
 
 termdir = './doc' #TODO
 
@@ -149,7 +149,7 @@ def htmlDocInfo( t ):
         doc = f.read()
         doc = termlink(doc)
     except:
-        return "" 	# "<p>No detailed documentation for this term.</p>"
+        return "" # "<p>No detailed documentation for this term.</p>"
     return doc
 
 
@@ -323,7 +323,7 @@ def owlInfo(term,m):
     o = m.find_statements( RDF.Statement(term, rdf.type, owl.DatatypeProperty) )
     if o.current():
         res += "<dt>OWL Type:</dt><dd>DatatypeProperty</dd>\n"
-	
+
     # Object Property ( owl.ObjectProperty )
     o = m.find_statements( RDF.Statement(term, rdf.type, owl.ObjectProperty) )
     if o.current():
@@ -343,7 +343,7 @@ def owlInfo(term,m):
     o = m.find_statements( RDF.Statement(term, rdf.type, owl.SymmetricProperty) )
     if o.current():
         res += "<dt>OWL Type:</dt><dd>SymmetricProperty</dd>\n"
-	
+
     return res
 
 
@@ -531,6 +531,14 @@ def specProperty(m, subject, predicate):
             return str(c.object)
     return ''
 
+def specAuthors(m, subject):
+    "Return an HTML description of the authors of the spec."
+    ret = ''
+    for i in m.find_statements(RDF.Statement(None, doap.maintainer, None)):
+        for j in m.find_statements(RDF.Statement(i.object, foaf.name, None)):
+            ret += '<div class="author">' + j.object.literal_value['string'] + '</div>\n'
+    return ret
+
 def getInstances(model, classes, properties):
     """
     Extract all resources instanced in the ontology
@@ -624,6 +632,7 @@ def specgen(specloc, template, instances=False, mode="spec"):
     template = template.replace('@FILENAME@', os.path.basename(specloc))
     template = template.replace('@MAIL@', 'devel@lists.lv2plug.in')
     template = template.replace('@COMMENT@', specProperty(m, spec_url, rdfs.comment))
+    template = template.replace('@AUTHORS@', specAuthors(m, spec_url))
     
     return template
 
@@ -705,7 +714,7 @@ if __name__ == "__main__":
             print "Error reading from template \"" + temploc + "\": " + str(e)
             usage()
 
-        # Sestination
+        # Destination
         dest = args[3]
  
         # Flags
