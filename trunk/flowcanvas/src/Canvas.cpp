@@ -29,7 +29,7 @@
 #include "flowcanvas/Module.hpp"
 
 #ifdef HAVE_AGRAPH
-#include <graphviz/gvc.h>
+#include <gvc.h>
 #endif
 
 using namespace std;
