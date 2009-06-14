@@ -38,11 +38,14 @@ def build_plugin(bld, lang, name):
 
 	obj              = bld.new_task_gen(lang, 'shlib')
 	obj.env          = penv
-	obj.source       = 'plugins/%s.lv2/%s.%s' % (name, name, ext)
+	obj.source       = [ 'plugins/%s.lv2/%s.%s' % (name, name, ext) ]
 	obj.includes     = '.'
 	obj.name         = name
 	obj.target       = name
 	obj.install_path = '${LV2DIR}/' + name + '.lv2'
+
+	if lang == 'cxx':
+		obj.source += [ 'ext/lv2plugin.cpp' ]
 
 	# Data
 	data_file     = 'plugins/%s.lv2/%s.ttl' % (name, name)
