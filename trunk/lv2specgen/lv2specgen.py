@@ -374,13 +374,13 @@ def docTerms(category, list, m):
         except:
             term_uri = term
         
-        doc += """<div class="specterm" id="term_%s">\n<h3>%s: <a href="%s">%s</a></h3>\n""" % (t, category, term_uri, curie)
+        doc += """<div class="specterm" id="term_%s" about="%s">\n<h3>%s: <a href="%s">%s</a></h3>\n""" % (t, term_uri, category, term_uri, curie)
 
         label, comment = get_rdfs(m, term)    
         status = get_status(m, term)
         doc += "<p><em>%s</em></p>" % label
         if comment!='':
-            doc += "<p>%s</p>" % comment
+			doc += "<p property=\"rdfs:comment\">%s</p>" % comment
         terminfo = ""
         if category=='Property':
             terminfo += owlInfo(term,m)
@@ -536,7 +536,7 @@ def specAuthors(m, subject):
     ret = ''
     for i in m.find_statements(RDF.Statement(None, doap.maintainer, None)):
         for j in m.find_statements(RDF.Statement(i.object, foaf.name, None)):
-            ret += '<div class="author">' + j.object.literal_value['string'] + '</div>\n'
+            ret += '<div class="author" property="dc:creator">' + j.object.literal_value['string'] + '</div>\n'
     return ret
 
 def getInstances(model, classes, properties):
