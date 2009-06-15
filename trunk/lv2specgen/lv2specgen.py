@@ -174,7 +174,7 @@ def rdfsPropertyInfo(term,m):
     if o.current():
         rlist = ''
         for st in o:
-            k = getTermLink(str(st.object.uri))
+            k = getTermLink(str(st.object.uri), term, rdfs.subPropertyOf)
             rlist += "<dd>%s</dd>" % k
         doc += "<dt>sub-property-of:</dt> %s" % rlist
 
@@ -186,11 +186,11 @@ def rdfsPropertyInfo(term,m):
         if collection.current():
             uris = parseCollection(m, collection)
             for uri in uris:
-                domainsdoc += "<dd>%s</dd>" % getTermLink(uri)
+                domainsdoc += "<dd>%s</dd>" % getTermLink(uri, term, rdfs.domain)
                 add(classdomains, uri, term.uri)
         else:
             if not d.object.is_blank():
-                domainsdoc += "<dd>%s</dd>" % getTermLink(str(d.object.uri))
+                domainsdoc += "<dd>%s</dd>" % getTermLink(str(d.object.uri), term, rdfs.domain)
     if (len(domainsdoc)>0):
         doc += "<dt>Domain:</dt> %s" % domainsdoc
 
@@ -202,11 +202,11 @@ def rdfsPropertyInfo(term,m):
         if collection.current():
             uris = parseCollection(m, collection)
             for uri in uris:
-                rangesdoc += "<dd>%s</dd>" % getTermLink(uri)
+                rangesdoc += "<dd>%s</dd>" % getTermLink(uri, term, rdfs.range)
                 add(classranges, uri, term.uri)
         else:
             if not r.object.is_blank():
-                rangesdoc += "<dd>%s</dd>" % getTermLink(str(r.object.uri))
+                rangesdoc += "<dd>%s</dd>" % getTermLink(str(r.object.uri), term, rdfs.range)
     if (len(rangesdoc)>0):
         doc += "<dt>Range:</dt> %s" % rangesdoc
 
@@ -241,12 +241,15 @@ def parseCollection(model, collection):
     return uris
 
 
-def getTermLink(uri):
+def getTermLink(uri, subject=None, predicate=None):
     uri = str(uri)
+    extra = ''
+    if subject != None and predicate != None:
+        extra = 'about="%s" rel="%s" resource="%s"' % (str(subject.uri), niceName(str(predicate.uri)), uri)
     if (uri.startswith(spec_ns_str)):
-        return '<a href="#term_%s" style="font-family: monospace;">%s</a>' % (uri.replace(spec_ns_str, ""), niceName(uri))
+        return '<a href="#term_%s" style="font-family: monospace;" %s>%s</a>' % (uri.replace(spec_ns_str, ""), extra, niceName(uri))
     else:
-        return '<a href="%s" style="font-family: monospace;">%s</a>' % (uri, niceName(uri))
+        return '<a href="%s" style="font-family: monospace;" %s>%s</a>' % (uri, extra, niceName(uri))
 
 
 def rdfsClassInfo(term,m):
@@ -300,7 +303,7 @@ def rdfsInstanceInfo(term,m):
     if t.current():
         doc += "<dt>RDF Type:</dt>"
     while t.current():
-        doc += "<dd>%s</dd>" % getTermLink(str(t.current().object.uri))
+        doc += "<dd>%s</dd>" % getTermLink(str(t.current().object.uri), RDF.Node(RDF.Uri(term)), rdf.type)
         t.next()
 
     return doc
