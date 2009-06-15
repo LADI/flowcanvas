@@ -34,12 +34,11 @@
 	doap:license <http://usefulinc.com/doap/licenses/mit> ;
 	doap:name	"LV2 Port Groups" ;
 	rdfs:comment "Defines meaningful groupings of LV2 ports" ;
-	doap:developer [
+	doap:maintainer [
 		a foaf:Person ;
 		foaf:name	 "Lars Luthman" ;
 		foaf:mbox     <mailto:lars.luthman@gmail.com>
-	] ;
-	doap:maintainer [
+	] , [
 		a foaf:Person ;
 		foaf:name	 "Dave Robillard" ;
 		foaf:homepage <http://drobilla.net/> ;
@@ -51,6 +50,19 @@
 
 pg:Group a rdfs:Class ;
 	rdfs:label   "LV2 Port Group" ;
+	rdfs:subClassOf [ a owl:Restriction ;
+		owl:onProperty lv2:symbol ;
+		owl:hasValue   xsd:string ;
+        rdfs:comment   """
+A pg:Group MUST have at least one string lv2:symbol.  This symbol must
+be unique according to the same rules as the lv2:symbol for an lv2:Port,
+where group symbols and port symbols reside in the same namespace.
+That is, a group on a plugin MUST NOT have the same symbol as a port
+on that plugin.
+Rationale: Hosts may find it useful to construct an identifier to refer
+to groups for the same reasons this is useful for ports.
+"""
+	] ;
 	rdfs:comment """
 A grouping of ports that can be logically considered a "stream", e.g.
 two audio ports in a group forming a stereo stream.  Both inputs and
@@ -73,7 +85,7 @@ pg:optionalRole a rdf:Property ;
 	rdfs:range   lv2:Port ;
 	rdfs:label   "May have port with role" ;
 	rdfs:comment """
-Indicates that a group may have a port with a particular role.
+Indicates that a group MAY have a port with a particular role.
 """ .
 
 pg:sideChainOf a rdf:Property ;
@@ -85,6 +97,27 @@ Indicates that this port group should be considered a "side chain" of some
 other group.  The precise definition of "side chain" depends on the plugin,
 but in general this group should be considered a modifier to some other
 group, rather than an independent input itself.
+""" .
+
+pg:source a rdf:Property ;
+	rdfs:domain  pg:Group ;
+	rdfs:range   pg:Group ;
+	rdfs:label   "Source group" ;
+	rdfs:comment """
+Indicates that this port group should be considered the "result" of some
+other group.  This property only makes sense on groups with outputs when
+the source is a group with inputs.  This can be used to convey a relationship
+between corresponding input and output groups with different types, e.g.
+a mono->stereo plugin.
+""" .
+
+pg:encodedType a rdf:Property ;
+	rdfs:domain  pg:Group ;
+	rdfs:range   rdfs:Class ;
+	rdfs:label   "Is an encoding of" ;
+	rdfs:comment """
+Indicates this group is an encoding of some other group type, e.g. 4.0
+encoded in 2.0 would be a StereoGroup with pg:encodedType FourPointZeroGroup.
 """ .
 
 pg:mainGroup a rdf:Property ;
