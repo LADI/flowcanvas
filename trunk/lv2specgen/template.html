@@ -12,6 +12,60 @@
     <meta http-equiv="content-type" content="text/xhtml+xml; charset=utf-8" />
     <meta name="generator" content="lv2specgen" />
     <!--<link rel="stylesheet" type="text/css" href="./style.css" />-->
+    <style type="text/css">
+        
+/* BEGIN STYLE */
+
+body {
+    color: black;
+    background: white;
+}
+
+:link    { color: #00C; background: transparent }
+:visited { color: #609; background: transparent }
+a:active { color: #C00; background: transparent }
+
+h1, h2, h3, h4, h5, h6 { text-align: left; background-color: #eee; padding: 0.25ex }
+h2, h3, h4, h5, h6 { margin-top: 2.5ex; }
+h1, h2, h3 { color: #005A9C; }
+
+.subtitle { margin: 0; padding: 0; font-style: italic }
+.index { padding: 1ex; border: dotted gray 2px; background-color: #eee; }
+
+dl { padding: 0; margin: 0 }
+dt { padding-top: 1ex; font-weight: bold }
+
+hr {
+    color: silver;
+    background-color: silver;
+    height: 1px;
+    border: 0;
+    margin-top: 3ex;
+    margin-bottom: 3ex
+}
+
+div.head { margin-bottom: 1em }
+div.head h1 { margin-top: 2em; clear: both }
+div.head table { margin-left: 2em; margin-top: 2em }
+
+pre { margin-left: 2em }
+/*
+p {
+  margin-top: 0.6em;
+  margin-bottom: 0.6em;
+}
+*/
+
+@media aural {  
+    h1, h2, h3 { stress: 20; richness: 90 }
+    p.copyright { volume: x-soft; speech-rate: x-fast }
+    dt { pause-before: 20% }
+    pre { speak-punctuation: code } 
+}
+
+/* END STYLE */
+
+  </style>
   </head>
   <body>
   <h1 id="title">@NAME@</h1>
@@ -29,12 +83,13 @@
   <!-- ===================================================================== -->
   <hr />
   <h2 id="abstract">Abstract</h2>
-  <p>This specification defines the "@NAME@" extension (with URI
-  <a href="@URI@">@URI@</a>) to the
-  <a href="http://lv2plug.in/ns/lv2core">LV2</a> specification.</p>
+  <p>@COMMENT@</p>
+
   <h2 id="status">About this Document</h2>
-  <p>This document is an <a href="http://validator.w3.org/check/referer?outline=1&amp;verbose=1"
-    title="Valid XHTML 1.0 Strict">XHTML+RDFa</a>
+  <p>This document describes &ldquo;@NAME@&rdquo; (<a href="@URI@">@URI@</a>), an extension to
+  <a href="http://lv2plug.in/ns/lv2core">LV2</a>.</p>
+  <p>This is an <a href="http://validator.w3.org/check/referer?outline=1&amp;verbose=1"
+    title="Valid XHTML+RDFa">XHTML+RDFa</a>
   page automatically generated from <a href="./@FILENAME@">@FILENAME@</a> by
   <a href="http://drobilla.net/software/lv2specgen">lv2specgen</a>.
   You may use, reproduce, redistribute, and create derivative works of
@@ -44,39 +99,29 @@
   </p>
 
   <p>Comments are welcome, please direct discussion to <a href="mailto:@MAIL@">@MAIL@</a>.</p>
-  <h2 id="contents">Table of Contents</h2>
+  <h2 id="contents">Contents</h2>
   <ol id="toc">
-    <li><a href="#desc">Description</a></li>
     <li><a href="#sec-glance">Index</a></li>
-    <li><a href="#reference">Reference</a></li>
-  </ol>
-  <h3>Appendices</h3>
-  <ol id="appendix">
+    <li><a href="#reference">Documentation</a></li>
     <li><a href="#references">References</a></li>
   </ol>
   <hr />
   
   <!-- ===================================================================== -->
-  <h2 id="desc">1 Description</h2>
-  <p>@COMMENT@</p>
-  
-  <!-- ===================================================================== -->
-  <h2 id="sec-glance">2. Index</h2>
-  <p>An alphabetical index of @NAME@ terms, by class (concepts) and by property
-  (relationships, attributes), are given below. All the terms are hyperlinked
-  to their detailed description for quick reference.</p>
+  <h2 id="sec-glance">1. Index</h2>
   <!-- The following is the script-generated index -->
-  %s 
+  @INDEX@ 
   <!-- End of the generated index -->
   
   <!-- ===================================================================== -->
-  <h2 id="reference">3. Reference</h2>
+  <h2 id="reference">2. Reference</h2>
   <!-- The following is the script-generated class/property/instance reference -->
-  %s 
+  @REFERENCE@
   <!-- End of the generated reference -->
 
   <!-- ===================================================================== -->
-  <h2 id="references">A References</h2>
+  <hr />
+  <h2 id="references">3. References</h2>
   <dl>
     <dt class="label" id="ref-rfc2119">IETF RFC 2119</dt>
     <dd>

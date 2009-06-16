@@ -2,7 +2,6 @@
 # -*- coding: utf8 -*-
 #
 # lv2specgen, an LV2 extension specification page generator
-#
 # Copyright (c) 2009 Dave Robillard <dave@drobilla.net>
 #
 # Based on SpecGen:
@@ -79,11 +78,11 @@ ns_list = { "http://www.w3.org/1999/02/22-rdf-syntax-ns#"   : "rdf",
             "http://usefulinc.com/ns/doap#"                 : "doap"
           }
 
-rdf = RDF.NS('http://www.w3.org/1999/02/22-rdf-syntax-ns#')
+rdf  = RDF.NS('http://www.w3.org/1999/02/22-rdf-syntax-ns#')
 rdfs = RDF.NS('http://www.w3.org/2000/01/rdf-schema#')
-owl = RDF.NS('http://www.w3.org/2002/07/owl#')
-vs = RDF.NS('http://www.w3.org/2003/06/sw-vocab-status/ns#')
-lv2 = RDF.NS('http://lv2plug.in/ns/lv2core#')
+owl  = RDF.NS('http://www.w3.org/2002/07/owl#')
+vs   = RDF.NS('http://www.w3.org/2003/06/sw-vocab-status/ns#')
+lv2  = RDF.NS('http://lv2plug.in/ns/lv2core#')
 doap = RDF.NS('http://usefulinc.com/ns/doap#')
 foaf = RDF.NS('http://xmlns.com/foaf/0.1/')
 
@@ -176,7 +175,7 @@ def rdfsPropertyInfo(term,m):
         for st in o:
             k = getTermLink(str(st.object.uri), term, rdfs.subPropertyOf)
             rlist += "<dd>%s</dd>" % k
-        doc += "<dt>sub-property-of:</dt> %s" % rlist
+        doc += "<dt>Sub-property of</dt> %s" % rlist
 
     #domain stuff
     domains = m.find_statements(RDF.Statement(term, rdfs.domain, None))
@@ -192,7 +191,7 @@ def rdfsPropertyInfo(term,m):
             if not d.object.is_blank():
                 domainsdoc += "<dd>%s</dd>" % getTermLink(str(d.object.uri), term, rdfs.domain)
     if (len(domainsdoc)>0):
-        doc += "<dt>Domain:</dt> %s" % domainsdoc
+        doc += "<dt>Domain</dt> %s" % domainsdoc
 
     #range stuff
     ranges = m.find_statements(RDF.Statement(term, rdfs.range, None))
@@ -208,7 +207,7 @@ def rdfsPropertyInfo(term,m):
             if not r.object.is_blank():
                 rangesdoc += "<dd>%s</dd>" % getTermLink(str(r.object.uri), term, rdfs.range)
     if (len(rangesdoc)>0):
-        doc += "<dt>Range:</dt> %s" % rangesdoc
+        doc += "<dt>Range</dt> %s" % rangesdoc
 
     return doc
 
@@ -258,24 +257,19 @@ def rdfsClassInfo(term,m):
     global classdomains
     doc = ""
 
-    #patch to control incoming strings (FIXME, why??? drop it!)
-    try:
-        term.uri
-    except:
-        term = RDF.Node(RDF.Uri(term))
-
     # Find subClassOf information
     o = m.find_statements( RDF.Statement(term, rdfs.subClassOf, None) )
     if o.current():
-        doc += "<dt>sub-class-of:</dt>"
         superclasses = []
         for st in o:
             if not st.object.is_blank():
                 uri = str(st.object.uri)
                 if (not uri in superclasses):
                     superclasses.append(uri)
-        for superclass in superclasses:
-            doc += "<dd>%s</dd>" % getTermLink(superclass)
+        if len(superclasses) > 0:
+            doc += "<dt>Sub-class of</dt>"
+            for superclass in superclasses:
+                doc += "<dd>%s</dd>" % getTermLink(superclass)
 
     # Find out about properties which have rdfs:domain of t
     d = classdomains.get(str(term.uri), "")
@@ -283,7 +277,7 @@ def rdfsClassInfo(term,m):
         dlist = ''
         for k in d:
             dlist += "<dd>%s</dd>" % getTermLink(k)
-        doc += "<dt>in-domain-of:</dt>" + dlist
+        doc += "<dt>In domain of</dt>" + dlist
 
     # Find out about properties which have rdfs:range of t
     r = classranges.get(str(term.uri), "")
@@ -291,9 +285,37 @@ def rdfsClassInfo(term,m):
         rlist = ''
         for k in r:
             rlist += "<dd>%s</dd>" % getTermLink(k)
-        doc += "<dt>in-range-of:</dt>" + rlist
+        doc += "<dt>In range of</dt>" + rlist
 
     return doc
+
+
+def isSpecial(pred):
+    """Return True if the predicate is "special" and shouldn't be emitted generically"""
+    return pred == rdf.type or pred == rdfs.range or pred == rdfs.domain or pred == rdfs.label or pred == rdfs.comment
+
+
+def extraInfo(term,m):
+    """Generate information about misc. properties of a term"""
+    doc = ""
+    properties = m.find_statements(RDF.Statement(term, None, None))
+    #if properties:
+    #    doc += '<dl>\n'
+    last_pred = ''
+    for p in properties:
+        if isSpecial(p.predicate) or p.object.is_blank():
+            continue
+        if p.predicate != last_pred:
+            doc += '<dt>%s</dt>\n' % niceName(str(p.predicate.uri))
+        if p.object.is_resource():
+            doc += '<dd>%s</dd>\n' % getTermLink(str(p.object.uri), term, p.predicate)
+        elif p.object.is_literal():
+            doc += '<dd>%s</dd>\n' % str(p.object)
+        last_pred = p.predicate
+    #if properties:
+    #    doc += '</dl>\n'
+    return doc
+
 
 def rdfsInstanceInfo(term,m):
     """Generate rdfs-type information for instances"""
@@ -301,10 +323,12 @@ def rdfsInstanceInfo(term,m):
     
     t = m.find_statements( RDF.Statement(RDF.Node(RDF.Uri(term)), rdf.type, None) )
     if t.current():
-        doc += "<dt>RDF Type:</dt>"
+        doc += "<dt>Type</dt>"
     while t.current():
         doc += "<dd>%s</dd>" % getTermLink(str(t.current().object.uri), RDF.Node(RDF.Uri(term)), rdf.type)
         t.next()
+
+    doc += extraInfo(RDF.Node(RDF.Uri(term)), m)
 
     return doc
 
@@ -325,27 +349,27 @@ def owlInfo(term,m):
     # Datatype Property ( owl.DatatypeProperty )
     o = m.find_statements( RDF.Statement(term, rdf.type, owl.DatatypeProperty) )
     if o.current():
-        res += "<dt>OWL Type:</dt><dd>DatatypeProperty</dd>\n"
+        res += "<dt>OWL Type</dt><dd>DatatypeProperty</dd>\n"
 
     # Object Property ( owl.ObjectProperty )
     o = m.find_statements( RDF.Statement(term, rdf.type, owl.ObjectProperty) )
     if o.current():
-        res += "<dt>OWL Type:</dt><dd>ObjectProperty</dd>\n"
+        res += "<dt>OWL Type</dt><dd>ObjectProperty</dd>\n"
 
     # Annotation Property ( owl.AnnotationProperty )
     o = m.find_statements( RDF.Statement(term, rdf.type, owl.AnnotationProperty) )
     if o.current():
-        res += "<dt>OWL Type:</dt><dd>AnnotationProperty</dd>\n"
+        res += "<dt>OWL Type</dt><dd>AnnotationProperty</dd>\n"
 
     # IFPs ( owl.InverseFunctionalProperty )
     o = m.find_statements( RDF.Statement(term, rdf.type, owl.InverseFunctionalProperty) )
     if o.current():
-        res += "<dt>OWL Type:</dt><dd>InverseFunctionalProperty (uniquely identifying property)</dd>\n"
+        res += "<dt>OWL Type</dt><dd>InverseFunctionalProperty (uniquely identifying property)</dd>\n"
 
     # Symmertic Property ( owl.SymmetricProperty )
     o = m.find_statements( RDF.Statement(term, rdf.type, owl.SymmetricProperty) )
     if o.current():
-        res += "<dt>OWL Type:</dt><dd>SymmetricProperty</dd>\n"
+        res += "<dt>OWL Type</dt><dd>SymmetricProperty</dd>\n"
 
     return res
 
@@ -377,11 +401,12 @@ def docTerms(category, list, m):
         except:
             term_uri = term
         
-        doc += """<div class="specterm" id="term_%s" about="%s">\n<h3>%s: <a href="%s">%s</a></h3>\n""" % (t, term_uri, category, term_uri, curie)
+        doc += """<div class="specterm" id="term_%s" about="%s">\n<h3>%s <a href="%s">%s</a></h3>\n""" % (t, term_uri, category, term_uri, curie)
 
         label, comment = get_rdfs(m, term)    
         status = get_status(m, term)
-        doc += "<p><em>%s</em></p>" % label
+        if label!='':
+            doc += "<span property=\"rdfs:label\" class=\"subtitle\">%s</span>" % label
         if comment!='':
 			doc += "<p property=\"rdfs:comment\">%s</p>" % comment
         terminfo = ""
@@ -392,10 +417,13 @@ def docTerms(category, list, m):
             terminfo += rdfsClassInfo(term,m)
         if category=='Instance':
             terminfo += rdfsInstanceInfo(term,m)
+        
+        terminfo += extraInfo(term,m)
+        
         if (len(terminfo)>0): #to prevent empty list (bug #882)
             doc += "\n<dl>%s</dl>\n" % terminfo
+        
         doc += htmlDocInfo(t)
-        doc += "<p style=\"float: right; font-size: small;\">[<a href=\"#sec-glance\">back to top</a>]</p>\n\n"
         doc += "\n\n</div>\n\n"
     
     return doc
@@ -415,68 +443,40 @@ def getAnchor(uri):
         return getShortName(uri)
 
 
-def buildazlist(classlist, proplist, instalist=None):
+def buildIndex(classlist, proplist, instalist=None):
     """
     Builds the A-Z list of terms. Args are a list of classes (strings) and 
     a list of props (strings)
     """
-    azlist = '<div style="padding: 1em; border: dotted; background-color: #ddd;">'
+    azlist = '<dl class="index">'
 
     if (len(classlist)>0):
-        azlist += "<p>Classes: "
+        azlist += "<dt>Classes</dt><dd>"
         classlist.sort()
         for c in classlist:
             if c.startswith(spec_ns_str):
                 c = c.split(spec_ns_str[-1])[1]
             azlist = """%s <a href="#term_%s">%s</a>, """ % (azlist, c, c)
-        azlist = """%s\n</p>""" % azlist
+        azlist = """%s</dd>\n""" % azlist
 
     if (len(proplist)>0):
-        azlist += "<p>Properties: "
+        azlist += "<dt>Properties</dt><dd>"
         proplist.sort()
         for p in proplist:
             if p.startswith(spec_ns_str):
                 p = p.split(spec_ns_str[-1])[1]
             azlist = """%s <a href="#term_%s">%s</a>, """ % (azlist, p, p)
-        azlist = """%s\n</p>""" % azlist
+        azlist = """%s</dd>\n""" % azlist
 
     if (instalist!=None and len(instalist)>0):
-        azlist += "<p>Instances: "
+        azlist += "<dt>Instances</dt><dd>"
         for i in instalist:
             p = getShortName(i)
             anchor = getAnchor(i)
             azlist = """%s <a href="#term_%s">%s</a>, """ % (azlist, anchor, p)
-        azlist = """%s\n</p>""" % azlist
+        azlist = """%s</dd>\n""" % azlist
 
-    azlist = """%s\n</div>""" % azlist
-    return azlist
-
-
-def build_simple_list(classlist, proplist, instalist=None):
-    """
-    Builds a simple <ul> A-Z list of terms. Args are a list of classes (strings) and 
-    a list of props (strings)
-    """
-
-    azlist = """<div style="padding: 5px; border: dotted; background-color: #ddd;">"""
-    azlist = """%s\n<p>Classes:""" % azlist
-    azlist += """\n<ul>"""
-
-    classlist.sort()
-    for c in classlist:
-        azlist += """\n  <li><a href="#term_%s">%s</a></li>""" % (c.replace(" ", ""), c)
-    azlist = """%s\n</ul></p>""" % azlist
-
-    azlist = """%s\n<p>Properties:""" % azlist
-    azlist += """\n<ul>"""
-    proplist.sort()
-    for p in proplist:
-        azlist += """\n  <li><a href="#term_%s">%s</a></li>""" % (p.replace(" ", ""), p)
-    azlist = """%s\n</ul></p>""" % azlist
-
-    #FIXME: instances
-
-    azlist = """%s\n</div>""" % azlist
+    azlist = """%s\n</dl>""" % azlist
     return azlist
 
 
@@ -527,12 +527,14 @@ def specInformation(m, ns):
 
     return classlist, proplist
 
+
 def specProperty(m, subject, predicate):
     "Return the rdfs:comment of the spec."
     for c in m.find_statements(RDF.Statement(None, predicate, None)):
         if str(c.subject.uri) == str(subject):
             return str(c.object)
     return ''
+
 
 def specAuthors(m, subject):
     "Return an HTML description of the authors of the spec."
@@ -541,6 +543,7 @@ def specAuthors(m, subject):
         for j in m.find_statements(RDF.Statement(i.object, foaf.name, None)):
             ret += '<div class="author" property="dc:creator">' + j.object.literal_value['string'] + '</div>\n'
     return ret
+
 
 def getInstances(model, classes, properties):
     """
@@ -598,12 +601,7 @@ def specgen(specloc, template, instances=False, mode="spec"):
         instalist = getInstances(m, classlist, proplist)
         instalist.sort(lambda x, y: cmp(getShortName(x).lower(), getShortName(y).lower()))
     
-    if mode == "spec":
-        # Build HTML list of terms.
-        azlist = buildazlist(classlist, proplist, instalist)
-    elif mode == "list":
-        # Build simple <ul> list of terms.
-        azlist = build_simple_list(classlist, proplist, instalist)
+    azlist = buildIndex(classlist, proplist, instalist)
 
     # Generate Term HTML
     termlist = docTerms('Property', proplist, m)
@@ -622,12 +620,8 @@ def specgen(specloc, template, instances=False, mode="spec"):
     template = re.sub(r"^#format \w*\n", "", template)
     template = re.sub(r"\$VersionInfo\$", owlVersionInfo(m).encode("utf-8"), template) 
     
-    # NOTE: This works with the assumtpion that all "%" in the template are escaped to "%%" and it
-    #       contains the same number of "%s" as the number of parameters in % ( ...parameters here... )
-    template = template % (azlist, termlist.encode("utf-8"));    
-    template += ("<!-- generated from %s by %s at %s -->" %
-        (os.path.basename(specloc), os.path.basename(sys.argv[0]), time.strftime('%X %x %Z')))
-
+    template = template.replace('@INDEX@', azlist)
+    template = template.replace('@REFERENCE@', termlist.encode("utf-8"))
     template = template.replace('@NAME@', specProperty(m, spec_url, doap.name))
     template = template.replace('@URI@', spec_url)
     template = template.replace('@PREFIX@', spec_pre)
@@ -636,6 +630,9 @@ def specgen(specloc, template, instances=False, mode="spec"):
     template = template.replace('@MAIL@', 'devel@lists.lv2plug.in')
     template = template.replace('@COMMENT@', specProperty(m, spec_url, rdfs.comment))
     template = template.replace('@AUTHORS@', specAuthors(m, spec_url))
+    
+    template += ("<!-- generated from %s by %s at %s -->" %
+        (os.path.basename(specloc), os.path.basename(sys.argv[0]), time.strftime('%X %x %Z')))
     
     return template
 
@@ -647,7 +644,7 @@ def save(path, text):
         f.flush()
         f.close()
     except Exception, e:
-        print "Error writting in file \"" + path + "\": " + str(e)
+        print "Error writing to file \"" + path + "\": " + str(e)
 
 
 def getOntologyNS(m):
@@ -694,6 +691,7 @@ Example:
 
 """ % (script, script)
     sys.exit(-1)
+
 
 if __name__ == "__main__":
     """Ontology specification generator tool"""
