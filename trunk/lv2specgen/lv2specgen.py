@@ -627,6 +627,7 @@ def specgen(specloc, template, instances=False, mode="spec"):
     template = template.replace('@PREFIX@', spec_pre)
     template = template.replace('@BASE@', spec_ns_str)
     template = template.replace('@FILENAME@', os.path.basename(specloc))
+    template = template.replace('@HEADER@', os.path.basename(specloc).replace('.ttl', '.h'))
     template = template.replace('@MAIL@', 'devel@lists.lv2plug.in')
     template = template.replace('@COMMENT@', specProperty(m, spec_url, rdfs.comment))
     template = template.replace('@AUTHORS@', specAuthors(m, spec_url))
