@@ -21,7 +21,7 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-@prefix pg:   <http://lv2plug.in/ns/ext/port-groups#> .
+@prefix pg:   <http://lv2plug.in/ns/dev/port-groups#> .
 @prefix lv2:  <http://lv2plug.in/ns/lv2core#> .
 @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
@@ -30,7 +30,7 @@
 @prefix doap: <http://usefulinc.com/ns/doap#> .
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 
-<http://lv2plug.in/ns/ext/port-groups> a lv2:Specification ;
+<http://lv2plug.in/ns/dev/port-groups> a lv2:Specification ;
 	doap:license <http://usefulinc.com/doap/licenses/mit> ;
 	doap:name	"LV2 Port Groups" ;
 	rdfs:comment "Defines semantic groupings of LV2 ports" ;
@@ -54,22 +54,22 @@ pg:Group a rdfs:Class ;
 		owl:onProperty lv2:symbol ;
 		owl:hasValue   xsd:string ;
         rdfs:comment   """
-A pg:Group MUST have at least one string lv2:symbol.  This symbol must
-be unique according to the same rules as the lv2:symbol for an lv2:Port,
-where group symbols and port symbols reside in the same namespace.
-That is, a group on a plugin MUST NOT have the same symbol as a port
-on that plugin.
-Rationale: Hosts may find it useful to construct an identifier to refer
-to groups for the same reasons this is useful for ports.
+A pg:Group MUST have at least one string lv2:symbol.  This symbol must be
+unique according to the same rules as the lv2:symbol for an lv2:Port, where
+group symbols and port symbols reside in the same namespace.  In other words,
+a group on a plugin MUST NOT have the same symbol as another group or a port
+on that plugin.  Rationale: Hosts or bindings may find it useful to construct
+an identifier to refer to groups for the same reasons this is useful for ports.
 """
 	] ;
 	rdfs:comment """
 A grouping of ports that can be logically considered a "stream", e.g.
-two audio ports in a group forming a stereo stream.  Both inputs and
-outputs can form a group, which allows describing to the host which
-outputs correspond to which inputs.  In this case, outputs with a given
-role correspond to the inputs in the same group with that role (though
-the output and input roles of a group do not necessarily match).
+two audio ports in a group forming a stereo stream.  Both inputs and outputs
+can form a group, which allows describing to the host which outputs correspond
+to which inputs.  In this case, outputs with a given role correspond to the
+inputs in the same group with that role (though the output and input roles
+of a group do not necessarily match).  The pg:source predicate can also be
+used to describe this correspondence between separate ports/groups.
 """ .
 
 pg:requiredRole a rdf:Property ;
@@ -89,26 +89,26 @@ Indicates that a group MAY have a port with a particular role.
 """ .
 
 pg:sideChainOf a rdf:Property ;
-	rdfs:domain  pg:Group ;
-	rdfs:range   pg:Group ;
+	rdfs:domain  pg:Group , lv2:Port ;
+	rdfs:range   pg:Group , lv2:Port ;
 	rdfs:label   "Side-chain of" ;
 	rdfs:comment """
-Indicates that this port group should be considered a "side chain" of some
-other group.  The precise definition of "side chain" depends on the plugin,
-but in general this group should be considered a modifier to some other
-group, rather than an independent input itself.
+Indicates that this port or group should be considered a "side chain" of
+some other port or group.  The precise definition of "side chain" depends
+on the plugin, but in general this group should be considered a modifier to
+some other group, rather than an independent input itself.
 """ .
 
 pg:source a rdf:Property ;
-	rdfs:domain  pg:Group ;
-	rdfs:range   pg:Group ;
+	rdfs:domain  pg:Group , lv2:Port ;
+	rdfs:range   pg:Group , lv2:Port ;
 	rdfs:label   "Source group" ;
 	rdfs:comment """
-Indicates that this port group should be considered the "result" of some
-other group.  This property only makes sense on groups with outputs when
-the source is a group with inputs.  This can be used to convey a relationship
-between corresponding input and output groups with different types, e.g.
-a mono->stereo plugin.
+Indicates that this port or group should be considered the "result" of
+some other port or group.  This property only makes sense on groups with
+outputs when the source is a group with inputs.  This can be used to convey
+a relationship between corresponding input and output groups with different
+types, e.g.  a mono->stereo plugin.
 """ .
 
 pg:encodedType a rdf:Property ;
@@ -125,11 +125,11 @@ pg:mainGroup a rdf:Property ;
 	rdfs:range   pg:Group ;
 	rdfs:label   "Main port group" ;
 	rdfs:comment """
-Indicates that this port group should be considered the "main" inputs/outputs
-of the plugin, e.g. a stereo effect has a "main" group with 2 inputs and 2
-outputs.  A plugin MUST NOT have more than one :mainGroup property.  High-level
-hosts that simply want to insert an plugin in a given stream should use
-this property to determine where the plugin 'fits'.
+Indicates that this group should be considered the "main" inputs/outputs of
+the plugin, e.g. it probably makes sense to just connect main groups and set
+some controls.  A plugin MUST NOT have more than one :mainGroup property.
+High-level hosts that simply want to insert an plugin in a given stream
+should use this property to determine where the plugin 'fits'.
 """ .
 
 pg:inGroup a rdf:Property ;
@@ -138,18 +138,16 @@ pg:inGroup a rdf:Property ;
 	rdfs:label   "In port group" ;
 	rdfs:comment """
 Indicates that this port is a part of a group of ports on the plugin.
-Ports that have a meaningful "role" that may be useful to hosts SHOULD
-also have a :role property, otherwise ports in the group have no meaningful
-order.""" .
+Ports that have a meaningful "role" that may be useful to hosts SHOULD also
+have a :role property, otherwise ports in the group have no meaningful order.
+""" .
 
 pg:Role a rdfs:Class ;
 	rdfs:label   "Port role" ;
 	rdfs:comment """
-The role of a port with respect to its plugin or group.
-
-If the port is a member of a group (has an :inGroup property) the
-role is relevant with respect to that group.  Otherwise the role
-is relevant with respect to the plugin.
+The role of a port with respect to its plugin or group.  If the port is a
+member of a group (has an :inGroup property) the role is relevant with respect
+to that group.  Otherwise the role is relevant with respect to the plugin.
 """ .
 
 pg:hasRole a rdf:Property ;
