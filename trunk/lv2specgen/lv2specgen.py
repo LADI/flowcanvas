@@ -282,7 +282,7 @@ def rdfsClassInfo(term,m):
             elif p.predicate == rdfs.comment:
                 comment = p.object
         if onProp != None:
-            doc += '<div class="restriction"><dt>Restriction on property %s</dt><dd>' % getTermLink(onProp.uri)
+            doc += '<dt>Restriction on property %s</dt><dd class="restriction">' % getTermLink(onProp.uri)
             if comment != None:
                 doc += "<p>%s</p>\n" % comment
             props = m.find_statements(RDF.Statement(r, None, None))
@@ -291,7 +291,7 @@ def rdfsClassInfo(term,m):
                 if p.predicate != owl.onProperty and p.predicate != rdfs.comment and not(
                         p.predicate == rdf.type and p.object == owl.Restriction):
                     doc += "<dt>%s</dt><dd>%s</dd>" % (getTermLink(p.predicate.uri), getTermLink(p.object.uri))
-            doc += "</dl></dd></div>"
+            doc += "</dl></dd>"
 
     # Find out about properties which have rdfs:domain of t
     d = classdomains.get(str(term.uri), "")
