@@ -105,12 +105,6 @@ def setTermDir(directory):
     termdir = directory
 
 
-def termlink(string):
-    """FOAF specific: function which replaces <code>foaf:*</code> with a 
-    link to the term in the document."""
-    return re.sub(r"<code>" + spec_pre + r":(\w+)</code>", r"""<code><a href="#term_\1">""" + spec_pre + r""":\1</a></code>""", string)    
-
-
 def return_name(m, urinode):
     "Trims the namespace out of a term to give a name to the term."
     return str(urinode.uri).replace(spec_ns_str, "")
@@ -146,7 +140,9 @@ def htmlDocInfo( t ):
     try:
         f = open("%s/%s.en" % (termdir, t), "r")
         doc = f.read()
-        doc = termlink(doc)
+        # replace <code>prefix:foo</code> with a link to foo in the document
+        doc = re.sub(r"<code>" + spec_pre + r":(\w+)</code>",
+                r"""<code><a href="#term_\1">""" + spec_pre + r""":\1</a></code>""", doc)    
     except:
         return "" # "<p>No detailed documentation for this term.</p>"
     return doc
@@ -259,6 +255,7 @@ def rdfsClassInfo(term,m):
 
     # Find subClassOf information
     o = m.find_statements( RDF.Statement(term, rdfs.subClassOf, None) )
+    restrictions = []
     if o.current():
         superclasses = []
         for st in o:
@@ -266,10 +263,35 @@ def rdfsClassInfo(term,m):
                 uri = str(st.object.uri)
                 if (not uri in superclasses):
                     superclasses.append(uri)
+            else:
+                meta_types = m.find_statements(RDF.Statement(o.current().object, rdf.type, None))
+                restrictions.append(meta_types.current().subject)
+
         if len(superclasses) > 0:
             doc += "<dt>Sub-class of</dt>"
             for superclass in superclasses:
                 doc += "<dd>%s</dd>" % getTermLink(superclass)
+
+    for r in restrictions:
+        props = m.find_statements(RDF.Statement(r, None, None))
+        onProp = None
+        comment = None
+        for p in props:
+            if p.predicate == owl.onProperty:
+                onProp = p.object
+            elif p.predicate == rdfs.comment:
+                comment = p.object
+        if onProp != None:
+            doc += '<div class="restriction"><dt>Restriction on property %s</dt><dd>' % getTermLink(onProp.uri)
+            if comment != None:
+                doc += "<p>%s</p>\n" % comment
+            props = m.find_statements(RDF.Statement(r, None, None))
+            doc += "<dl>"
+            for p in props:
+                if p.predicate != owl.onProperty and p.predicate != rdfs.comment and not(
+                        p.predicate == rdf.type and p.object == owl.Restriction):
+                    doc += "<dt>%s</dt><dd>%s</dd>" % (getTermLink(p.predicate.uri), getTermLink(p.object.uri))
+            doc += "</dl></dd></div>"
 
     # Find out about properties which have rdfs:domain of t
     d = classdomains.get(str(term.uri), "")
@@ -306,7 +328,7 @@ def extraInfo(term,m):
         if isSpecial(p.predicate) or p.object.is_blank():
             continue
         if p.predicate != last_pred:
-            doc += '<dt>%s</dt>\n' % niceName(str(p.predicate.uri))
+            doc += '<dt>%s</dt>\n' % getTermLink(str(p.predicate.uri))
         if p.object.is_resource():
             doc += '<dd>%s</dd>\n' % getTermLink(str(p.object.uri), term, p.predicate)
         elif p.object.is_literal():
