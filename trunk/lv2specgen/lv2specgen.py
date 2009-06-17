@@ -427,10 +427,14 @@ def docTerms(category, list, m):
 
         label, comment = get_rdfs(m, term)    
         status = get_status(m, term)
+        if label!='' or comment != '':
+            doc += '<div class="description">'
         if label!='':
-            doc += "<span property=\"rdfs:label\" class=\"subtitle\">%s</span>" % label
+            doc += "<div property=\"rdfs:label\" class=\"label\">%s</div>" % label
         if comment!='':
-			doc += "<p property=\"rdfs:comment\">%s</p>" % comment
+			doc += "<div property=\"rdfs:comment\">%s</div>" % comment
+        if label!='' or comment != '':
+            doc += "</div>"
         terminfo = ""
         if category=='Property':
             terminfo += owlInfo(term,m)
