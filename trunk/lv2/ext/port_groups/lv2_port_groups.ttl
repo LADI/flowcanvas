@@ -193,164 +193,164 @@ pg:waveform             a pg:Role ; rdfs:label "Waveform" .
 
 pg:MonoGroup a pg:Group ;
 	rdfs:label "Mono" ;
-	pg:hasPort pg:centerChannel .
+	pg:hasRole pg:centerChannel .
 
 pg:StereoGroup a pg:Group ;
 	rdfs:label "Stereo" ;
-	pg:hasPort pg:leftChannel ;
-	pg:hasPort pg:rightChannel .
+	pg:hasRole pg:leftChannel ;
+	pg:hasRole pg:rightChannel .
 
 pg:MidSideGroup a pg:Group ;
 	rdfs:label "Mid-Side Stereo" ;
-	pg:hasPort pg:centerChannel ;
-	pg:hasPort pg:sideChannel .
+	pg:hasRole pg:centerChannel ;
+	pg:hasRole pg:sideChannel .
 
 pg:ThreePointZeroGroup a pg:Group ;
 	rdfs:label "3.0 Surround" ;
-	pg:hasPort pg:leftChannel ;
-	pg:hasPort pg:rightChannel ;
-	pg:hasPort pg:surroundChannel .
+	pg:hasRole pg:leftChannel ;
+	pg:hasRole pg:rightChannel ;
+	pg:hasRole pg:surroundChannel .
 
 pg:FourPointZeroGroup a pg:Group ;
 	rdfs:label "4.0 Surround (Quadraphonic)" ;
-	pg:hasPort pg:leftChannel ;
-	pg:hasPort pg:rightChannel ;
-	pg:hasPort pg:centerChannel ;
-	pg:hasPort pg:surroundChannel .
+	pg:hasRole pg:leftChannel ;
+	pg:hasRole pg:rightChannel ;
+	pg:hasRole pg:centerChannel ;
+	pg:hasRole pg:surroundChannel .
 
 pg:FivePointZeroGroup a pg:Group ;
 	rdfs:label "5.0 Surround (3-2 stereo)" ;
-	pg:hasPort pg:leftChannel ;
-	pg:hasPort pg:rightChannel ;
-	pg:hasPort pg:centerChannel ;
-	pg:hasPort pg:leftSurroundChannel ;
-	pg:hasPort pg:rightSurroundChannel .
+	pg:hasRole pg:leftChannel ;
+	pg:hasRole pg:rightChannel ;
+	pg:hasRole pg:centerChannel ;
+	pg:hasRole pg:leftSurroundChannel ;
+	pg:hasRole pg:rightSurroundChannel .
 
 pg:FivePointOneGroup a pg:Group ;
 	rdfs:label "5.1 Surround (3-2 stereo)" ;
-	pg:hasPort pg:leftChannel ;
-	pg:hasPort pg:rightChannel ;
-	pg:hasPort pg:centerChannel ;
-	pg:hasPort pg:leftSurroundChannel ;
-	pg:hasPort pg:rightSurroundChannel ;
-	pg:hasPort pg:lfeChannel .
+	pg:hasRole pg:leftChannel ;
+	pg:hasRole pg:rightChannel ;
+	pg:hasRole pg:centerChannel ;
+	pg:hasRole pg:leftSurroundChannel ;
+	pg:hasRole pg:rightSurroundChannel ;
+	pg:hasRole pg:lfeChannel .
 
 pg:SixPointOneGroup a pg:Group ;
 	rdfs:label "6.1 Surround" ;
-	pg:hasPort pg:leftChannel ;
-	pg:hasPort pg:rightChannel ;
-	pg:hasPort pg:centerChannel ;
-	pg:hasPort pg:leftSurroundChannel ;
-	pg:hasPort pg:rightSurroundChannel ;
-	pg:hasPort pg:centerRearChannel ;
-	pg:hasPort pg:lfeChannel .
+	pg:hasRole pg:leftChannel ;
+	pg:hasRole pg:rightChannel ;
+	pg:hasRole pg:centerChannel ;
+	pg:hasRole pg:leftSurroundChannel ;
+	pg:hasRole pg:rightSurroundChannel ;
+	pg:hasRole pg:centerRearChannel ;
+	pg:hasRole pg:lfeChannel .
 
 pg:SevenPointOneGroup a pg:Group ;
 	rdfs:label "7.1 Surround" ;
-	pg:hasPort pg:leftChannel ;
-	pg:hasPort pg:rightChannel ;
-	pg:hasPort pg:centerChannel ;
-	pg:hasPort pg:leftSurroundChannel ;
-	pg:hasPort pg:rightSurroundChannel ;
-	pg:hasPort pg:leftRearChannel ;
-	pg:hasPort pg:rightRearChannel ;
-	pg:hasPort pg:lfeChannel .
+	pg:hasRole pg:leftChannel ;
+	pg:hasRole pg:rightChannel ;
+	pg:hasRole pg:centerChannel ;
+	pg:hasRole pg:leftSurroundChannel ;
+	pg:hasRole pg:rightSurroundChannel ;
+	pg:hasRole pg:leftRearChannel ;
+	pg:hasRole pg:rightRearChannel ;
+	pg:hasRole pg:lfeChannel .
 
 pg:AmbisonicBH1V0Group a pg:Group ;
 	rdfs:label "Ambisonic B stream of horizontal order 1 and vertical order 0." ;
-	pg:hasPort pg:wChannel ;
-	pg:hasPort pg:xChannel ;
-	pg:hasPort pg:yChannel .
+	pg:hasRole pg:wChannel ;
+	pg:hasRole pg:xChannel ;
+	pg:hasRole pg:yChannel .
 
 pg:AmbisonicBH1V1Group a pg:Group ;
 	rdfs:label "Ambisonic B stream of horizontal order 1 and vertical order 1." ;
-	pg:hasPort pg:wChannel ;
-	pg:hasPort pg:xChannel ;
-	pg:hasPort pg:yChannel ;
-	pg:hasPort pg:zChannel .
+	pg:hasRole pg:wChannel ;
+	pg:hasRole pg:xChannel ;
+	pg:hasRole pg:yChannel ;
+	pg:hasRole pg:zChannel .
 
 pg:AmbisonicBH2V0Group a pg:Group ;
 	rdfs:label "Ambisonic B stream of horizontal order 2 and vertical order 0." ;
-	pg:hasPort pg:wChannel ;
-	pg:hasPort pg:xChannel ;
-	pg:hasPort pg:yChannel ;
-	pg:hasPort pg:uChannel ;
-	pg:hasPort pg:vChannel .
+	pg:hasRole pg:wChannel ;
+	pg:hasRole pg:xChannel ;
+	pg:hasRole pg:yChannel ;
+	pg:hasRole pg:uChannel ;
+	pg:hasRole pg:vChannel .
 
 pg:AmbisonicBH2V1Group a pg:Group ;
 	rdfs:label "Ambisonic B stream of horizontal order 2 and vertical order 1." ;
-	pg:hasPort pg:wChannel ;
-	pg:hasPort pg:xChannel ;
-	pg:hasPort pg:yChannel ;
-	pg:hasPort pg:zChannel ;
-	pg:hasPort pg:uChannel ;
-	pg:hasPort pg:vChannel .
+	pg:hasRole pg:wChannel ;
+	pg:hasRole pg:xChannel ;
+	pg:hasRole pg:yChannel ;
+	pg:hasRole pg:zChannel ;
+	pg:hasRole pg:uChannel ;
+	pg:hasRole pg:vChannel .
 
 pg:AmbisonicBH2V2Group a pg:Group ;
 	rdfs:label "Ambisonic B stream of horizontal order 2 and vertical order 2." ;
-	pg:hasPort pg:wChannel ;
-	pg:hasPort pg:xChannel ;
-	pg:hasPort pg:yChannel ;
-	pg:hasPort pg:zChannel ;
-	pg:hasPort pg:rChannel ;
-	pg:hasPort pg:sChannel ;
-	pg:hasPort pg:tChannel ;
-	pg:hasPort pg:uChannel ;
-	pg:hasPort pg:vChannel .
+	pg:hasRole pg:wChannel ;
+	pg:hasRole pg:xChannel ;
+	pg:hasRole pg:yChannel ;
+	pg:hasRole pg:zChannel ;
+	pg:hasRole pg:rChannel ;
+	pg:hasRole pg:sChannel ;
+	pg:hasRole pg:tChannel ;
+	pg:hasRole pg:uChannel ;
+	pg:hasRole pg:vChannel .
 
 pg:AmbisonicBH3V0Group a pg:Group ;
 	rdfs:label "Ambisonic B stream of horizontal order 3 and vertical order 0." ;
-	pg:hasPort pg:wChannel ;
-	pg:hasPort pg:xChannel ;
-	pg:hasPort pg:yChannel ;
-	pg:hasPort pg:uChannel ;
-	pg:hasPort pg:vChannel ;
-	pg:hasPort pg:pChannel ;
-	pg:hasPort pg:qChannel .
+	pg:hasRole pg:wChannel ;
+	pg:hasRole pg:xChannel ;
+	pg:hasRole pg:yChannel ;
+	pg:hasRole pg:uChannel ;
+	pg:hasRole pg:vChannel ;
+	pg:hasRole pg:pChannel ;
+	pg:hasRole pg:qChannel .
 
 pg:AmbisonicBH3V1Group a pg:Group ;
 	rdfs:label "Ambisonic B stream of horizontal order 3 and vertical order 1." ;
-	pg:hasPort pg:wChannel ;
-	pg:hasPort pg:xChannel ;
-	pg:hasPort pg:yChannel ;
-	pg:hasPort pg:zChannel ;
-	pg:hasPort pg:uChannel ;
-	pg:hasPort pg:vChannel ;
-	pg:hasPort pg:pChannel ;
-	pg:hasPort pg:qChannel .
+	pg:hasRole pg:wChannel ;
+	pg:hasRole pg:xChannel ;
+	pg:hasRole pg:yChannel ;
+	pg:hasRole pg:zChannel ;
+	pg:hasRole pg:uChannel ;
+	pg:hasRole pg:vChannel ;
+	pg:hasRole pg:pChannel ;
+	pg:hasRole pg:qChannel .
 
 pg:AmbisonicBH3V2Group a pg:Group ;
 	rdfs:label "Ambisonic B stream of horizontal order 3 and vertical order 2." ;
-	pg:hasPort pg:wChannel ;
-	pg:hasPort pg:xChannel ;
-	pg:hasPort pg:yChannel ;
-	pg:hasPort pg:zChannel ;
-	pg:hasPort pg:rChannel ;
-	pg:hasPort pg:sChannel ;
-	pg:hasPort pg:tChannel ;
-	pg:hasPort pg:uChannel ;
-	pg:hasPort pg:vChannel ;
-	pg:hasPort pg:pChannel ;
-	pg:hasPort pg:qChannel .
+	pg:hasRole pg:wChannel ;
+	pg:hasRole pg:xChannel ;
+	pg:hasRole pg:yChannel ;
+	pg:hasRole pg:zChannel ;
+	pg:hasRole pg:rChannel ;
+	pg:hasRole pg:sChannel ;
+	pg:hasRole pg:tChannel ;
+	pg:hasRole pg:uChannel ;
+	pg:hasRole pg:vChannel ;
+	pg:hasRole pg:pChannel ;
+	pg:hasRole pg:qChannel .
 
 pg:AmbisonicBH3V3Group a pg:Group ;
 	rdfs:label "Ambisonic B stream of horizontal order 3 and vertical order 3." ;
-	pg:hasPort pg:wChannel ;
-	pg:hasPort pg:xChannel ;
-	pg:hasPort pg:yChannel ;
-	pg:hasPort pg:zChannel ;
-	pg:hasPort pg:rChannel ;
-	pg:hasPort pg:sChannel ;
-	pg:hasPort pg:tChannel ;
-	pg:hasPort pg:uChannel ;
-	pg:hasPort pg:vChannel ;
-	pg:hasPort pg:kChannel ;
-	pg:hasPort pg:lChannel ;
-	pg:hasPort pg:mChannel ;
-	pg:hasPort pg:nChannel ;
-	pg:hasPort pg:oChannel ;
-	pg:hasPort pg:pChannel ;
-	pg:hasPort pg:qChannel .
+	pg:hasRole pg:wChannel ;
+	pg:hasRole pg:xChannel ;
+	pg:hasRole pg:yChannel ;
+	pg:hasRole pg:zChannel ;
+	pg:hasRole pg:rChannel ;
+	pg:hasRole pg:sChannel ;
+	pg:hasRole pg:tChannel ;
+	pg:hasRole pg:uChannel ;
+	pg:hasRole pg:vChannel ;
+	pg:hasRole pg:kChannel ;
+	pg:hasRole pg:lChannel ;
+	pg:hasRole pg:mChannel ;
+	pg:hasRole pg:nChannel ;
+	pg:hasRole pg:oChannel ;
+	pg:hasRole pg:pChannel ;
+	pg:hasRole pg:qChannel .
 
 pg:EnvelopeControlGroup a pg:Group ;
 	rdfs:label "The controls for an envelope." ;
