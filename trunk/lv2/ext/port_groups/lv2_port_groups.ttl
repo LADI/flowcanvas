@@ -174,7 +174,7 @@ pg:leftRearChannel      a pg:Role ; rdfs:label "Left Rear" .
 pg:rightRearChannel     a pg:Role ; rdfs:label "Right Rear" .
 pg:subChannel           a pg:Role ; rdfs:label "Sub (LFE)" .
 pg:amplitude            a pg:Role ; rdfs:label "Amplitude" .
-pg:attack               a pg:Role ; rdfs:label "Attach" .
+pg:attack               a pg:Role ; rdfs:label "Attack" .
 pg:cutoffFrequency      a pg:Role ; rdfs:label "Cutoff Frequency" .
 pg:decay                a pg:Role ; rdfs:label "Decay" .
 pg:delay                a pg:Role ; rdfs:label "Delay" .
