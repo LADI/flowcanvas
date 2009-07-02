@@ -32,15 +32,15 @@
 
 <http://lv2plug.in/ns/dev/port-groups> a lv2:Specification ;
 	doap:license <http://usefulinc.com/doap/licenses/mit> ;
-	doap:name	"LV2 Port Groups" ;
+	doap:name    "LV2 Port Groups" ;
 	rdfs:comment "Defines semantic groupings of LV2 ports" ;
 	doap:maintainer [
 		a foaf:Person ;
-		foaf:name	 "Lars Luthman" ;
-		foaf:mbox     <mailto:lars.luthman@gmail.com>
+		foaf:name "Lars Luthman" ;
+		foaf:mbox <mailto:lars.luthman@gmail.com>
 	] , [
 		a foaf:Person ;
-		foaf:name	 "Dave Robillard" ;
+		foaf:name     "Dave Robillard" ;
 		foaf:homepage <http://drobilla.net/> ;
 		rdfs:seeAlso  <http://drobilla.net/drobilla.rdf>
 	] .
