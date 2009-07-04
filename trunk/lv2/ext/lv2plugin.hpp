@@ -35,7 +35,7 @@
 
 #include "lv2.h"
 #include "ext/lv2types.hpp"
-#include "ext/uri_map/lv2_uri_map.h"
+#include "ext/uri-map/lv2_uri_map.h"
 
 
 namespace LV2 {
