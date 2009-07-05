@@ -606,6 +606,7 @@ def specgen(specloc, template, instances=False, mode="spec"):
     global spec_url
     global spec_ns_str
     global spec_ns
+    global spec_pre
     global ns_list
         
     m = RDF.Model()
@@ -625,6 +626,21 @@ def specgen(specloc, template, instances=False, mode="spec"):
         spec_ns_str += "#"
 
     spec_ns = RDF.NS(spec_ns_str)
+    
+    namespaces = getNamespaces(p)
+    keys = namespaces.keys()
+    keys.sort()
+    prefixes_html = ""
+    for i in keys:
+        uri = namespaces[i]
+        if str(uri) == str(spec_url + '#'):
+            spec_pre = i
+        prefixes_html += '\n    <tr><td>%s</td><td><a href="%s">%s</a></td></tr>' % (i, uri, uri)
+
+    if spec_pre is None:
+        print 'No namespace prefix for specification defined'
+        sys.exit(1)
+    
     ns_list[spec_ns_str] = spec_pre
 
     classlist, proplist = specInformation(m, spec_ns_str)
@@ -658,18 +674,11 @@ def specgen(specloc, template, instances=False, mode="spec"):
     template = template.replace('@NAME@', specProperty(m, spec_url, doap.name))
     template = template.replace('@URI@', spec_url)
     template = template.replace('@PREFIX@', spec_pre)
-    namespaces = getNamespaces(p)
-    prefixes = ""
 
     filename = os.path.basename(specloc)
     basename = filename[0:filename.rfind('.')]
     
-    keys = namespaces.keys()
-    keys.sort()
-    for i in keys:
-        uri = namespaces[i]
-        prefixes += '\n    <tr><td>%s</td><td><a href="%s">%s</a></td></tr>' % (i, uri, uri)
-    template = template.replace('@PREFIXES@', str(prefixes))
+    template = template.replace('@PREFIXES@', str(prefixes_html))
     template = template.replace('@BASE@', spec_ns_str)
     template = template.replace('@AUTHORS@', specAuthors(m, spec_url))
     template = template.replace('@INDEX@', azlist)
@@ -749,7 +758,7 @@ def __getScriptPath():
 def usage():
     script = __getScriptPath()
     print """Usage: 
-    %s ONTOLOGY PREFIX TEMPLATE STYLE OUTPUT [FLAGS]
+    %s ONTOLOGY TEMPLATE STYLE OUTPUT [FLAGS]
 
         ONTOLOGY : Path to ontology file
         PREFIX   : Prefix for ontology
@@ -770,16 +779,15 @@ if __name__ == "__main__":
     """Ontology specification generator tool"""
     
     args = sys.argv[1:]
-    if (len(args) < 4):
+    if (len(args) < 3):
         usage()
     else:
         
         # Ontology
         specloc = "file:" + str(args[0])
-        spec_pre = args[1]
 
         # Template
-        temploc = args[2]
+        temploc = args[1]
         template = None
         try:
             f = open(temploc, "r")
@@ -801,7 +809,7 @@ if __name__ == "__main__":
         template = template.replace('@FOOTER@', footer)
         
         # Style
-        styleloc = args[3]
+        styleloc = args[2]
         style = ''
         try:
             f = open(styleloc, "r")
@@ -813,12 +821,12 @@ if __name__ == "__main__":
         template = template.replace('@STYLE@', style)
 
         # Destination
-        dest = args[4]
+        dest = args[3]
  
         # Flags
         instances = False
-        if len(args) > 4:
-            flags = args[4:]
+        if len(args) > 3:
+            flags = args[3:]
             if '-i' in flags:
                 instances = True
         

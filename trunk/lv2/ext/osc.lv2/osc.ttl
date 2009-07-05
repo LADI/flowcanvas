@@ -19,7 +19,7 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-@prefix :     <http://drobilla.net/ns/lv2ext/osc#> .
+@prefix osc:  <http://lv2plug.in/ns/dev/osc#> .
 @prefix lv2:  <http://lv2plug.in/ns/lv2core#> .
 @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
@@ -43,7 +43,7 @@
 ## Plugin Properties ##
 #######################
 
-:interfacePort a rdf:Property ;
+osc:interfacePort a rdf:Property ;
 	rdfs:domain  lv2:Plugin ;
 	rdfs:range   lv2:Port ;
 	rdfs:label   "Has a main OSC control port" ;

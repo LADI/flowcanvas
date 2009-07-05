@@ -1,13 +1,17 @@
 #!/bin/sh
 
-cd ext
+rm -rf ext-upload
+mkdir ext-upload
+cp -r ext/* ext-upload
+rm -rf `find ext-upload -name '.svn'`
+
+cd ext-upload
 
 echo
 echo "**** Generating code documentation with doxygen"
 doxygen Doxyfile
 
-rm index.html
-echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>" >> index.html 
+echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>" > index.html 
 echo "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML+RDFa 1.0//EN\" \"http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd\">" >> index.html
 echo "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head>" >> index.html
 echo "<meta http-equiv=\"Content-Type\" content=\"application/xhtml+xml;charset=utf-8\"/>" >> index.html
@@ -22,7 +26,7 @@ for bundle in `find -name '*.lv2'`; do
 	if [ -e $b.lv2/$b.ttl ]; then
 		echo
 		echo "**** Generating RDF documentation $b.html"
-		../specgen/lv2specgen.py $b.lv2/$b.ttl dman ../specgen/template.html ../specgen/style.css $b.lv2/$b.html -i;
+		../specgen/lv2specgen.py $b.lv2/$b.ttl ../specgen/template.html ../specgen/style.css $b.lv2/$b.html -i;
 		echo "<li><a rel=\"rdfs:seeAlso\" href=\"$b.lv2/$b.html\">$b</a></li>" >> index.html;
 	fi
 	if [ -e $b.lv2/$b.h ]; then
@@ -34,3 +38,4 @@ done
 echo "</ul><hr/>" >> index.html
 cat ../specgen/footer.html >> index.html
 echo "</body></html>" >> index.html
+

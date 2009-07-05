@@ -19,7 +19,7 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-@prefix :     <http://lv2plug.in/ns/ext/instance-var#> .
+@prefix var:  <http://lv2plug.in/ns/ext/instance-var#> .
 @prefix lv2:  <http://lv2plug.in/ns/lv2core#> .
 @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
@@ -81,7 +81,7 @@ to variables.  A future revision, or a different extension, may.
 """ .
 
 
-:Variable a rdfs:Class ;
+var:Variable a rdfs:Class ;
 	rdfs:label   "LV2 Variable" ;
 	rdfs:comment "A typed instance variable." ;
 
@@ -99,9 +99,9 @@ to variables.  A future revision, or a different extension, may.
 	] .
 
 
-:variable a owl:ObjectProperty ;
+var:variable a owl:ObjectProperty ;
 	rdfs:label   "Has a Variable" ;
-	rdfs:range   :Variable ;
+	rdfs:range   var:Variable ;
 	rdfs:comment """
 Relates an LV2 Variable to some Resource, usually a plugin instance.
 The domain of this property is not restricted, it may be used for anything.

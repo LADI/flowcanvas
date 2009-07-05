@@ -19,7 +19,7 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-@prefix :      <http://lv2plug.in/ns/dev/polymorphic-port#> .
+@prefix polym: <http://lv2plug.in/ns/dev/polymorphic-port#> .
 @prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
 @prefix rdf:   <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
@@ -38,7 +38,7 @@
 	] .
 
 
-:PolymorphicPort a rdfs:Class ;
+polym:PolymorphicPort a rdfs:Class ;
     rdfs:label      "Polymorphic port" ;
     rdfs:subClassOf lv2:Port ;
     rdfs:comment    """
@@ -54,13 +54,13 @@ In this way polymorphic plugins are backwards compatible and may be used by
 hosts which are not aware of the polymorphic port extension.
 """ .
 
-:generic a lv2:PortProperty ;
+polym:generic a lv2:PortProperty ;
 	rdfs:label "Generic polymorphic port" ;
 	rdfs:comment """
 Indicates that this port can be connected to a buffer of any type.
 """ .
 
-:supportsType a rdf:Property ;
+polym:supportsType a rdf:Property ;
 	rdfs:domain  lv2:Port ;
     rdfs:label   "Supports data type" ;
     rdfs:comment """

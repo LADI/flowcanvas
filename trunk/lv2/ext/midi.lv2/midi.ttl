@@ -22,7 +22,7 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-@prefix :      <http://lv2plug.in/ns/ext/midi#> .
+@prefix midi:  <http://lv2plug.in/ns/ext/midi#> .
 @prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
 @prefix lv2ev: <http://lv2plug.in/ns/ext/events#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
@@ -41,7 +41,7 @@
 	] .
 
 
-:MidiEvent a rdfs:Class ;
+midi:MidiEvent a rdfs:Class ;
 	rdfs:label      "LV2 MIDI event" ;
 	rdfs:subClassOf lv2ev:Event ;
 	rdfs:comment    """
