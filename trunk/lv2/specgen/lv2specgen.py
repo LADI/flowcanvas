@@ -661,6 +661,9 @@ def specgen(specloc, template, instances=False, mode="spec"):
     namespaces = getNamespaces(p)
     prefixes = ""
 
+    filename = os.path.basename(specloc)
+    basename = filename[0:filename.rfind('.')]
+    
     keys = namespaces.keys()
     keys.sort()
     for i in keys:
@@ -671,9 +674,17 @@ def specgen(specloc, template, instances=False, mode="spec"):
     template = template.replace('@AUTHORS@', specAuthors(m, spec_url))
     template = template.replace('@INDEX@', azlist)
     template = template.replace('@REFERENCE@', termlist.encode("utf-8"))
-    template = template.replace('@FILENAME@', os.path.basename(specloc))
-    template = template.replace('@HEADER@', os.path.basename(specloc).replace('.ttl', '.h'))
+    template = template.replace('@FILENAME@', filename)
+    template = template.replace('@HEADER@', basename + '.h')
     template = template.replace('@MAIL@', 'devel@lists.lv2plug.in')
+
+    other_files = '<p>See also:</p>\n<ul>'
+    other_files += '<li><a href=".">Bundle</a></li>'
+    other_files += '<li><a href="%s">%s</a> - Ontology</li>' % (filename, filename)
+    other_files += '<li><a href="%s">%s</a> - Header</li>' % (basename + '.h', basename + '.h')
+    other_files += '<li><a href="%s">%s</a> - Header Documentation</li>' % (basename + '.h.html', basename + '.h.html')
+    other_files += '</ul>'
+    template = template.replace('@FILES@', other_files);
 
     comment = specProperty(m, spec_url, rdfs.comment)
     if not comment:
