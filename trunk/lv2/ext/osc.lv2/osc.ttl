@@ -27,6 +27,17 @@
 @prefix doap: <http://usefulinc.com/ns/doap#> .
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 
+<http://lv2plug.in/ns/dev/osc> a lv2:Specification ;
+	doap:license <http://usefulinc.com/doap/licenses/mit> ;
+	doap:name "LV2 OSC Events" ;
+	rdfs:comment "Defines an LV2 event type for standard raw OSC" ;
+	doap:maintainer [
+		a foaf:Person ;
+		foaf:name "Dave Robillard" ;
+		foaf:homepage <http://drobilla.net/> ;
+		rdfs:seeAlso <http://drobilla.net/drobilla.xrdf>
+	] .
+
 
 #######################
 ## Plugin Properties ##

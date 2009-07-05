@@ -30,7 +30,7 @@
 
 <http://lv2plug.in/ns/ext/instance-var> a lv2:Specification ;
     doap:license <http://usefulinc.com/doap/licenses/mit> ;
-    doap:name "Instance Variables" ;
+    doap:name "LV2 Instance Variables" ;
     doap:created "2008-08-18" ;
     doap:maintainer [
         a foaf:Person ;

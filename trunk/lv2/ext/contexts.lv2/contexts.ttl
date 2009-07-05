@@ -23,7 +23,7 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-@prefix :     <http://lv2plug.in/ns/dev/contexts#> .
+@prefix ctx:  <http://lv2plug.in/ns/dev/contexts#> .
 @prefix lv2:  <http://lv2plug.in/ns/lv2core#> .
 @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
@@ -34,6 +34,7 @@
 <http://lv2plug.in/ns/dev/contexts>
 	a lv2:Specification ;
 	a lv2:Feature ;
+    doap:name "LV2 Contexts" ;
 	rdfs:comment """
 An extension for LV2 plugins which have potentially concurrent contexts.
 
@@ -59,7 +60,7 @@ threading class similar to the Audio class defined by LV2.  Each context has a
 run callback and a connect_port callback both in the same class (i.e. can't be
 called concurrently), but may be called concurrently with functions for other
 contexts (excluding the Instantiation class).  Context properties such as
-:hardRtCapable apply to both functions.
+ctx:hardRtCapable apply to both functions.
 The host MUST only call the correct connect_port function associated with the
 context for that port, i.e. it is an error to use the main LV2 connect_port
 function on a port with a context other than the main LV2 run function.
@@ -70,20 +71,20 @@ function on a port with a context other than the main LV2 run function.
 ## Context Base Classes ##
 ##########################
 
-:Context a rdfs:Class ;
+ctx:Context a rdfs:Class ;
 	rdfs:label "LV2 Context" ;
 	rdfs:comment """
 A potentially concurrent context (callback) on a plugin.
 
 If a plugin supports a context (specified with the :optionalContext or
-:requiredContext plugin properties) its extension_data function, called with
+ctx:requiredContext plugin properties) its extension_data function, called with
 the URI for that context, should return a context descriptor as defined by the
 specification of the context URI.  If a plugin has any contexts, it MUST specify
 the associated context of ALL ports, with the :context port property.""" .
 
 
 
-:RollingContext a rdfs:Class ;
+ctx:RollingContext a rdfs:Class ;
 	rdfs:subClassOf :Context ;
 	rdfs:comment """
 A context which is is continually executed in blocks (like the standard LV2
@@ -99,7 +100,7 @@ read from/written to all ports associated with this context.
 """ .
 
 
-:BlockingContext a rdfs:Class ;
+ctx:BlockingContext a rdfs:Class ;
 	rdfs:subClassOf :Context ;
 	rdfs:comment """
 A context which is executed only when there is work to be done
@@ -127,17 +128,17 @@ The plugin MUST NOT touch any bits corresponding to ports on another context.
 ## Plugin Properties ##
 #######################
 
-:optionalContext a rdf:Property ;
+ctx:optionalContext a rdf:Property ;
 	rdfs:domain  lv2:Plugin ;
-	rdfs:range   :Context ;
+	rdfs:range   ctx:Context ;
 	rdfs:label   "Has an optional context" ;
 	rdfs:comment """
 Signifies a Plugin supports a certain context, defined by a URI, which may
 be ignored by the host.""" .
 
-:requiredContext a rdf:Property ;
+ctx:requiredContext a rdf:Property ;
 	rdfs:domain  lv2:Plugin ;
-	rdfs:range   :Context ;
+	rdfs:range   ctx:Context ;
 	rdfs:label   "Has a required context" ;
 	rdfs:comment """
 Signifies a Plugin supports a certain context, defined by a URI, which must be
@@ -148,9 +149,9 @@ supported by the host for the plugin to function.""" .
 ## Port Properties ##
 #####################
 
-:context a rdf:Property ;
+ctx:context a rdf:Property ;
 	rdfs:domain lv2:Port ;
-	rdfs:range  :Context ;
+	rdfs:range  ctx:Context ;
 	rdfs:label  "Is used by context" ;
 	rdfs:comment """
 The context a particular port is associated with; the port will only be
@@ -164,18 +165,18 @@ audio context.""" .
 ## Context Hints ##
 ###################
 
-:ContextHint a rdfs:Class ;
+ctx:ContextHint a rdfs:Class ;
     rdfs:label      "Context hint" ;
     rdfs:subClassOf lv2:Hint ;
     rdfs:comment    "Hint for a plugin context." .
 
-:contextHint a rdf:Property ;
+ctx:contextHint a rdf:Property ;
     rdfs:domain  :Context ;
     rdfs:range   :ContextHint ;
     rdfs:label   "Context hint" ;
     rdfs:comment "Relates Contexts to ContextHints." .
 
-:hardRTCapable a :ContextHint ;
+ctx:hardRTCapable a :ContextHint ;
     rdfs:label   "Hard realtime capable" ;
     rdfs:comment """
 Indicates that the context is capable of running in a "hard real-time"
@@ -187,22 +188,22 @@ environment, with identical conditions as lv2:hardRTCapable.
 ## Context Priorities ##
 ########################
 
-:ContextPriority a rdfs:Class ;
+ctx:ContextPriority a rdfs:Class ;
 	rdfs:label "Context priority" ;
 	rdfs:comment """
 The scheduling priority of a context.
 """ .
 
-:AudioPriority a rdfs:Class ;
-	rdfs:subClassOf :ContextPriority ;
+ctx:AudioPriority a rdfs:Class ;
+	rdfs:subClassOf ctx:ContextPriority ;
 	rdfs:label "Audio context priority" ;
 	rdfs:comment """
 Signifies a context should be run with priority equal to that of the
 standard LV2 run callback.
 """ .
 
-:MainPriority a rdfs:Class ;
-	rdfs:subClassOf :ContextPriority ;
+ctx:MainPriority a rdfs:Class ;
+	rdfs:subClassOf ctx:ContextPriority ;
 	rdfs:label "Main context priority" ;
 	rdfs:comment """
 Signifies a context should be run with priority equal to that of the
@@ -210,16 +211,16 @@ main context of the host (typically non-realtime default system priority).
 """ .
 
 
-:HighPriorityWorker a rdfs:Class ;
-	rdfs:subClassOf :Context ;
+ctx:HighPriorityWorker a rdfs:Class ;
+	rdfs:subClassOf ctx:Context ;
 	rdfs:comment """
 A worker context with a high priority, just below that of the main run
 callback.  If the run callback is run with realtime priority, the host
 should run this context with (slighly lower) realtime priority as well.
 """ .
 
-:LowPriorityWorker a rdfs:Class ;
-	rdfs:subClassOf :Context ;
+ctx:LowPriorityWorker a rdfs:Class ;
+	rdfs:subClassOf ctx:Context ;
 	rdfs:comment """
 A worker context with a low non-realtime priority, lower then that of the
 standard LV2 run callback.
@@ -230,8 +231,8 @@ standard LV2 run callback.
 ## Specific context definitions ##
 ##################################
 
-:MessageContext a rdfs:Class ;
-	rdfs:subClassOf :BlockingContext ;
+ctx:MessageContext a rdfs:Class ;
+	rdfs:subClassOf ctx:BlockingContext ;
 	rdfs:comment """
 A blocking context for on-demand message-like processing.
 """ .
