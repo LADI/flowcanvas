@@ -13,50 +13,8 @@
     <meta http-equiv="content-type" content="text/xhtml+xml; charset=utf-8" />
     <meta name="generator" content="lv2specgen" />
     <style type="text/css">
-
-body {
-    color: black;
-    background: white;
-}
-
-:link    { color: #00C; background: transparent }
-:visited { color: #609; background: transparent }
-a:active { color: #C00; background: transparent }
-
-h1, h2, h3, h4, h5, h6 { text-align: left; background-color: #eee; padding: 0.25ex }
-h2, h3, h4, h5, h6 { margin-top: 2.5ex; }
-h1, h2, h3 { color: #005A9C; }
-
-.label { font-style: italic; margin-bottom: 0.5ex; }
-.index { padding: 1ex; border: 2px dotted gray; background-color: #eee; }
-.restriction { margin-bottom: 2ex; padding: 0; }
-.description { margin-bottom: 2ex; }
-
-dl { padding: 0; margin: 0 }
-dt { font-weight: bold ; margin-top: 0.75ex; }
-
-hr {
-    color: silver;
-    background-color: silver;
-    height: 1px;
-    border: 0;
-    margin-top: 3ex;
-    margin-bottom: 3ex
-}
-
-div.head { margin-bottom: 1em }
-div.head h1 { margin-top: 2em; clear: both }
-div.head table { margin-left: 2em; margin-top: 2em }
-
-pre { margin-left: 2em }
-
-@media aural {  
-    dt { pause-before: 20% }
-    pre { speak-punctuation: code } 
-}
-
-
-  </style>
+		@STYLE@
+    </style>
   </head>
   <body>
   <h1 id="title">@NAME@</h1>
@@ -129,30 +87,7 @@ pre { margin-left: 2em }
   <!-- FOOTER -->
 
   <hr />
-  <div class="footer">
-    <span about="" resource="http://www.w3.org/TR/rdfa-syntax"
-          rel="dct:conformsTo">
-      <a href="http://validator.w3.org/check?uri=referer">
-        <img style="border:0;width:88px;height:31px"
-             src="http://www.w3.org/Icons/valid-xhtml-rdfa-blue"
-             alt="Valid XHTML + RDFa"/>
-      </a>
-    </span>
-    <span about="" resource="http://www.w3.org/TR/CSS2"
-          rel="dct:conformsTo">
-      <a href="http://jigsaw.w3.org/css-validator/check/referer">
-        <img style="border:0;width:88px;height:31px"
-             src="http://jigsaw.w3.org/css-validator/images/vcss-blue"
-             alt="Valid CSS"/></a>
-    </span>
-    <span about="">
-      <a about="" rel="license" href="http://creativecommons.org/licenses/by/3.0/">
-        <img alt="Creative Commons Attribution 3.0 Unported License"
-             style="border-width:0;width:88px;height:31px"
-             src="http://i.creativecommons.org/l/by/3.0/88x31.png" />
-      </a>
-    </span>
-  </div>
+  @FOOTER@
 
   </body>
 </html>

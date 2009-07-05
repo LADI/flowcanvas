@@ -749,7 +749,7 @@ def __getScriptPath():
 def usage():
     script = __getScriptPath()
     print """Usage: 
-    %s ONTOLOGY PREFIX TEMPLATE OUTPUT [FLAGS]
+    %s ONTOLOGY PREFIX TEMPLATE STYLE OUTPUT [FLAGS]
 
         ONTOLOGY : Path to ontology file
         PREFIX   : Prefix for ontology
@@ -787,14 +787,38 @@ if __name__ == "__main__":
         except Exception, e:
             print "Error reading from template \"" + temploc + "\": " + str(e)
             usage()
+        
+        # Footer
+        footerloc = temploc.replace('template', 'footer')
+        footer = ''
+        try:
+            f = open(footerloc, "r")
+            footer = f.read()
+        except Exception, e:
+            print "Error reading from footer \"" + footerloc + "\": " + str(e)
+            usage()
+        
+        template = template.replace('@FOOTER@', footer)
+        
+        # Style
+        styleloc = args[3]
+        style = ''
+        try:
+            f = open(styleloc, "r")
+            style = f.read()
+        except Exception, e:
+            print "Error reading from style \"" + styleloc + "\": " + str(e)
+            usage()
+
+        template = template.replace('@STYLE@', style)
 
         # Destination
-        dest = args[3]
+        dest = args[4]
  
         # Flags
         instances = False
-        if len(args) > 3:
-            flags = args[3:]
+        if len(args) > 4:
+            flags = args[4:]
             if '-i' in flags:
                 instances = True
         
