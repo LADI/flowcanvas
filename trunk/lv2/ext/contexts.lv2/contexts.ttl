@@ -36,17 +36,15 @@
 	a lv2:Feature ;
     doap:name "LV2 Contexts" ;
 	rdfs:comment """
-An extension for LV2 plugins which have potentially concurrent contexts.
+An extension for LV2 plugins which have several execution contexts.
 
 Any host which supports this extension must pass an LV2_Feature to
 the plugin's instantiate method with URI http://lv2plug.in/ns/dev/contexts
-and a pointer to a
-
+and a pointer to a <code>
 struct {
 	void* host_handle;
 	void (*request_run)(void* host_handle, const char* context_uri);
-}
-
+} </code>
 where the plugin may call request_run with the given host_handle (from any
 context) to demand immediate execution of the context specified.
 
