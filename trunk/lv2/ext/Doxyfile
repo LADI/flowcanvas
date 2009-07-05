@@ -564,21 +564,22 @@ WARN_LOGFILE           =
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
 
-INPUT                  =  \
-	./ui/lv2_ui.h \
-	./osc/lv2_osc_print.h \
-	./osc/lv2_osc.h \
-	./instance-access/lv2_instance_access.h \
-	./event/lv2_event.h \
-	./event/lv2_event_helpers.h \
-	./dyn-manifest/dyn-manifest.h \
-	./polymorphic-port/lv2_polymorphic_port.h \
-	./variables/lv2_variables.h \
-	./variables/lv2_variables_private.h \
-	./contexts/lv2_contexts.h \
-	./data-access/lv2_data_access.h \
-	./object/lv2_object.h \
-	./uri-map/lv2_uri_map.h \
+INPUT =  \
+	contexts/lv2_contexts.h \
+	data-access/lv2_data_access.h \
+	dyn-manifest.lv2/dyn-manifest.h \
+	event/lv2_event.h \
+	event/lv2_event_helpers.h \
+	instance-access/lv2_instance_access.h \
+	object/lv2_object.h \
+	osc/lv2_osc.h \
+	osc/lv2_osc_print.h \
+	polymorphic-port/lv2_polymorphic_port.h \
+	port-groups.lv2/port-groups.h \
+	ui/lv2_ui.h \
+	uri-map/lv2_uri_map.h \
+	variables/lv2_variables.h \
+	variables/lv2_variables_private.h
 
 # This tag can be used to specify the character encoding of the source files 
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is 
