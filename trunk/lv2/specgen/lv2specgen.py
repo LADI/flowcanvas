@@ -44,6 +44,7 @@ import urllib
 
 try:
     import RDF
+    import Redland
 except ImportError:
     version = sys.version.split(" ")[0]
     if version.startswith("2.5"):
@@ -53,7 +54,7 @@ except ImportError:
     try:
         import RDF
     except:
-        sys.exit("Error importing RedLand bindings for Python; check if it is installed correctly")
+        sys.exit("Error importing Redland bindings for Python; check if it is installed correctly")
 
 #global vars
 classranges = {}
@@ -268,7 +269,7 @@ def rdfsClassInfo(term,m):
                 restrictions.append(meta_types.current().subject)
 
         if len(superclasses) > 0:
-            doc += "<dt>Sub-class of</dt>"
+            doc += "\n<dt>Sub-class of</dt>"
             for superclass in superclasses:
                 doc += "<dd>%s</dd>" % getTermLink(superclass)
 
@@ -282,16 +283,24 @@ def rdfsClassInfo(term,m):
             elif p.predicate == rdfs.comment:
                 comment = p.object
         if onProp != None:
-            doc += '<dt>Restriction on property %s</dt><dd class="restriction">' % getTermLink(onProp.uri)
+            doc += '<dt>Restriction on property %s</dt>\n' % getTermLink(onProp.uri)
+            doc += '<dd class="restriction">\n'
             if comment != None:
                 doc += "<p>%s</p>\n" % comment
-            props = m.find_statements(RDF.Statement(r, None, None))
-            doc += "<dl>"
-            for p in props:
+
+            prop_str = ''
+            for p in m.find_statements(RDF.Statement(r, None, None)):
                 if p.predicate != owl.onProperty and p.predicate != rdfs.comment and not(
                         p.predicate == rdf.type and p.object == owl.Restriction):
-                    doc += "<dt>%s</dt><dd>%s</dd>" % (getTermLink(p.predicate.uri), getTermLink(p.object.uri))
-            doc += "</dl></dd>"
+                    if p.object.is_resource():
+                        prop_str += '\n<dt>%s</dt><dd>%s</dd>\n' % (
+                                getTermLink(p.predicate.uri), getTermLink(p.object.uri))
+                    elif p.object.is_literal():
+                        prop_str += '\n<dt>%s</dt><dd>%s</dd>\n' % (
+                                getTermLink(p.predicate.uri), p.object.literal_value['string'])
+            if prop_str != '':
+                doc += '<dl class=\"prop\">%s</dl>\n' % prop_str
+            doc += '</dd>'
 
     # Find out about properties which have rdfs:domain of t
     d = classdomains.get(str(term.uri), "")
@@ -321,8 +330,6 @@ def extraInfo(term,m):
     """Generate information about misc. properties of a term"""
     doc = ""
     properties = m.find_statements(RDF.Statement(term, None, None))
-    #if properties:
-    #    doc += '<dl>\n'
     last_pred = ''
     for p in properties:
         if isSpecial(p.predicate) or p.object.is_blank():
@@ -333,9 +340,11 @@ def extraInfo(term,m):
             doc += '<dd>%s</dd>\n' % getTermLink(str(p.object.uri), term, p.predicate)
         elif p.object.is_literal():
             doc += '<dd>%s</dd>\n' % str(p.object)
+        else:
+            doc += '<dd>?</dd>\n'
         last_pred = p.predicate
-    #if properties:
-    #    doc += '</dl>\n'
+    if doc != '':
+        doc = '<dl>\n%s\n</dl>\n' % doc
     return doc
 
 
@@ -447,7 +456,7 @@ def docTerms(category, list, m):
         terminfo += extraInfo(term,m)
         
         if (len(terminfo)>0): #to prevent empty list (bug #882)
-            doc += "\n<dl>%s</dl>\n" % terminfo
+            doc += '\n<dl class="terminfo">%s</dl>\n' % terminfo
         
         doc += htmlDocInfo(t)
         doc += "\n\n</div>\n\n"
@@ -555,9 +564,9 @@ def specInformation(m, ns):
 
 
 def specProperty(m, subject, predicate):
-    "Return the rdfs:comment of the spec."
+    "Return a property of the spec."
     for c in m.find_statements(RDF.Statement(None, predicate, None)):
-        if str(c.subject.uri) == str(subject):
+        if c.subject.is_resource() and str(c.subject.uri) == str(subject):
             return str(c.object)
     return ''
 
@@ -567,7 +576,7 @@ def specAuthors(m, subject):
     ret = ''
     for i in m.find_statements(RDF.Statement(None, doap.maintainer, None)):
         for j in m.find_statements(RDF.Statement(i.object, foaf.name, None)):
-            ret += '<div class="author" property="dc:creator">' + j.object.literal_value['string'] + '</div>\n'
+            ret += '<div class="author" property="dc:creator">' + j.object.literal_value['string'] + '</div>'
     return ret
 
 
@@ -646,18 +655,31 @@ def specgen(specloc, template, instances=False, mode="spec"):
     template = re.sub(r"^#format \w*\n", "", template)
     template = re.sub(r"\$VersionInfo\$", owlVersionInfo(m).encode("utf-8"), template) 
     
-    template = template.replace('@INDEX@', azlist)
-    template = template.replace('@REFERENCE@', termlist.encode("utf-8"))
     template = template.replace('@NAME@', specProperty(m, spec_url, doap.name))
     template = template.replace('@URI@', spec_url)
     template = template.replace('@PREFIX@', spec_pre)
+    namespaces = getNamespaces(p)
+    prefixes = ""
+
+    keys = namespaces.keys()
+    keys.sort()
+    for i in keys:
+        uri = namespaces[i]
+        prefixes += '\n    <tr><td>%s</td><td><a href="%s">%s</a></td></tr>' % (i, uri, uri)
+    template = template.replace('@PREFIXES@', str(prefixes))
     template = template.replace('@BASE@', spec_ns_str)
+    template = template.replace('@AUTHORS@', specAuthors(m, spec_url))
+    template = template.replace('@INDEX@', azlist)
+    template = template.replace('@REFERENCE@', termlist.encode("utf-8"))
     template = template.replace('@FILENAME@', os.path.basename(specloc))
     template = template.replace('@HEADER@', os.path.basename(specloc).replace('.ttl', '.h'))
     template = template.replace('@MAIL@', 'devel@lists.lv2plug.in')
-    template = template.replace('@COMMENT@', specProperty(m, spec_url, rdfs.comment))
-    template = template.replace('@AUTHORS@', specAuthors(m, spec_url))
-    
+
+    comment = specProperty(m, spec_url, rdfs.comment)
+    if not comment:
+        comment = specProperty(m, spec_url, doap.shortdesc)
+    template = template.replace('@COMMENT@', comment)
+
     template += ("<!-- generated from %s by %s at %s -->" %
         (os.path.basename(specloc), os.path.basename(sys.argv[0]), time.strftime('%X %x %Z')))
     
@@ -673,6 +695,19 @@ def save(path, text):
     except Exception, e:
         print "Error writing to file \"" + path + "\": " + str(e)
 
+def getNamespaces(parser):
+    """Return a prefix:URI dictionary of all namespaces seen during parsing"""
+    count = Redland.librdf_parser_get_namespaces_seen_count(parser._parser)
+    nspaces = {}
+    for index in range(0, count - 1):
+        prefix = Redland.librdf_parser_get_namespaces_seen_prefix(parser._parser, index)
+        uri_obj = Redland.librdf_parser_get_namespaces_seen_uri(parser._parser, index)
+        if uri_obj is None:
+            uri = None
+        else:
+            uri = RDF.Uri(from_object=uri_obj)
+        nspaces[prefix] = uri
+    return nspaces
 
 def getOntologyNS(m):
     ns = None
