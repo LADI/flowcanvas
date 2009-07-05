@@ -85,7 +85,7 @@ the associated context of ALL ports, with the :context port property.""" .
 
 
 ctx:RollingContext a rdfs:Class ;
-	rdfs:subClassOf :Context ;
+	rdfs:subClassOf ctx:Context ;
 	rdfs:comment """
 A context which is is continually executed in blocks (like the standard LV2
 run callback).  Extension data is a pointer to a
@@ -101,7 +101,7 @@ read from/written to all ports associated with this context.
 
 
 ctx:BlockingContext a rdfs:Class ;
-	rdfs:subClassOf :Context ;
+	rdfs:subClassOf ctx:Context ;
 	rdfs:comment """
 A context which is executed only when there is work to be done
 (e.g. a message is received).  Extension data is a pointer to a
@@ -171,12 +171,12 @@ ctx:ContextHint a rdfs:Class ;
     rdfs:comment    "Hint for a plugin context." .
 
 ctx:contextHint a rdf:Property ;
-    rdfs:domain  :Context ;
-    rdfs:range   :ContextHint ;
+    rdfs:domain  ctx:Context ;
+    rdfs:range   ctx:ContextHint ;
     rdfs:label   "Context hint" ;
     rdfs:comment "Relates Contexts to ContextHints." .
 
-ctx:hardRTCapable a :ContextHint ;
+ctx:hardRTCapable a ctx:ContextHint ;
     rdfs:label   "Hard realtime capable" ;
     rdfs:comment """
 Indicates that the context is capable of running in a "hard real-time"

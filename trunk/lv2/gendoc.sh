@@ -16,7 +16,7 @@ for bundle in `find -name '*.lv2'`; do
 	if [ -e $b.lv2/$b.h ]; then
 		echo
 		echo "**** Copying code documentation $b.h.html"
-		cp doc/html/${b}_8h.html $b.lv2/$b.h.html;
+		cd $b.lv2 && ln -fs ../doc/html/${b}_8h.html $b.h.html && cd -;
 	fi
 done
 
