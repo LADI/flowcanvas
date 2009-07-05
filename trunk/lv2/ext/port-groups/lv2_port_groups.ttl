@@ -51,10 +51,11 @@
 pg:Group a rdfs:Class ;
 	rdfs:label   "LV2 Port Group" ;
 	rdfs:subClassOf [ a owl:Restriction ;
-		owl:onProperty lv2:symbol ;
-		owl:hasValue   xsd:string ;
+		owl:onProperty     lv2:symbol ;
+		owl:someValuesFrom xsd:string ;
+		owl:cardinality    1 ;
         rdfs:comment   """
-A pg:Group MUST have at least one string lv2:symbol.  This symbol must be
+A pg:Group MUST have exactly one string lv2:symbol.  This symbol must be
 unique according to the same rules as the lv2:symbol for an lv2:Port, where
 group symbols and port symbols reside in the same namespace.  In other words,
 a group on a plugin MUST NOT have the same symbol as another group or a port
@@ -63,13 +64,9 @@ an identifier to refer to groups for the same reasons this is useful for ports.
 """
 	] ;
 	rdfs:comment """
-A grouping of ports that can be logically considered a "stream", e.g.
-two audio ports in a group forming a stereo stream.  Both inputs and outputs
-can form a group, which allows describing to the host which outputs correspond
-to which inputs.  In this case, outputs with a given role correspond to the
-inputs in the same group with that role (though the output and input roles
-of a group do not necessarily match).  The pg:source predicate can also be
-used to describe this correspondence between separate ports/groups.
+A grouping of ports that can be logically considered a single "stream", e.g.
+two audio ports in a group may form a stereo stream.  The pg:source predicate
+can also be used to describe this correspondence between separate ports/groups.
 """ .
 
 pg:requiredRole a rdf:Property ;
@@ -78,14 +75,6 @@ pg:requiredRole a rdf:Property ;
 	rdfs:label   "Has port with role" ;
 	rdfs:comment """
 Indicates that a group always has a port with a particular role.
-""" .
-
-pg:optionalRole a rdf:Property ;
-	rdfs:domain  pg:Group ;
-	rdfs:range   lv2:Port ;
-	rdfs:label   "May have port with role" ;
-	rdfs:comment """
-Indicates that a group MAY have a port with a particular role.
 """ .
 
 pg:sideChainOf a rdf:Property ;
