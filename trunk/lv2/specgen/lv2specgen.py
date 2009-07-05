@@ -633,7 +633,7 @@ def specgen(specloc, template, instances=False, mode="spec"):
     prefixes_html = ""
     for i in keys:
         uri = namespaces[i]
-        if str(uri) == str(spec_url + '#'):
+        if spec_pre is None and str(uri) == str(spec_url + '#'):
             spec_pre = i
         prefixes_html += '\n    <tr><td>%s</td><td><a href="%s">%s</a></td></tr>' % (i, uri, uri)
 
@@ -761,15 +761,16 @@ def usage():
     %s ONTOLOGY TEMPLATE STYLE OUTPUT [FLAGS]
 
         ONTOLOGY : Path to ontology file
-        PREFIX   : Prefix for ontology
         TEMPLATE : HTML template path
+        STYLE    : CSS style path
         OUTPUT   : HTML output path
 
         Optional flags:
-                -i   : Document class/property instances (disabled by default)
+                -i        : Document class/property instances (disabled by default)
+                -p PREFIX : Set ontology namespace prefix from command line
 
 Example:
-    %s lv2_foos.ttl foos template.html lv2_foos.html -i
+    %s lv2_foos.ttl template.html lv2_foos.html -i -p foos
 
 """ % (script, script)
     sys.exit(-1)
@@ -827,8 +828,14 @@ if __name__ == "__main__":
         instances = False
         if len(args) > 3:
             flags = args[3:]
-            if '-i' in flags:
-                instances = True
+            i = 0
+            while i < len(flags):
+                if flags[i] == '-i':
+                    instances = True
+                elif flags[i] == '-p':
+                    spec_pre = flags[i + 1]
+                    i += 1
+                i += 1
         
         save(dest, specgen(specloc, template, instances=instances))
 
