@@ -39,7 +39,7 @@ def build_plugin(bld, lang, name):
 	obj              = bld.new_task_gen(lang, 'shlib')
 	obj.env          = penv
 	obj.source       = [ 'plugins/%s.lv2/%s.%s' % (name, name, ext) ]
-	obj.includes     = '.'
+	obj.includes     = ['.', './ext']
 	obj.name         = name
 	obj.target       = name
 	obj.install_path = '${LV2DIR}/' + name + '.lv2'

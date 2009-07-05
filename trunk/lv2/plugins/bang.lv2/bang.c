@@ -20,9 +20,9 @@
 #include <string.h>
 #include <assert.h>
 #include "lv2.h"
-#include "ext/event/lv2_event.h"
-#include "ext/event/lv2_event_helpers.h"
-#include "ext/contexts/lv2_contexts.h"
+#include "ext/event.lv2/event.h"
+#include "ext/event.lv2/event-helpers.h"
+#include "ext/contexts.lv2/contexts.h"
 
 
 /* Plugin */

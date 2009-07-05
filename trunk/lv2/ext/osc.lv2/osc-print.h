@@ -18,7 +18,7 @@
 #ifndef LV2_OSC_PRINT_H
 #define LV2_OSC_PRINT_H
 
-#include "lv2_osc.h"
+#include "ext/osc.lv2/osc.h"
 
 #ifdef __cplusplus
 extern "C" {

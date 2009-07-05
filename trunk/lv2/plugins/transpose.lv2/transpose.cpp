@@ -17,7 +17,7 @@
 
 #include <iostream>
 #include "ext/lv2plugin.hpp"
-#include "ext/event/lv2_event.h"
+#include "ext/event.lv2/event.h"
 
 using namespace std;
 
