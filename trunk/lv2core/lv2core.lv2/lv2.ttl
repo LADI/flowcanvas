@@ -1,10 +1,10 @@
 # RDF Schema for LV2 plugins
-# Revision 3
+# PROVISIONAL Revision 4
 #
 # This document describes the classes and properties that are defined by the
 # core LV2 specification.  See <http://lv2plug.in> for more information.
 # 
-# Copyright (C) 2006-2008 Steve Harris, Dave Robillard
+# Copyright (C) 2006-2009 Steve Harris, Dave Robillard
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -27,21 +27,21 @@
 @prefix :     <http://lv2plug.in/ns/lv2core#> .
 @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix xsd:  <http://www.w3.org/2001/XMLSchema> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
 @prefix doap: <http://usefulinc.com/ns/doap#> .
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 
 :Specification a rdfs:Class ;
     rdfs:comment """
-An LV2 specification (ie this specification, or an LV2 extension).
+An LV2 specification (i.e. this specification, or an LV2 extension).
 
 Specification data, like plugins, is distributed in standardized
 bundles so hosts may discover all present LV2 data.
 See http://lv2plug.in/docs for more details.
 """ .
 
-<> a doap:Project ;
-    a :Specification ;
+<http://lv2plug.in/ns/lv2core>
+	a doap:Project , :Specification ;
     doap:license <http://usefulinc.com/doap/licenses/mit> ;
     doap:name "LV2" ;
     doap:homepage <http://lv2plug.in> ;
@@ -283,26 +283,29 @@ values in the range of :float.
     rdfs:comment "An additional feature which a plugin may use or require.".
 
 :optionalFeature a rdf:Property ;
-    rdfs:domain  :Plugin ;
+    rdfs:domain  :Plugin , rdfs:Class ;
     rdfs:range   :Feature ;
     rdfs:label   "Optional feature" ;
     rdfs:comment """
-Signifies that a plugin is able to make use of or provide a certain feature.
+Signifies that a plugin or other resource supports a certain features.
 If the host supports this feature, it MUST pass its URI and any additional
 data to the plugin in the instantiate() function. The plugin MUST NOT fail to
-instantiate if an optional feature is not supported by the host.""" .
+instantiate if an optional feature is not supported by the host.
+This predicate may be used by extensions for any type of subject.
+""" .
 
 :requiredFeature a rdf:Property ;
-    rdfs:domain  :Plugin ;
+    rdfs:domain  :Plugin , rdfs:Class ;
     rdfs:range   :Feature ;
     rdfs:label   "Required feature" ;
     rdfs:comment """
-Signifies that a plugin requires a certain feature in order to function.
+Signifies that a plugin or other resource requires a certain feature.
 If the host supports this feature, it MUST pass its URI and any additional
 data to the plugin in the instantiate() function. The plugin MUST fail to 
 instantiate if a required feature is not present; hosts SHOULD always check 
 this before attempting to instantiate a plugin (i.e. discovery by attempting 
 to instantiate is strongly discouraged).
+This predicate may be used by extensions for any type of subject.
 """ .
 
 
@@ -431,6 +434,15 @@ Hosts that support bounds at all MUST support this property.
 Indicates that a port's reasonable values are integers (eg. a user interface
 would likely wish to provide a stepped control allowing only integer input).
 A plugin MUST operate reasonably even if such a port has a non-integer input.
+""" .
+
+:enumeration a :PortProperty ;
+   rdfs:label   "Enumeration" ;
+   rdfs:comment """
+Indicates that a port's only reasonable values are the scale points defined for
+that port.  Though a host SHOULD NOT allow a user to set the value of such a 
+port to anything other than a scale point, a plugin MUST operate reasonably
+even if such a port has an input that is not a scale point.
 """ .
 
 
