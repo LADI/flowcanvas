@@ -4,10 +4,12 @@ cd ext
 
 doxygen Doxyfile
 
-../specgen/lv2specgen.py dyn-manifest/dyn-manifest.ttl dman ../specgen/template.html dyn-manifest/dyn-manifest.html -i
+for b in dyn-manifest port-groups uri-map; do
+	if [ -x $b.lv2/$b.ttl ]; then
+		../specgen/lv2specgen.py $b.lv2/$b.ttl dman ../specgen/template.html $b.lv2/$b.html -i;
+	fi
+	if [ -x $b.lv2/$b.h ]; then
+		cp doc/html/${b}_8h.html $b.lv2/$b.h.html;
+	fi
+done
 
-cp doc/html/dyn-manifest_8h.html dyn-manifest/dyn-manifest.h.html
-
-cd dyn-manifest && ln -fs ../doc/html/doxygen.css doxygen.css
-
-cd -

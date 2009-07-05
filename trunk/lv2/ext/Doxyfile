@@ -577,7 +577,7 @@ INPUT =  \
 	polymorphic-port/lv2_polymorphic_port.h \
 	port-groups.lv2/port-groups.h \
 	ui/lv2_ui.h \
-	uri-map/lv2_uri_map.h \
+	uri-map.lv2/uri-map.h \
 	variables/lv2_variables.h \
 	variables/lv2_variables_private.h
 
