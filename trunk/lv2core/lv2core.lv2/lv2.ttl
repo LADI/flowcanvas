@@ -27,6 +27,7 @@
 @prefix :     <http://lv2plug.in/ns/lv2core#> .
 @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
 @prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
 @prefix doap: <http://usefulinc.com/ns/doap#> .
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
@@ -41,7 +42,7 @@ See http://lv2plug.in/docs for more details.
 """ .
 
 <http://lv2plug.in/ns/lv2core>
-	a doap:Project , :Specification ;
+    a doap:Project , :Specification ;
     doap:license <http://usefulinc.com/doap/licenses/mit> ;
     doap:name "LV2" ;
     doap:homepage <http://lv2plug.in> ;
@@ -49,8 +50,8 @@ See http://lv2plug.in/docs for more details.
     doap:shortdesc "An audio processing plugin specification" ;
     doap:programming-language "C" ;
     doap:release [
-        doap:revision "3" ;
-        doap:created "2008-10-08"
+        doap:revision "4" ;
+        doap:created "2009-07-10"
     ] ;
     doap:maintainer [
         a foaf:Person ;
@@ -70,16 +71,25 @@ See http://lv2plug.in/docs for more details.
 ##################
 
 :Plugin a rdfs:Class ;
-    rdfs:label   "Plugin" ;
+    rdfs:label "Plugin" ;
+    rdfs:subClassOf [
+        a                  owl:Restriction ;
+        owl:onProperty     rdf:type ;
+        owl:hasValue       :Plugin ;
+        rdfs:comment """
+A Plugin MUST have at least one rdf:type that is a :Plugin.
+""" ] , [
+        a                  owl:Restriction ;
+        owl:onProperty     doap:name ;
+        owl:someValuesFrom xsd:string ;
+        rdfs:comment """
+A Plugin MUST have at least one doap:name that is a string
+with no language tag.
+""" ] ;
     rdfs:comment """
 The class which represents an LV2 plugin.
 
-To be used by a host a Plugin MUST have at least the following properties:
-    rdf:type (with object :Plugin)
-    doap:name (one without language tag)
-    doap:license
-    :port
-
+Plugins SHOULD have a doap:license property whenever possible.
 The doap:name property should be at most a few words in length using title
 capitalization, e.g. "Tape Delay Unit".  Use doap:shortdesc or
 doap:description for more detailed descriptions.
@@ -93,6 +103,45 @@ doap:description for more detailed descriptions.
 
 :Port a rdfs:Class ;
     rdfs:label   "Port" ;
+    rdfs:subClassOf [
+        a                  owl:Restriction ;
+        owl:onProperty     rdf:type ;
+        owl:someValuesFrom [
+            a         owl:DataRange ;
+            owl:oneOf ( :Port :InputPort :OutputPort )
+        ] ;
+        rdfs:comment """
+A Port MUST have at least one rdf:type with object either :Port, :InputPort,
+or :OutputPort.
+""" ] , [
+        a                  owl:Restriction ;
+        owl:onProperty     rdf:type ;
+        owl:minCardinality 2 ;
+        rdfs:comment """
+A Port MUST have at least two rdf:type properties with objects that are some
+subclass of :Port (one for :Port, :InputPort, or :OutputPort, and another to
+describe the specific data type (e.g. :AudioPort).
+"""  ] , [
+         a                  owl:Restriction ;
+         owl:onProperty     :index ;
+         owl:someValuesFrom xsd:decimal ;
+         rdfs:comment """
+A port MUST have a single :index which is of type xsd:decimal
+(e.g. a literal integer in Turtle).
+"""  ] , [
+         a                  owl:Restriction ;
+         owl:onProperty     :symbol ;
+         owl:someValuesFrom xsd:string ;
+         rdfs:comment """
+A port MUST have a single :symbol which is of type xsd:string
+with no language tag.
+"""  ] , [
+         a                  owl:Restriction ;
+         owl:onProperty     :name ;
+         owl:someValuesFrom xsd:string ;
+         rdfs:comment """
+A port MUST have at least one :name which is of type xsd:string.
+""" ] ;
     rdfs:comment """
 The class which represents an LV2 port.
 
