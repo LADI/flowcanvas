@@ -37,5 +37,5 @@ def build(bld):
 		autowaf.build_pc(bld, 'LV2CORE', LV2CORE_VERSION, [])
 
 	# Bundle (data)
-	bld.install_files('${LV2DIR}/lv2core.lv2', 'lv2core.lv2/lv2.ttl lv2core.lv2/manifest.ttl')
+	bld.install_files('${LV2DIR}/lv2core.lv2', 'lv2.ttl manifest.ttl')
 

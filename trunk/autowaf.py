@@ -92,7 +92,7 @@ def check_tool(conf, name):
 		checked[name] = True
 
 def nameify(name):
-	return name.replace('/', '_').replace('++', 'PP').replace('-', '_')
+	return name.replace('/', '_').replace('++', 'PP').replace('-', '_').replace('.', '_')
 
 def check_pkg(conf, name, **args):
 	if not 'mandatory' in args:
