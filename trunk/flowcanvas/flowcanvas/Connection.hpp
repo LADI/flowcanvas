@@ -18,6 +18,7 @@
 #ifndef FLOWCANVAS_CONNECTION_HPP
 #define FLOWCANVAS_CONNECTION_HPP
 
+#include <stdint.h>
 #include <list>
 #include <boost/weak_ptr.hpp>
 #include <libgnomecanvasmm.h>
