@@ -770,7 +770,7 @@ def usage():
                 -p PREFIX : Set ontology namespace prefix from command line
 
 Example:
-    %s lv2_foos.ttl template.html lv2_foos.html -i -p foos
+    %s lv2_foos.ttl template.html style.css lv2_foos.html -i -p foos
 
 """ % (script, script)
     sys.exit(-1)
