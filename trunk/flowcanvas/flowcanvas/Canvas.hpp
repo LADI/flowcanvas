@@ -107,6 +107,8 @@ public:
 	void resize(double width, double height);
 	void resize_all_items();
 
+	void scroll_to_center();
+
 	enum FlowDirection {
 		HORIZONTAL,
 		VERTICAL
@@ -165,7 +167,6 @@ private:
 	void ports_joined(boost::shared_ptr<Port> port1, boost::shared_ptr<Port> port2);
 	bool animate_selected();
 
-	void scroll_to_center();
 	void on_parent_changed(Gtk::Widget* old_parent);
 	sigc::connection _parent_event_connection;
 
