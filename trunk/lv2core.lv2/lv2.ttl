@@ -125,6 +125,7 @@ describe the specific data type (e.g. :AudioPort).
          a                  owl:Restriction ;
          owl:onProperty     :index ;
          owl:someValuesFrom xsd:decimal ;
+         owl:cardinality    1 ;
          rdfs:comment """
 A port MUST have a single :index which is of type xsd:decimal
 (e.g. a literal integer in Turtle).
