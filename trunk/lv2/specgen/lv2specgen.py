@@ -323,8 +323,30 @@ def rdfsClassInfo(term,m):
 
 def isSpecial(pred):
     """Return True if the predicate is "special" and shouldn't be emitted generically"""
-    return pred == rdf.type or pred == rdfs.range or pred == rdfs.domain or pred == rdfs.label or pred == rdfs.comment
+    return pred == rdf.type or pred == rdfs.range or pred == rdfs.domain or pred == rdfs.label or pred == rdfs.comment or pred == rdfs.subClassOf
 
+
+def blankNodeDesc(node,m):
+    properties = m.find_statements(RDF.Statement(node, None, None))
+    doc = ''
+    last_pred = ''
+    for p in properties:
+        if isSpecial(p.predicate):
+            continue
+        doc += '<tr>'
+        doc += '<td class="blankterm">%s</td>\n' % getTermLink(str(p.predicate.uri))
+        if p.object.is_resource():
+            doc += '<td class="blankdef">%s</td>\n' % getTermLink(str(p.object.uri))#getTermLink(str(p.object.uri), node, p.predicate)
+        elif p.object.is_literal():
+            doc += '<td class="blankdef">%s</td>\n' % str(p.object.literal_value['string'])
+        elif p.object.is_blank():
+            doc += '<td class="blankdef">' + blankNodeDesc(p.object,m) + '</td>\n'
+        else:
+            doc += '<td class="blankdef">?</td>\n'
+        doc += '</tr>'
+    if doc != '':
+        doc = '<table class="blankdesc">\n%s\n</table>\n' % doc
+    return doc
 
 def extraInfo(term,m):
     """Generate information about misc. properties of a term"""
@@ -332,7 +354,7 @@ def extraInfo(term,m):
     properties = m.find_statements(RDF.Statement(term, None, None))
     last_pred = ''
     for p in properties:
-        if isSpecial(p.predicate) or p.object.is_blank():
+        if isSpecial(p.predicate):
             continue
         if p.predicate != last_pred:
             doc += '<dt>%s</dt>\n' % getTermLink(str(p.predicate.uri))
@@ -340,6 +362,8 @@ def extraInfo(term,m):
             doc += '<dd>%s</dd>\n' % getTermLink(str(p.object.uri), term, p.predicate)
         elif p.object.is_literal():
             doc += '<dd>%s</dd>\n' % str(p.object)
+        elif p.object.is_blank():
+            doc += '<dd>' + blankNodeDesc(p.object,m) + '</dd>\n'
         else:
             doc += '<dd>?</dd>\n'
         last_pred = p.predicate
@@ -441,7 +465,7 @@ def docTerms(category, list, m):
         if label!='':
             doc += "<div property=\"rdfs:label\" class=\"label\">%s</div>" % label
         if comment!='':
-			doc += "<div property=\"rdfs:comment\">%s</div>" % comment
+            doc += "<div property=\"rdfs:comment\">%s</div>" % comment
         if label!='' or comment != '':
             doc += "</div>"
         terminfo = ""

@@ -15,6 +15,8 @@ h1, h2, h3 { color: #005A9C; }
 .index { padding: 1ex; border: 2px dotted gray; background-color: #eee; }
 .restriction { margin-bottom: 2ex; padding: 0; }
 .description { margin-bottom: 2ex; }
+.blankdesc { background-color: #eee; margin: 0.5em }
+.blankterm { padding-right: 0.5em; }
 
 dl { padding: 0; margin: 0 }
 dt { font-weight: bold ; margin-top: 0.75ex; }
