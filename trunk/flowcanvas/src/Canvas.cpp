@@ -832,8 +832,9 @@ void
 Canvas::on_parent_changed(Gtk::Widget* old_parent)
 {
 	_parent_event_connection.disconnect();
-	_parent_event_connection = get_parent()->signal_event().connect(
-			sigc::mem_fun(*this, &Canvas::frame_event));
+    if (get_parent())
+		_parent_event_connection = get_parent()->signal_event().connect(
+				sigc::mem_fun(*this, &Canvas::frame_event));
 }
 
 
