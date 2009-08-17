@@ -32,14 +32,34 @@
 @prefix doap: <http://usefulinc.com/ns/doap#> .
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 
-:Specification a rdfs:Class ;
-    rdfs:comment """
-An LV2 specification (i.e. this specification, or an LV2 extension).
+####################
+## Resource Class ##
+####################
 
-Specification data, like plugins, is distributed in standardized
-bundles so hosts may discover all present LV2 data.
-See http://lv2plug.in/docs for more details.
+:Resource a rdfs:Class ;
+    rdfs:comment """
+An LV2 Resource (e.g. plugin, specification, or any other LV2 related thing
 """ .
+
+
+#########################
+## Specification Class ##
+#########################
+
+:Specification a rdfs:Class ;
+	rdfs:subClassOf :Resource ;
+    rdfs:comment """
+An LV2 specification (i.e. this specification, or an LV2 "extension").
+
+Specification data, like plugin data, is distributed in standardized bundles
+so hosts may discover all present LV2 data.  See http://lv2plug.in/docs for
+more details.
+""" .
+
+
+#######################
+## LV2 Specification ##
+#######################
 
 <http://lv2plug.in/ns/lv2core>
     a doap:Project , :Specification ;
@@ -51,7 +71,7 @@ See http://lv2plug.in/docs for more details.
     doap:programming-language "C" ;
     doap:release [
         doap:revision "4" ;
-        doap:created "2009-07-10"
+        doap:created "2009-08-16"
     ] ;
     doap:maintainer [
         a foaf:Person ;
@@ -66,18 +86,20 @@ See http://lv2plug.in/docs for more details.
     ] .
 
 
+
 ##################
 ## Plugin Class ##
 ##################
 
 :Plugin a rdfs:Class ;
+	rdfs:subClassOf :Resource ;
     rdfs:label "Plugin" ;
     rdfs:subClassOf [
         a                  owl:Restriction ;
         owl:onProperty     rdf:type ;
         owl:hasValue       :Plugin ;
         rdfs:comment """
-A Plugin MUST have at least one rdf:type that is a :Plugin.
+A Plugin MUST have at least one rdf:type that is :Plugin.
 """ ] , [
         a                  owl:Restriction ;
         owl:onProperty     doap:name ;
@@ -102,6 +124,7 @@ doap:description for more detailed descriptions.
 ##################
 
 :Port a rdfs:Class ;
+	rdfs:subClassOf :Resource ;
     rdfs:label   "Port" ;
     rdfs:subClassOf [
         a                  owl:Restriction ;
@@ -120,7 +143,7 @@ or :OutputPort.
         rdfs:comment """
 A Port MUST have at least two rdf:type properties with objects that are some
 subclass of :Port (one for :Port, :InputPort, or :OutputPort, and another to
-describe the specific data type (e.g. :AudioPort).
+describe the specific data type, e.g. :AudioPort).
 """  ] , [
          a                  owl:Restriction ;
          owl:onProperty     :index ;
@@ -176,32 +199,32 @@ index for a port may differ between plugin binaries).
 """ .
 
 :InputPort a rdfs:Class ;
-    rdfs:label      "Input port" ;
     rdfs:subClassOf :Port ;
+    rdfs:label      "Input port" ;
     rdfs:comment    """
 Ports of this type will be connected to a pointer to some value, which will
 be read by the plugin during their run method.
 """ .
 
 :OutputPort a rdfs:Class ;
-    rdfs:label      "Output port" ;
     rdfs:subClassOf :Port ;
+    rdfs:label      "Output port" ;
     rdfs:comment    """
 Ports of this type will be connected to a pointer to some value, which will
 be written to by the plugin during their run method.
 """ .
 
 :ControlPort a rdfs:Class ;
-    rdfs:label      "Control port" ;
     rdfs:subClassOf :Port ;
+    rdfs:label      "Control port" ;
     rdfs:comment    """
 Ports of this type will be connected to a pointer to a single value conforming
 to the 32bit IEEE-754 floating point specification.
 """ .
 
 :AudioPort a rdfs:Class ;
-    rdfs:label      "Audio port" ;
     rdfs:subClassOf :Port ;
+    rdfs:label      "Audio port" ;
     rdfs:comment    """
 Ports of this type will be connected to an array of length SampleCount
 conforming to the 32bit IEEE-754 floating point specification.
@@ -213,22 +236,42 @@ conforming to the 32bit IEEE-754 floating point specification.
 #####################################
 
 :port a rdf:Property ;
-    rdfs:domain  :Plugin ;
+    rdfs:domain  :Resource ;
     rdfs:range   :Port ;
     rdfs:label   "port" ;
-    rdfs:comment "Relates a Plugin to the Ports it contains" .
+    rdfs:comment "Relates a Resource to the Ports it contains" .
 
 
 ####################################
 ## Optional Plugin RDF Properties ##
 ####################################
 
+:basicXHTML a rdfs:Class ;
+	rdfs:seeAlso <http://www.w3.org/TR/xhtml1/> ;
+	rdfs:seeAlso <http://www.w3.org/TR/xhtml-modularization/> ;
+	rdfs:comment """
+A very basic subset of XHTML for use with :documentation, intended to be
+reasonable for hosts to support for styled inline documentation.
+
+A literal with this data type is an XHTML 1.0 fragment containing only
+tags from the following XHTML modules: text, hypertext, list, basic tables,
+image, presentation.  See the XHTML and XHTML Modularization specifications
+for details.  All content must be enclosed in some block level element
+(e.g. free text is not allowed, use <p>).
+
+If only basicXHTML documentation is given but a host has no facilities for
+handling tags, simply stripping tags and inserting newlines after appropriate
+tags will yield a somewhat readable plain text version of the documentation.
+""" .
+
 :documentation a rdf:Property ;
-    rdfs:domain  :Plugin ;
+    rdfs:domain  :Resource ;
     rdfs:label   "documentation" ;
     rdfs:comment """
-Relates a Plugin to some text/audio/video documentation either online
-or included with the plugin package.
+Relates a Plugin to some text/audio/video documentation either online or
+included with the plugin package.  The value of this property may be either a
+URL, or a literal of any type.  Literal documentation SHOULD be either plain
+text, or :basicXHTML.  More advanced documentation should be linked to instead.
 """ .
 
 
@@ -247,6 +290,7 @@ function. The index uniqely identifies the port on an instance of the plugin.
 """ .
 
 :symbol a rdf:Property ;
+	rdfs:domain  :Resource ;
     rdfs:label   "symbol" ;
     rdfs:comment """
 A short name used as a machine and human readable identifier.
@@ -280,7 +324,7 @@ property without changing the Plugin URI.
    rdfs:label   "Port value point" ;
    rdfs:comment """
 Used to describe interesting values in a Port's range.  To be valid it
-requires two rdf:properties, rdfs:label and rdf:value.
+requires two properties: rdfs:label and rdf:value.
 
 There are 3 specially defined Points in the LV2 specification (default,
 minimum, and maximum), though future extensions may define more.
@@ -333,7 +377,7 @@ values in the range of :float.
     rdfs:comment "An additional feature which a plugin may use or require.".
 
 :optionalFeature a rdf:Property ;
-    rdfs:domain  :Plugin , rdfs:Class ;
+    rdfs:domain  :Resource ;
     rdfs:range   :Feature ;
     rdfs:label   "Optional feature" ;
     rdfs:comment """
@@ -345,7 +389,7 @@ This predicate may be used by extensions for any type of subject.
 """ .
 
 :requiredFeature a rdf:Property ;
-    rdfs:domain  :Plugin , rdfs:Class ;
+    rdfs:domain  :Resource ;
     rdfs:range   :Feature ;
     rdfs:label   "Required feature" ;
     rdfs:comment """
@@ -390,7 +434,8 @@ interface for the port.
     rdfs:comment """
 Indicates that the plugin has a real-time dependency (e.g. queues data from a
 socket) and so its output must not be cached or subject to significant latency,
-and calls to the run method should be done in rapid succession.
+and calls to the run method should be done in rapid succession.  This property
+is not related to "hard real-time" execution requirements (see :hardRtCapable).
 """ .
 
 :inPlaceBroken a :Feature ;
@@ -491,8 +536,10 @@ A plugin MUST operate reasonably even if such a port has a non-integer input.
    rdfs:comment """
 Indicates that a port's only reasonable values are the scale points defined for
 that port.  Though a host SHOULD NOT allow a user to set the value of such a 
-port to anything other than a scale point, a plugin MUST operate reasonably
-even if such a port has an input that is not a scale point.
+port to anything other than a scale point.  A plugin MUST operate reasonably
+even if such a port has an input that is not a scale point, preferably by
+simply choosing the largest enumeration value less than or equal to the
+actual input value (i.e. round the input value down).
 """ .
 
 
