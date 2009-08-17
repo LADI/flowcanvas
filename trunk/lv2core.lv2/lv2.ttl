@@ -87,12 +87,21 @@ more details.
 
 
 
-##################
-## Plugin Class ##
-##################
+#############################
+## Template/Plugin Classes ##
+#############################
 
-:Plugin a rdfs:Class ;
+:Template a rdfs:Class ;
 	rdfs:subClassOf :Resource ;
+	rdfs:comment """
+An abstract plugin-like resource that may not actually be an LV2 plugin
+(e.g. may not actually have a plugin binary).  A Template is a Resource
+that may have ports, and otherwise mimic the structure of a plugin.
+This should be subclassed by extensions that define such things.
+""" .
+	
+:Plugin a rdfs:Class ;
+	rdfs:subClassOf :Template ;
     rdfs:label "Plugin" ;
     rdfs:subClassOf [
         a                  owl:Restriction ;
@@ -236,10 +245,10 @@ conforming to the 32bit IEEE-754 floating point specification.
 #####################################
 
 :port a rdf:Property ;
-    rdfs:domain  :Resource ;
+    rdfs:domain  :Template ;
     rdfs:range   :Port ;
     rdfs:label   "port" ;
-    rdfs:comment "Relates a Resource to the Ports it contains" .
+    rdfs:comment "Relates a Template or Plugin to the Ports it contains" .
 
 
 ####################################
