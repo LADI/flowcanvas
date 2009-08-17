@@ -261,6 +261,11 @@ change or are removed, the plugin URI MUST be changed, the revision acts
 as a 'minor version' to distinguish otherwise compatible revisions of
 a plugin.  A plugin that has changed indices MUST have a :revision
 property, if a plugin has no revision property it is assumed to be 0.
+
+Anything that refers to a specific revision of a plugin (e.g. a serialisation
+that depends on specific port indices) MUST refer to the plugin by URI along
+with the revision.
+
 This property may be used for other objects, in this case it should be
 used in a similar way to represent a 'minor version', and NOT as a major
 version to distinguish incompatible objects (use the URI for that).
