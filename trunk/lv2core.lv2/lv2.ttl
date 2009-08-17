@@ -250,6 +250,22 @@ conforming to the 32bit IEEE-754 floating point specification.
     rdfs:label   "port" ;
     rdfs:comment "Relates a Template or Plugin to the Ports it contains" .
 
+:revision a rdf:Property
+	rdfs:domain :Resource ;
+	rdfs:range  xsd:nonNegativeInteger ;
+	rdfs:label  "revision" ;
+	rdfs:comment """
+The revision of an LV2 Resource.  If a plugin's port indices change, the
+revision of the plugin MUST be increased.  Note that if port symbols
+change or are removed, the plugin URI MUST be changed, the revision acts
+as a 'minor version' to distinguish otherwise compatible revisions of
+a plugin.  A plugin that has changed indices MUST have a :revision
+property, if a plugin has no revision property it is assumed to be 0.
+This property may be used for other objects, in this case it should be
+used in a similar way to represent a 'minor version', and NOT as a major
+version to distinguish incompatible objects (use the URI for that).
+""" .
+
 
 ####################################
 ## Optional Plugin RDF Properties ##
