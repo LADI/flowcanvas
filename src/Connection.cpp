@@ -1,15 +1,15 @@
 /* This file is part of FlowCanvas.
- * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ * Copyright (C) 2007-2009 Dave Robillard <http://drobilla.net>
+ *
  * FlowCanvas is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
- * 
+ *
  * FlowCanvas is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
@@ -25,7 +25,7 @@
 #include "flowcanvas/Ellipse.hpp"
 
 namespace FlowCanvas {
-	
+
 
 Connection::Connection(boost::shared_ptr<Canvas>      canvas,
 	                   boost::shared_ptr<Connectable> source,
@@ -47,9 +47,8 @@ Connection::Connection(boost::shared_ptr<Canvas>      canvas,
 	_bpath.property_width_units() = 2.0;
 	set_color(color);
 
-	update_location();	
-	lower_to_bottom();
-	raise(1); // raise above base rect
+	update_location();
+	raise_to_top();
 }
 
 
@@ -83,7 +82,7 @@ Connection::update_location()
 {
 	boost::shared_ptr<Connectable> src = _source.lock();
 	boost::shared_ptr<Connectable> dst = _dest.lock();
-	
+
 	if (!src || !dst)
 		return;
 
@@ -104,14 +103,14 @@ Connection::update_location()
 		gnome_canvas_path_def_moveto(_path, src_x, src_y);
 		gnome_canvas_path_def_lineto(_path, dst_x, dst_y);
 		double dx = src_x - dst_x;
-		double dy = src_y - dst_y;	
-		
+		double dy = src_y - dst_y;
+
 		if (_handle) {
 			_handle->property_x() = src_x - dx/2.0;
 			_handle->property_y() = src_y - dy/2.0;
 			_handle->move(0, 0);
 		}
-		
+
 		if (_show_arrowhead) {
 
 			const double h  = sqrt(dx*dx + dy*dy);
@@ -138,18 +137,26 @@ Connection::update_location()
 		double dx = fabs(dst_x - src_x);
 		double dy = fabs(dst_y - src_y);
 
+		Gnome::Art::Point src_vec = src->connection_point_vector(dx/3.0, dy/3.0);
+		Gnome::Art::Point dst_vec = dst->connection_point_vector(dx/3.0, dy/3.0);
+
+		double src_point_dx = src_vec.get_x();
+		double src_point_dy = src_vec.get_y();
+		double dst_point_dx = dst_vec.get_x();
+		double dst_point_dy = dst_vec.get_y();
+
 		// Path 1 (src_x, src_y) -> (join_x, join_y)
 		// Control point 1
-		const double src_x1 = src_x + (dx+dy)/5.0;//std::min(x_dist+y_dist, 40.0);
-		const double src_y1 = src_y;
+		const double src_x1 = src_x + src_point_dx;
+		const double src_y1 = src_y + src_point_dy;
 		// Control point 2
 		const double src_x2 = (join_x + src_x1) / 2.0;
 		const double src_y2 = (join_y + src_y1) / 2.0;
 
 		// Path 2, (join_x, join_y) -> (dst_x, dst_y)
 		// Control point 1
-		const double dst_x1 = dst_x - (dx + dy)/5.0;//std::min(x_dist+y_dist, 40.0);
-		const double dst_y1 = dst_y;
+		const double dst_x1 = dst_x - dst_point_dx;
+		const double dst_y1 = dst_y - dst_point_dy;
 		// Control point 2
 		const double dst_x2 = (join_x + dst_x1) / 2.0;
 		const double dst_y2 = (join_y + dst_y1) / 2.0;
@@ -168,16 +175,15 @@ Connection::update_location()
 		gnome_canvas_path_def_lineto(_path, join_x, join_y);
 		gnome_canvas_path_def_lineto(_path, dst_x2, dst_y2);
 		gnome_canvas_path_def_lineto(_path, dst_x1, dst_y1);
-		gnome_canvas_path_def_lineto(_path, dst_x, dst_y);
-		*/
-		
+		gnome_canvas_path_def_lineto(_path, dst_x, dst_y);*/
+
 		if (_show_arrowhead) {
 
 			const double h  = sqrt(dx*dx + dy*dy);
 
 			dx = dx / h * 10;
 			dy = dy / h * 10;
-			
+
 			gnome_canvas_path_def_lineto(_path,
 					dst_x - 12,
 					dst_y - 4);
@@ -236,7 +242,7 @@ Connection::show_handle(bool show)
 	if (show) {
 		if (!_handle)
 			_handle = new Handle(*this);
-		
+
 		double handle_width = 8.0;
 		double handle_height = 8.0;
 		if (_handle->text) {
@@ -246,7 +252,7 @@ Connection::show_handle(bool show)
 
 		// FIXME: slow
 		delete _handle->shape;
-		
+
 		if (_handle_style != HANDLE_NONE) {
 			if (_handle_style == HANDLE_RECT)
 				_handle->shape = new Gnome::Canvas::Rect(*_handle,
@@ -300,7 +306,7 @@ void
 Connection::raise_to_top()
 {
 	Gnome::Canvas::Item::raise_to_top();
-	
+
 	// Raise source above us
 	boost::shared_ptr<Item> item = boost::dynamic_pointer_cast<Item>(_source.lock());
 	if (item)
@@ -312,9 +318,9 @@ Connection::raise_to_top()
 		item->raise_to_top();
 
 	/* Raise the roof
-	       \o/ 
+	       \o/
 	        |
-	       / \ 
+	       / \
 	*/
 }
 
@@ -325,7 +331,7 @@ Connection::select_tick()
 	_bpath.property_dash() = _canvas.lock()->select_dash();
 }
 
-	
+
 void
 Connection::zoom(double z)
 {

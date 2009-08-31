@@ -1,15 +1,15 @@
 /* This file is part of FlowCanvas.
- * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ * Copyright (C) 2007-2009 Dave Robillard <http://drobilla.net>
+ *
  * FlowCanvas is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
- * 
+ *
  * FlowCanvas is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
@@ -23,19 +23,21 @@
 #include <iostream>
 #include <cmath>
 #include <boost/enable_shared_from_this.hpp>
-#include "config.h"
+#include "flowcanvas-config.h"
 #include "flowcanvas/Canvas.hpp"
 #include "flowcanvas/Port.hpp"
 #include "flowcanvas/Module.hpp"
 
 #ifdef HAVE_AGRAPH
-#include <graphviz/gvc.h>
+#include <gvc.h>
 #endif
 
 using namespace std;
 
 namespace FlowCanvas {
-	
+
+sigc::signal<void, Gnome::Canvas::Item*> Canvas::signal_item_entered;
+sigc::signal<void, Gnome::Canvas::Item*> Canvas::signal_item_left;
 
 Canvas::Canvas(double width, double height)
 	: _zoom(1.0)
@@ -44,29 +46,30 @@ Canvas::Canvas(double width, double height)
 	, _drag_state(NOT_DRAGGING)
 	, _remove_objects(true)
 	, _locked(false)
+	, _direction(HORIZONTAL)
 	, _base_rect(*root(), 0, 0, width, height)
 	, _select_rect(NULL)
 	, _select_dash(NULL)
 {
 	set_scroll_region(0.0, 0.0, width, height);
 	set_center_scroll_region(true);
-	
+
 	_base_rect.property_fill_color_rgba() = 0x000000FF;
 	//_base_rect.show();
 	_base_rect.signal_event().connect(sigc::mem_fun(this, &Canvas::scroll_drag_handler));
 	_base_rect.signal_event().connect(sigc::mem_fun(this, &Canvas::canvas_event));
 	_base_rect.signal_event().connect(sigc::mem_fun(this, &Canvas::select_drag_handler));
 	_base_rect.signal_event().connect(sigc::mem_fun(this, &Canvas::connection_drag_handler));
-	
+
 	set_dither(Gdk::RGB_DITHER_NORMAL); // NONE or NORMAL or MAX
-	
+
 	// Dash style for selected modules and selection box
 	_select_dash = new ArtVpathDash();
 	_select_dash->n_dash = 2;
 	_select_dash->dash = art_new(double, 2);
 	_select_dash->dash[0] = 5;
 	_select_dash->dash[1] = 5;
-		
+
 	Glib::signal_timeout().connect(
 		sigc::mem_fun(this, &Canvas::animate_selected), 300);
 }
@@ -78,14 +81,14 @@ Canvas::~Canvas()
 	art_free(_select_dash->dash);
 	delete _select_dash;
 }
-	
+
 
 void
 Canvas::lock(bool l)
 {
 	_locked = l;
 	if (l)
-		_base_rect.property_fill_color_rgba() = 0x232425FF;
+		_base_rect.property_fill_color_rgba() = 0x131415FF;
 	else
 		_base_rect.property_fill_color_rgba() = 0x000000FF;
 
@@ -103,7 +106,7 @@ Canvas::set_zoom(double pix_per_unit)
 
 	for (ItemList::iterator m = _items.begin(); m != _items.end(); ++m)
 		(*m)->zoom(_zoom);
-	
+
 	for (list<boost::shared_ptr<Connection> >::iterator c = _connections.begin(); c != _connections.end(); ++c)
 		(*c)->zoom(_zoom);
 }
@@ -141,7 +144,7 @@ Canvas::zoom_full()
 		const boost::shared_ptr<Item> mod = (*m);
 		if (!mod)
 			continue;
-		
+
 		if (mod->property_x() < left)
 			left = mod->property_x();
 		if (mod->property_x() + mod->width() > right)
@@ -159,7 +162,7 @@ Canvas::zoom_full()
 		((double)win_height / (double)(top - bottom + pad*2.0)));
 
 	set_zoom(new_zoom);
-	
+
 	int scroll_x, scroll_y;
 	w2c(lrintf(left - pad), lrintf(bottom - pad), scroll_x, scroll_y);
 
@@ -174,7 +177,7 @@ Canvas::clear_selection()
 
 	for (list<boost::shared_ptr<Item> >::iterator m = _selected_items.begin(); m != _selected_items.end(); ++m)
 		(*m)->set_selected(false);
-	
+
 	for (list<boost::shared_ptr<Connection> >::iterator c = _selected_connections.begin(); c != _selected_connections.end(); ++c)
 		(*c)->set_selected(false);
 
@@ -204,7 +207,7 @@ void
 Canvas::select_item(boost::shared_ptr<Item> m)
 {
 	assert(! m->selected());
-	
+
 	_selected_items.push_back(m);
 
 	for (ConnectionList::iterator i = _connections.begin(); i != _connections.end(); ++i) {
@@ -234,10 +237,10 @@ Canvas::select_item(boost::shared_ptr<Item> m)
 			} else if (dst_module == m && src_module->selected()) {
 				c->set_selected(true);
 				_selected_connections.push_back(c);
-			} 
+			}
 		}
 	}
-				
+
 	m->set_selected(true);
 }
 
@@ -256,14 +259,14 @@ Canvas::unselect_item(boost::shared_ptr<Item> m)
 			i = _selected_connections.erase(i);
 			continue;
 		}
-		
+
 		boost::shared_ptr<Port> src_port = boost::dynamic_pointer_cast<Port>(c->source().lock());
 		if (src_port && src_port->module().lock() == m) {
 			c->set_selected(false);
 			i = _selected_connections.erase(i);
 			continue;
 		}
-		
+
 		boost::shared_ptr<Port> dst_port = boost::dynamic_pointer_cast<Port>(c->dest().lock());
 		if (dst_port && dst_port->module().lock() == m) {
 			c->set_selected(false);
@@ -273,7 +276,7 @@ Canvas::unselect_item(boost::shared_ptr<Item> m)
 
 		++i;
 	}
-	
+
 	// Remove the module
 	for (list<boost::shared_ptr<Item> >::iterator i = _selected_items.begin(); i != _selected_items.end(); ++i) {
 		if ((*i) == m) {
@@ -281,7 +284,7 @@ Canvas::unselect_item(boost::shared_ptr<Item> m)
 			break;
 		}
 	}
-	
+
 	m->set_selected(false);
 }
 
@@ -300,7 +303,7 @@ Canvas::destroy()
 
 	_selected_ports.clear();
 	_connect_port.reset();
-	
+
 	_items.clear();
 
 	_remove_objects = true;
@@ -312,7 +315,7 @@ Canvas::unselect_ports()
 {
 	for (SelectedPorts::iterator i = _selected_ports.begin(); i != _selected_ports.end(); ++i)
 		(*i)->set_selected(false);
-	
+
 	_selected_ports.clear();
 	_last_selected_port.reset();
 }
@@ -330,7 +333,7 @@ Canvas::select_port(boost::shared_ptr<Port> p, bool unique)
 	_last_selected_port = p;
 }
 
-	
+
 void
 Canvas::unselect_port(boost::shared_ptr<Port> p)
 {
@@ -342,7 +345,7 @@ Canvas::unselect_port(boost::shared_ptr<Port> p)
 		_last_selected_port.reset();
 }
 
-	
+
 void
 Canvas::select_port_toggle(boost::shared_ptr<Port> p, int mod_state)
 {
@@ -393,7 +396,7 @@ void
 Canvas::set_default_placement(boost::shared_ptr<Module> m)
 {
 	assert(m);
-	
+
 	// Simple cascade.  This will get more clever in the future.
 	double x = ((_width / 2.0) + (_items.size() * 25));
 	double y = ((_height / 2.0) + (_items.size() * 25));
@@ -425,7 +428,7 @@ Canvas::remove_item(boost::shared_ptr<Item> item)
 			break;
 		}
 	}
-	
+
 	// Remove from items
 	for (ItemList::iterator i = _items.begin(); i != _items.end(); ++i) {
 		if (*i == item) {
@@ -434,14 +437,14 @@ Canvas::remove_item(boost::shared_ptr<Item> item)
 			break;
 		}
 	}
-	
+
 	// Remove any connections adjacent to this item
 	boost::shared_ptr<Connection> c;
 	for (ConnectionList::iterator i = _connections.begin(); i != _connections.end() ; ) {
 		c = (*i);
 		ConnectionList::iterator next = i;
 		++next;
-		
+
 		const boost::shared_ptr<Port> src_port
 			= boost::dynamic_pointer_cast<Port>(c->source().lock());
 		const boost::shared_ptr<Port> dst_port
@@ -462,7 +465,7 @@ Canvas::remove_item(boost::shared_ptr<Item> item)
 
 boost::shared_ptr<Connection>
 Canvas::remove_connection(boost::shared_ptr<Connectable> item1,
-                              boost::shared_ptr<Connectable> item2)
+                          boost::shared_ptr<Connectable> item2)
 {
 	boost::shared_ptr<Connection> ret;
 
@@ -471,7 +474,7 @@ Canvas::remove_connection(boost::shared_ptr<Connectable> item1,
 
 	assert(item1);
 	assert(item2);
-	
+
 	boost::shared_ptr<Connection> c = get_connection(item1, item2);
 	if (!c) {
 		cerr << "Couldn't find connection.\n";
@@ -490,7 +493,7 @@ Canvas::remove_connection(boost::shared_ptr<Connectable> item1,
  */
 bool
 Canvas::are_connected(boost::shared_ptr<const Connectable> tail,
-                          boost::shared_ptr<const Connectable> head)
+                      boost::shared_ptr<const Connectable> head)
 {
 	for (ConnectionList::const_iterator c = _connections.begin(); c != _connections.end(); ++c) {
 		const boost::shared_ptr<Connectable> src = (*c)->source().lock();
@@ -520,7 +523,7 @@ Canvas::get_connection(boost::shared_ptr<Connectable> tail,
 		if (src == tail && dst == head)
 			return *i;
 	}
-	
+
 	return boost::shared_ptr<Connection>();
 }
 
@@ -569,7 +572,7 @@ Canvas::remove_connection(boost::shared_ptr<Connection> connection)
 
 	if (i != _connections.end()) {
 		const boost::shared_ptr<Connection> c = *i;
-		
+
 		const boost::shared_ptr<Connectable> src = c->source().lock();
 		const boost::shared_ptr<Connectable> dst = c->dest().lock();
 
@@ -578,7 +581,7 @@ Canvas::remove_connection(boost::shared_ptr<Connection> connection)
 
 		if (dst)
 			dst->remove_connection(c);
-		
+
 		_connections.erase(i);
 	}
 }
@@ -591,7 +594,7 @@ Canvas::selection_joined_with(boost::shared_ptr<Port> port)
 		ports_joined(*i, port);
 }
 
-	
+
 void
 Canvas::join_selection()
 {
@@ -637,7 +640,7 @@ Canvas::ports_joined(boost::shared_ptr<Port> port1, boost::shared_ptr<Port> port
 
 	boost::shared_ptr<Port> src_port;
 	boost::shared_ptr<Port> dst_port;
-	
+
 	if (port2->is_input() && ! port1->is_input()) {
 		src_port = port1;
 		dst_port = port2;
@@ -647,7 +650,7 @@ Canvas::ports_joined(boost::shared_ptr<Port> port1, boost::shared_ptr<Port> port
 	} else {
 		return;
 	}
-	
+
 	if (are_connected(src_port, dst_port))
 		disconnect(src_port, dst_port);
 	else
@@ -672,9 +675,9 @@ Canvas::port_event(GdkEvent* event, boost::weak_ptr<Port> weak_port)
 	static bool control_dragging = false;
 	static bool ignore_button_release = false;
 	bool handled = true;
-	
+
 	switch (event->type) {
-	
+
 	case GDK_BUTTON_PRESS:
 		if (event->button.button == 1) {
 			boost::shared_ptr<Module> module = port->module().lock();
@@ -709,7 +712,7 @@ Canvas::port_event(GdkEvent* event, boost::weak_ptr<Port> weak_port)
 			handled = false;
 		}
 		break;
-	
+
 	case GDK_MOTION_NOTIFY:
 		if (control_dragging) {
 			boost::shared_ptr<Module> module = port->module().lock();
@@ -720,12 +723,12 @@ Canvas::port_event(GdkEvent* event, boost::weak_ptr<Port> weak_port)
 					new_control = 0.0;
 				else if (new_control > 1.0)
 					new_control = 1.0;
-				
+
 				new_control *= (port->control_max() - port->control_min());
 				new_control += port->control_min();
 				assert(new_control >= port->control_min());
 				assert(new_control <= port->control_max());
-				
+
 				if (new_control != port->control_value())
 					port->set_control(new_control);
 
@@ -755,10 +758,10 @@ Canvas::port_event(GdkEvent* event, boost::weak_ptr<Port> weak_port)
 		} else {
 			handled = false;
 		}
-		_base_rect.ungrab(event->button.time);
 		break;
 
 	case GDK_ENTER_NOTIFY:
+		signal_item_entered.emit(port.get());
 		if (!control_dragging && !port->selected()) {
 			port->set_highlighted(true);
 			return true;
@@ -769,20 +772,20 @@ Canvas::port_event(GdkEvent* event, boost::weak_ptr<Port> weak_port)
 		if (port_dragging) {
 			_drag_state = CONNECTION;
 			_connect_port = port;
-			
-			_base_rect.grab(GDK_POINTER_MOTION_MASK | GDK_BUTTON_RELEASE_MASK,
-				Gdk::Cursor(Gdk::CROSSHAIR), event->button.time);
-
 			port_dragging = false;
+			_base_rect.grab(
+				GDK_BUTTON_PRESS_MASK|GDK_POINTER_MOTION_MASK|GDK_BUTTON_RELEASE_MASK,
+				Gdk::Cursor(Gdk::CROSSHAIR), event->crossing.time);
 		} else if (!control_dragging) {
 			port->set_highlighted(false);
 		}
+		signal_item_left.emit(port.get());
 		break;
-	
+
 	default:
 		handled = false;
 	}
-	
+
 	return handled;
 }
 
@@ -824,12 +827,14 @@ Canvas::canvas_event(GdkEvent* event)
 	}
 }
 
-	
+
 void
 Canvas::on_parent_changed(Gtk::Widget* old_parent)
 {
 	_parent_event_connection.disconnect();
-	_parent_event_connection = get_parent()->signal_event().connect(sigc::mem_fun(*this, &Canvas::frame_event));
+    if (get_parent())
+		_parent_event_connection = get_parent()->signal_event().connect(
+				sigc::mem_fun(*this, &Canvas::frame_event));
 }
 
 
@@ -840,10 +845,10 @@ Canvas::frame_event(GdkEvent* ev)
 	// Zoom
 	if (ev->type == GDK_SCROLL && (ev->scroll.state & GDK_CONTROL_MASK)) {
 		if (ev->scroll.direction == GDK_SCROLL_UP) {
-			set_zoom(_zoom + 0.1);
+			set_zoom(_zoom * 1.25);
 			handled = true;
 		} else if (ev->scroll.direction == GDK_SCROLL_DOWN) {
-			set_zoom(_zoom - 0.1);
+			set_zoom(_zoom * 0.75);
 			handled = true;
 		}
 	}
@@ -855,7 +860,7 @@ bool
 Canvas::scroll_drag_handler(GdkEvent* event)
 {
 	bool handled = true;
-	
+
 	static int    original_scroll_x = 0;
 	static int    original_scroll_y = 0;
 	static double origin_x = 0;
@@ -866,9 +871,9 @@ Canvas::scroll_drag_handler(GdkEvent* event)
 	static double last_y = 0;
 
 	bool first_motion = true;
-	
+
 	if (event->type == GDK_BUTTON_PRESS && event->button.button == 2) {
-		_base_rect.grab(GDK_POINTER_MOTION_MASK | GDK_BUTTON_RELEASE_MASK | GDK_BUTTON_PRESS_MASK,
+		_base_rect.grab(GDK_POINTER_MOTION_MASK|GDK_BUTTON_RELEASE_MASK,
 			Gdk::Cursor(Gdk::FLEUR), event->button.time);
 		get_scroll_offsets(original_scroll_x, original_scroll_y);
 		scroll_offset_x = 0;
@@ -880,13 +885,13 @@ Canvas::scroll_drag_handler(GdkEvent* event)
 		last_y = origin_y;
 		first_motion = true;
 		_drag_state = SCROLL;
-		
+
 	} else if (event->type == GDK_MOTION_NOTIFY && _drag_state == SCROLL) {
 		const double x        = event->motion.x_root;
 		const double y        = event->motion.y_root;
 		const double x_offset = last_x - x;
 		const double y_offset = last_y - y;
-		
+
 		//cerr << "Coord: (" << x << "," << y << ")\n";
 		//cerr << "Offset: (" << x_offset << "," << y_offset << ")\n";
 
@@ -911,7 +916,7 @@ bool
 Canvas::select_drag_handler(GdkEvent* event)
 {
 	boost::shared_ptr<Item> module;
-	
+
 	if (event->type == GDK_BUTTON_PRESS && event->button.button == 1) {
 		assert(_select_rect == NULL);
 		_drag_state = SELECT;
@@ -924,11 +929,13 @@ Canvas::select_drag_handler(GdkEvent* event)
 		_select_rect->property_width_units() = 0.5;
 		_select_rect->lower_to_bottom();
 		_base_rect.lower_to_bottom();
+		_base_rect.grab(GDK_POINTER_MOTION_MASK|GDK_BUTTON_RELEASE_MASK,
+				Gdk::Cursor(Gdk::ARROW), event->button.time);
 		return true;
 	} else if (event->type == GDK_MOTION_NOTIFY && _drag_state == SELECT) {
 		assert(_select_rect);
 		double x = event->button.x, y = event->button.y;
-		
+
 		if (event->motion.is_hint) {
 			gint t_x;
 			gint t_y;
@@ -951,9 +958,9 @@ Canvas::select_drag_handler(GdkEvent* event)
 					select_item(module);
 			}
 		}
-		
+
 		_base_rect.ungrab(event->button.time);
-		
+
 		delete _select_rect;
 		_select_rect = NULL;
 		_drag_state = NOT_DRAGGING;
@@ -970,17 +977,19 @@ bool
 Canvas::animate_selected()
 {
 	static int i = 0;
-	
+
 	i = (i+1) % 10;
-	
+
 	_select_dash->offset = i;
-	
-	for (list<boost::shared_ptr<Item> >::iterator m = _selected_items.begin(); m != _selected_items.end(); ++m)
+
+	for (ItemList::iterator m = _selected_items.begin();
+			m != _selected_items.end(); ++m)
 		(*m)->select_tick();
-	
-	for (list<boost::shared_ptr<Connection> >::iterator c = _selected_connections.begin(); c != _selected_connections.end(); ++c)
+
+	for (ConnectionList::iterator c = _selected_connections.begin();
+			c != _selected_connections.end(); ++c)
 		(*c)->select_tick();
-	
+
 	return true;
 }
 
@@ -989,21 +998,21 @@ bool
 Canvas::connection_drag_handler(GdkEvent* event)
 {
 	bool handled = true;
-	
+
 	// These are invisible, just used for making connections (while dragging)
 	static boost::shared_ptr<Module> drag_module;
 	static boost::shared_ptr<Port>   drag_port;
-	
+
 	static boost::shared_ptr<Connection> drag_connection;
 	static boost::shared_ptr<Port>       snapped_port;
 
 	static bool snapped = false;
-	
+
 	/*if (event->type == GDK_BUTTON_PRESS && event->button.button == 2) {
 		_drag_state = SCROLL;
 	} else */if (event->type == GDK_MOTION_NOTIFY && _drag_state == CONNECTION) {
 		double x = event->button.x, y = event->button.y;
-		
+
 		if (event->motion.is_hint) {
 			gint t_x;
 			gint t_y;
@@ -1017,24 +1026,24 @@ Canvas::connection_drag_handler(GdkEvent* event)
 		if (!drag_connection) { // Havn't created the connection yet
 			assert(drag_port == NULL);
 			assert(_connect_port);
-			
+
 			drag_module = boost::shared_ptr<Module>(new Module(shared_from_this(), "", x, y));
 			bool drag_port_is_input = true;
 			if (_connect_port->is_input())
 				drag_port_is_input = false;
-				
+
 			drag_port = boost::shared_ptr<Port>(new Port(drag_module, "", drag_port_is_input, _connect_port->color()));
 
 			//drag_port->hide();
 			drag_module->hide();
 
 			drag_module->move_to(x, y);
-			
+
 			drag_port->property_x() = 0;
 			drag_port->property_y() = 0;
 			drag_port->_rect->property_x2() = 1;
 			drag_port->_rect->property_y2() = 1;
-			
+
 			if (drag_port_is_input)
 				drag_connection = boost::shared_ptr<Connection>(new Connection(
 					shared_from_this(), _connect_port, drag_port,
@@ -1043,7 +1052,7 @@ Canvas::connection_drag_handler(GdkEvent* event)
 				drag_connection = boost::shared_ptr<Connection>(new Connection(
 					shared_from_this(), drag_port, _connect_port,
 					_connect_port->color() + 0x22222200));
-				
+
 			drag_connection->update_location();
 		}
 
@@ -1093,12 +1102,12 @@ Canvas::connection_drag_handler(GdkEvent* event)
 			// "Snap" to port, if we're on a port and it's the right direction
 			if (drag_connection)
 				drag_connection->hide();
-			
+
 			boost::shared_ptr<Port> p = get_port_at(x, y);
-			
+
 			if (drag_connection)
 				drag_connection->show();
-			
+
 			if (p && p->is_input() != _connect_port->is_input()) {
 				boost::shared_ptr<Module> m = p->module().lock();
 				if (m) {
@@ -1111,7 +1120,8 @@ Canvas::connection_drag_handler(GdkEvent* event)
 					drag_module->set_height(m->height());
 					drag_port->property_x() = p->property_x().get_value();
 					drag_port->property_y() = p->property_y().get_value();
-					// Make the drag port as wide as the snapped port so the connection coords are the same
+					// Make the drag port as wide as the snapped port
+					// so the connection coords are the same
 					drag_port->_rect->property_x2() = p->_rect->property_x2().get_value();
 					drag_port->_rect->property_y2() = p->_rect->property_y2().get_value();
 				}
@@ -1123,21 +1133,21 @@ Canvas::connection_drag_handler(GdkEvent* event)
 		}
 	} else if (event->type == GDK_BUTTON_RELEASE && _drag_state == CONNECTION) {
 		_base_rect.ungrab(event->button.time);
-		
+
 		double x = event->button.x;
 		double y = event->button.y;
 		_base_rect.i2w(x, y);
 
 		if (drag_connection)
 			drag_connection->hide();
-		
+
 		boost::shared_ptr<Port> p = get_port_at(x, y);
-		
+
 		if (drag_connection)
 			drag_connection->show();
-	
+
 		if (p) {
-			if (p == _connect_port) {   // drag ended on same port it started on
+			if (p == _connect_port) {  // drag ended on same port it started on
 				if (_selected_ports.empty()) {  // no active port, just activate (hilite) it
 					select_port(_connect_port);
 				} else {  // there is already an active port, connect it with this one
@@ -1154,11 +1164,9 @@ Canvas::connection_drag_handler(GdkEvent* event)
 				snapped_port.reset();
 			}
 		}
-		
+
 		// Clean up dragging stuff
-		
-		_base_rect.ungrab(event->button.time);
-		
+
 		if (_connect_port)
 			_connect_port->set_highlighted(false);
 
@@ -1185,7 +1193,7 @@ Canvas::get_port_at(double x, double y)
 	for (ItemList::const_iterator i = _items.begin(); i != _items.end(); ++i) {
 		const boost::shared_ptr<Module> m
 			= boost::dynamic_pointer_cast<Module>(*i);
-		
+
 		if (m && m->point_is_within(x, y))
 			return m->port_at(x, y);
 
@@ -1194,69 +1202,46 @@ Canvas::get_port_at(double x, double y)
 }
 
 
-void
-Canvas::render_to_dot(const string& dot_output_filename)
-{
 #ifdef HAVE_AGRAPH
-	std::map<boost::shared_ptr<Item>, Agnode_t*> nodes;
+class GVNodes : public std::map<boost::shared_ptr<Item>, Agnode_t*> {
+public:
+	GVNodes() : gvc(0), G(0) {}
 
-	GVC_t* gvc = gvContext();
-	Agraph_t* G = agopen((char*)"g", AGDIGRAPH);
-
-	agraphattr(G, (char*)"rankdir", (char*)"LR");
-
-	unsigned id = 0;
-	for (ItemList::const_iterator i = _items.begin(); i != _items.end(); ++i) {
-		std::ostringstream id_ss;
-		id_ss << "n" << id++;
-		nodes.insert(std::make_pair(*i, agnode(G, strdup(id_ss.str().c_str()))));
-	}
-	
-	for (ConnectionList::iterator i = _connections.begin(); i != _connections.end(); ++i) {
-		const boost::shared_ptr<Connection> c = *i;
-		const boost::shared_ptr<Item> src = boost::dynamic_pointer_cast<Item>(c->source().lock());
-		const boost::shared_ptr<Item> dst = boost::dynamic_pointer_cast<Item>(c->dest().lock());
-		if (!src || !dst)
-			continue;
-
-		Agnode_t* src_node = nodes[src];
-		Agnode_t* dst_node = nodes[dst];
-
-		assert(src_node && dst_node);
-
-		agedge(G, src_node, dst_node);
+	void cleanup() {
+		gvFreeLayout(gvc, G);
+		agclose (G);
+		gvc = 0;
+		G = 0;
 	}
 
-	gvLayout (gvc, G, (char*)"dot");
-		
-	FILE* out_fd = fopen(dot_output_filename.c_str(), "w+");
-	if (out_fd) {
-		gvRender (gvc, G, (char*)"dot", out_fd);
-		fclose(out_fd);
-	}
-	
-	gvFreeLayout(gvc, G);
-	agclose(G);
-	gvFreeContext(gvc);
-
+	GVC_t*    gvc;
+	Agraph_t* G;
+};
+#else
+class GVNodes : public std::map<boost::shared_ptr<Item>, void*> {};
 #endif
-}
-	
 
-void
-Canvas::arrange(bool use_length_hints)
+
+GVNodes
+Canvas::layout_dot(bool use_length_hints, const std::string& filename)
 {
+	GVNodes nodes;
+
+#ifdef HAVE_AGRAPH
 	/* FIXME: Are the strdup's here a leak?
 	 * GraphViz documentation disagrees with function prototypes.
 	 */
-#ifdef HAVE_AGRAPH
-	typedef std::map<boost::shared_ptr<Item>, Agnode_t*> Nodes;
-	Nodes nodes;
 
 	GVC_t* gvc = gvContext();
 	Agraph_t* G = agopen((char*)"g", AGDIGRAPH);
 
-	agraphattr(G, (char*)"rankdir", (char*)"LR");
+	nodes.gvc = gvc;
+	nodes.G = G;
+
+	if (_direction == HORIZONTAL)
+		agraphattr(G, (char*)"rankdir", (char*)"LR");
+	else
+		agraphattr(G, (char*)"rankdir", (char*)"TD");
 
 	unsigned id = 0;
 	for (ItemList::const_iterator i = _items.begin(); i != _items.end(); ++i) {
@@ -1270,38 +1255,38 @@ Canvas::arrange(bool use_length_hints)
 			ss.str("");
 			ss << (*i)->height() / 96.0;
 			agsafeset(node, (char*)"height", strdup(ss.str().c_str()), (char*)"");
-			//agsafeset(node, (char*)"shape", agstrdup((char*)"box"), (char*)"");
 			agsafeset(node, (char*)"shape", (char*)"box", (char*)"");
+			agsafeset(node, (char*)"label", (char*)(*i)->name().c_str(), (char*)"");
 		} else {
 			agsafeset(node, (char*)"width", (char*)"1.0", (char*)"");
 			agsafeset(node, (char*)"height", (char*)"1.0", (char*)"");
-			//agsafeset(node, (char*)"shape", agstrdup((char*)"ellipse"), (char*)"");
 			agsafeset(node, (char*)"shape", (char*)"ellipse", (char*)"");
+			agsafeset(node, (char*)"label", (char*)(*i)->name().c_str(), (char*)"");
 		}
 		assert(node);
 		nodes.insert(std::make_pair(*i, node));
 	}
-	
+
 	for (ConnectionList::iterator i = _connections.begin(); i != _connections.end(); ++i) {
 		const boost::shared_ptr<Connection> c = *i;
-		
+
 		boost::shared_ptr<Port> src_port = boost::dynamic_pointer_cast<Port>(c->source().lock());
 		boost::shared_ptr<Port> dst_port = boost::dynamic_pointer_cast<Port>(c->dest().lock());
-		
+
 		boost::shared_ptr<Item> src_item = boost::dynamic_pointer_cast<Item>(c->source().lock());
 		boost::shared_ptr<Item> dst_item = boost::dynamic_pointer_cast<Item>(c->dest().lock());
-		
-		Nodes::iterator src_i = nodes.end();
-		Nodes::iterator dst_i = nodes.end();
+
+		GVNodes::iterator src_i = nodes.end();
+		GVNodes::iterator dst_i = nodes.end();
 
 		Agnode_t* src_node = NULL;
 		Agnode_t* dst_node = NULL;
-		
+
 		if (src_port)
 			src_i = nodes.find(src_port->module().lock());
 		else
 			src_i = nodes.find(src_item);
-		
+
 		if (dst_port)
 			dst_i = nodes.find(dst_port->module().lock());
 		else
@@ -1311,7 +1296,7 @@ Canvas::arrange(bool use_length_hints)
 
 		src_node = src_i->second;
 		dst_node = dst_i->second;
-		
+
 		assert(src_node && dst_node);
 
 		Agedge_t* edge = agedge(G, src_node, dst_node);
@@ -1325,25 +1310,49 @@ Canvas::arrange(bool use_length_hints)
 
 	gvLayout (gvc, G, (char*)"dot");
 	gvRender (gvc, G, (char*)"dot", fopen("/dev/null", "w"));
-	//gvRender (gvc, G, (char*)"dot", fopen("/home/dave/test.dot", "w"));
+
+	if (filename != "") {
+		FILE* fd = fopen(filename.c_str(), "w");
+		gvRender (gvc, G, (char*)"dot", fd);
+		fclose(fd);
+	}
+#endif
+
+	return nodes;
+}
+
+
+void
+Canvas::render_to_dot(const string& dot_output_filename)
+{
+#ifdef HAVE_AGRAPH
+	GVNodes nodes = layout_dot(false, dot_output_filename);
+	nodes.cleanup();
+#endif
+}
+
+
+void
+Canvas::arrange(bool use_length_hints)
+{
+#ifdef HAVE_AGRAPH
+	GVNodes nodes = layout_dot(use_length_hints, "");
 
 	double least_x=HUGE_VAL, least_y=HUGE_VAL, most_x=0, most_y=0;
-	
-	// FIXME: locale kludges
+
+	// Set numeric locale to POSIX for reading graphviz output with strtod
 	char* locale = strdup(setlocale(LC_NUMERIC, NULL));
 	setlocale(LC_NUMERIC, "POSIX");
 
 	// Arrange to graphviz coordinates
-	for (std::map<boost::shared_ptr<Item>, Agnode_t*>::iterator i = nodes.begin();
-			i != nodes.end(); ++i) {
+	for (GVNodes::iterator i = nodes.begin(); i != nodes.end(); ++i) {
 		char* pos_prop = agget(i->second, (char*)"pos");
 		assert(pos_prop);
-		string pos(pos_prop);
+		const string pos(pos_prop);
 		const string x_str = pos.substr(0, pos.find(","));
 		const string y_str = pos.substr(pos.find(",")+1);
-		double x = strtod(x_str.c_str(), NULL) * 1.25;
-		double y = -strtod(y_str.c_str(), NULL) * 1.25;
-		//cerr << "MOVE: " << x << ", " << y << endl;
+		const double x = strtod(x_str.c_str(), NULL) * 1.25;
+		const double y = -strtod(y_str.c_str(), NULL) * 1.25;
 		i->first->property_x() = x - i->first->width()/2.0;
 		i->first->property_y() = y - i->first->height()/2.0;
 		least_x = std::min(least_x, x);
@@ -1351,7 +1360,8 @@ Canvas::arrange(bool use_length_hints)
 		most_x = std::max(most_x, x);
 		most_y = std::max(most_y, y);
 	}
-	
+
+	// Reset numeric locale to original value
 	setlocale(LC_NUMERIC, locale);
 	free(locale);
 
@@ -1363,23 +1373,19 @@ Canvas::arrange(bool use_length_hints)
 
 	if (graph_width + 10 > _width)
 		resize(graph_width + 10, _height);
-	
+
 	if (graph_height + 10 > _height)
 		resize(_width, graph_height + 10);
 
-	// This isn't trial and error code.  Honest!
-	
 	// Center on canvas
-	for (std::map<boost::shared_ptr<Item>, Agnode_t*>::iterator i = nodes.begin();
-			i != nodes.end(); ++i) {
+	for (GVNodes::iterator i = nodes.begin(); i != nodes.end(); ++i) {
 		i->first->move((_width / 2.0) - graph_width/2.0,
 		              ((_height / 2.0) + graph_height/2.0));
 	}
 
 	scroll_to_center();
 
-	gvFreeLayout(gvc, G);
-	agclose (G);
+	nodes.cleanup();
 #endif
 }
 
@@ -1395,7 +1401,7 @@ Canvas::resize(double width, double height)
 		set_scroll_region(0.0, 0.0, width, height);
 	}
 }
-	
+
 
 void
 Canvas::resize_all_items()

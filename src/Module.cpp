@@ -1,15 +1,15 @@
 /* This file is part of FlowCanvas.
- * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ * Copyright (C) 2007-2009 Dave Robillard <http://drobilla.net>
+ *
  * FlowCanvas is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
- * 
+ *
  * FlowCanvas is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
@@ -34,6 +34,8 @@ static const uint32_t MODULE_HILITE_FILL_COLOUR    = 0x2E3436FF;
 static const uint32_t MODULE_OUTLINE_COLOUR        = 0x93978FFF;
 static const uint32_t MODULE_HILITE_OUTLINE_COLOUR = 0xEEEEECFF;
 static const uint32_t MODULE_TITLE_COLOUR          = 0xFFFFFFFF;
+static const double   MODULE_EMPTY_PORT_BREADTH    = 12.0;
+static const double   MODULE_EMPTY_PORT_DEPTH      = 6.0;
 
 
 /** Construct a Module
@@ -45,7 +47,11 @@ static const uint32_t MODULE_TITLE_COLOUR          = 0xFFFFFFFF;
  * If @a name is the empty string, the space where the title would usually be
  * is not created (eg the module will be shorter).
  */
-Module::Module(boost::shared_ptr<Canvas> canvas, const string& name, double x, double y, bool show_title)
+Module::Module(
+		boost::shared_ptr<Canvas> canvas,
+		const string& name,
+		double x, double y,
+		bool show_title, bool show_port_labels)
 	: Item(canvas, name, x, y, MODULE_FILL_COLOUR)
 	, _border_width(1.0)
 	, _title_visible(show_title)
@@ -55,6 +61,9 @@ Module::Module(boost::shared_ptr<Canvas> canvas, const string& name, double x, d
 	, _port_renamed(false)
 	, _widest_input(0)
 	, _widest_output(0)
+	, _show_port_labels(show_port_labels)
+	, _title_width(0.0)
+	, _title_height(0.0)
 	, _module_box(*this, 0, 0, 0, 0) // w, h set later
 	, _canvas_title(*this, 0, 8, name) // x set later
 	, _stacked_border(NULL)
@@ -74,22 +83,17 @@ Module::Module(boost::shared_ptr<Canvas> canvas, const string& name, double x, d
 		_canvas_title.property_size() = 9000;
 		_canvas_title.property_weight_set() = true;
 		_canvas_title.property_weight() = 400; */
-		if (canvas->get_zoom() != 1.0)
-			zoom(canvas->get_zoom());
+		//if (canvas->get_zoom() != 1.0)
+		zoom(canvas->get_zoom());
 		_canvas_title.property_fill_color_rgba() = MODULE_TITLE_COLOUR;
+		_title_width = _canvas_title.property_text_width();
+		_title_height = _canvas_title.property_text_height();
 	} else {
 		_canvas_title.hide();
 	}
 
 	set_width(10.0);
 	set_height(10.0);
-
-	signal_pointer_entered.connect(sigc::bind(sigc::mem_fun(this,
-		&Module::set_highlighted), true));
-	signal_pointer_exited.connect(sigc::bind(sigc::mem_fun(this,
-		&Module::set_highlighted), false));
-	signal_dropped.connect(sigc::mem_fun(this,
-		&Module::on_drop));
 }
 
 
@@ -103,13 +107,42 @@ Module::~Module()
 bool
 Module::on_event(GdkEvent* event)
 {
-	if (event->type == GDK_KEY_PRESS || event->type == GDK_KEY_RELEASE) {
-		boost::shared_ptr<Canvas> canvas = _canvas.lock();
-		if (canvas)
+	boost::shared_ptr<Canvas> canvas;
+	switch (event->type) {
+	case GDK_KEY_PRESS:
+	case GDK_KEY_RELEASE:
+		if ((canvas = _canvas.lock()))
 			canvas->canvas_event(event);
+		break;
+	case GDK_ENTER_NOTIFY:
+		set_highlighted(true);
+		break;
+	case GDK_LEAVE_NOTIFY:
+		set_highlighted(false);
+	default: break;
 	}
 
-	return Item::on_event(event);
+	bool ret = Item::on_event(event);
+
+	if (event->type == GDK_ENTER_NOTIFY)
+		for (PortVector::iterator p = _ports.begin(); p != _ports.end(); ++p)
+			(*p)->raise_connections();
+
+	return ret;
+}
+
+
+double
+Module::empty_port_breadth() const
+{
+	return MODULE_EMPTY_PORT_BREADTH;
+}
+
+
+double
+Module::empty_port_depth() const
+{
+	return MODULE_EMPTY_PORT_DEPTH;
 }
 
 
@@ -166,16 +199,9 @@ Module::set_icon(const Glib::RefPtr<Gdk::Pixbuf>& icon)
 
 
 void
-Module::on_drop(double new_x, double new_y)
-{
-	store_location();
-}
-
-
-void
 Module::zoom(double z)
 {
-	_canvas_title.property_size() = static_cast<int>(floor(8000.0f * z));
+	_canvas_title.property_size() = static_cast<int>(floor(9000.0f * z));
 	for (PortVector::iterator p = _ports.begin(); p != _ports.end(); ++p)
 		(*p)->zoom(z);
 }
@@ -228,22 +254,10 @@ Module::port_at(double x, double y)
 		if (x > port->property_x() && x < port->property_x() + port->width()
 				&& y > port->property_y() && y < port->property_y() + port->height()) {
 			return port;
-		} 
+		}
 	}
 
 	return boost::shared_ptr<Port>();
-}
-
-
-boost::shared_ptr<Port>
-Module::remove_port(const string& name)
-{
-	boost::shared_ptr<Port> ret = get_port(name);
-
-	if (ret)
-		remove_port(ret);
-	
-	return ret;
 }
 
 
@@ -254,7 +268,7 @@ Module::remove_port(boost::shared_ptr<Port> port)
 
 	if (i != _ports.end()) {
 		_ports.erase(i);
-		
+
 		// Find new widest input or output, if necessary
 		if (port->is_input() && port->width() >= _widest_input) {
 			_widest_input = 0;
@@ -273,6 +287,8 @@ Module::remove_port(boost::shared_ptr<Port> port)
 		}
 
 		resize();
+		port->hide();
+		port.reset();
 
 	} else {
 		std::cerr << "Unable to find port " << port->name() << " to remove." << std::endl;
@@ -324,12 +340,12 @@ Module::move(double dx, double dy)
 
 	double new_x = property_x() + dx;
 	double new_y = property_y() + dy;
-	
+
 	if (new_x < 0)
 		dx = property_x() * -1;
 	else if (new_x + _width > canvas->width())
 		dx = canvas->width() - property_x() - _width;
-	
+
 	if (new_y < 0)
 		dy = property_y() * -1;
 	else if (new_y + _height > canvas->height())
@@ -362,7 +378,7 @@ Module::move_to(double x, double y)
 	if (y < 0) y = 0;
 	if (x + _width > canvas->width()) x = canvas->width() - _width - 1;
 	if (y + _height > canvas->height()) y = canvas->height() - _height - 1;
-		
+
 	assert(x >= 0);
 	assert(y >= 0);
 
@@ -374,10 +390,10 @@ Module::move_to(double x, double y)
 
 	property_x() = x;
 	property_y() = y;
-	
+
 	// Actually move (stupid gnomecanvas)
 	move(0, 0);
-	
+
 	// Update any connection line positions
 	for (PortVector::iterator p = _ports.begin(); p != _ports.end(); ++p)
 		(*p)->move_connections();
@@ -391,6 +407,8 @@ Module::set_name(const string& n)
 		string old_name = _name;
 		_name = n;
 		_canvas_title.property_text() = _name;
+		_title_width = _canvas_title.property_text_width();
+		_title_height = _canvas_title.property_text_height();
 		if (_title_visible)
 			resize();
 	}
@@ -410,19 +428,19 @@ Module::add_port(boost::shared_ptr<Port> p)
 	PortVector::const_iterator i = std::find(_ports.begin(), _ports.end(), p);
 	if (i != _ports.end()) // already added
 		return;            // so do nothing
-		
+
 	if (p->is_input() && p->natural_width() > _widest_input)
 		_widest_input = p->width();
 	else if (p->is_output() && p->natural_width() > _widest_output)
 		_widest_output = p->width();
-	
+
 	_ports.push_back(p);
-	
+
 	boost::shared_ptr<Canvas> canvas = _canvas.lock();
 	if (canvas)
 		p->signal_event().connect(
 			sigc::bind(sigc::mem_fun(canvas.get(), &Canvas::port_event), p));
-	
+
 	p->signal_renamed.connect(sigc::mem_fun(this, &Module::port_renamed));
 }
 
@@ -448,7 +466,7 @@ Module::embed(Gtk::Container* widget)
 	_embed_container->set_border_width(2);
 	_embed_container->show_all();
 
-	const double y = 4 + _canvas_title.property_text_height();
+	const double y = 4 + _title_height;
 	delete _embed_item;
 	_embed_item = new Gnome::Canvas::Widget(*this, 2.0, y, *_embed_container);
 	_embed_item->show();
@@ -462,7 +480,7 @@ Module::embed(Gtk::Container* widget)
 				sigc::mem_fun(this, &Module::embed_size_request), false));
 }
 
-	
+
 void
 Module::embed_size_request(Gtk::Requisition* r, bool force)
 {
@@ -471,7 +489,7 @@ Module::embed_size_request(Gtk::Requisition* r, bool force)
 
 	_embed_width = r->width;
 	_embed_height = r->height;
-	
+
 	resize();
 
 	Gtk::Allocation allocation;
@@ -491,6 +509,7 @@ Module::measure_ports()
 	_widest_output = 0.0;
 	for (PortVector::iterator pi = _ports.begin(); pi != _ports.end(); ++pi) {
 		const boost::shared_ptr<Port> p = (*pi);
+		p->show_label(_show_port_labels);
 		if (p->is_input()) {
 			_widest_input = 0.0;
 			for (PortVector::iterator pi = _ports.begin(); pi != _ports.end(); ++pi)
@@ -511,6 +530,24 @@ Module::measure_ports()
 void
 Module::resize()
 {
+	boost::shared_ptr<Canvas> canvas = _canvas.lock();
+	if (!canvas)
+		return;
+
+	switch (canvas->direction()) {
+	case Canvas::HORIZONTAL:
+		resize_horiz();
+		break;
+	case Canvas::VERTICAL:
+		resize_vert();
+		break;
+	}
+}
+
+
+void
+Module::resize_horiz()
+{
 	if (_port_renamed) {
 		measure_ports();
 		_port_renamed = false;
@@ -519,38 +556,39 @@ Module::resize()
 	// The amount of space between a port edge and the module edge (on the
 	// side that the port isn't right on the edge).
 	const double hor_pad = (_title_visible ? 10.0 : 20.0);
-	
-	double width = (_title_visible
-		? _canvas_title.property_text_width() + 10.0
-		: 1.0);
-	
+
+	double width = (_title_visible ? _title_width + 10.0 : 1.0);
+
 	if (_icon_box)
 		width += _icon_size + 2;
 
 	// Title is wide, put inputs and outputs beside each other
 	bool horiz = (_widest_input + _widest_output + 10.0 < std::max(width, _embed_width));
-	
+
 	// Fit ports to module (or vice-versa)
 	double widest_in  = _widest_input;
 	double widest_out = _widest_output;
 	double expand_w = (horiz ? (width / 2.0) : width) - hor_pad;
-	widest_in  = (_embed_item ? _widest_input  : std::max(_widest_input,  expand_w));
-	widest_out = (_embed_item ? _widest_output : std::max(_widest_output, expand_w));
+	if (_show_port_labels) {
+		widest_in  = (_embed_item ? _widest_input  : std::max(_widest_input,  expand_w));
+		widest_out = (_embed_item ? _widest_output : std::max(_widest_output, expand_w));
+	}
 
 	const double widest = std::max(widest_in, widest_out);
-	const double title_height = _canvas_title.property_text_height();
 
 	double above_w   = std::max(width, widest + hor_pad);
 	double between_w = std::max(width, widest_in + widest_out + _embed_width);
-	
+
 	above_w = std::max(above_w, _embed_width);
 
 	// Basic height contains title, icon
-	double header_height = 2;
-	if (_title_visible)
-		header_height += 2 + title_height;
-	if (_icon_box && _icon_size > title_height)
-		header_height += _icon_size - title_height;
+	double header_height = 2.0;
+	if (_show_port_labels) {
+		if (_title_visible)
+			header_height += 2 + _title_height;
+		if (_icon_box && _icon_size > _title_height)
+			header_height += _icon_size - _title_height;
+	}
 
 	double height = header_height;
 
@@ -560,13 +598,13 @@ Module::resize()
 
 	//double between_h = std::max(above_h, _embed_height);
 	above_h += _embed_height;
-	
+
 	/*cerr << above_w << "x" << above_h << "(" << above_w * above_h << ") ? "
 			<< between_w << "x" << between_h << "(" << between_w * between_h << ")" << endl;*/
-	
+
 	// Decide where to place embedded widget if necessary)
 	enum { BETWEEN, ABOVE } embed_pos = ABOVE;
-	//if (above_w * above_h >= between_w * between_h) { // minimize area
+	//if (above_w * above_h >= between_w * between_h) // minimize area
 	if (_embed_width < _embed_height * 2.0) {
 		embed_pos = BETWEEN;
 		width = between_w;
@@ -586,15 +624,15 @@ Module::resize()
 	}
 
 	width += _border_width * 2.0;
-	
+
 	// Actually set width and height
 	set_width(width);
-	
+
 	// Offset ports below embedded widget
 	if (embed_pos == ABOVE) {
 		header_height += _embed_height;
 	}
-	
+
 	// Move ports to appropriate locations
 	int i = 0;
 	bool last_was_input = false;
@@ -605,42 +643,140 @@ Module::resize()
 		h = p->height();
 
 		if (p->is_input()) {
-			y = header_height + (i * (h + 2.0));
+			y = header_height + (i * (h + 1.0));
 			++i;
 			p->set_width(widest_in);
-			p->property_x() = 0.5;
+			p->property_x() = -0.5;
 			p->property_y() = y;
 			last_was_input = true;
 		} else {
 			if (!horiz || !last_was_input) {
-				y = header_height + (i * (h + 2.0));
+				y = header_height + (i * (h + 1.0));
 				++i;
 			}
 			p->set_width(widest_out);
-			p->property_x() = _width - p->width() - 0.5;
+			p->property_x() = _width - p->width() + 0.5;
 			p->property_y() = y;
 			last_was_input = false;
 		}
-		
+
 		(*pi)->move_connections();
 	}
-	
+
 	if (_ports.empty())
 		h += header_height;
 
-	set_height(y + h + 2.0);
+	height = y + h + 2.0;
+	if (_embed_item && embed_pos == BETWEEN)
+		height = std::max(height, _embed_height + header_height + 2.0);
 
-	// Center title
-	if (_icon_box)
-		_canvas_title.property_x() = _icon_size + (_width - _icon_size + 1)/2.0;
-	else
-		_canvas_title.property_x() = _width/2.0;
+	set_height(height);
+
+	if (_title_visible) {
+		if (_show_port_labels)
+			_canvas_title.property_y() = _title_height / 2.0;
+		else
+			_canvas_title.property_y() = (_height / 2.0) - 1.0;
+		if (_icon_box)
+			_canvas_title.property_x() = _icon_size + (_width - _icon_size + 1)/2.0;
+		else
+			_canvas_title.property_x() = _width/2.0;
+	}
 
 	// Make things actually move to their new locations (?!)
 	move(0, 0);
 }
 
-	
+
+void
+Module::resize_vert()
+{
+	if (_port_renamed) {
+		measure_ports();
+		_port_renamed = false;
+	}
+
+	double width = (_title_visible
+		? _canvas_title.property_text_width() + 10.0
+		: 1.0);
+
+	if (_icon_box)
+		width += _icon_size + 2;
+
+	double height = 4.0;
+	if (_show_port_labels) {
+		if (_title_visible)
+			height += 2 + _title_height;
+		if (_icon_box && _icon_size > _title_height)
+			height += _icon_size - _title_height;
+	}
+
+	height += MODULE_EMPTY_PORT_DEPTH * 4.0;
+
+	// Move ports to appropriate locations
+	int i = 0;
+	bool last_was_input = false;
+	double x = 0.0;
+	static const double PAD = 2.0;
+	for (PortVector::iterator pi = _ports.begin(); pi != _ports.end(); ++pi) {
+		const boost::shared_ptr<Port> p = (*pi);
+		p->hide_control();
+		p->set_width(MODULE_EMPTY_PORT_BREADTH);
+		p->set_height(MODULE_EMPTY_PORT_DEPTH);
+		if (p->is_input()) {
+			x = PAD + (i * (MODULE_EMPTY_PORT_BREADTH + 1.0));
+			++i;
+			p->property_x() = x;
+			p->property_y() = -0.5;
+			last_was_input = true;
+		} else {
+			if (!last_was_input) {
+				x = PAD + (i * (MODULE_EMPTY_PORT_BREADTH + 1.0));
+				++i;
+			}
+			p->property_x() = x;
+			p->property_y() = height - p->height() + 0.5;
+			last_was_input = false;
+		}
+
+		(*pi)->move_connections();
+	}
+
+	x += MODULE_EMPTY_PORT_BREADTH;
+
+	if (x > width - 2.0)
+		width = x + 2.0;
+
+	set_width(width);
+	set_height(height);
+
+	if (_title_visible) {
+		_canvas_title.property_y() = (_height / 2.0) - 1.0;
+		_canvas_title.property_x() = (_width / 2.0);
+	}
+
+	// Make things actually move to their new locations (?!)
+	move(0, 0);
+}
+
+
+void
+Module::set_show_port_labels(bool b)
+{
+	boost::shared_ptr<Canvas> canvas = _canvas.lock();
+	if (!canvas)
+		return;
+
+	if (canvas->direction() == Canvas::VERTICAL)
+		b = false; // can't show labels in vertical mode
+
+	_show_port_labels = b;
+	_port_renamed  = true; // remeasure
+
+	resize();
+}
+
+
 /** Expand the canvas if the module is outside bounds.
  */
 void
@@ -650,7 +786,7 @@ Module::fit_canvas()
 	if (canvas) {
 		double canvas_width = canvas->width();
 		double canvas_height = canvas->height();
-	
+
 		canvas_width = max(canvas_width, property_x() + _width + 5.0);
 		canvas_height = max(canvas_height, property_y() + _height + 5.0);
 
@@ -667,7 +803,7 @@ Module::select_tick()
 		_module_box.property_dash() = canvas->select_dash();
 }
 
-	
+
 void
 Module::set_border_color(uint32_t c)
 {

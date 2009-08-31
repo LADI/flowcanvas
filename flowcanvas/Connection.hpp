@@ -1,15 +1,15 @@
 /* This file is part of FlowCanvas.
- * Copyright (C) 2007 Dave Robillard <http://drobilla.net>
- * 
+ * Copyright (C) 2007-2009 Dave Robillard <http://drobilla.net>
+ *
  * FlowCanvas is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
- * 
+ *
  * FlowCanvas is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
@@ -18,6 +18,7 @@
 #ifndef FLOWCANVAS_CONNECTION_HPP
 #define FLOWCANVAS_CONNECTION_HPP
 
+#include <stdint.h>
 #include <list>
 #include <boost/weak_ptr.hpp>
 #include <libgnomecanvasmm.h>
@@ -44,20 +45,20 @@ public:
 			   bool                           show_arrow_head = false);
 
 	virtual ~Connection();
-	
+
 	virtual void move(double /*dx*/, double /*dy*/)
 	{ /* ignore, src/dst take care of it */ }
-	
+
 	virtual void zoom(double);
 
 	bool selected() const { return _selected; }
 	void set_selected(bool b);
-	
+
 	virtual double length_hint() const { return 0.0; }
 
 	void set_label(const std::string& str);
 	void show_handle(bool show);
-	
+
 	void set_color(uint32_t color);
 	void set_highlighted(bool b);
 	void raise_to_top();
@@ -79,7 +80,7 @@ protected:
 	friend class Canvas;
 	friend class Connectable;
 	void update_location();
-	
+
 	const boost::weak_ptr<Canvas>      _canvas;
 	const boost::weak_ptr<Connectable> _source;
 	const boost::weak_ptr<Connectable> _dest;
