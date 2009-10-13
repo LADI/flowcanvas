@@ -250,7 +250,7 @@ conforming to the 32bit IEEE-754 floating point specification.
     rdfs:label   "port" ;
     rdfs:comment "Relates a Template or Plugin to the Ports it contains" .
 
-:revision a rdf:Property
+:revision a rdf:Property ;
 	rdfs:domain :Resource ;
 	rdfs:range  xsd:nonNegativeInteger ;
 	rdfs:label  "revision" ;
