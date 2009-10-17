@@ -1,5 +1,5 @@
 /* This file is part of Evoral.
- * Copyright (C) 2008-2009 Dave Robillard <http://drobilla.net>
+ * Copyright (C) 2008 Dave Robillard <http://drobilla.net>
  * Copyright (C) 2000-2008 Paul Davis
  *
  * Evoral is free software; you can redistribute it and/or modify it under the
@@ -58,8 +58,8 @@ public:
 
 	bool find_next_event(FrameTime start, FrameTime end, ControlEvent& ev) const;
 
-	virtual bool empty() const { return _controls.size() == 0; }
-	virtual void clear();
+	virtual bool controls_empty() const { return _controls.size() == 0; }
+	virtual void clear_controls();
 
 	void what_has_data(std::set<Parameter>&) const;
 

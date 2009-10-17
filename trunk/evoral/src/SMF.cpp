@@ -1,6 +1,7 @@
 /* This file is part of Evoral.
- * Copyright (C) 2008-2009 Dave Robillard <http://drobilla.net>
+ * Copyright (C) 2008 Dave Robillard <http://drobilla.net>
  * Copyright (C) 2000-2008 Paul Davis
+ * Author: Hans Baier
  *
  * Evoral is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -16,181 +17,152 @@
  * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include <sys/stat.h>
-#include <unistd.h>
-#include <errno.h>
-#include <string.h>
+#define __STDC_LIMIT_MACROS 1
 #include <cassert>
+#include <cmath>
 #include <iostream>
-#include <glibmm/miscutils.h>
-#include "evoral/midi_util.h"
-#include "evoral/SMF.hpp"
-#include "evoral/SMFReader.hpp"
+#include <stdint.h>
+#include "libsmf/smf.h"
 #include "evoral/Event.hpp"
+#include "evoral/SMF.hpp"
+#include "evoral/midi_util.h"
 
 using namespace std;
 
 namespace Evoral {
 
-template<typename T>
-SMF<T>::SMF()
-	: _fd(0)
-	, _last_ev_time(0)
-	, _track_size(4) // 4 bytes for the ever-present EOT event
-	, _header_size(22)
-	, _empty(true)
+SMF::~SMF()
 {
+	if (_smf) {
+		smf_delete(_smf);
+		_smf = 0;
+		_smf_track = 0;
+	}
 }
 
-template<typename T>
-SMF<T>::~SMF()
+uint16_t
+SMF::num_tracks() const
 {
+	return _smf->number_of_tracks;
 }
 
-/** Attempt to open the SMF file for reading and writing.
- *
- * Currently SMF is always read/write.
+uint16_t
+SMF::ppqn() const
+{
+	return _smf->ppqn;
+}
+
+/** Seek to the specified track (1-based indexing)
+ * \return 0 on success
+ */
+int
+SMF::seek_to_track(int track)
+{
+	_smf_track = smf_get_track_by_number(_smf, track);
+	if (_smf_track != NULL) {
+		_smf_track->next_event_number = (_smf_track->number_of_events == 0) ? 0 : 1;
+		return 0;
+	} else {
+		return -1;
+	}
+}
+
+/** Attempt to open the SMF file for reading and/or writing.
  *
  * \return  0 on success
- *         -1 if the file can not be opened for reading,
- *         -2 if the file can not be opened for writing
+ *         -1 if the file can not be opened or created
+ *         -2 if the file exists but specified track does not exist
  */
-template<typename T>
 int
-SMF<T>::open(const std::string& path)
+SMF::open(const std::string& path, int track) THROW_FILE_ERROR
 {
-	//cerr << "Opening SMF file " << path() << " writeable: " << writable() << endl;
-	_fd = fopen(path.c_str(), "r+");
+	assert(track >= 1);
+	if (_smf) {
+		smf_delete(_smf);
+	}
 
-	// File already exists
-	if (_fd) {
-		fseek(_fd, _header_size - 4, 0);
-		uint32_t track_size_be = 0;
-		fread(&track_size_be, 4, 1, _fd);
-		_track_size = GUINT32_FROM_BE(track_size_be);
-		_empty = _track_size > 4;
-		//cerr << "SMF - read track size " << _track_size << endl;
+	_file_path = path;
+	_smf = smf_load(_file_path.c_str());
+	if (_smf == NULL) {
+		return -1;
+	}
 
-	// We're making a new file
-	} else {
-		_fd = fopen(path.c_str(), "w+");
-		if (_fd == NULL) {
-			cerr << "ERROR: Can not open SMF file " << path << " for writing: " <<
-				strerror(errno) << endl;
-			return -2;
-		}
-		_track_size = 4;
+	_smf_track = smf_get_track_by_number(_smf, track);
+	if (!_smf_track)
+		return -2;
+
+	//cerr << "Track " << track << " # events: " << _smf_track->number_of_events << endl;
+	if (_smf_track->number_of_events == 0) {
+		_smf_track->next_event_number = 0;
 		_empty = true;
-
-		// Write a tentative header just to pad things out so writing happens in the right spot
-		flush_header();
-		flush_footer();
-	}
-
-	return (_fd == 0) ? -1 : 0;
-}
-
-template<typename T>
-void
-SMF<T>::close()
-{
-	if (_fd) {
-		flush_header();
-		flush_footer();
-		fclose(_fd);
-		_fd = NULL;
-	}
-}
-
-template<typename T>
-void
-SMF<T>::seek_to_start() const
-{
-	fseek(_fd, _header_size, SEEK_SET);
-}
-
-template<typename T>
-void
-SMF<T>::seek_to_footer_position()
-{
-	uint8_t buffer[4];
-
-	// Check if there is a track end marker at the end of the data
-	fseek(_fd, -4, SEEK_END);
-	size_t read_bytes = fread(buffer, sizeof(uint8_t), 4, _fd);
-
-	if ((read_bytes == 4)
-			&& buffer[0] == 0x00
-			&& buffer[1] == 0xFF
-			&& buffer[2] == 0x2F
-			&& buffer[3] == 0x00) {
-		// there is one, so overwrite it
-		fseek(_fd, -4, SEEK_END);
 	} else {
-		// there is none, so append
-		fseek(_fd, 0, SEEK_END);
+		_smf_track->next_event_number = 1;
+		_empty = false;
+	}
+
+	return 0;
+}
+
+
+/** Attempt to create a new SMF file for reading and/or writing.
+ *
+ * \return  0 on success
+ *         -1 if the file can not be created
+ *         -2 if the track can not be created
+ */
+int
+SMF::create(const std::string& path, int track, uint16_t ppqn) THROW_FILE_ERROR
+{
+	assert(track >= 1);
+	if (_smf) {
+		smf_delete(_smf);
+	}
+
+	_file_path = path;
+
+	_smf = smf_new();
+	if (smf_set_ppqn(_smf, ppqn) != 0) {
+		throw FileError();
+	}
+
+	if (_smf == NULL) {
+		return -1;
+	}
+
+	for (int i = 0; i < track; ++i) {
+		_smf_track = smf_track_new();
+		assert(_smf_track);
+		smf_add_track(_smf, _smf_track);
+	}
+
+	_smf_track = smf_get_track_by_number(_smf, track);
+	if (!_smf_track)
+		return -2;
+
+	_smf_track->next_event_number = 0;
+	_empty = true;
+
+	return 0;
+}
+
+void
+SMF::close() THROW_FILE_ERROR
+{
+	if (_smf) {
+		if (smf_save(_smf, _file_path.c_str()) != 0) {
+			throw FileError();
+		}
+		smf_delete(_smf);
+		_smf = 0;
+		_smf_track = 0;
 	}
 }
 
-template<typename T>
 void
-SMF<T>::flush()
+SMF::seek_to_start() const
 {
-	fflush(_fd);
+	_smf_track->next_event_number = 1;
 }
-
-template<typename T>
-int
-SMF<T>::flush_header()
-{
-	// FIXME: write timeline position somehow?
-
-	//cerr << path() << " SMF Flushing header\n";
-
-	assert(_fd);
-
-	const uint16_t type     = GUINT16_TO_BE(0);     // SMF Type 0 (single track)
-	const uint16_t ntracks  = GUINT16_TO_BE(1);     // Number of tracks (always 1 for Type 0)
-	const uint16_t division = GUINT16_TO_BE(_ppqn); // Pulses per quarter note (beat)
-
-	char data[6];
-	memcpy(data, &type, 2);
-	memcpy(data+2, &ntracks, 2);
-	memcpy(data+4, &division, 2);
-
-	//_fd = freopen(path().c_str(), "r+", _fd);
-	//assert(_fd);
-	fseek(_fd, 0, SEEK_SET);
-	write_chunk("MThd", 6, data);
-	write_chunk_header("MTrk", _track_size);
-
-	fflush(_fd);
-
-	return 0;
-}
-
-template<typename T>
-int
-SMF<T>::flush_footer()
-{
-	//cerr << path() << " SMF Flushing footer\n";
-	seek_to_footer_position();
-	write_footer();
-	seek_to_footer_position();
-
-	return 0;
-}
-
-template<typename T>
-void
-SMF<T>::write_footer()
-{
-	write_var_len(0);
-	char eot[3] = { 0xFF, 0x2F, 0x00 }; // end-of-track meta-event
-	fwrite(eot, 1, 3, _fd);
-	fflush(_fd);
-}
-
 
 /** Read an event from the current position in file.
  *
@@ -199,158 +171,105 @@ SMF<T>::write_footer()
  * will have it's time field set to it's delta time, in SMF tempo-based ticks, using the
  * rate given by ppqn() (it is the caller's responsibility to calculate a real time).
  *
- * \a size should be the capacity of \a buf.  If it is not large enough, \a buf will
- * be freed and a new buffer allocated in its place, the size of which will be placed
- * in size.
+ * \a buf must be a pointer to a buffer allocated with malloc, or a pointer to NULL.
+ * \a size must be the capacity of \a buf.  If it is not large enough, \a buf will
+ * be reallocated and *size will be set to the new size of buf.
  *
- * Returns event length (including status byte) on success, 0 if event was
- * skipped (eg a meta event), or -1 on EOF (or end of track).
+ * \return event length (including status byte) on success, 0 if event was
+ * skipped (e.g. a meta event), or -1 on EOF (or end of track).
  */
-template<typename T>
 int
-SMF<T>::read_event(uint32_t* delta_t, uint32_t* size, uint8_t** buf) const
+SMF::read_event(uint32_t* delta_t, uint32_t* size, uint8_t** buf) const
 {
-	if (feof(_fd)) {
-		return -1;
-	}
+	smf_event_t* event;
 
 	assert(delta_t);
 	assert(size);
 	assert(buf);
 
-	try {
-		*delta_t = SMFReader::read_var_len(_fd);
-	} catch (...) {
-		return -1; // Premature EOF
-	}
+    if ((event = smf_track_get_next_event(_smf_track)) != NULL) {
+    	if (smf_event_is_metadata(event)) {
+    		return 0;
+    	}
+    	*delta_t = event->delta_time_pulses;
 
-	if (feof(_fd)) {
-		return -1; // Premature EOF
-	}
+    	int event_size = event->midi_buffer_length;
+    	assert(event_size > 0);
 
-	const int status = fgetc(_fd);
+    	// Make sure we have enough scratch buffer
+    	if (*size < (unsigned)event_size) {
+    		*buf = (uint8_t*)realloc(*buf, event_size);
+    	}
+    	memcpy(*buf, event->midi_buffer, size_t(event_size));
+    	*size = event_size;
 
-	if (status == EOF) {
-		return -1; // Premature EOF
-	}
+		assert(midi_event_is_valid(*buf, *size));
 
-	//printf("Status @ %X = %X\n", (unsigned)ftell(_fd) - 1, status);
+		/* printf("SMF::read_event @ %u: ", *delta_t);
+		for (size_t i = 0; i < *size; ++i) {
+			printf("%X ", (*buf)[i]);
+		} printf("\n") */
 
-	if (status == 0xFF) {
-		if (feof(_fd)) {
-			return -1; // Premature EOF
-		}
-		const int type = fgetc(_fd);
-		if ((unsigned char)type == 0x2F) {
-			return -1; // hit end of track
-		} else {
-			*size = 0;
-			return 0;
-		}
-	}
-
-	const int event_size = midi_event_size((unsigned char)status) + 1;
-	if (event_size <= 0) {
-		*size = 0;
-		return 0;
-	}
-
-	// Make sure we have enough scratch buffer
-	if (*size < (unsigned)event_size)
-		*buf = (uint8_t*)realloc(*buf, event_size);
-
-	*size = event_size;
-
-	(*buf)[0] = (unsigned char)status;
-	if (event_size > 1)
-		fread((*buf) + 1, 1, *size - 1, _fd);
-
-	/*printf("SMF %s read event: delta = %u, size = %u, data = ", _name.c_str(), *delta_t, *size);
-	for (size_t i=0; i < *size; ++i) {
-		printf("%X ", (*buf)[i]);
-	}
-	printf("\n");*/
-
-	return (int)*size;
+    	return event_size;
+    } else {
+    	return -1;
+    }
 }
 
-template<typename T>
 void
-SMF<T>::append_event_unlocked(uint32_t delta_t, const Event<T>& ev)
+SMF::append_event_delta(uint32_t delta_t, uint32_t size, const uint8_t* buf)
 {
-	if (ev.size() == 0)
+	if (size == 0) {
 		return;
-
-	const size_t stamp_size = write_var_len(delta_t);
-	fwrite(ev.buffer(), 1, ev.size(), _fd);
-
-	_track_size += stamp_size + ev.size();
-	_last_ev_time = ev.time();
-
-	if (ev.size() > 0)
-		_empty = false;
-}
-
-template<typename T>
-void
-SMF<T>::begin_write(FrameTime start_frame)
-{
-	_last_ev_time = 0;
-	fseek(_fd, _header_size, SEEK_SET);
-}
-
-template<typename T>
-void
-SMF<T>::end_write()
-{
-	flush_header();
-	flush_footer();
-}
-
-template<typename T>
-void
-SMF<T>::write_chunk_header(const char id[4], uint32_t length)
-{
-	const uint32_t length_be = GUINT32_TO_BE(length);
-
-	fwrite(id, 1, 4, _fd);
-	fwrite(&length_be, 4, 1, _fd);
-}
-
-template<typename T>
-void
-SMF<T>::write_chunk(const char id[4], uint32_t length, void* data)
-{
-	write_chunk_header(id, length);
-
-	fwrite(data, 1, length, _fd);
-}
-
-/** Returns the size (in bytes) of the value written. */
-template<typename T>
-size_t
-SMF<T>::write_var_len(uint32_t value)
-{
-	size_t ret = 0;
-
-	uint32_t buffer = value & 0x7F;
-
-	while ( (value >>= 7) ) {
-		buffer <<= 8;
-		buffer |= ((value & 0x7F) | 0x80);
 	}
 
-	while (true) {
-		//printf("Writing var len byte %X\n", (unsigned char)buffer);
-		++ret;
-		fputc(buffer, _fd);
-		if (buffer & 0x80)
-			buffer >>= 8;
-		else
-			break;
+	/* printf("SMF::append_event_delta @ %u:", delta_t);
+	for (size_t i = 0; i < size; ++i) {
+		printf("%X ", buf[i]);
+		} printf("\n"); */
+
+	if (!midi_event_is_valid(buf, size)) {
+		cerr << "WARNING: SMF ignoring illegal MIDI event" << endl;
+		return;
 	}
 
-	return ret;
+	smf_event_t* event;
+
+	event = smf_event_new_from_pointer(buf, size);
+	assert(event != NULL);
+
+	assert(_smf_track);
+	smf_track_add_event_delta_pulses(_smf_track, event, delta_t);
+	_empty = false;
 }
+
+void
+SMF::begin_write()
+{
+	assert(_smf_track);
+	smf_track_delete(_smf_track);
+
+	_smf_track = smf_track_new();
+	assert(_smf_track);
+
+	smf_add_track(_smf, _smf_track);
+	assert(_smf->number_of_tracks == 1);
+}
+
+void
+SMF::end_write() THROW_FILE_ERROR
+{
+	if (smf_save(_smf, _file_path.c_str()) != 0)
+		throw FileError();
+}
+
+double
+SMF::round_to_file_precision (double val) const
+{
+	double div = ppqn();
+
+	return round (val * div) / div;
+}
+
 
 } // namespace Evoral

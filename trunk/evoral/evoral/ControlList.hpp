@@ -1,5 +1,5 @@
 /* This file is part of Evoral.
- * Copyright (C) 2008-2009 Dave Robillard <http://drobilla.net>
+ * Copyright (C) 2008 Dave Robillard <http://drobilla.net>
  * Copyright (C) 2000-2008 Paul Davis
  *
  * Evoral is free software; you can redistribute it and/or modify it under the
@@ -19,16 +19,17 @@
 #ifndef EVORAL_CONTROL_LIST_HPP
 #define EVORAL_CONTROL_LIST_HPP
 
+#include <cassert>
 #include <list>
 #include <boost/pool/pool.hpp>
 #include <boost/pool/pool_alloc.hpp>
 #include <glibmm/thread.h>
 #include "evoral/types.hpp"
 #include "evoral/Parameter.hpp"
-#include "evoral/Curve.hpp"
 
 namespace Evoral {
 
+class Curve;
 
 /** A single event (time-stamped value) for a control
  */
@@ -216,8 +217,11 @@ public:
 	bool rt_safe_earliest_event (double start, double end, double& x, double& y, bool start_inclusive=false) const;
 	bool rt_safe_earliest_event_unlocked (double start, double end, double& x, double& y, bool start_inclusive=false) const;
 
-	Curve&       curve()       { return *_curve; }
-	const Curve& curve() const { return *_curve; }
+	void create_curve();
+	void destroy_curve();
+
+	Curve&       curve()       { assert(_curve); return *_curve; }
+	const Curve& curve() const { assert(_curve); return *_curve; }
 
 	virtual void mark_dirty () const;
 

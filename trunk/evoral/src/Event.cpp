@@ -1,5 +1,5 @@
 /* This file is part of Evoral.
- * Copyright (C) 2008-2009 Dave Robillard <http://drobilla.net>
+ * Copyright (C) 2008 Dave Robillard <http://drobilla.net>
  * Copyright (C) 2000-2008 Paul Davis
  *
  * Evoral is free software; you can redistribute it and/or modify it under the
@@ -22,28 +22,30 @@ namespace Evoral {
 
 #ifdef EVORAL_EVENT_ALLOC
 
-template<typename T>
-Event<T>::Event(uint32_t tid, T t, uint32_t s, uint8_t* b, bool owns_buf)
-	: _type(tid)
-	, _time(t)
-	, _size(s)
-	, _buf(b)
-	, _owns_buf(owns_buf)
+template<typename Timestamp>
+Event<Timestamp>::Event(EventType type, Timestamp time, uint32_t size, uint8_t* buf, bool alloc)
+	: _type(type)
+	, _original_time(time)
+	, _nominal_time(time)
+	, _size(size)
+	, _buf(buf)
+	, _owns_buf(alloc)
 {
-	if (owns_buf) {
+	if (alloc) {
 		_buf = (uint8_t*)malloc(_size);
-		if (b) {
-			memcpy(_buf, b, _size);
+		if (buf) {
+			memcpy(_buf, buf, _size);
 		} else {
 			memset(_buf, 0, _size);
 		}
 	}
 }
 
-template<typename T>
-Event<T>::Event(const Event& copy, bool owns_buf)
+template<typename Timestamp>
+Event<Timestamp>::Event(const Event& copy, bool owns_buf)
 	: _type(copy._type)
-	, _time(copy._time)
+	, _original_time(copy._original_time)
+	, _nominal_time(copy._nominal_time)
 	, _size(copy._size)
 	, _buf(copy._buf)
 	, _owns_buf(owns_buf)
@@ -58,8 +60,8 @@ Event<T>::Event(const Event& copy, bool owns_buf)
 	}
 }
 
-template<typename T>
-Event<T>::~Event() {
+template<typename Timestamp>
+Event<Timestamp>::~Event() {
 	if (_owns_buf) {
 		free(_buf);
 	}
@@ -67,5 +69,8 @@ Event<T>::~Event() {
 
 #endif // EVORAL_EVENT_ALLOC
 
-} // namespace MIDI
+template class Event<Evoral::MusicalTime>;
+template class Event<uint32_t>;
+
+} // namespace Evoral
 

@@ -1,5 +1,5 @@
 /* This file is part of Evoral.
- * Copyright (C) 2008-2009 Dave Robillard <http://drobilla.net>
+ * Copyright (C) 2008 Dave Robillard <http://drobilla.net>
  * Copyright (C) 2000-2008 Paul Davis
  *
  * Evoral is free software; you can redistribute it and/or modify it under the
@@ -21,20 +21,20 @@
 
 #include <stdint.h>
 #include <list>
+#include <cmath>
 
 namespace Evoral {
 
 /** Frame count (i.e. length of time in audio frames) */
 typedef uint32_t FrameTime;
 
-/** Time-stamp of an event */
-typedef double timestamp_t;
+/** Musical time: beats relative to some defined origin */
+typedef double MusicalTime;
 
-/** Duration of time in timestamp_t units */
-typedef timestamp_t timedur_t;
-
-/** Time stamp of an event */
-typedef double EventLength;
+static inline bool musical_time_equal (MusicalTime a, MusicalTime b) {
+        /* acceptable tolerance is 1 tick. Nice if there was no magic number here */
+	return fabs (a - b) <= (1.0/1920.0);
+}
 
 /** Type of an event (opaque, mapped by application) */
 typedef uint32_t EventType;

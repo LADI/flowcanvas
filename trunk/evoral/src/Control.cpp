@@ -1,5 +1,5 @@
 /* This file is part of Evoral.
- * Copyright (C) 2008-2009 Dave Robillard <http://drobilla.net>
+ * Copyright (C) 2008 Dave Robillard <http://drobilla.net>
  * Copyright (C) 2000-2008 Paul Davis
  *
  * Evoral is free software; you can redistribute it and/or modify it under the
@@ -51,19 +51,6 @@ Control::set_float(float value, bool to_list, FrameTime frame)
 
 	if (to_list)
 		_list->add(frame, value);
-}
-
-
-/** Get the latest user-set value, which may not equal get_value() when automation
- * is playing back, etc.
- *
- * Automation write/touch works by periodically sampling this value and adding it
- * to the AutomationList.
- */
-float
-Control::user_float() const
-{
-	return _user_value;
 }
 
 

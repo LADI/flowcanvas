@@ -1,5 +1,5 @@
 /* This file is part of Evoral.
- * Copyright (C) 2008-2009 Dave Robillard <http://drobilla.net>
+ * Copyright (C) 2008 Dave Robillard <http://drobilla.net>
  *
  * Evoral is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -34,8 +34,8 @@ namespace Evoral {
  * This packs a timestamp, size, and size bytes of data flat into the buffer.
  * Useful for MIDI events, OSC messages, etc.
  */
-template<typename T>
-class EventRingBuffer : public Evoral::RingBuffer<uint8_t>, public Evoral::EventSink {
+template<typename Time>
+class EventRingBuffer : public Evoral::RingBuffer<uint8_t>, public Evoral::EventSink<Time> {
 public:
 
 	/** @param capacity Ringbuffer capacity in bytes.
@@ -45,25 +45,27 @@ public:
 
 	size_t capacity() const { return _size; }
 
-	bool peek_time(T* time);
+	bool peek_time(Time* time);
 
-	uint32_t write(T  time, EventType  type, uint32_t  size, const uint8_t* buf);
-	bool     read (T* time, EventType* type, uint32_t* size,       uint8_t* buf);
+	uint32_t write(Time  time, EventType  type, uint32_t  size, const uint8_t* buf);
+	bool     read (Time* time, EventType* type, uint32_t* size,       uint8_t* buf);
 };
 
 
+template<typename Time>
 inline bool
-EventRingBuffer::peek_time(T* time)
+EventRingBuffer<Time>::peek_time(Time* time)
 {
-	bool success = RingBuffer<uint8_t>::full_peek(sizeof(T), (uint8_t*)time);
+	bool success = RingBuffer<uint8_t>::full_peek(sizeof(Time), (uint8_t*)time);
 	return success;
 }
 
 
+template<typename Time>
 inline bool
-EventRingBuffer::read(T* time, EventType* type, uint32_t* size, uint8_t* buf)
+EventRingBuffer<Time>::read(Time* time, EventType* type, uint32_t* size, uint8_t* buf)
 {
-	bool success = RingBuffer<uint8_t>::full_read(sizeof(T), (uint8_t*)time);
+	bool success = RingBuffer<uint8_t>::full_read(sizeof(Time), (uint8_t*)time);
 	if (success)
 		success = RingBuffer<uint8_t>::full_read(sizeof(EventType), (uint8_t*)type);
 	if (success)
@@ -75,13 +77,14 @@ EventRingBuffer::read(T* time, EventType* type, uint32_t* size, uint8_t* buf)
 }
 
 
+template<typename Time>
 inline uint32_t
-EventRingBuffer::write(T time, EventType type, uint32_t size, const uint8_t* buf)
+EventRingBuffer<Time>::write(Time time, EventType type, uint32_t size, const uint8_t* buf)
 {
-	if (write_space() < (sizeof(T) + sizeof(EventType) + sizeof(uint32_t) + size)) {
+	if (write_space() < (sizeof(Time) + sizeof(EventType) + sizeof(uint32_t) + size)) {
 		return 0;
 	} else {
-		RingBuffer<uint8_t>::write(sizeof(T), (uint8_t*)&time);
+		RingBuffer<uint8_t>::write(sizeof(Time), (uint8_t*)&time);
 		RingBuffer<uint8_t>::write(sizeof(EventType), (uint8_t*)&type);
 		RingBuffer<uint8_t>::write(sizeof(uint32_t), (uint8_t*)&size);
 		RingBuffer<uint8_t>::write(size, buf);

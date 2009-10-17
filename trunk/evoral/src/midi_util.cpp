@@ -1,6 +1,6 @@
 /* This file is part of Evoral.
  * Copyright (C) 2008 Dave Robillard <http://drobilla.net>
- * Copyright (C) 2000-2008 Paul Davis
+ * Copyright (C) 2009 Paul Davis
  *
  * Evoral is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -16,43 +16,40 @@
  * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#ifndef EVORAL_CURVE_HPP
-#define EVORAL_CURVE_HPP
-
-#include <inttypes.h>
-#include <boost/utility.hpp>
+#include "evoral/midi_util.h"
+#include <cstdio>
 
 namespace Evoral {
 
-class ControlList;
-
-class Curve : public boost::noncopyable
+std::string
+midi_note_name (uint8_t val)
 {
-public:
-	Curve (const ControlList& cl);
+	if (val > 127) {
+		return "???";
+	}
 
-	bool rt_safe_get_vector (double x0, double x1, float *arg, int32_t veclen);
-	void get_vector (double x0, double x1, float *arg, int32_t veclen);
+	static const char* notes[] = {
+		"c",
+		"c#",
+		"d",
+		"d#",
+		"e",
+		"f",
+		"f#",
+		"g",
+		"a",
+		"a#",
+		"b",
+		"b#"
+	};
 
-	void solve ();
+	int octave = val/12;
+	static char buf[8];
 
-	void mark_dirty() const { _dirty = true; }
+	val -= octave*12;
 
-private:
-	double unlocked_eval (double where);
-	double multipoint_eval (double x);
-
-	void _get_vector (double x0, double x1, float *arg, int32_t veclen);
-
-	mutable bool       _dirty;
-	const ControlList& _list;
-};
-
-} // namespace Evoral
-
-extern "C" {
-	void curve_get_vector_from_c (void *arg, double, double, float*, int32_t);
+	snprintf (buf, sizeof (buf), "%s%d", notes[val], octave);
+	return buf;
 }
 
-#endif // EVORAL_CURVE_HPP
-
+}

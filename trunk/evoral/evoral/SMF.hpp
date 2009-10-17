@@ -1,6 +1,7 @@
 /* This file is part of Evoral.
  * Copyright(C) 2008 Dave Robillard <http://drobilla.net>
  * Copyright(C) 2000-2008 Paul Davis
+ * Author: Hans Baier
  *
  * Evoral is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -19,63 +20,57 @@
 #ifndef EVORAL_SMF_HPP
 #define EVORAL_SMF_HPP
 
-#include <string>
-#include "evoral/types.hpp"
+#include <cassert>
+
+struct smf_struct;
+struct smf_track_struct;
+typedef smf_struct smf_t;
+typedef smf_track_struct smf_track_t;
 
 namespace Evoral {
 
-template<typename T> class Event;
-class EventRingBuffer;
+#define THROW_FILE_ERROR throw(FileError)
 
-
-/** Standard Midi File (Type 0)
+/** Standard Midi File.
+ * Currently only tempo-based time of a given PPQN is supported.
  */
-template<typename T>
 class SMF {
 public:
-	SMF();
+	class FileError : public std::exception {
+		const char* what() const throw() { return "Unknown SMF error"; }
+	};
+
+	SMF() : _smf(0), _smf_track(0), _empty(true) {};
 	virtual ~SMF();
 
+	int  open(const std::string& path, int track=1) THROW_FILE_ERROR;
+	int  create(const std::string& path, int track=1, uint16_t ppqn=19200) THROW_FILE_ERROR;
+	void close() THROW_FILE_ERROR;
+
+	const std::string& file_path() const { return _file_path; };
+
 	void seek_to_start() const;
+	int  seek_to_track(int track);
 
-	uint16_t ppqn()     const { return _ppqn; }
-	bool     is_empty() const { return _empty; }
-	bool     eof()      const { return feof(_fd); }
+	int read_event(uint32_t* delta_t, uint32_t* size, uint8_t** buf) const;
 
-	T last_event_time() const { return _last_ev_time; }
+	uint16_t num_tracks() const;
+	uint16_t ppqn()       const;
+	bool     is_empty()   const { return _empty; }
 
-	void begin_write(FrameTime start_time);
-	void append_event_unlocked(uint32_t delta_t, const Event<T>& ev);
-	void end_write();
+	void begin_write();
+	void append_event_delta(uint32_t delta_t, uint32_t size, const uint8_t* buf);
+	void end_write() THROW_FILE_ERROR;
 
-	void flush();
-	int  flush_header();
-	int  flush_footer();
+	void flush() {};
 
-protected:
-	int  open(const std::string& path);
-	void close();
-
-	/** Used by flush_footer() to find the position to write the footer */
-	void seek_to_footer_position();
-
-	/** Write the track footer at the current seek position */
-	void write_footer();
-
-	void     write_chunk_header(const char id[4], uint32_t length);
-	void     write_chunk(const char id[4], uint32_t length, void* data);
-	size_t   write_var_len(uint32_t val);
-	uint32_t read_var_len() const;
-	int      read_event(uint32_t* delta_t, uint32_t* size, uint8_t** buf) const;
+        double round_to_file_precision (double val) const;
 
 private:
-	static const uint16_t _ppqn = 19200;
-
-	FILE*    _fd;
-	T        _last_ev_time; ///< last frame time written, relative to source start
-	uint32_t _track_size;
-	uint32_t _header_size; ///< size of SMF header, including MTrk chunk header
-	bool     _empty; ///< true iff file contains(non-empty) events
+	std::string  _file_path;
+	smf_t*       _smf;
+	smf_track_t* _smf_track;
+	bool         _empty; ///< true iff file contains(non-empty) events
 };
 
 }; /* namespace Evoral */

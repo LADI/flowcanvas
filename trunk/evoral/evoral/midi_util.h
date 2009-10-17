@@ -19,15 +19,21 @@
 #ifndef EVORAL_MIDI_UTIL_H
 #define EVORAL_MIDI_UTIL_H
 
+#include <stdint.h>
+#include <stdbool.h>
+#include <string>
+#include <sys/types.h>
+#include <assert.h>
 #include "evoral/midi_events.h"
 
 namespace Evoral {
 
-/** Return the size of the given event NOT including the status byte,
- * or -1 if unknown (eg sysex)
+
+/** Return the size of the given event including the status byte,
+ * or -1 if unknown (e.g. sysex)
  */
 static inline int
-midi_event_size(unsigned char status)
+midi_event_size(uint8_t status)
 {
 	// if we have a channel event
 	if (status >= 0x80 && status < 0xF0) {
@@ -41,13 +47,13 @@ midi_event_size(unsigned char status)
 	case MIDI_CMD_CONTROL:
 	case MIDI_CMD_BENDER:
 	case MIDI_CMD_COMMON_SONG_POS:
-		return 2;
+		return 3;
 
 	case MIDI_CMD_PGM_CHANGE:
 	case MIDI_CMD_CHANNEL_PRESSURE:
 	case MIDI_CMD_COMMON_MTC_QUARTER:
 	case MIDI_CMD_COMMON_SONG_SELECT:
-		return 1;
+		return 2;
 
 	case MIDI_CMD_COMMON_TUNE_REQUEST:
 	case MIDI_CMD_COMMON_SYSEX_END:
@@ -57,7 +63,7 @@ midi_event_size(unsigned char status)
 	case MIDI_CMD_COMMON_STOP:
 	case MIDI_CMD_COMMON_SENSING:
 	case MIDI_CMD_COMMON_RESET:
-		return 0;
+		return 1;
 
 	case MIDI_CMD_COMMON_SYSEX:
 		return -1;
@@ -65,6 +71,51 @@ midi_event_size(unsigned char status)
 
 	return -1;
 }
+
+/** Return the size of the given event including the status byte,
+ * or -1 if event is illegal.
+ */
+static inline int
+midi_event_size(const uint8_t* buffer)
+{
+	uint8_t status = buffer[0];
+
+	// Mask off channel if applicable
+	if (status >= 0x80 && status < 0xF0) {
+		status &= 0xF0;
+	}
+
+	// see http://www.midi.org/techspecs/midimessages.php
+	if (status == MIDI_CMD_COMMON_SYSEX) {
+		int end;
+		for (end = 1; buffer[end] != MIDI_CMD_COMMON_SYSEX_END; end++) {
+			assert((buffer[end] & 0x80) == 0);
+		}
+		assert(buffer[end] == MIDI_CMD_COMMON_SYSEX_END);
+		return end + 1;
+	} else {
+		return midi_event_size(status);
+	}
+}
+
+/** Return true iff the given buffer is a valid MIDI event.
+ * \a len must be exactly correct for the contents of \a buffer
+ */
+static inline bool
+midi_event_is_valid(const uint8_t* buffer, size_t len)
+{
+	uint8_t status = buffer[0];
+	if (status < 0x80) {
+		return false;
+	}
+	const int size = midi_event_size(buffer);
+	if (size < 0 || (size_t)size != len) {
+		return false;
+	}
+	return true;
+}
+
+std::string midi_note_name (uint8_t noteval);
 
 } // namespace Evoral
 

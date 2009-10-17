@@ -1,5 +1,5 @@
 /* This file is part of Evoral.
- * Copyright (C) 2008-2009 Dave Robillard <http://drobilla.net>
+ * Copyright (C) 2008 Dave Robillard <http://drobilla.net>
  * Copyright (C) 2000-2008 Paul Davis
  *
  * Evoral is free software; you can redistribute it and/or modify it under the
@@ -17,12 +17,13 @@
  */
 
 #include <iostream>
+#include <limits>
 #include "evoral/Note.hpp"
 
 namespace Evoral {
 
-template<typename T>
-Note<T>::Note(uint8_t chan, T t, EventLength l, uint8_t n, uint8_t v)
+template<typename Time>
+Note<Time>::Note(uint8_t chan, Time t, Time l, uint8_t n, uint8_t v)
 	// FIXME: types?
 	: _on_event(0xDE, t, 3, NULL, true)
 	, _off_event(0xAD, t + l, 3, NULL, true)
@@ -38,7 +39,7 @@ Note<T>::Note(uint8_t chan, T t, EventLength l, uint8_t n, uint8_t v)
 	_off_event.buffer()[2] = 0x40;
 
 	assert(time() == t);
-	assert(length() == l);
+	assert(musical_time_equal (length(), l));
 	assert(note() == n);
 	assert(velocity() == v);
 	assert(_on_event.channel() == _off_event.channel());
@@ -46,8 +47,8 @@ Note<T>::Note(uint8_t chan, T t, EventLength l, uint8_t n, uint8_t v)
 }
 
 
-template<typename T>
-Note<T>::Note(const Note& copy)
+template<typename Time>
+Note<Time>::Note(const Note<Time>& copy)
 	: _on_event(copy._on_event, true)
 	, _off_event(copy._off_event, true)
 {
@@ -72,29 +73,30 @@ Note<T>::Note(const Note& copy)
 	assert(channel() == copy.channel());
 }
 
-
-template<typename T>
-Note<T>::~Note()
+template<typename Time>
+Note<Time>::~Note()
 {
 }
 
-
-template<typename T>
-const Note<T>&
-Note<T>::operator=(const Note<T>& copy)
+template<typename Time>
+const Note<Time>&
+Note<Time>::operator=(const Note<Time>& other)
 {
-	_on_event = copy._on_event;
-	_off_event = copy._off_event;
+	_on_event = other._on_event;
+	_off_event = other._off_event;
 
-	assert(time() == copy.time());
-	assert(end_time() == copy.end_time());
-	assert(note() == copy.note());
-	assert(velocity() == copy.velocity());
-	assert(length() == copy.length());
+	assert(time() == other.time());
+	assert(end_time() == other.end_time());
+	assert(note() == other.note());
+	assert(velocity() == other.velocity());
+	assert(length() == other.length());
 	assert(_on_event.channel() == _off_event.channel());
-	assert(channel() == copy.channel());
+	assert(channel() == other.channel());
 
 	return *this;
 }
 
+template class Note<Evoral::MusicalTime>;
+
 } // namespace Evoral
+

@@ -1,5 +1,5 @@
 /* This file is part of Evoral.
- * Copyright (C) 2008-2009 Dave Robillard <http://drobilla.net>
+ * Copyright (C) 2008 Dave Robillard <http://drobilla.net>
  * Copyright (C) 2000-2008 Paul Davis
  *
  * Evoral is free software; you can redistribute it and/or modify it under the
@@ -26,11 +26,11 @@ namespace Evoral {
 
 /** Pure virtual base for anything you can write events to.
  */
-template<typename T>
+template<typename Time>
 class EventSink {
 public:
 	virtual ~EventSink() {}
-	virtual uint32_t write(T time, EventType type, uint32_t size, const uint8_t* buf) = 0;
+	virtual uint32_t write(Time time, EventType type, uint32_t size, const uint8_t* buf) = 0;
 };
 
 

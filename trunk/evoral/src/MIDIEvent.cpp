@@ -1,5 +1,5 @@
 /* This file is part of Evoral.
- * Copyright (C) 2008-2009 Dave Robillard <http://drobilla.net>
+ * Copyright (C) 2008 Dave Robillard <http://drobilla.net>
  * Copyright (C) 2000-2008 Paul Davis
  *
  * Evoral is free software; you can redistribute it and/or modify it under the
@@ -19,7 +19,7 @@
 #include <string>
 #include "evoral/MIDIEvent.hpp"
 #ifdef EVORAL_MIDI_XML
-	#include <pbd/xml++.h>
+	#include "pbd/xml++.h"
 #endif
 
 using namespace std;
@@ -28,9 +28,9 @@ namespace Evoral {
 
 #ifdef EVORAL_MIDI_XML
 
-template<typename T>
-MIDIEvent<T>::MIDIEvent(const XMLNode& event)
-  : Event<T>()
+template<typename Time>
+MIDIEvent<Time>::MIDIEvent(const XMLNode& event)
+  : Event<Time>()
 {
 	string name = event.name();
 
@@ -51,9 +51,9 @@ MIDIEvent<T>::MIDIEvent(const XMLNode& event)
 }
 
 
-template<typename T>
+template<typename Time>
 boost::shared_ptr<XMLNode>
-MIDIEvent<T>::to_xml() const
+MIDIEvent<Time>::to_xml() const
 {
 	XMLNode *result = 0;
 
@@ -81,7 +81,7 @@ MIDIEvent<T>::to_xml() const
 
 #endif // EVORAL_MIDI_XML
 
-template class MIDIEvent<double>;
+template class MIDIEvent<Evoral::MusicalTime>;
 
 } // namespace Evoral
 

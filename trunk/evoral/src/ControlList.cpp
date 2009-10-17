@@ -1,5 +1,5 @@
 /* This file is part of Evoral.
- * Copyright (C) 2008-2009 Dave Robillard <http://drobilla.net>
+ * Copyright (C) 2008 Dave Robillard <http://drobilla.net>
  * Copyright (C) 2000-2008 Paul Davis
  *
  * Evoral is free software; you can redistribute it and/or modify it under the
@@ -21,6 +21,7 @@
 #include <utility>
 #include <iostream>
 #include "evoral/ControlList.hpp"
+#include "evoral/Curve.hpp"
 
 using namespace std;
 
@@ -36,13 +37,14 @@ inline bool event_time_less_than (ControlEvent* a, ControlEvent* b)
 ControlList::ControlList (const Parameter& id)
 	: _parameter(id)
 	, _interpolation(Linear)
-	, _curve(new Curve(*this))
+	, _curve(0)
 {
 	_frozen = 0;
 	_changed_when_thawed = false;
 	_min_yval = id.min();
 	_max_yval = id.max();
 	_max_xval = 0; // means "no limit"
+	_default_value = 0;
 	_rt_insertion_point = _events.end();
 	_lookup_cache.left = -1;
 	_lookup_cache.range.first = _events.end();
@@ -54,7 +56,7 @@ ControlList::ControlList (const Parameter& id)
 ControlList::ControlList (const ControlList& other)
 	: _parameter(other._parameter)
 	, _interpolation(Linear)
-	, _curve(new Curve(*this))
+	, _curve(0)
 {
 	_frozen = 0;
 	_changed_when_thawed = false;
@@ -77,7 +79,7 @@ ControlList::ControlList (const ControlList& other)
 ControlList::ControlList (const ControlList& other, double start, double end)
 	: _parameter(other._parameter)
 	, _interpolation(Linear)
-	, _curve(new Curve(*this))
+	, _curve(0)
 {
 	_frozen = 0;
 	_changed_when_thawed = false;
@@ -108,6 +110,8 @@ ControlList::~ControlList()
 	for (EventList::iterator x = _events.begin(); x != _events.end(); ++x) {
 		delete (*x);
 	}
+
+	delete _curve;
 }
 
 boost::shared_ptr<ControlList>
@@ -143,6 +147,19 @@ ControlList::operator= (const ControlList& other)
 	}
 
 	return *this;
+}
+
+void
+ControlList::create_curve()
+{
+	_curve = new Curve(*this);
+}
+
+void
+ControlList::destroy_curve()
+{
+	delete _curve;
+	_curve = NULL;
 }
 
 void
@@ -195,7 +212,7 @@ void ControlList::_x_scale (double factor)
 }
 
 void
-ControlList::reposition_for_rt_add (double when)
+ControlList::reposition_for_rt_add (double /*when*/)
 {
 	_rt_insertion_point = _events.end();
 }
@@ -993,7 +1010,8 @@ ControlList::rt_safe_earliest_event_discrete_unlocked (double start, double end,
 bool
 ControlList::rt_safe_earliest_event_linear_unlocked (double start, double end, double& x, double& y, bool inclusive) const
 {
-	cerr << "earliest_event(start: " << start << ", end: " << end << ", x: " << x << ", y: " << y << ", inclusive: " << inclusive <<  ")" << endl;
+	//cerr << "earliest_event(start: " << start << ", end: " << end
+	//<< ", x: " << x << ", y: " << y << ", inclusive: " << inclusive <<  ")" << endl;
 
 	const_iterator length_check_iter = _events.begin();
 	if (_events.empty()) // 0 events
@@ -1237,7 +1255,7 @@ ControlList::clear (double start, double end)
 }
 
 bool
-ControlList::paste (ControlList& alist, double pos, float times)
+ControlList::paste (ControlList& alist, double pos, float /*times*/)
 {
 	if (alist._events.empty()) {
 		return false;

@@ -38,12 +38,12 @@ namespace Evoral {
 
 /** An event (much like a type generic jack_midi_event_t)
  *
- * Template parameter T is the type of the time stamp used for this event.
+ * Template parameter Time is the type of the time stamp used for this event.
  */
-template<typename T>
+template<typename Time>
 struct Event {
 #ifdef EVORAL_EVENT_ALLOC
-	Event(EventType type=0, T t=0, uint32_t s=0, uint8_t* b=NULL, bool alloc=false);
+	Event(EventType type=0, Time time=0, uint32_t size=0, uint8_t* buf=NULL, bool alloc=false);
 
 	/** Copy \a copy.
 	 *
@@ -57,7 +57,8 @@ struct Event {
 
 	inline const Event& operator=(const Event& copy) {
 		_type = copy._type;
-		_time = copy._time;
+		_original_time = copy._original_time;
+		_nominal_time = copy._nominal_time;
 		if (_owns_buf) {
 			if (copy._buf) {
 				if (copy._size > _size) {
@@ -84,12 +85,13 @@ struct Event {
 		}
 
 		_type = copy._type;
-		_time = copy._time;
+		_original_time = copy._nominal_time;
+		_nominal_time = copy._nominal_time;
 		_size = copy._size;
 		_buf  = copy._buf;
 	}
 
-	inline void set(uint8_t* buf, uint32_t size, T t) {
+	inline void set(uint8_t* buf, uint32_t size, Time t) {
 		if (_owns_buf) {
 			if (_size < size) {
 				_buf = (uint8_t*) ::realloc(_buf, size);
@@ -99,7 +101,8 @@ struct Event {
 			_buf = buf;
 		}
 
-		_time = t;
+		_original_time = t;
+		_nominal_time = t;
 		_size = size;
 	}
 
@@ -107,7 +110,10 @@ struct Event {
 		if (_type != other._type)
 			return false;
 
-		if (_time != other._time)
+		if (_nominal_time != other._nominal_time)
+			return false;
+
+		if (_original_time != other._original_time)
 			return false;
 
 		if (_size != other._size)
@@ -151,7 +157,8 @@ struct Event {
 
 	inline void clear() {
 		_type = 0;
-		_time = 0;
+		_original_time = 0;
+		_nominal_time = 0;
 		_size = 0;
 		_buf  = NULL;
 	}
@@ -164,8 +171,10 @@ struct Event {
 
 	inline EventType   event_type()            const { return _type; }
 	inline void        set_event_type(EventType t)   { _type = t; }
-	inline T           time()                  const { return _time; }
-	inline T&          time()                        { return _time; }
+	inline Time        time()                  const { return _nominal_time; }
+	inline Time&       time()                        { return _nominal_time; }
+	inline Time        original_time()         const { return _original_time; }
+	inline Time&       original_time()               { return _original_time; }
 	inline uint32_t    size()                  const { return _size; }
 	inline uint32_t&   size()                        { return _size; }
 
@@ -174,7 +183,8 @@ struct Event {
 
 protected:
 	EventType _type; /**< Type of event (application relative, NOT MIDI 'type') */
-	T         _time; /**< Sample index (or beat time) at which event is valid */
+	Time      _original_time; /**< Sample index (or beat time) at which event is valid */
+	Time      _nominal_time; /**< Quantized version of _time, used in preference */
 	uint32_t  _size; /**< Number of uint8_ts of data in \a buffer */
 	uint8_t*  _buf;  /**< Raw MIDI data */
 
@@ -185,6 +195,19 @@ protected:
 
 
 } // namespace Evoral
+
+
+template<typename Time>
+std::ostream& operator<<(std::ostream& o, const Evoral::Event<Time>& ev) {
+	o << "Event type = " << ev.event_type() << " @ " << ev.time();
+	o << std::hex;
+	for (uint32_t n = 0; n < ev.size(); ++n) {
+		o << ' ' << (int) ev.buffer()[n];
+	}
+	o << std::dec;
+	return o;
+}
+
 
 #endif // EVORAL_EVENT_HPP
 
