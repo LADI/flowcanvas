@@ -6,5 +6,5 @@ includedir=${prefix}/include
 Name: eugene-core
 Version: @EUGENE_VERSION@
 Description: A basic (but fast and parallel) Genetic Algorithm implementation in C++
-Libs: -L${libdir} -leugene_core
+Libs: -L${libdir} -leugene
 Cflags: -I${includedir}
