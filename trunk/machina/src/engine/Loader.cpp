@@ -95,7 +95,7 @@ Loader::load(const Glib::ustring& uri)
 	for (Query::Results::iterator i = results.begin(); i != results.end(); ++i) {
 		const char* node_id = (*i)["node"];
 		SharedPtr<Node> node(new Node(
-				TimeStamp(TimeUnit(TimeUnit::BEATS, MACHINA_PPQN), (double)(*i)["duration"]),
+				TimeStamp(TimeUnit(TimeUnit::BEATS, MACHINA_PPQN), (*i)["duration"].to_float()),
 				true));
 		machine->add_node(node);
 		created[node_id] = node;
@@ -116,7 +116,7 @@ Loader::load(const Glib::ustring& uri)
 		const char* node_id = (*i)["node"];
 		if (created.find(node_id) == created.end()) {
 			SharedPtr<Node> node(new Node(
-				TimeStamp(TimeUnit(TimeUnit::BEATS, MACHINA_PPQN), (double)(*i)["duration"]),
+				TimeStamp(TimeUnit(TimeUnit::BEATS, MACHINA_PPQN), (*i)["duration"].to_float()),
 				false));
 			machine->add_node(node);
 			created[node_id] = node;
@@ -158,7 +158,7 @@ Loader::load(const Glib::ustring& uri)
 		Created::iterator node_i = created.find((const char*)(*i)["node"]);
 		if (node_i != created.end()) {
 			SharedPtr<Node> node = node_i->second;
-			const int note_num = (*i)["note"];
+			const int note_num = (*i)["note"].to_int();
 			if (note_num >= 0 && note_num <= 127) {
 				node->set_enter_action(ActionFactory::note_on((unsigned char)note_num));
 				node->set_exit_action(ActionFactory::note_off((unsigned char)note_num));
@@ -185,7 +185,7 @@ Loader::load(const Glib::ustring& uri)
 	for (Query::Results::iterator i = results.begin(); i != results.end(); ++i) {
 		const char* src_uri = (*i)["src"];
 		const char* dst_uri = (*i)["dst"];
-		float       prob    = (*i)["prob"];
+		float       prob    = (*i)["prob"].to_float();
 
 		Created::iterator src_i = created.find(src_uri);
 		Created::iterator dst_i = created.find(dst_uri);

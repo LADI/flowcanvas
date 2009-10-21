@@ -28,6 +28,7 @@
 #include "raul/SMFReader.hpp"
 #include "raul/midi_events.h"
 #include "eugene/Problem.hpp"
+#include "machina-config.h"
 
 using namespace std;
 
