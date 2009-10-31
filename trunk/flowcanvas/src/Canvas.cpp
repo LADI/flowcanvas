@@ -366,7 +366,7 @@ Canvas::select_port_toggle(boost::shared_ptr<Port> p, int mod_state)
 				if (!first && !done && (ports[i] == _last_selected_port || ports[i] == p))
 					first = ports[i];
 
-				if (first && !done)
+				if (first && !done && ports[i]->is_input() == first->is_input())
 					select_port(ports[i], false);
 				else
 					unselect_port(ports[i]);
