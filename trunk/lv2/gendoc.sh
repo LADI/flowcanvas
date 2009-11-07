@@ -3,8 +3,18 @@
 rm -rf upload
 mkdir upload
 
-SPECGENDIR=../../specgen
 URIPREFIX=http://lv2plug.in/ns/
+	
+echo "**** Generating core documentation"
+SPECGENDIR=./specgen
+mkdir upload/lv2core
+cp core.lv2/lv2.h upload/lv2core
+cp core.lv2/lv2.ttl upload/lv2core
+cp core.lv2/manifest.ttl upload/lv2core
+$SPECGENDIR/lv2specgen.py core.lv2/lv2.ttl $SPECGENDIR/template.html $SPECGENDIR/style.css upload/lv2core/lv2core.html -i;
+cd core.lv2
+doxygen
+cd ..
 
 for dir in ext dev; do
 	echo
@@ -14,6 +24,7 @@ for dir in ext dev; do
 	cp -r $dir upload
 	rm -rf `find upload/$dir -name '.svn'`
 	cd upload/$dir
+	SPECGENDIR=../../specgen
 
 	doxygen Doxyfile
 	

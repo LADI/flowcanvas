@@ -93,6 +93,8 @@ termdir = './doc' #TODO
 def niceName(uri):
     regexp = re.compile( "^(.*[/#])([^/#]+)$" )
     rez = regexp.search( uri )
+    if not rez:
+        return uri
     pref = rez.group(1)
     #return ns_list.get(pref, pref) + ":" + rez.group(2)
     if ns_list.has_key(pref):

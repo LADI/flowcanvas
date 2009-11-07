@@ -68,18 +68,3 @@ def build(bld):
 		uri_map
 		variables
 	'''
-
-	# LV2 plugins
-	c_plugins = '''
-		print
-		metro
-		bang
-	'''
-	for i in c_plugins.split():
-		build_plugin(bld, 'cc', i)
-
-	cxx_plugins = '''
-		transpose
-	'''
-	for i in cxx_plugins.split():
-		build_plugin(bld, 'cxx', i)

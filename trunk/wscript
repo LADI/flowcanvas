@@ -16,13 +16,13 @@ blddir = 'build'
 @after('apply_lib_vars')
 @before('apply_obj_vars_cc', 'apply_obj_vars_cxx')
 def include_lv2_h(self):
-	lv2coredir = self.bld.path.find_dir('../../lv2core.lv2')
+	lv2coredir = self.bld.path.find_dir('../../lv2/core.lv2')
 	if lv2coredir != None:
 		self.env.append_value('INC_PATHS', lv2coredir)
 
 def set_options(opt):
 	autowaf.set_options(opt)
-	opt.sub_options('lv2core.lv2')
+	opt.sub_options('lv2/core.lv2')
 	opt.sub_options('lv2')
 	opt.sub_options('slv2')
 	#opt.sub_options('evoral')
@@ -40,7 +40,7 @@ def sub_config_and_use(conf, name, has_objects = True):
 def configure(conf):
 	autowaf.set_recursive()
 	autowaf.configure(conf)
-	sub_config_and_use(conf, 'lv2core.lv2', False)
+	sub_config_and_use(conf, 'lv2/core.lv2', False)
 	sub_config_and_use(conf, 'lv2', False)
 	sub_config_and_use(conf, 'slv2')
 	#sub_config_and_use(conf, 'evoral')
@@ -53,7 +53,7 @@ def configure(conf):
 
 def build(bld):
 	autowaf.set_recursive()
-	bld.add_subdirs('lv2core.lv2 lv2 slv2 raul flowcanvas patchage redlandmm ingen')# evoral machina')
+	bld.add_subdirs('lv2/core.lv2 lv2 slv2 raul flowcanvas patchage redlandmm ingen')# evoral machina')
 
 def shutdown():
 	autowaf.shutdown()
