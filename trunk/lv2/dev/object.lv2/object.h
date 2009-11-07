@@ -20,7 +20,7 @@
 #ifndef LV2_OBJECT_H
 #define LV2_OBJECT_H
 
-#define LV2_OBJECT_URI "http://lv2plug.in/ns/ext/object"
+#define LV2_OBJECT_URI "http://lv2plug.in/ns/dev/object"
 
 #include <stdint.h>
 

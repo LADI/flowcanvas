@@ -4,6 +4,5 @@ some (but not all) of which are experimental.
 It is NOT:
 
  - "LV2" itself
- - Anything you should package as a whole under any circumstances
- - A set of plugins that are useful in any way whatsoever (if they even work)
+ - Something you should package as a whole
 
