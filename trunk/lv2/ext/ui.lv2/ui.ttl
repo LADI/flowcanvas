@@ -1,0 +1,74 @@
+# LV2 UI Extension
+# Copyright (C) 2006-2008 Lars Luthman <lars.luthman@gmail.com>
+# Copyright (C) 2009 Dave Robillard <dave@drobilla.net>
+#
+# Permission is hereby granted, free of charge, to any person obtaining a
+# copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following conditions:
+# 
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+# 
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+# THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+# OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+# ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+# OTHER DEALINGS IN THE SOFTWARE.
+
+@prefix ui:   <http://lv2plug.in/ns/extensions/ui#> .
+@prefix lv2:  <http://lv2plug.in/ns/lv2core#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+@prefix doap: <http://usefulinc.com/ns/doap#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+
+<http://lv2plug.in/ns/extensions/ui> a lv2:Specification ;
+	doap:license <http://usefulinc.com/doap/licenses/mit> ;
+	doap:name    "LV2 UI" ;
+	rdfs:comment "Defines UIs for LV2 plugins" ;
+	doap:maintainer [
+		a foaf:Person ;
+		foaf:name "Lars Luthman" ;
+		foaf:mbox <mailto:lars.luthman@gmail.com>
+	] , [
+		a foaf:Person ;
+		foaf:name     "Dave Robillard" ;
+		foaf:homepage <http://drobilla.net/> ;
+		rdfs:seeAlso  <http://drobilla.net/drobilla.rdf>
+	] .
+
+ui:UI a rdfs:Class ;
+	rdfs:label "LV2 UI" ;
+	rdfs:comment "A UI for an LV2 plugin" .
+
+ui:optionalFeature a rdf:Property ;
+    rdfs:domain  ui:UI ;
+    rdfs:range   ui:Feature ;
+    rdfs:label   "Optional feature" ;
+    rdfs:comment """
+Signifies that a UI supports a feature.  This has the same semantics as
+lv2:optionalFeature, but is for UIs rather than Plugins.""".
+
+ui:requiredFeature a rdf:Property ;
+    rdfs:domain  ui:UI ;
+    rdfs:range   ui:Feature ;
+    rdfs:label   "Required feature" ;
+    rdfs:comment """
+Signifies that a UI requires a feature.  This has the same semantics as
+lv2:optionalFeature, but is for UIs rather than Plugins.""".
+
+ui:GtkUI a rdfs:Class ;
+	rdfs:subClassOf ui:UI ;
+	rdfs:comment """
+A UI where the LV2_Widget is a pointer to a Gtk+ 2.0 compatible GtkWidget,
+and the host guarantees that the Gtk+ library has been initialised and the
+Glib main loop is running before an UI of this type is instantiated.""" .
+
+
