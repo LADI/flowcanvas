@@ -47,7 +47,7 @@ An LV2 Resource (e.g. plugin, specification, or any other LV2 related thing
 #########################
 
 lv2:Specification a rdfs:Class ;
-	rdfs:subClassOf lv2:Resource ;
+    rdfs:subClassOf lv2:Resource ;
     rdfs:comment """
 An LV2 specification (i.e. this specification, or an LV2 "extension").
 
@@ -92,16 +92,16 @@ more details.
 #############################
 
 lv2:Template a rdfs:Class ;
-	rdfs:subClassOf lv2:Resource ;
-	rdfs:comment """
+    rdfs:subClassOf lv2:Resource ;
+    rdfs:comment """
 An abstract plugin-like resource that may not actually be an LV2 plugin
 (e.g. may not actually have a plugin binary).  A Template is a Resource
 that may have ports, and otherwise mimic the structure of a plugin.
 This should be subclassed by extensions that define such things.
 """ .
-	
+    
 lv2:Plugin a rdfs:Class ;
-	rdfs:subClassOf lv2:Template ;
+    rdfs:subClassOf lv2:Template ;
     rdfs:label "Plugin" ;
     rdfs:subClassOf [
         a                  owl:Restriction ;
@@ -133,7 +133,7 @@ doap:description for more detailed descriptions.
 ##################
 
 lv2:Port a rdfs:Class ;
-	rdfs:subClassOf lv2:Resource ;
+    rdfs:subClassOf lv2:Resource ;
     rdfs:label   "Port" ;
     rdfs:subClassOf [
         a                  owl:Restriction ;
@@ -251,10 +251,10 @@ lv2:port a rdf:Property ;
     rdfs:comment "Relates a Template or Plugin to the Ports it contains" .
 
 lv2:revision a rdf:Property ;
-	rdfs:domain lv2:Resource ;
-	rdfs:range  xsd:nonNegativeInteger ;
-	rdfs:label  "revision" ;
-	rdfs:comment """
+    rdfs:domain lv2:Resource ;
+    rdfs:range  xsd:nonNegativeInteger ;
+    rdfs:label  "revision" ;
+    rdfs:comment """
 The revision of an LV2 Resource.  If a plugin's port indices change, the
 revision of the plugin MUST be increased.  Note that if port symbols
 change or are removed, the plugin URI MUST be changed, the revision acts
@@ -277,9 +277,9 @@ version to distinguish incompatible objects (use the URI for that).
 ####################################
 
 lv2:basicXHTML a rdfs:Class ;
-	rdfs:seeAlso <http://www.w3.org/TR/xhtml1/> ;
-	rdfs:seeAlso <http://www.w3.org/TR/xhtml-modularization/> ;
-	rdfs:comment """
+    rdfs:seeAlso <http://www.w3.org/TR/xhtml1/> ;
+    rdfs:seeAlso <http://www.w3.org/TR/xhtml-modularization/> ;
+    rdfs:comment """
 A very basic subset of XHTML for use with lv2:documentation, intended to be
 reasonable for hosts to support for styled inline documentation.
 
@@ -320,7 +320,7 @@ function. The index uniqely identifies the port on an instance of the plugin.
 """ .
 
 lv2:symbol a rdf:Property ;
-	rdfs:domain  lv2:Resource ;
+    rdfs:domain  lv2:Resource ;
     rdfs:label   "symbol" ;
     rdfs:comment """
 A short name used as a machine and human readable identifier.
@@ -351,8 +351,8 @@ property without changing the Plugin URI.
 ##################################
 
 lv2:Point a rdfs:Class ;
-   rdfs:label   "Port value point" ;
-   rdfs:comment """
+    rdfs:label   "Port value point" ;
+    rdfs:comment """
 Used to describe interesting values in a Port's range.  To be valid it
 requires two properties: rdfs:label and rdf:value.
 
@@ -365,10 +365,10 @@ lv2:ScalePoint a rdfs:Class ;
     rdfs:comment "A single lv2:float Point (for control inputs)" .
 
 lv2:scalePoint a rdf:Property ;
-   rdfs:domain  lv2:Port ;
-   rdfs:range   lv2:ScalePoint ;
-   rdfs:label   "Scale point" ;
-   rdfs:comment "Relates a Port to its ScalePoints." .
+    rdfs:domain  lv2:Port ;
+    rdfs:range   lv2:ScalePoint ;
+    rdfs:label   "Scale point" ;
+    rdfs:comment "Relates a Port to its ScalePoints." .
 
 lv2:default a rdf:Property ;
     rdfs:subPropertyOf lv2:scalePoint ;
@@ -538,16 +538,16 @@ should not report their delay as latency, as it is an intentional effect).
 """ .
 
 lv2:toggled a lv2:PortProperty ;
-   rdfs:label   "Toggled" ;
-   rdfs:comment """
+    rdfs:label   "Toggled" ;
+    rdfs:comment """
 Indicates that the data item should be considered a Boolean toggle. Data less
 than or equal to zero should be considered "off" or "false", and data above
 zero should be considered "on" or "true".
 """ .
 
 lv2:sampleRate a lv2:PortProperty ;
-   rdfs:label   "Sample rate" ;
-   rdfs:comment """
+    rdfs:label   "Sample rate" ;
+    rdfs:comment """
 Indicates that any bounds specified should be interpreted as multiples of the
 sample rate. For instance, a frequency range from 0Hz to the Nyquist frequency
 (half the sample rate) could be requested by this property in conjunction with
@@ -556,16 +556,16 @@ Hosts that support bounds at all MUST support this property.
 """ .
 
 lv2:integer a lv2:PortProperty ;
-   rdfs:label   "Integer" ;
-   rdfs:comment """
+    rdfs:label   "Integer" ;
+    rdfs:comment """
 Indicates that a port's reasonable values are integers (eg. a user interface
 would likely wish to provide a stepped control allowing only integer input).
 A plugin MUST operate reasonably even if such a port has a non-integer input.
 """ .
 
 lv2:enumeration a lv2:PortProperty ;
-   rdfs:label   "Enumeration" ;
-   rdfs:comment """
+    rdfs:label   "Enumeration" ;
+    rdfs:comment """
 Indicates that a port's only reasonable values are the scale points defined for
 that port.  Though a host SHOULD NOT allow a user to set the value of such a 
 port to anything other than a scale point.  A plugin MUST operate reasonably
