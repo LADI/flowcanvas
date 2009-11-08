@@ -287,7 +287,7 @@ A literal with this data type is an XHTML 1.0 fragment containing only
 tags from the following XHTML modules: text, hypertext, list, basic tables,
 image, presentation.  See the XHTML and XHTML Modularization specifications
 for details.  A literal with this data type must be legal to insert as the
-body of a <div> tag (free text is allowed).
+body of a &lt;div&gt; tag (free text is allowed).
 
 If only basicXHTML documentation is given but a host has no facilities for
 handling tags, simply stripping tags and inserting newlines after appropriate
