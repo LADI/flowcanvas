@@ -97,6 +97,19 @@ a LV2_Feature struct (as defined in lv2.h) to the UI's instantiate() function.
 
 These features may be used to specify how to pass data between the UI and
 the plugin port buffers - see LV2UI_Write_Function for details.
+
+UIs written to this specification do not need to be threadsafe - the 
+functions defined below may only be called in the same thread as the UI
+main loop is running in.
+
+Note that this UI extension is NOT a lv2:Feature. There is no way for a 
+plugin to know whether the host that loads it supports UIs or not, and 
+the plugin must ALWAYS work without the UI (although it may be rather 
+useless unless it has been configured using the UI in a previous session).
+
+A UI does not have to be a graphical widget, it could just as well be a
+server listening for OSC input or an interface to some sort of hardware
+device, depending on the RDF class of the UI.
 """ .
 
 
@@ -179,17 +192,4 @@ the main widget on its own - it will always remain the same size (e.g. a
 pixmap based GUI). This feature may not make sense for all UI types.
 The data pointer for the LV2_Feature for this feature should always be set
 to NULL.
-
-UIs written to this specification do not need to be threadsafe - the 
-functions defined below may only be called in the same thread as the UI
-main loop is running in.
-
-Note that this UI extension is NOT a lv2:Feature. There is no way for a 
-plugin to know whether the host that loads it supports UIs or not, and 
-the plugin must ALWAYS work without the UI (although it may be rather 
-useless unless it has been configured using the UI in a previous session).
-
-A UI does not have to be a graphical widget, it could just as well be a
-server listening for OSC input or an interface to some sort of hardware
-device, depending on the RDF class of the UI.
 """ .
