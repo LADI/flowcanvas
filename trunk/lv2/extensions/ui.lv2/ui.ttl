@@ -175,7 +175,7 @@ the host only needs to find the shared library files corresponding to the
 given SO names if it wants to save RAM by unloading the UI shared object 
 file when it is no longer needed. The data pointer for the LV2_Feature for
 this feature should always be set to NULL.
-""" .
+"""^^lv2:basicXHTML .
 
 ui:noUserResize a lv2:Feature ;
 	rdfs:comment """

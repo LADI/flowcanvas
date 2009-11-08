@@ -593,7 +593,7 @@ def specProperty(m, subject, predicate):
     "Return a property of the spec."
     for c in m.find_statements(RDF.Statement(None, predicate, None)):
         if c.subject.is_resource() and str(c.subject.uri) == str(subject):
-            return str(c.object)
+            return c.object.literal_value['string']
     return ''
 
 
