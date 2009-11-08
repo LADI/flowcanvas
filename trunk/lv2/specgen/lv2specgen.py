@@ -378,14 +378,14 @@ def rdfsInstanceInfo(term,m):
     """Generate rdfs-type information for instances"""
     doc = ""
     
-    t = m.find_statements( RDF.Statement(RDF.Node(RDF.Uri(term)), rdf.type, None) )
+    t = m.find_statements( RDF.Statement(term, rdf.type, None) )
     if t.current():
         doc += "<dt>Type</dt>"
     while t.current():
-        doc += "<dd>%s</dd>" % getTermLink(str(t.current().object.uri), RDF.Node(RDF.Uri(term)), rdf.type)
+        doc += "<dd>%s</dd>" % getTermLink(str(t.current().object.uri), term, rdf.type)
         t.next()
 
-    doc += extraInfo(RDF.Node(RDF.Uri(term)), m)
+    doc += extraInfo(term, m)
 
     return doc
 
@@ -617,12 +617,16 @@ def getInstances(model, classes, properties):
             uri = str(i.subject.uri)
             if not uri in instances:
                 instances.append(uri)
-    for i in model.find_statements(RDF.Statement(None, rdfs.isDefinedBy, RDF.Uri(spec_url))):            
-            uri = str(i.subject.uri)
-            if (uri.startswith(spec_ns_str)):
-                uri = uri[len(spec_ns_str):]
-            if ((not uri in instances) and (not uri in classes)):
-                instances.append(uri)
+    for i in model.find_statements(RDF.Statement(None, rdf.type, None)):
+        if not i.subject.is_resource():
+            continue;
+        full_uri = str(i.subject.uri)
+        if (full_uri.startswith(spec_ns_str)):
+            uri = full_uri[len(spec_ns_str):]
+        else:
+            uri = full_uri
+        if ((not uri in instances) and (not uri in classes) and (not uri in properties) and (full_uri != spec_url)):
+            instances.append(full_uri)
     return instances
    
  
