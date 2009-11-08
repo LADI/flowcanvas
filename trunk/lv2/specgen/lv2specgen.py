@@ -38,7 +38,7 @@ __date__    = "2009-06-11"
  
 import os
 import sys
-import time
+import datetime
 import re
 import urllib
 
@@ -730,9 +730,8 @@ def specgen(specloc, template, instances=False, mode="spec"):
         comment = specProperty(m, spec_url, doap.shortdesc)
     template = template.replace('@COMMENT@', '<p>' + comment.strip().replace('\n\n', '</p><p>') + '</p>')
 
-    template += ("<!-- generated from %s by %s at %s -->" %
-        (os.path.basename(specloc), os.path.basename(sys.argv[0]), time.strftime('%X %x %Z')))
-    
+    template = template.replace('@TIME@', datetime.datetime.utcnow().strftime('%F %H:%M UTC'))
+
     return template
 
 
@@ -836,7 +835,7 @@ if __name__ == "__main__":
         except Exception, e:
             print "Error reading from footer \"" + footerloc + "\": " + str(e)
             usage()
-        
+
         template = template.replace('@FOOTER@', footer)
         
         # Style
