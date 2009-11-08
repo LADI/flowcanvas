@@ -728,7 +728,8 @@ def specgen(specloc, template, instances=False, mode="spec"):
     comment = specProperty(m, spec_url, rdfs.comment)
     if not comment:
         comment = specProperty(m, spec_url, doap.shortdesc)
-    template = template.replace('@COMMENT@', '<p>' + comment.strip().replace('\n\n', '</p><p>') + '</p>')
+    #template = template.replace('@COMMENT@', '<p>' + comment.strip().replace('\n\n', '</p><p>') + '</p>')
+    template = template.replace('@COMMENT@', comment)
 
     template = template.replace('@TIME@', datetime.datetime.utcnow().strftime('%F %H:%M UTC'))
 

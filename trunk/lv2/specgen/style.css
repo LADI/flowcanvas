@@ -7,12 +7,15 @@ body {
 :visited { color: #609; background: transparent }
 a:active { color: #C00; background: transparent }
 
-h1, h2, h3, h4, h5, h6 { text-align: left; background-color: #eee; padding: 0.25ex }
-h2, h3, h4, h5, h6 { margin-top: 2.5ex; }
+h1 { text-align: left; background-color: #eee; padding: 0.5ex; border: 1px solid #005A9C }
+h2 { text-align: left; background-color: #eee; padding: 0.5ex; border: 1px solid #005A9C }
+h2, h3, h4, h5, h6 { text-align: left; background-color: #eee; padding: 0.25ex }
+h2, h3, h4, h5, h6 { margin-top: 3ex; }
+h4, h5, h6 { margin-top: 2ex; }
 h1, h2, h3 { color: #005A9C; }
 
 .label { font-style: italic; margin-bottom: 0.5ex; }
-.index { padding: 1ex; border: 2px dotted gray; background-color: #eee; }
+.index { margin-left: 1em; }
 .restriction { margin-bottom: 2ex; padding: 0; }
 .description { margin-bottom: 2ex; }
 .blankdesc { background-color: #eee; margin: 0.5em }
