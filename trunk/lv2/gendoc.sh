@@ -16,7 +16,7 @@ cd core.lv2
 doxygen
 cd ..
 
-for dir in ext dev; do
+for dir in ext dev extensions; do
 	echo
 	echo "**** Generating $dir documentation"
 
@@ -60,3 +60,4 @@ for dir in ext dev; do
 	cd ../..
 done
 
+cp index.html upload

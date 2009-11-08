@@ -47,10 +47,11 @@ This extension defines an interface that can be used in LV2 plugins and hosts
 to create UIs for plugins. The UIs are similar to plugins and reside in shared object
 files in an LV2 bundle.  UIs are associated with a plugin in RDF using the triples
 <pre>    
-@prefix lv2ui: &lt;http://lv2plug.in/ns/extensions/ui#&gt; .
-&lt;http://my.plugin&gt;   lv2ui:ui     &lt;http://my.pluginui&gt; .
-&lt;http://my.plugin&gt;   a            lv2ui:GtkUI .
-&lt;http://my.pluginui&gt; lv2ui:binary &lt;myui.so&gt; .
+@prefix ui: &lt;http://lv2plug.in/ns/extensions/ui#&gt; .
+
+&lt;http://my.plugin&gt;   ui:ui     &lt;http://my.pluginui&gt; .
+&lt;http://my.plugin&gt;   a         ui:GtkUI .
+&lt;http://my.pluginui&gt; ui:binary &lt;myui.so&gt; .
 </pre>
 where &lt;http://my.plugin&gt; is the URI of the plugin,
 &lt;http://my.pluginui&gt; is the URI of the plugin UI and &lt;myui.so&gt;
@@ -59,7 +60,7 @@ is the relative URI to the shared object file.
 While it is possible to have the plugin UI and the plugin in the same shared
 object file it is probably a good idea to keep them separate so that hosts
 that don't want UIs don't have to load the UI code.  A UI MUST specify its
-class in the RDF data, in this case lv2ui:GtkUI. The class defines what type
+class in the RDF data, in this case ui:GtkUI. The class defines what type
 the UI is, e.g. what graphics toolkit it uses.  Any type of UI class can be
 defined separately from this extension.
 
@@ -85,8 +86,8 @@ allows for meta-extensions that can extend the interface between the UI and
 the host. These extensions mirror the extensions used for plugins - there are
 required and optional "features" that you declare in the RDF data for the UI as
 <pre>    
-&lt;http://my.pluginui&gt; lv2ui:requiredFeature &lt;http://my.feature&gt; .
-&lt;http://my.pluginui&gt; lv2ui:optionalFeature &lt;http://my.feature&gt; .
+&lt;http://my.pluginui&gt; ui:requiredFeature &lt;http://my.feature&gt; .
+&lt;http://my.pluginui&gt; ui:optionalFeature &lt;http://my.feature&gt; .
 </pre>
 These predicates have the same semantics as lv2:requiredFeature and
 lv2:optionalFeature - if a UI is declaring a feature as required, the host is
@@ -158,18 +159,18 @@ use the ELF file format for the UI shared object files (e.g. on Linux).
 If it is required by an UI the UI should also list a number of SO names
 (shared object names) for libraries that the UI shared object
 depends on and that may not be unloaded during the lifetime of the host
-process, using the predicate @c lv2ui:residentSONames, like this:
+process, using the predicate @c ui:residentSONames, like this:
 <pre>
-&lt;http://my.pluginui&gt; lv2ui:residentSONames "libgtkmm-2.4.so.1", "libfoo.so.0"
+&lt;http://my.pluginui&gt; ui:residentSONames "libgtkmm-2.4.so.1", "libfoo.so.0"
 </pre>
 The host MUST then make sure that the shared libraries with the given ELF
 SO names are not unloaded when the plugin UI is, but stay loaded during
 the entire lifetime of the host process. On Linux this can be accomplished
 by calling dlopen() on the shared library file with that SO name and never
 calling a matching dlclose(). However, if a plugin UI requires the 
-@c lv2ui:makeSONameResident feature, it MUST ALWAYS be safe for the host to
+@c ui:makeSONameResident feature, it MUST ALWAYS be safe for the host to
 just never unload the shared object containing the UI implementation, i.e.
-act as if the UI required the @c lv2ui:makeResident feature instead. Thus
+act as if the UI required the @c ui:makeResident feature instead. Thus
 the host only needs to find the shared library files corresponding to the
 given SO names if it wants to save RAM by unloading the UI shared object 
 file when it is no longer needed. The data pointer for the LV2_Feature for
@@ -187,7 +188,7 @@ LV2_Feature for this feature should always be set to NULL.
 ui:fixedSize a lv2:Feature ;
 	rdfs:comment """
 If a UI requires this feature it indicates the same thing as 
-lv2ui:noUserResize, and additionally it means that the UI will not resize
+ui:noUserResize, and additionally it means that the UI will not resize
 the main widget on its own - it will always remain the same size (e.g. a
 pixmap based GUI). This feature may not make sense for all UI types.
 The data pointer for the LV2_Feature for this feature should always be set

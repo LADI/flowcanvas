@@ -565,12 +565,7 @@ WARN_LOGFILE           =
 # with spaces.
 
 INPUT =  \
-	data-access.lv2/data-access.h \
-	dyn-manifest.lv2/dyn-manifest.h \
-	event.lv2/event-helpers.h \
-	event.lv2/event.h \
-	instance-access.lv2/instance-access.h \
-	uri-map.lv2/uri-map.h
+	ui.lv2/ui.h
 
 # This tag can be used to specify the character encoding of the source files 
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is 
