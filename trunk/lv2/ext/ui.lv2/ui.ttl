@@ -169,9 +169,10 @@ If a UI requires this feature it indicates that it does not make sense
 to let the user resize the main widget, and the host should prevent that.
 This feature may not make sense for all UI types. The data pointer for the
 LV2_Feature for this feature should always be set to NULL.
-<pre>
-lv2ui:fixedSize
-</pre>
+""" .
+
+ui:fixedSize a lv2:Feature ;
+	rdfs:comment """
 If a UI requires this feature it indicates the same thing as 
 lv2ui:noUserResize, and additionally it means that the UI will not resize
 the main widget on its own - it will always remain the same size (e.g. a
