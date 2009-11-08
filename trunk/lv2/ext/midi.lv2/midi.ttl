@@ -49,31 +49,32 @@ A single raw (sequence of bytes) MIDI event.
 
 These events are equivalent to standard MIDI events, with the following
 restrictions to ease the burden on plugin authors:
-      
-  * Running status is not allowed. Every event must have its own status 
-    byte.
+<ul>
+  <li>Running status is not allowed. Every event must have its own status
+    byte.</li>
   
-  * Note On events with velocity 0 are not allowed. These events are 
-    equivalent to Note Off in standard MIDI streams, but in order to make
-    plugins and hosts easier to write, as well as more efficient, only
-    proper Note Off events are allowed as Note Off. 
+  <li>Note On events with velocity 0 are not allowed. These events are
+  equivalent to Note Off in standard MIDI streams, but in order to make
+  plugins and hosts easier to write, as well as more efficient, only proper
+  Note Off events are allowed as Note Off.</li>
   
-  * "Realtime events" (status bytes 0xF8 to 0xFF) are allowed, but may not
-    occur inside other events like they are allowed to in hardware MIDI 
-    streams.
+  <li>"Realtime events" (status bytes 0xF8 to 0xFF) are allowed, but may
+  not occur inside other events like they are allowed to in hardware MIDI
+  streams.</li>
   
-  * All events must be fully contained in a single data buffer, i.e. events
-    may not "wrap around" by storing the first few bytes in one buffer and
-    then wait for the next run() call to store the rest of the event. If 
-    there isn't enough space in the current data buffer to store an event,
-    the event will either have to wait until next run() call, be ignored,
-    or compensated for in some more clever way.
+  <li>All events must be fully contained in a single data buffer, i.e. events
+  may not "wrap around" by storing the first few bytes in one buffer and
+  then wait for the next run() call to store the rest of the event. If
+  there isn't enough space in the current data buffer to store an event,
+  the event will either have to wait until next run() call, be ignored,
+  or compensated for in some more clever way.</li>
   
-  * All events must be valid MIDI events. This means for example that
-    only the first byte in each event (the status byte) may have the eighth
-    bit set, that Note On and Note Off events are always 3 bytes long etc.
-    The MIDI writer (host or plugin) is responsible for writing valid MIDI
-    events to the buffer, and the MIDI reader (plugin or host) can assume
-    that all events are valid.
-""" .
+  <li>All events must be valid MIDI events. This means for example that
+  only the first byte in each event (the status byte) may have the eighth
+  bit set, that Note On and Note Off events are always 3 bytes long etc.
+  The MIDI writer (host or plugin) is responsible for writing valid MIDI
+  events to the buffer, and the MIDI reader (plugin or host) can assume that
+  all events are valid.</li>
+</ul>
+"""^^lv2:basicXHTML .
 
