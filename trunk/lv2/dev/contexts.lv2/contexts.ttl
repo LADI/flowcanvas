@@ -40,11 +40,13 @@ An extension for LV2 plugins which have several execution contexts.
 
 Any host which supports this extension must pass an LV2_Feature to
 the plugin's instantiate method with URI http://lv2plug.in/ns/dev/contexts
-and a pointer to a <code>
+and a pointer to a
+<pre>
 struct {
 	void* host_handle;
 	void (*request_run)(void* host_handle, const char* context_uri);
-} </code>
+}
+</pre>
 where the plugin may call request_run with the given host_handle (from any
 context) to demand immediate execution of the context specified.
 
@@ -62,7 +64,7 @@ ctx:hardRtCapable apply to both functions.
 The host MUST only call the correct connect_port function associated with the
 context for that port, i.e. it is an error to use the main LV2 connect_port
 function on a port with a context other than the main LV2 run function.
-""" .
+"""^^lv2:basicXHTML .
 
 
 ##########################

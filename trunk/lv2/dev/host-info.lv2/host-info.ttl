@@ -51,7 +51,7 @@ The extensions supported by a host can be described like this:
 &lt;http://example.org/some-host&gt; a hi:Host ;
 	rdfs:label "Foo Rack" ;
 	hi:supportsExtension [
-		hi:extension &lt;http://example.org/some-extension&gt ;
+		hi:extension &lt;http://example.org/some-extension&gt; ;
 		hi:sinceVersion "1.2.0"
 	] .
 </pre>

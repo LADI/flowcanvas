@@ -54,23 +54,29 @@ Serialisation and code access to complex variables is considered outside
 the scope of this extension.
 
 Hosts and plugins SHOULD use the following types for appropriate values:
- * xsd:string  - string
- * xsd:decimal - floating point number
- * xsd:integer - integer number
- * xsd:boolean - boolean value
+
+<table>
+<tr><th>RDF Type</td><th>Data Type</th></tr>
+<tr><td>xsd:string</td><td>string</td></tr>
+<tr><td>xsd:decimal</td><td>floating point number</td></tr>
+<tr><td>xsd:integer</td><td>integer number</td></tr>
+<tr><td>xsd:boolean</td><td>boolean value</td></tr>
+</table>
 
 This extension does not currently define a code mechanism for access
 to variables.  A future revision, or a different extension, may.
 
-<http://example.org/plugin> a lv2:Plugin ;
+An example of a plugin with several variables:
+<pre>
+&lt;http://example.org/plugin&gt; a lv2:Plugin ;
 	lv2var:variable [
-		rdf:predicate <http://example.org/greetingology#Greeting> ;
+		rdf:predicate &lt;http://example.org/greetingology#Greeting&gt; ;
 		rdf:value "Hello, cruel world."
 	] , [
-		rdf:predicate <http://example.org/matheybits#Coeff> ;
+		rdf:predicate &lt;http://example.org/matheybits#Coeff&gt; ;
 		rdf:value 1.23456
 	] , [
-		rdf:predicate <http://example.org/databits#BigValue> ;
+		rdf:predicate &lt;http://example.org/databits#BigValue&gt; ;
 		rdf:value [
 			a somext:Something ;
 			someext:foo "Foo?" ;
@@ -78,6 +84,7 @@ to variables.  A future revision, or a different extension, may.
 			someext:baz 1234.0
 		]
 	] .
+</pre>
 """ .
 
 
