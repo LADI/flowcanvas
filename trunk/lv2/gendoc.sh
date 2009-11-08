@@ -60,4 +60,4 @@ for dir in ext dev extensions; do
 	cd ../..
 done
 
-cp index.html upload
+#cp index.html upload
