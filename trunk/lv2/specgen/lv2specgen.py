@@ -720,8 +720,13 @@ def specgen(specloc, template, instances=False, mode="spec"):
     other_files = '<p>See also:</p>\n<ul>'
     other_files += '<li><a href=".">Bundle</a></li>'
     other_files += '<li><a href="%s">%s</a> - Ontology</li>' % (filename, filename)
-    other_files += '<li><a href="%s">%s</a> - Header</li>' % (basename + '.h', basename + '.h')
-    other_files += '<li><a href="../doc/html/%s">%s</a> - Header Documentation</li>' % (basename + '_8h.html', basename + '.h.html')
+
+    bundle_path = os.path.split(specloc[specloc.find(':')+1:])[0]
+    header_path = bundle_path + '/' + basename + '.h'
+    if os.path.exists(os.path.abspath(header_path)):
+        other_files += '<li><a href="%s">%s</a> - Header</li>' % (basename + '.h', basename + '.h')
+        other_files += '<li><a href="../doc/html/%s">%s</a> - Header Documentation</li>' % (basename + '_8h.html', basename + '.h.html')
+
     other_files += '</ul>'
     template = template.replace('@FILES@', other_files);
 

@@ -37,6 +37,8 @@ div.head { margin-bottom: 1em }
 div.head h1 { margin-top: 2em; clear: both }
 div.head table { margin-left: 2em; margin-top: 2em }
 
+.meta { font-size: small }
+
 pre { margin-left: 2em; color: #373; }
 
 @media aural {  
