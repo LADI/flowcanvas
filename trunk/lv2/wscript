@@ -53,18 +53,36 @@ def build_plugin(bld, lang, name):
 	bld.install_files('${LV2DIR}/' + name + '.lv2', data_file)
 	bld.install_files('${LV2DIR}/' + name + '.lv2', manifest_file)
 
+def build_extension(bld, name, dir):
+	data_file     = '%s/%s.lv2/%s.ttl' % (dir, name, name)
+	manifest_file = '%s/%s.lv2/manifest.ttl' % (dir, name)
+	bld.install_files('${LV2DIR}/' + name + '.lv2', data_file)
+	bld.install_files('${LV2DIR}/' + name + '.lv2', manifest_file)
+
 def build(bld):
-	# LV2 extensions
-	extensions = '''
-		contexts
-		data_access
+	ext = '''
+		data-access
+		dyn-manifest
 		event
-		instance_access
+		instance-access
 		midi
+		uri-map
+	'''
+	for e in ext.split():
+		build_extension(bld, e, './ext')
+	
+	dev = '''
+		contexts
+		host-info
 		object
 		osc
-		polymorphic_port
-		ui
-		uri_map
+		polymorphic-port
+		port-groups
+		presets
 		variables
+	'''
+	
+	extensions = '''
+		ui
+		units
 	'''
