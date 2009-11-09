@@ -81,8 +81,12 @@ def build(bld):
 		presets
 		variables
 	'''
+	for e in dev.split():
+		build_extension(bld, e, './dev')
 	
 	extensions = '''
 		ui
 		units
 	'''
+	for e in extensions.split():
+		build_extension(bld, e, './extensions')
