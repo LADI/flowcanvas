@@ -52,8 +52,8 @@ DATA must be a Redland RDF store containing all relevant LV2 data
 
 You can create one with something like this:
 
-find /usr/lib/lv2/ /usr/local/lib/lv2 ~/.lv2 -name '*.ttl' >> lv2_files.txt
-for i in lv2_files.txt; do
+find /usr/lib/lv2 /usr/local/lib/lv2 ~/.lv2 -name '*.ttl' >> lv2_files.txt
+for i in `cat lv2_files.txt`; do
 	rapper -g $i -o turtle >> lv2_all.ttl;
 done
 rdfproc ./data parse lv2_all.ttl turtle
