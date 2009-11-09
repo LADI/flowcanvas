@@ -102,7 +102,7 @@ write_plugin(AudioEffectX* effect, const string& lib_file_name)
 	os << "\t:symbol \"" << effect->getUniqueID() << "\" ;" << endl;
 	os << "\tdoap:name \"" << name_buf << "\" ;" << endl;
 	os << "\tdoap:license <http://usefulinc.com/doap/licenses/gpl> ;" << endl;
-	os << "\t:pluginProperty :hardRtCapable";
+	os << "\t:pluginProperty :hardRTCapable";
 
 	uint32_t num_params     = effect->getNumParameters();
 	uint32_t num_audio_ins  = effect->getNumInputs();

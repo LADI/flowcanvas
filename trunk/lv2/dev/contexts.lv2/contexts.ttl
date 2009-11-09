@@ -52,15 +52,15 @@ context) to demand immediate execution of the context specified.
 
 If the host does not support blocking contexts, request_run may be set to NULL,
 but plugins which have a :BlockingContext which is :mandatory MUST NOT be
-instantiated.  If the plugin has ANY context which is :hardRtCapable,
-request_run must be realtime safe (as defined by lv2:hardRtCapable).
+instantiated.  If the plugin has ANY context which is :hardRTCapable,
+request_run must be realtime safe (as defined by lv2:hardRTCapable).
 
 Unless otherwise stated, each context (defined by some URI) adds a new
 threading class similar to the Audio class defined by LV2.  Each context has a
 run callback and a connect_port callback both in the same class (i.e. can't be
 called concurrently), but may be called concurrently with functions for other
 contexts (excluding the Instantiation class).  Context properties such as
-ctx:hardRtCapable apply to both functions.
+ctx:hardRTCapable apply to both functions.
 The host MUST only call the correct connect_port function associated with the
 context for that port, i.e. it is an error to use the main LV2 connect_port
 function on a port with a context other than the main LV2 run function.
