@@ -1,0 +1,56 @@
+body {
+    color: black;
+    background: white;
+}
+
+:link    { color: #00C; background: transparent }
+:visited { color: #609; background: transparent }
+a:active { color: #C00; background: transparent }
+
+h1 { text-align: left; background-color: #eee; padding: 0.5ex; border: 1px solid #005A9C }
+h2 { text-align: left; background-color: #eee; padding: 0.5ex; border: 1px solid #005A9C }
+h2, h3, h4, h5, h6 { text-align: left; padding: 0; margin: 0 0 0.5ex 0; /*padding: 0.25ex;*/ }
+
+h2 { padding: 0.5ex; margin: 3ex 0 1ex 0 }
+h1, h2, h3 { color: #005A9C; }
+
+.label { font-style: italic; margin: 1ex 0 1ex 0; }
+.index { margin-left: 1em; }
+.restriction { margin: 0.5ex 0 2ex 4ex; background-color: #eee; padding: 0.25ex; border: 1px solid #ddd }
+.description { margin-bottom: 2ex; }
+.blankdesc { background-color: #eee; margin: 0.5em; border: 1px solid #ddd }
+.blankterm { padding-right: 0.5em; }
+
+.specterm { margin-top: 3ex; padding: 1ex; background-color: #fafafa; border: 1px solid #ddd; }
+
+dl { padding: 0; margin: 0 }
+dt { font-weight: bold ; margin-top: 0.75ex; }
+
+hr {
+    color: silver;
+    background-color: silver;
+    height: 1px;
+    border: 0;
+    margin-top: 1.5ex;
+    margin-bottom: 1.5ex
+}
+
+div.head { margin-bottom: 1em }
+div.head h1 { margin-top: 2em; clear: both }
+div.head table { margin-left: 2em; margin-top: 2em }
+
+table { border: 1px solid gray; border-collapse: collapse }
+th { text-align: left; }
+td, th { margin: 0; padding: 0; text-align: left; padding-right: 2ex; border: 1px solid gray }
+
+td.optional { background-color: #4f4; text-align: center }
+td.required { background-color: #ff4; text-align: center }
+
+.meta { font-size: small }
+
+pre { margin-left: 2em; color: #373; }
+
+@media aural {  
+    dt { pause-before: 20% }
+    pre { speak-punctuation: code } 
+}
