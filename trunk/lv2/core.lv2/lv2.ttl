@@ -466,7 +466,7 @@ Indicates that the plugin has a real-time dependency (e.g. queues data from
 a socket) and so its output must not be cached or subject to significant
 latency, and calls to the run method should be done in rapid succession.
 This property is not related to "hard real-time" execution requirements
-(see lv2:hardRtCapable).
+(see lv2:hardRTCapable).
 """ .
 
 lv2:inPlaceBroken a lv2:Feature ;
