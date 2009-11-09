@@ -3,5 +3,5 @@
 
 <http://lv2plug.in/ns/ext/midi>
 	a lv2:Specification ;
-	rdfs:seeAlso <lv2_midi.ttl> .
+	rdfs:seeAlso <midi.ttl> .
 

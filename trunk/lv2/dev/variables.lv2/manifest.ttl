@@ -2,6 +2,6 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
 <http://lv2plug.in/ns/dev/variables>
-  a lv2:Specification ;
-  rdfs:seeAlso <lv2_variables.ttl> .
+	a lv2:Specification ;
+	rdfs:seeAlso <variables.ttl> .
 
