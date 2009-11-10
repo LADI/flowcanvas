@@ -31,6 +31,7 @@
 	doap:license <http://usefulinc.com/doap/licenses/mit> ;
 	doap:name "LV2 Events" ;
 	rdfs:comment "Defines a generic LV2 event" ;
+	rdfs:seeAlso "event-helpers.h" ;
 	doap:maintainer [
 		a foaf:Person ;
 		foaf:name "Dave Robillard" ;
