@@ -4,14 +4,14 @@ rm -rf upload
 mkdir upload
 
 URIPREFIX=http://lv2plug.in/ns/
-	
+
 echo "**** Generating core documentation"
 SPECGENDIR=./specgen
 mkdir upload/lv2core
 cp core.lv2/lv2.h upload/lv2core
 cp core.lv2/lv2.ttl upload/lv2core
 cp core.lv2/manifest.ttl upload/lv2core
-$SPECGENDIR/lv2specgen.py core.lv2/lv2.ttl $SPECGENDIR/template.html $SPECGENDIR/style.css upload/lv2core/lv2core.html -i;
+$SPECGENDIR/lv2specgen.py core.lv2/lv2.ttl $SPECGENDIR/template.html $SPECGENDIR/style.css upload/lv2core/index.html -i;
 cd core.lv2
 doxygen
 cd ..
@@ -21,6 +21,7 @@ for dir in ext dev extensions; do
 	echo "**** Generating $dir documentation"
 
 	mkdir upload/$dir
+    mkdir upload/$dir/releases
 	cp -r $dir upload
 	rm -rf `find upload/$dir -name '.svn'`
 	cd upload/$dir
@@ -41,23 +42,46 @@ for dir in ext dev extensions; do
 	
 	for bundle in `find -name '*.lv2'`; do
 		b=`echo $bundle | sed 's/\.lv2$//' | sed 's/^.*\///'`
+		ext=`roqet -q -e "
+PREFIX lv2: <http://lv2plug.in/ns/lv2core#>
+SELECT ?ext FROM <$b.lv2/$b.ttl> WHERE { ?ext a lv2:Specification }"`
+		if [ "$ext" != "" ]; then
+			ext=`echo $ext | sed 's/.*ext=uri<\(.*\)>.*/\1/'`
+			rev=`roqet -q -e "
+PREFIX lv2: <http://lv2plug.in/ns/lv2core#>
+PREFIX doap: <http://usefulinc.com/ns/doap#>
+SELECT ?rev FROM <$b.lv2/$b.ttl> WHERE { <$ext> doap:release [ doap:revision ?rev ] }"`
+			if [ "$rev" != "" ]; then
+				rev=`echo $rev | sed 's/.*rev=string("\(.*\)").*/\1/'`
+			else
+                rev="1"
+			fi
+			tar -czf releases/$b.lv2-$rev.tgz $b.lv2
+		fi
 		if [ -e $b.lv2/$b.ttl ]; then
 			echo
-			echo "**** Generating RDF documentation $b.html"
+			echo "**** Generating XHTML schema documentation for $b"
 			$SPECGENDIR/lv2specgen.py $b.lv2/$b.ttl $SPECGENDIR/template.html $SPECGENDIR/style.css $b.lv2/$b.html -i;
-			echo "<li><a rel=\"rdfs:seeAlso\" href=\"$b.lv2/$b.html\">$b</a></li>" >> index.html;
+			echo "<li><a rel=\"rdfs:seeAlso\" href=\"$b/$b.html\">$b</a></li>" >> index.html;
 		fi
 		if [ -e $b.lv2/$b.h ]; then
 			echo
 			echo "**** Copying code documentation $b.h.html"
 		fi
+        mv $b.lv2 $b
+		cp ../../index.php $b
 	done
 	
-	echo "</ul><hr/>" >> index.html
+	echo "</ul>" >> index.html
+
+	echo "<a href=\"./releases\">Releases</a>" >> index.html
+
+	echo "<hr/>" >> index.html
 	cat $SPECGENDIR/footer.html >> index.html
 	echo "</body></html>" >> index.html
+
+	rm Doxyfile
 
 	cd ../..
 done
 
-#cp index.html upload
