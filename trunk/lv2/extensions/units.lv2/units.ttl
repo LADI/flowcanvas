@@ -31,6 +31,10 @@
     a lv2:Specification ;
     doap:created "2007-02-06" ;
     doap:homepage <http://lv2plug.in/ns/extensions/units> ;
+    doap:release [
+        doap:revision "5" ;
+        doap:created "2009-11-10"
+    ] ;
     doap:maintainer [
         a foaf:Person ;
         rdfs:seeAlso <http://plugin.org.uk/swh.xrdf> ;
