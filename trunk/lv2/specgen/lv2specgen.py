@@ -145,7 +145,7 @@ def htmlDocInfo( t ):
         doc = f.read()
         # replace <code>prefix:foo</code> with a link to foo in the document
         doc = re.sub(r"<code>" + spec_pre + r":(\w+)</code>",
-                r"""<code><a href="#term_\1">""" + spec_pre + r""":\1</a></code>""", doc)    
+                r"""<code><a href="#\1">""" + spec_pre + r""":\1</a></code>""", doc)    
     except:
         return "" # "<p>No detailed documentation for this term.</p>"
     return doc
@@ -245,7 +245,7 @@ def getTermLink(uri, subject=None, predicate=None):
     if subject != None and predicate != None:
         extra = 'about="%s" rel="%s" resource="%s"' % (str(subject.uri), niceName(str(predicate.uri)), uri)
     if (uri.startswith(spec_ns_str)):
-        return '<a href="#term_%s" style="font-family: monospace;" %s>%s</a>' % (uri.replace(spec_ns_str, ""), extra, niceName(uri))
+        return '<a href="#%s" style="font-family: monospace;" %s>%s</a>' % (uri.replace(spec_ns_str, ""), extra, niceName(uri))
     else:
         return '<a href="%s" style="font-family: monospace;" %s>%s</a>' % (uri, extra, niceName(uri))
 
@@ -369,8 +369,8 @@ def extraInfo(term,m):
         else:
             doc += '<dd>?</dd>\n'
         last_pred = p.predicate
-    if doc != '':
-        doc = '<dl>\n%s\n</dl>\n' % doc
+#    if doc != '':
+ #       doc = '\n<dl class="extrainfo">\n%s\n</dl>\n' % doc
     return doc
 
 
@@ -458,7 +458,7 @@ def docTerms(category, list, m):
         except:
             term_uri = term
         
-        doc += """<div class="specterm" id="term_%s" about="%s">\n<h3>%s <a href="%s">%s</a></h3>\n""" % (t, term_uri, category, term_uri, curie)
+        doc += """<div class="specterm" id="%s" about="%s">\n<h3>%s <a href="%s">%s</a></h3>\n""" % (t, term_uri, category, term_uri, curie)
 
         label, comment = get_rdfs(m, term)    
         status = get_status(m, term)
@@ -517,7 +517,7 @@ def buildIndex(classlist, proplist, instalist=None):
         for c in classlist:
             if c.startswith(spec_ns_str):
                 c = c.split(spec_ns_str[-1])[1]
-            azlist = """%s <a href="#term_%s">%s</a>, """ % (azlist, c, c)
+            azlist = """%s <a href="#%s">%s</a>, """ % (azlist, c, c)
         azlist = """%s</dd>\n""" % azlist
 
     if (len(proplist)>0):
@@ -526,7 +526,7 @@ def buildIndex(classlist, proplist, instalist=None):
         for p in proplist:
             if p.startswith(spec_ns_str):
                 p = p.split(spec_ns_str[-1])[1]
-            azlist = """%s <a href="#term_%s">%s</a>, """ % (azlist, p, p)
+            azlist = """%s <a href="#%s">%s</a>, """ % (azlist, p, p)
         azlist = """%s</dd>\n""" % azlist
 
     if (instalist!=None and len(instalist)>0):
@@ -534,7 +534,7 @@ def buildIndex(classlist, proplist, instalist=None):
         for i in instalist:
             p = getShortName(i)
             anchor = getAnchor(i)
-            azlist = """%s <a href="#term_%s">%s</a>, """ % (azlist, anchor, p)
+            azlist = """%s <a href="#%s">%s</a>, """ % (azlist, anchor, p)
         azlist = """%s</dd>\n""" % azlist
 
     azlist = """%s\n</dl>""" % azlist
@@ -596,6 +596,13 @@ def specProperty(m, subject, predicate):
             return c.object.literal_value['string']
     return ''
 
+def specProperties(m, subject, predicate):
+    "Return a property of the spec."
+    properties=[]
+    for c in m.find_statements(RDF.Statement(None, predicate, None)):
+        if c.subject.is_resource() and str(c.subject.uri) == str(subject):
+            properties += [c.object]
+    return properties
 
 def specAuthors(m, subject):
     "Return an HTML description of the authors of the spec."
@@ -625,7 +632,7 @@ def getInstances(model, classes, properties):
             uri = full_uri[len(spec_ns_str):]
         else:
             uri = full_uri
-        if ((not uri in instances) and (not uri in classes) and (not uri in properties) and (full_uri != spec_url)):
+        if ((not full_uri in instances) and (not uri in classes) and (not uri in properties) and (full_uri != spec_url)):
             instances.append(full_uri)
     return instances
    
@@ -719,6 +726,7 @@ def specgen(specloc, template, instances=False, mode="spec"):
 
     other_files = '<p>See also:</p>\n<ul>'
     other_files += '<li><a href=".">Bundle</a></li>'
+    other_files += '<li><a href="../releases">Releases</a> - Tarballs of current/past releases</li>'
     other_files += '<li><a href="%s">%s</a> - Ontology</li>' % (filename, filename)
 
     bundle_path = os.path.split(specloc[specloc.find(':')+1:])[0]
@@ -726,6 +734,10 @@ def specgen(specloc, template, instances=False, mode="spec"):
     if os.path.exists(os.path.abspath(header_path)):
         other_files += '<li><a href="%s">%s</a> - Header</li>' % (basename + '.h', basename + '.h')
         other_files += '<li><a href="../doc/html/%s">%s</a> - Header Documentation</li>' % (basename + '_8h.html', basename + '.h.html')
+    
+    see_also_files = specProperties(m, spec_url, rdfs.seeAlso)
+    for f in see_also_files:
+        other_files += '<li><a href="%s">%s</a></li>' % (f, f)
 
     other_files += '</ul>'
     template = template.replace('@FILES@', other_files);
