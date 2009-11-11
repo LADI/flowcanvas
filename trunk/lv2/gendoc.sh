@@ -11,7 +11,8 @@ mkdir upload/lv2core
 cp core.lv2/lv2.h upload/lv2core
 cp core.lv2/lv2.ttl upload/lv2core
 cp core.lv2/manifest.ttl upload/lv2core
-$SPECGENDIR/lv2specgen.py core.lv2/lv2.ttl $SPECGENDIR/template.html $SPECGENDIR/style.css upload/lv2core/index.html -i;
+cp index.php upload/lv2core
+$SPECGENDIR/lv2specgen.py core.lv2/lv2.ttl $SPECGENDIR/template.html $SPECGENDIR/style.css upload/lv2core/lv2core.html -i;
 cd core.lv2
 doxygen
 cd ..
@@ -62,7 +63,7 @@ SELECT ?rev FROM <$b.lv2/$b.ttl> WHERE { <$ext> doap:release [ doap:revision ?re
 			echo
 			echo "**** Generating XHTML schema documentation for $b"
 			$SPECGENDIR/lv2specgen.py $b.lv2/$b.ttl $SPECGENDIR/template.html $SPECGENDIR/style.css $b.lv2/$b.html -i;
-			echo "<li><a rel=\"rdfs:seeAlso\" href=\"$b/$b.html\">$b</a></li>" >> index.html;
+			echo "<li><a rel=\"rdfs:seeAlso\" href=\"$b\">$b</a></li>" >> index.html;
 		fi
 		if [ -e $b.lv2/$b.h ]; then
 			echo
@@ -74,7 +75,7 @@ SELECT ?rev FROM <$b.lv2/$b.ttl> WHERE { <$ext> doap:release [ doap:revision ?re
 	
 	echo "</ul>" >> index.html
 
-	echo "<a href=\"./releases\">Releases</a>" >> index.html
+	echo "<div><a href=\"./releases\">Releases</a></div>" >> index.html
 
 	echo "<hr/>" >> index.html
 	cat $SPECGENDIR/footer.html >> index.html

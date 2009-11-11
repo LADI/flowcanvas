@@ -30,21 +30,36 @@
 <http://lv2plug.in/ns/ext/event> a lv2:Specification ;
 	doap:license <http://usefulinc.com/doap/licenses/mit> ;
 	doap:name "LV2 Events" ;
-	rdfs:comment "Defines a generic LV2 event" ;
 	rdfs:seeAlso "event-helpers.h" ;
 	doap:maintainer [
 		a foaf:Person ;
 		foaf:name "Dave Robillard" ;
 		foaf:homepage <http://drobilla.net/> ;
 		rdfs:seeAlso <http://drobilla.net/drobilla.xrdf>
+	] ;
+	rdfs:comment """
+This extension defines a generic time-stamped event port type, which can be
+used to create plugins that read and write real-time events, such as MIDI,
+OSC, or any other type of event payload.  The type(s) of event supported by
+a port is defined in the data file for a plugin, for example:
+<pre>
+&lt;http://example.org/some-plugin&gt;
+	lv2:port [
+		a ev:EventPort, lv2:InputPort ;
+		lv2:index 0 ;
+		ev:supportsEvent &lt;http://lv2plug.in/ns/ext/midi#MidiEvent&gt; ;
+		lv2:symbol "midi_input" ;
+		lv2:name "MIDI input" ;
 	] .
+</pre>
+""" .
 
 ev:EventPort a rdfs:Class ;
     rdfs:label      "Event port" ;
     rdfs:subClassOf lv2:Port ;
     rdfs:comment    """
 Ports of this type will be connected to a struct of type LV2_Event_Buffer,
-defined in <lv2_event.h>.  These ports contain a sequence of generic events
+defined in event.h.  These ports contain a sequence of generic events
 (possibly several types mixed in a single stream), the specific types of
 which are defined by some URI in another LV2 extension.
 """ .
@@ -57,7 +72,7 @@ A single generic time-stamped event.
 
 An lv2ev:EventPort contains an LV2_Event_Buffer which contains a sequence
 of these events.  The binary format of LV2 events is defined by the
-LV2_Event struct in <lv2_event.h>.
+LV2_Event struct in event.h.
 
 Specific event types (e.g. MIDI, OSC) are defined by extensions, and should
 be rdfs:subClassOf this class.

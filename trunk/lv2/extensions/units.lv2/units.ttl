@@ -85,13 +85,13 @@ lv2:port [
 Units are defined by a number of properties:
 
 <dl>
-<dt>units:name</dl>
+<dt>units:name</dt>
 <dd>A display name for the unit (eg. decibels)</dd>
-<dt>units:symbol</dl>
+<dt>units:symbol</dt>
 <dd>The abbreviated symbol for the unit (eg. dB)</dd>
-<dt>units:render</dl>
+<dt>units:render</dt>
 <dd>A printf(3) string to be used to render the numerical value (eg. \"%f dB\")</dd>
-<dt>units:conversion</dl>
+<dt>units:conversion</dt>
 <dd>Defines a conversion into another unit, commonly the SI unit for the
 unit class (eg. units:conversion [ units:to units:m ; units:factor 1000 ]).
 conversions are expressed as either factors (multiplicand for the conversion)

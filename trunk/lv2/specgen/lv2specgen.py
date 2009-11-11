@@ -509,6 +509,10 @@ def buildIndex(classlist, proplist, instalist=None):
     Builds the A-Z list of terms. Args are a list of classes (strings) and 
     a list of props (strings)
     """
+
+    if len(classlist)==0 and len(proplist)==0 and (not instalist or len(instalist)==0):
+        return ''
+
     azlist = '<dl class="index">'
 
     if (len(classlist)>0):
@@ -725,7 +729,7 @@ def specgen(specloc, template, instances=False, mode="spec"):
     template = template.replace('@MAIL@', 'devel@lists.lv2plug.in')
 
     other_files = '<p>See also:</p>\n<ul>'
-    other_files += '<li><a href=".">Bundle</a></li>'
+    #other_files += '<li><a href=".">Bundle</a></li>'
     other_files += '<li><a href="../releases">Releases</a> - Tarballs of current/past releases</li>'
     other_files += '<li><a href="%s">%s</a> - Ontology</li>' % (filename, filename)
 

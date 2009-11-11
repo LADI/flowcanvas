@@ -47,8 +47,8 @@ provides a set_type function for the host to specify which type a port is
 currently connected to.
 
 A Port specifies the types it supports using the :supportsType property.
-The type specific in the normal LV2 manner (<port> a <sometype>) is the
-"default type".  If the port is connected without set_type being called
+The type specific in the normal LV2 manner (&lt;port&gt; a &lt;sometype&gt;)
+is the "default type".  If the port is connected without set_type being called
 for that port, the type of the buffer is assumed to be the default type.
 In this way polymorphic plugins are backwards compatible and may be used by
 hosts which are not aware of the polymorphic port extension.

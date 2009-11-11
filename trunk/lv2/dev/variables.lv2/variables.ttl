@@ -56,7 +56,7 @@ the scope of this extension.
 Hosts and plugins SHOULD use the following types for appropriate values:
 
 <table>
-<tr><th>RDF Type</td><th>Data Type</th></tr>
+<tr><th>RDF Type</th><th>Data Type</th></tr>
 <tr><td>xsd:string</td><td>string</td></tr>
 <tr><td>xsd:decimal</td><td>floating point number</td></tr>
 <tr><td>xsd:integer</td><td>integer number</td></tr>
