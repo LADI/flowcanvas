@@ -33,11 +33,18 @@
 	doap:license <http://usefulinc.com/doap/licenses/mit> ;
 	doap:name "LV2 MIDI Events" ;
 	rdfs:comment "Defines an LV2 event type for standard raw MIDI" ;
+    doap:release [
+        doap:revision "1" ;
+        doap:created "2008-08-11" ;
+    ] ;
 	doap:maintainer [
 		a foaf:Person ;
 		foaf:name "Dave Robillard" ;
 		foaf:homepage <http://drobilla.net/> ;
 		rdfs:seeAlso <http://drobilla.net/drobilla.xrdf>
+	] , [
+		a foaf:Person ;
+		foaf:name "Lars Luthman" ;
 	] .
 
 

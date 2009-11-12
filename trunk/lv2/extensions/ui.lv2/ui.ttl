@@ -32,6 +32,10 @@
 <http://lv2plug.in/ns/extensions/ui> a lv2:Specification ;
     doap:license <http://usefulinc.com/doap/licenses/mit> ;
     doap:name    "LV2 UI" ;
+    doap:release [
+        doap:revision "1" ;
+        doap:created "2008-04-04"
+    ] ;
     doap:maintainer [
         a foaf:Person ;
         foaf:name "Lars Luthman" ;

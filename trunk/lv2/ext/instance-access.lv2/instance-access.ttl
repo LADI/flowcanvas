@@ -30,6 +30,10 @@
 <http://lv2plug.in/ns/ext/instance-access> a lv2:Specification ;
 	doap:license <http://usefulinc.com/doap/licenses/mit> ;
 	doap:name "LV2 Instance Access" ;
+    doap:release [
+        doap:revision "1" ;
+        doap:created "2008-08-11" ;
+    ] ;
 	doap:maintainer [
 		a foaf:Person ;
 		foaf:name "Dave Robillard" ;

@@ -678,7 +678,7 @@ def specgen(specloc, template, instances=False, mode="spec"):
     
     template = template.replace('@PREFIXES@', str(prefixes_html))
     template = template.replace('@BASE@', spec_ns_str)
-    template = template.replace('@AUTHORS@', specAuthors(m, spec_url))
+    template = template.replace('@MAINTAINERS@', specAuthors(m, spec_url))
     template = template.replace('@INDEX@', azlist)
     template = template.replace('@REFERENCE@', termlist.encode("utf-8"))
     template = template.replace('@FILENAME@', filename)

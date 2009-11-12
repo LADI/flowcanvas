@@ -79,6 +79,7 @@ def build(bld):
 		polymorphic-port
 		port-groups
 		presets
+		string-port
 		variables
 	'''
 	for e in dev.split():

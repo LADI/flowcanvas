@@ -30,13 +30,20 @@
 <http://lv2plug.in/ns/ext/uri-map> a lv2:Specification ;
 	doap:license <http://usefulinc.com/doap/licenses/mit> ;
 	doap:name "LV2 URI Map" ;
+    doap:release [
+        doap:revision "1" ;
+        doap:created "2008-04-16"
+    ] ;
 	doap:maintainer [
 		a foaf:Person ;
 		foaf:name "Dave Robillard" ;
 		foaf:homepage <http://drobilla.net/> ;
 		rdfs:seeAlso <http://drobilla.net/drobilla.xrdf>
+	] , [
+		a foaf:Person ;
+		foaf:name "Lars Luthman" ;
 	] ;
-	rdfs:comment """
+    rdfs:comment """
 This extension defines a simple mechanism for plugins to map URIs to integers,
 usually for performance reasons (e.g. processing events typed by URIs in
 real time).  The expected use case is for plugins to map URIs to integers for

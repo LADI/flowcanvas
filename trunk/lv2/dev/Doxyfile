@@ -569,7 +569,8 @@ INPUT =  \
 	object.lv2/object.h \
 	osc.lv2/osc-print.h \
 	osc.lv2/osc.h \
-	polymorphic-port.lv2/polymorphic-port.h
+	polymorphic-port.lv2/polymorphic-port.h \
+	string-port.lv2/string-port.h
 
 # This tag can be used to specify the character encoding of the source files 
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is 
