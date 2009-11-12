@@ -84,7 +84,6 @@ public:
 	bool  is_float() const;
 	float to_float() const;
 
-
 	bool is_bool() const;
 	bool to_bool() const;
 

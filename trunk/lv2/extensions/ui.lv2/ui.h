@@ -176,7 +176,7 @@ typedef struct _LV2UI_Descriptor {
       in the RDF for your UI:
       <pre>
       <http://my.pluginui> uiext:portNotification [ uiext:plugin <http://my.plugin> ;
-                                                      uiext:portIndex 4 ] .
+                                                    uiext:portIndex 4 ] .
       </pre>
       and similarly with <code>uiext:noPortNotification</code> if you wanted
       to prevent notifications for a port for which it would be on by default
