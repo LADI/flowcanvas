@@ -71,7 +71,6 @@ ns_list = { "http://www.w3.org/1999/02/22-rdf-syntax-ns#"   : "rdf",
             "http://xmlns.com/foaf/0.1/"                    : "foaf", 
             "http://purl.org/dc/elements/1.1/"              : "dc",
             "http://purl.org/dc/terms/"                     : "dct",
-            "http://www.w3.org/2003/06/sw-vocab-status/ns#" : "status",
             "http://purl.org/rss/1.0/modules/content/"      : "content", 
             "http://www.w3.org/2003/01/geo/wgs84_pos#"      : "geo",
             "http://www.w3.org/2004/02/skos/core#"          : "skos",
@@ -82,7 +81,6 @@ ns_list = { "http://www.w3.org/1999/02/22-rdf-syntax-ns#"   : "rdf",
 rdf  = RDF.NS('http://www.w3.org/1999/02/22-rdf-syntax-ns#')
 rdfs = RDF.NS('http://www.w3.org/2000/01/rdf-schema#')
 owl  = RDF.NS('http://www.w3.org/2002/07/owl#')
-vs   = RDF.NS('http://www.w3.org/2003/06/sw-vocab-status/ns#')
 lv2  = RDF.NS('http://lv2plug.in/ns/lv2core#')
 doap = RDF.NS('http://usefulinc.com/ns/doap#')
 foaf = RDF.NS('http://xmlns.com/foaf/0.1/')
@@ -128,14 +126,6 @@ def get_rdfs(m, urinode):
     return label, comment
 
 
-def get_status(m, urinode):
-    "Returns the status text for a term."
-    status = ''
-    s = m.find_statements(RDF.Statement(urinode, vs.term_status, None))
-    if s.current():
-        return s.current().object.literal_value['string']
-
-
 def htmlDocInfo( t ):
     """Opens a file based on the term name (t) and termdir directory (global).
        Reads in the file, and returns a linkified version of it."""
@@ -160,7 +150,7 @@ def owlVersionInfo(m):
 
 
 def rdfsPropertyInfo(term,m):
-    """Generate HTML for properties: Domain, range, status."""
+    """Generate HTML for properties: Domain, range"""
     global classranges
     global classdomains
     doc = ""
@@ -461,7 +451,6 @@ def docTerms(category, list, m):
         doc += """<div class="specterm" id="%s" about="%s">\n<h3>%s <a href="%s">%s</a></h3>\n""" % (t, term_uri, category, term_uri, curie)
 
         label, comment = get_rdfs(m, term)    
-        status = get_status(m, term)
         if label!='' or comment != '':
             doc += '<div class="description">'
         if label!='':
@@ -808,7 +797,7 @@ def __getScriptPath():
 
 
 def usage():
-    script = __getScriptPath()
+    script = os.path.basename(sys.argv[0])
     print """Usage: 
     %s ONTOLOGY TEMPLATE STYLE OUTPUT [FLAGS]
 
