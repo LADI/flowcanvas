@@ -50,8 +50,8 @@ files in an LV2 bundle.  UIs are associated with a plugin in RDF using the tripl
 @prefix ui: &lt;http://lv2plug.in/ns/extensions/ui#&gt; .
 
 &lt;http://my.plugin&gt;   ui:ui     &lt;http://my.pluginui&gt; .
-&lt;http://my.plugin&gt;   a         ui:GtkUI .
-&lt;http://my.pluginui&gt; ui:binary &lt;myui.so&gt; .
+&lt;http://my.pluginui&gt; a         ui:GtkUI ;
+                     ui:binary &lt;myui.so&gt; .
 </pre>
 where &lt;http://my.plugin&gt; is the URI of the plugin,
 &lt;http://my.pluginui&gt; is the URI of the plugin UI and &lt;myui.so&gt;
