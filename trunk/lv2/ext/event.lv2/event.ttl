@@ -31,6 +31,10 @@
 	doap:license <http://usefulinc.com/doap/licenses/mit> ;
 	doap:name "LV2 Events" ;
 	rdfs:seeAlso "event-helpers.h" ;
+    doap:release [
+        doap:revision "1" ;
+        doap:created "2008-04-04" ;
+    ] ;
 	doap:maintainer [
 		a foaf:Person ;
 		foaf:name "Dave Robillard" ;

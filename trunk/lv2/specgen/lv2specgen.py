@@ -85,8 +85,6 @@ lv2  = RDF.NS('http://lv2plug.in/ns/lv2core#')
 doap = RDF.NS('http://usefulinc.com/ns/doap#')
 foaf = RDF.NS('http://xmlns.com/foaf/0.1/')
 
-termdir = './doc' #TODO
-
 
 def niceName(uri):
     regexp = re.compile( "^(.*[/#])([^/#]+)$" )
@@ -94,16 +92,10 @@ def niceName(uri):
     if not rez:
         return uri
     pref = rez.group(1)
-    #return ns_list.get(pref, pref) + ":" + rez.group(2)
     if ns_list.has_key(pref):
         return ns_list.get(pref, pref) + ":" + rez.group(2)
     else:
         return uri
-
-
-def setTermDir(directory):
-    global termdir
-    termdir = directory
 
 
 def return_name(m, urinode):
@@ -126,21 +118,6 @@ def get_rdfs(m, urinode):
     return label, comment
 
 
-def htmlDocInfo( t ):
-    """Opens a file based on the term name (t) and termdir directory (global).
-       Reads in the file, and returns a linkified version of it."""
-    doc = ""
-    try:
-        f = open("%s/%s.en" % (termdir, t), "r")
-        doc = f.read()
-        # replace <code>prefix:foo</code> with a link to foo in the document
-        doc = re.sub(r"<code>" + spec_pre + r":(\w+)</code>",
-                r"""<code><a href="#\1">""" + spec_pre + r""":\1</a></code>""", doc)    
-    except:
-        return "" # "<p>No detailed documentation for this term.</p>"
-    return doc
-
-
 def owlVersionInfo(m):
     v = m.find_statements(RDF.Statement(None, owl.versionInfo, None))
     if v.current():
@@ -157,7 +134,7 @@ def rdfsPropertyInfo(term,m):
     range = ""
     domain = ""
 
-    #find subPropertyOf information
+    # Find subPropertyOf information
     o = m.find_statements( RDF.Statement(term, rdfs.subPropertyOf, None) )
     if o.current():
         rlist = ''
@@ -166,7 +143,7 @@ def rdfsPropertyInfo(term,m):
             rlist += "<dd>%s</dd>" % k
         doc += "<dt>Sub-property of</dt> %s" % rlist
 
-    #domain stuff
+    # Domain stuff
     domains = m.find_statements(RDF.Statement(term, rdfs.domain, None))
     domainsdoc = ""
     for d in domains:
@@ -182,7 +159,7 @@ def rdfsPropertyInfo(term,m):
     if (len(domainsdoc)>0):
         doc += "<dt>Domain</dt> %s" % domainsdoc
 
-    #range stuff
+    # Range stuff
     ranges = m.find_statements(RDF.Statement(term, rdfs.range, None))
     rangesdoc = ""
     for r in ranges:
@@ -202,20 +179,7 @@ def rdfsPropertyInfo(term,m):
 
 
 def parseCollection(model, collection):
-    # #propertyA a rdf:Property ;
-    #   rdfs:domain [
-    #      a owl:Class ;
-    #      owl:unionOf [
-    #        rdf:parseType Collection ;
-    #        #Foo a owl:Class ;
-    #        #Bar a owl:Class
-    #     ]
-    #   ]
-    # 
-    # seeAlso "Collections in RDF"
-
     uris = []
-
     rdflist = model.find_statements(RDF.Statement(collection.current().object, None, None))
     while rdflist and rdflist.current() and not rdflist.current().object.is_blank():
         one = rdflist.current()
@@ -340,6 +304,7 @@ def blankNodeDesc(node,m):
         doc = '<table class="blankdesc">\n%s\n</table>\n' % doc
     return doc
 
+
 def extraInfo(term,m):
     """Generate information about misc. properties of a term"""
     doc = ""
@@ -359,8 +324,6 @@ def extraInfo(term,m):
         else:
             doc += '<dd>?</dd>\n'
         last_pred = p.predicate
-#    if doc != '':
- #       doc = '\n<dl class="extrainfo">\n%s\n</dl>\n' % doc
     return doc
 
 
@@ -384,39 +347,25 @@ def owlInfo(term,m):
     """Returns an extra information that is defined about a term (an RDF.Node()) using OWL."""
     res = ''
 
-    # FIXME: refactor this code
-    
     # Inverse properties ( owl:inverseOf )
-    o = m.find_statements( RDF.Statement(term, owl.inverseOf, None) )
+    o = m.find_statements(RDF.Statement(term, owl.inverseOf, None))
     if o.current():
         res += "<dt>Inverse:</dt>"
         for st in o:
             res += "<dd>%s</dd>" % getTermLink(str(st.object.uri))
     
-    # Datatype Property ( owl.DatatypeProperty )
-    o = m.find_statements( RDF.Statement(term, rdf.type, owl.DatatypeProperty) )
-    if o.current():
-        res += "<dt>OWL Type</dt><dd>DatatypeProperty</dd>\n"
+    def owlTypeInfo(term, propertyType, name):
+        o = m.find_statements(RDF.Statement(term, rdf.type, propertyType))
+        if o.current():
+            return "<dt>OWL Type</dt><dd>%s</dd>\n" % name
+        else:
+            return ""
 
-    # Object Property ( owl.ObjectProperty )
-    o = m.find_statements( RDF.Statement(term, rdf.type, owl.ObjectProperty) )
-    if o.current():
-        res += "<dt>OWL Type</dt><dd>ObjectProperty</dd>\n"
-
-    # Annotation Property ( owl.AnnotationProperty )
-    o = m.find_statements( RDF.Statement(term, rdf.type, owl.AnnotationProperty) )
-    if o.current():
-        res += "<dt>OWL Type</dt><dd>AnnotationProperty</dd>\n"
-
-    # IFPs ( owl.InverseFunctionalProperty )
-    o = m.find_statements( RDF.Statement(term, rdf.type, owl.InverseFunctionalProperty) )
-    if o.current():
-        res += "<dt>OWL Type</dt><dd>InverseFunctionalProperty (uniquely identifying property)</dd>\n"
-
-    # Symmertic Property ( owl.SymmetricProperty )
-    o = m.find_statements( RDF.Statement(term, rdf.type, owl.SymmetricProperty) )
-    if o.current():
-        res += "<dt>OWL Type</dt><dd>SymmetricProperty</dd>\n"
+    res += owlTypeInfo(term, owl.DatatypeProperty, "Datatype Property")
+    res += owlTypeInfo(term, owl.ObjectProperty, "Object Property")
+    res += owlTypeInfo(term, owl.AnnotationProperty, "Annotation Property")
+    res += owlTypeInfo(term, owl.InverseFunctionalProperty, "Inverse Functional Property")
+    res += owlTypeInfo(term, owl.SymmetricProperty, "Symmetric Property")
 
     return res
 
@@ -473,7 +422,6 @@ def docTerms(category, list, m):
         if (len(terminfo)>0): #to prevent empty list (bug #882)
             doc += '\n<dl class="terminfo">%s</dl>\n' % terminfo
         
-        doc += htmlDocInfo(t)
         doc += "\n\n</div>\n\n"
     
     return doc
@@ -589,6 +537,7 @@ def specProperty(m, subject, predicate):
             return c.object.literal_value['string']
     return ''
 
+
 def specProperties(m, subject, predicate):
     "Return a property of the spec."
     properties=[]
@@ -597,6 +546,7 @@ def specProperties(m, subject, predicate):
             properties += [c.object]
     return properties
 
+
 def specAuthors(m, subject):
     "Return an HTML description of the authors of the spec."
     ret = ''
@@ -604,6 +554,24 @@ def specAuthors(m, subject):
         for j in m.find_statements(RDF.Statement(i.object, foaf.name, None)):
             ret += '<div class="author" property="dc:creator">' + j.object.literal_value['string'] + '</div>'
     return ret
+
+
+def specRevision(m, subject):
+    """
+    Return a (revision date) tuple, both strings, about the latest
+    release of the specification
+    """
+    latest_revision = ""
+    latest_release = None
+    for i in m.find_statements(RDF.Statement(None, doap.release, None)):
+        for j in m.find_statements(RDF.Statement(i.object, doap.revision, None)):
+            revision = j.object.literal_value['string']
+            if latest_revision == "" or revision > latest_revision:
+                latest_revision = revision
+                latest_release = i.object
+    if latest_release != None:
+        for i in m.find_statements(RDF.Statement(latest_release, doap.created, None)):
+            return (latest_revision, i.object.literal_value['string'])
 
 
 def getInstances(model, classes, properties):
@@ -717,6 +685,12 @@ def specgen(specloc, template, instances=False, mode="spec"):
     template = template.replace('@HEADER@', basename + '.h')
     template = template.replace('@MAIL@', 'devel@lists.lv2plug.in')
 
+    revision = specRevision(m, spec_url) # (revision, date)
+    if revision:
+        template = template.replace('@REVISION@', revision[0] + " (" + revision[1] + ")")
+    else:
+        template = template.replace('@REVISION@', '0')
+
     other_files = '<p>See also:</p>\n<ul>'
     #other_files += '<li><a href=".">Bundle</a></li>'
     other_files += '<li><a href="../releases">Releases</a> - Tarballs of current/past releases</li>'
@@ -756,6 +730,7 @@ def save(path, text):
     except Exception, e:
         print "Error writing to file \"" + path + "\": " + str(e)
 
+
 def getNamespaces(parser):
     """Return a prefix:URI dictionary of all namespaces seen during parsing"""
     count = Redland.librdf_parser_get_namespaces_seen_count(parser._parser)
@@ -770,6 +745,7 @@ def getNamespaces(parser):
         nspaces[prefix] = uri
     return nspaces
 
+
 def getOntologyNS(m):
     ns = None
     o = m.find_statements(RDF.Statement(None, rdf.type, lv2.Specification))
@@ -782,18 +758,6 @@ def getOntologyNS(m):
         sys.exit("Impossible to get ontology's namespace")
     else:
         return ns
-
-
-def __getScriptPath():
-    path = sys.argv[0]
-    if path.startswith("./"):
-        return path
-    else:
-        base = "/".join(path.split("/")[:-1])
-        for one in os.environ["PATH"].split(":"):
-            if base == one:
-                return path.split("/")[-1]
-        return path
 
 
 def usage():
