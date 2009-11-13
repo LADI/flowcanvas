@@ -440,7 +440,7 @@ This predicate may be used by extensions for any type of subject.
 lv2:PortProperty a rdfs:Class ;
     rdfs:label "Port property" ;
     rdfs:comment """
-A port propety - a useful piece of information that allows a host to make more
+A port property - a useful piece of information that allows a host to make more
 sensible decisions (e.g. to provide a better interface).
 """ .
 
