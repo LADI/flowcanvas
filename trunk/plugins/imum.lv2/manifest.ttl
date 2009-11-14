@@ -1,0 +1,15 @@
+@prefix doap: <http://usefulinc.com/ns/doap#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix imum: <http://drobilla.net/software/plugins/imum.lv2/> .
+@prefix lv2:  <http://lv2plug.in/ns/lv2core#> .
+@prefix obj:  <http://lv2plug.in/ns/dev/object#> .
+@prefix pg:   <http://lv2plug.in/ns/dev/port-groups#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+imum:parse a lv2:Plugin ;
+	rdfs:seeAlso <parse.ttl> ;
+	lv2:binary <parse.so> .
+
+imum:reverse a lv2:Plugin ;
+	rdfs:seeAlso <reverse.ttl> ;
+	lv2:binary <reverse.so> .
