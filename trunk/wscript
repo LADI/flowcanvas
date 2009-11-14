@@ -50,10 +50,11 @@ def configure(conf):
 	sub_config_and_use(conf, 'redlandmm')
 	sub_config_and_use(conf, 'ingen', False)
 	#sub_config_and_use(conf, 'machina', False)
+	sub_config_and_use(conf, 'plugins/imum.lv2')
 
 def build(bld):
 	autowaf.set_recursive()
-	bld.add_subdirs('lv2/core.lv2 lv2 slv2 raul flowcanvas patchage redlandmm ingen')# evoral machina')
+	bld.add_subdirs('lv2/core.lv2 lv2 slv2 raul flowcanvas patchage redlandmm ingen plugins/imum.lv2')# evoral machina')
 
 def shutdown():
 	autowaf.shutdown()

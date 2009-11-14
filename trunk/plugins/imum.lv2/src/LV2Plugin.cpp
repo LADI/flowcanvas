@@ -21,7 +21,7 @@
 
 ****************************************************************************/
 
-#include "lv2plugin.hpp"
+#include "LV2Plugin.hpp"
 
 
 namespace LV2 {

@@ -1,4 +1,4 @@
-/* LV2 OSC Messages Extension
+/* LV2 Contexts Extension
  * Copyright (C) 2007-2009 Dave Robillard <http://drobilla.net>
  *
  * This header is free software; you can redistribute it and/or modify it
@@ -41,33 +41,26 @@ lv2_contexts_port_is_valid(const void* flags, uint32_t index) {
 }
 
 #include "lv2.h"
-#include <stdbool.h>
-
 
 typedef struct {
+
 	/** The message run function.  This is called once to process a set of
-	 * inputs and produce a set of outputs.  Before calling the host MUST
-	 * set valid_inputs such that the bit corresponding to each input port
-	 * is 1 iff data is present.  The plugin MUST only inspect bits
-	 * corresponding to ports in the message thread.  Before returning the
-	 * plugin MUST set valid_outputs such that the bit corresponding to
-	 * each output port of the message context is 1 iff data has been written
-	 * to that port in the duration of this function invocation.
+	 * inputs and produce a set of outputs.
+	 *
+	 * Before calling the host MUST set valid_inputs such that the bit
+	 * corresponding to each input port is 1 iff data is present. The plugin
+	 * MUST only inspect bits corresponding to ports in the message thread.
+	 *
+	 * Similarly, before returning the plugin MUST set valid_outputs such that
+	 * the bit corresponding to each output port of the message context is 1
+	 * iff the value at that port has changed.
 	 * The plugin must return 1 if outputs have been written, 0 otherwise.
 	 */
 	uint32_t (*message_run)(LV2_Handle  instance,
 	                        const void* valid_inputs,
 	                        void*       valid_outputs);
 
-	/** The message thread function alalogous to the LV2 connect_port
-	 * function.  This function must only be used to connect ports that
-	 * belong to the message context. */
-	void (*message_connect_port)(LV2_Handle instance,
-	                             uint32_t   port,
-	                             void*      data);
-
 } LV2MessageContext;
-
 
 #endif // LV2_CONTEXTS_H
 

@@ -151,7 +151,6 @@ connecting an input, but this property should be set whenever it applies.
 """ .
 
 
-
 ev:supportsTimeStamp a rdf:Property ;
 	rdfs:domain  lv2:Port ;
 	rdfs:range   ev:TimeStamp ;

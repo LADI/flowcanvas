@@ -1,0 +1,52 @@
+#!/usr/bin/env python
+import autowaf
+
+# Version of this package (even if built as a child)
+IMUM_VERSION = '0.0.0'
+
+# Variables for 'waf dist'
+APPNAME = 'imum.lv2'
+VERSION = IMUM_VERSION
+
+# Mandatory variables
+srcdir = '.'
+blddir = 'build'
+
+def set_options(opt):
+	opt.tool_options('compiler_cc')
+	opt.tool_options('compiler_cxx')
+
+def configure(conf):
+	conf.check_tool('compiler_cc')
+	conf.check_tool('compiler_cxx')
+	autowaf.check_pkg(conf, 'lv2core', uselib_store='LV2CORE', atleast_version='1', mandatory=True)
+	conf.env.append_value('CCFLAGS', '-std=c99')
+	pat = conf.env['shlib_PATTERN']
+	ext = pat[pat.rfind('.'):]
+	conf.env.append_value('shlib_EXTENSION', ext)
+	
+def build_plugin(bld, lang, bundle, name, source):
+	penv = bld.env.copy()
+	penv['shlib_PATTERN'] = '%s' + bld.env['shlib_EXTENSION'][0]
+
+	# Library
+	ext = 'c'
+	if lang != 'cc':
+		ext = 'cpp'
+
+	obj              = bld.new_task_gen(lang, 'shlib')
+	obj.env          = penv
+	obj.source       = source
+	obj.includes     = ['.','./src']
+	obj.name         = name
+	obj.target       = name
+	obj.install_path = '${LV2DIR}/' + bundle
+
+	# Data
+	data_file = '%s.ttl' % name
+	bld.install_files('${LV2DIR}/' + bundle, data_file)
+
+def build(bld):
+	build_plugin(bld, 'cxx', 'imum.lv2', 'parse', ['src/parse.cpp', 'src/LV2Plugin.cpp'])
+	build_plugin(bld, 'cxx', 'imum.lv2', 'reverse', ['src/reverse.cpp', 'src/LV2Plugin.cpp'])
+	bld.install_files('${LV2DIR}/imum.lv2', 'manifest.ttl')

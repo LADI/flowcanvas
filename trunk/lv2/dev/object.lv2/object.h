@@ -20,136 +20,165 @@
 #ifndef LV2_OBJECT_H
 #define LV2_OBJECT_H
 
-#define LV2_OBJECT_URI "http://lv2plug.in/ns/dev/object"
+#define LV2_OBJECT_URI       "http://lv2plug.in/ns/dev/object"
+#define LV2_BLOB_SUPPORT_URI "http://lv2plug.in/ns/dev/object#blobSupport"
+
+#define LV2_OBJECT_REFERENCE_TYPE 0
 
 #include <stdint.h>
 
 /** @file
  * This header defines the code portion of the LV2 Object extension with URI
- * <http://lv2plug.in/ns/ext/object> (preferred prefix 'lv2obj').
- *
- * This extension allows hosts and plugins to manage dynamically allocated
- * 'objects' of any type (defined by a URI).  This is useful for large/shared
- * data structures (like images or waveforms) and for non-POD event payloads
- * (allowing plugins to process events too large/expensive to copy).
- *
- * This extension requires the host to support the LV2 URI Map extension.
+ * <http://lv2plug.in/ns/dev/object>.
  */
 
-
-/** Function to free an LV2 object (destructor).
+/** An LV2 Object.
  *
- * Any creator of an object must provide a pointer to this function to the
- * host so the object can be freed.  This function must 'deinitialize' the
- * contents of the object, NOT free the LV2_Object struct itself.
- * For POD objects this function does not need to be provided, as freeing
- * the LV2_Object struct will completely free the object. */
-typedef void (*LV2_Object_Destructor)(LV2_Object* object);
-
-
-/** The data field of the LV2_Feature for the LV2 Object extension.
+ * An "Object" is a generic chunk of memory with a given type and size.
+ * The type field defines how to interpret an object.
  *
- * A host which supports this extension must pass an LV2_Feature struct to the
- * plugin's instantiate method with 'URI' "http://lv2plug.in/ns/ext/object" and
- * 'data' pointing to an instance of this struct. */
-typedef struct {
-
-	/** Opaque pointer to host data.
-	 *
-	 * The plugin MUST pass this to any call to functions in this struct.
-	 * Otherwise, it must not be interpreted in any way.
-	 */
-	LV2_Object_Callback_Data callback_data;
-
-	/** Create (allocate) a new LV2 Object.
-	 *
-	 * The returned value has size bytes of memory immediately following the
-	 * LV2_Object header, which the caller must initialize appropriately.
-	 *
-	 * @param callback_data Must be the callback_data member of this struct.
-	 * @param destructor Function to clean up after any initialisation which
-	 *        is done after this call.  This function is not responsible for
-	 *        freeing the returned LV2_Object struct itself; NULL may be passed
-	 *        if the object does not require any destruction (e.g. POD objects).
-	 * @param context The calling context, mapped to a URI (see lv2_context.h)
-	 * @param type Type of the new object, mapped to a URI as in LV2_Object.
-	 * @param size Size in bytes of the new object, not including header. */
-	LV2_Object* (*lv2_object_new)(LV2_Object_Callback_Data callback_data,
-	                              LV2_Object_Destructor    destructor,
-	                              uint32_t                 context,
-	                              uint32_t                 type,
-	                              uint32_t                 size);
-
-	/** Reference an LV2 Object.
-	 *
-	 * This function can be called to increment the reference count of a
-	 * object (preventing destruction while a reference is held).
-	 *
-	 * Note that when an object is the payload of an event sent to a plugin,
-	 * the plugin implicitly already has a reference to the object so this
-	 h* function is not required for typical event processing situations.
-	 *
-	 * @param callback_data Must be the callback_data member of this struct.
-	 * @param context The calling context, mapped to a URI (see lv2_context.h)
-	 * @param object The object to obtain a reference to. */
-	LV2_Object* (*lv2_object_ref)(LV2_Object_Callback_Data callback_data,
-	                                uint32_t                 context,
-	                                LV2_Object*              object);
-
-
-	/** Unreference an LV2 Object.
-	 *
-	 * Plugins must call this function whenever they drop a reference to an
-	 * object.  When objects are the payload of an event sent to a plugin,
-	 * the plugin implicitly has a reference to the object and must call this
-	 * function if the event is not stored somehow or passed to an output.
-	 *
-	 * @param callback_data Must be the callback_data member of this struct.
-	 * @param context The calling context, mapped to a URI (see lv2_context.h)
-	 * @param object The object to drop a reference to. */
-	LV2_Object* (*lv2_object_unref)(LV2_Object_Callback_Data callback_data,
-	                                uint32_t                 context,
-	                                LV2_Object*              object);
-
-} LV2_Object_Feature;
-
-
-
-/** An LV2 object.
- *
- * LV2 objects are (like ports and events) generic 'blobs' of any type.
- * The type field defines the format of a given object's contents.
- *
- * This struct defines the header of an LV2 object.  Immediately following
- * the header in memory is the contents of the object (though the object
- * itself may not be POD, i.e. objects may contain pointers). */
-typedef struct {
-
-	/** Opaque host data associated with this object.
-	 *
-	 * Plugins must not interpret this data in any way.  Hosts may store
-	 * whatever information they need to associate with object instances
-	 * here, via the lv2_object_new method (which is the only way for a
-	 * plugin to allocate a new LV2 Object. */
-	LV2_Object_Host_Data host_data;
-
-	/** Destructor function for this object.
-	 */
-	LV2_Object_Destructor destructor;
+ * All objects are by definition Plain Old Data (POD) and may be safely
+ * copied (e.g. with memcpy) using the size field, except objects with type 0.
+ * An object with type 0 is a reference, and may only be used via the functions
+ * provided in LV2_Blob_Support (e.g. it MUST NOT be manually copied).
+ */
+typedef struct _LV2_Object {
 
 	/** The type of this object.  This number represents a URI, mapped to an
-	 * integer by from some call to the uri_to_id function (defined in the
-	 * LV2 URI Map extension), with the URI of this extension as the 'map'
-	 * argument.  0 is never the type of a valid object, if this field is 0
-	 * any reader must ignore the object's contents entirely. */
+	 * integer using the extension <http://lv2plug.in/ns/ext/uri-map>
+	 * with "http://lv2plug.in/ns/dev/object" as the 'map' argument.
+	 * Type 0 is a special case which indicates this object
+	 * is a reference and MUST NOT be copied manually.
+	 */
 	uint32_t type;
 
-	/** The size of this object, not including this header. */
+	/** The size of this object, not including this header, in bytes. */
 	uint32_t size;
 
 	/* size bytes of data follow here */
 
 } LV2_Object;
+
+/** Reference, an LV2_Object with type 0 */
+typedef LV2_Object LV2_Reference;
+
+
+/* Everything below here is related to blobs, which are dynamically allocated
+ * objects that are not necessarily POD.  This functionality is optional,
+ * hosts may support objects without implementing blob support.
+ * Blob support is an LV2 Feature.
+ */
+
+
+typedef void* LV2_Blob_Data;
+
+/** Dynamically Allocated LV2 Blob.
+ *
+ * This is a blob of data of any type, dynamically allocated in memory.
+ * Unlike an LV2_Object, a blob is not necessarily POD.  Plugins may only
+ * refer to blobs via a Reference (an LV2_Object with type 0), there is no
+ * way for a plugin to directly create, copy, or destroy a Blob.
+ */
+typedef struct _LV2_Blob {
+
+	/** Pointer to opaque data.
+	 *
+	 * Plugins MUST NOT interpret this data in any way.  Hosts may store
+	 * whatever information they need to associate with references here.
+	 */
+	LV2_Blob_Data data;
+
+	/** Get blob's type as a URI mapped to an integer.
+	 *
+	 * The return value may be any type URI, mapped to an integer with the
+	 * URI Map extension.  If this type is an LV2_Object type, get returns
+	 * a pointer to the LV2_Object header (e.g. a blob with type obj:Int32
+	 * does NOT return a pointer to a int32_t).
+	 */
+	uint32_t (*type)(struct _LV2_Blob* blob);
+
+	/** Get blob's body.
+	 *
+	 * Returns a pointer to the start of the blob data.  The format of this
+	 * data is defined by the return value of the type method.  It MUST NOT
+	 * be used in any way by code which does not understand that type.
+	 */
+	void* (*get)(struct _LV2_Blob* blob);
+
+} LV2_Blob;
+
+
+typedef void* LV2_Blob_Support_Data;
+
+typedef void (*LV2_Blob_Destroy)(LV2_Blob* blob);
+
+/** The data field of the LV2_Feature for the LV2 Object extension.
+ *
+ * A host which supports this extension must pass an LV2_Feature struct to the
+ * plugin's instantiate method with 'URI' "http://lv2plug.in/ns/dev/object" and
+ * 'data' pointing to an instance of this struct.  All fields of this struct,
+ * MUST be set to non-NULL values by the host (except possibly data).
+ */
+typedef struct {
+
+	/** Pointer to opaque data.
+	 *
+	 * The plugin MUST pass this to any call to functions in this struct.
+	 * Otherwise, it must not be interpreted in any way.
+	 */
+	LV2_Blob_Support_Data data;
+
+	/** The size of a reference, in bytes.
+	 *
+	 * This value is provided by the host so plugins can allocate large
+	 * enough chunks of memory to store references.
+	 */
+	size_t reference_size;
+
+	/** Initialize a reference to point to a newly allocated Blob.
+	 *
+	 * @param data Must be the data member of this struct.
+	 * @param reference Pointer to an area of memory at least as large as
+	 *     the reference_size field of this struct.  On return, this will
+	 *     be the unique reference to the new blob which is owned by the
+	 *     caller.  Caller MUST NOT pass a valid reference.
+	 * @param destroy Function to destroy a blob of this type.  This function
+	 *     MUST clean up any resources contained in the blob, but MUST NOT
+	 *     attempt to free the memory pointed to by its LV2_Blob* parameter.
+	 * @param type Type of blob to allocate.
+	 * @param size Size of blob to allocate in bytes.
+	 */
+	void (*lv2_blob_new)(LV2_Blob_Support_Data data,
+	                     LV2_Reference*        reference,
+	                     LV2_Blob_Destroy      destroy_func,
+	                     uint32_t              type,
+	                     uint32_t              size);
+
+	/** Return a pointer to the Blob referred to by @a ref.
+	 *
+	 * The returned value MUST NOT be used in any way other than by calling
+	 * methods defined in LV2_Blob (e.g. it MUST NOT be copied or destroyed).
+	 */
+	LV2_Blob* (*lv2_reference_get)(LV2_Blob_Support_Data data,
+	                               LV2_Reference*        ref);
+
+	/** Copy a reference.
+	 * This copies a reference but not the blob it refers to,
+	 * i.e. after this call @a dst and @a src refer to the same LV2_Blob.
+	 */
+	void (*lv2_reference_copy)(LV2_Blob_Support_Data data,
+	                           LV2_Reference*        dst,
+	                           LV2_Reference*        src);
+
+	/** Reset (release) a reference.
+	 * After this call, @a ref is invalid.  Use of this function is only
+	 * necessary if a plugin makes a copy of a reference it does not later
+	 * send to an output (which transfers ownership to the host).
+	 */
+	void (*lv2_reference_reset)(LV2_Blob_Support_Data data,
+	                            LV2_Reference*        ref);
+
+} LV2_Blob_Support;
 
 
 #endif // LV2_OBJECT_H
