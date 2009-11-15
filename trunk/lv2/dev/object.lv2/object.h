@@ -56,6 +56,7 @@ typedef struct _LV2_Object {
 	uint32_t size;
 
 	/* size bytes of data follow here */
+	uint8_t body[];
 
 } LV2_Object;
 

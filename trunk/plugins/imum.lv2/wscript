@@ -36,7 +36,7 @@ def build_plugin(bld, lang, bundle, name, source):
 
 	obj              = bld.new_task_gen(lang, 'shlib')
 	obj.env          = penv
-	obj.source       = source
+	obj.source       = source + ['src/LV2Plugin.cpp']
 	obj.includes     = ['.','./src']
 	obj.name         = name
 	obj.target       = name
@@ -47,6 +47,8 @@ def build_plugin(bld, lang, bundle, name, source):
 	bld.install_files('${LV2DIR}/' + bundle, data_file)
 
 def build(bld):
-	build_plugin(bld, 'cxx', 'imum.lv2', 'parse', ['src/parse.cpp', 'src/LV2Plugin.cpp'])
-	build_plugin(bld, 'cxx', 'imum.lv2', 'reverse', ['src/reverse.cpp', 'src/LV2Plugin.cpp'])
+	build_plugin(bld, 'cxx', 'imum.lv2', 'parse',   ['src/parse.cpp'])
+	build_plugin(bld, 'cxx', 'imum.lv2', 'reverse', ['src/reverse.cpp'])
+	build_plugin(bld, 'cxx', 'imum.lv2', 'sum',     ['src/sum.cpp'])
+	build_plugin(bld, 'cxx', 'imum.lv2', 'print',   ['src/print.cpp'])
 	bld.install_files('${LV2DIR}/imum.lv2', 'manifest.ttl')

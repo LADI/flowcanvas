@@ -49,29 +49,57 @@ functions.  Blob support requires the host to support the
 """ .
 
 
-obj:ObjectPort a rdfs:Class ;
-    rdfs:label      "Object port" ;
+obj:ValuePort a rdfs:Class ;
+    rdfs:label      "Value Port" ;
     rdfs:subClassOf lv2:Port ;
     rdfs:comment    """
 Ports of this type will be connected to a struct of type LV2_Object (as
-defined in object.h) aligned to 32-bits.  Before calling the run method
-(or equivalent for the port's context) the host guarantees that:
+defined in object.h) aligned to 32-bits.
+
+The contents of a ValuePort are considered persistent and time-independent.
 <ul>
-<li>All ObjectPort inputs are connected to a valid LV2_Object with type and
-size set accordingly, or NULL if lv2:connectionOptional.</li>
-<li>All ObjectPort outputs are connected to an LV2_Object with size set to
-the number of bytes of space available immediately following the LV2_Object
-header, or NULL if lv2:connectionOptional.  The type and contents MUST NOT
-be interpreted by the plugin.</li>
+<li>If a plugin has fixed input values for all ports, all ValuePort outputs
+are also fixed regardless of the number of times the plugin is run.</li>
+<li>If a plugin has fixed input values for all ports except a ValuePort,
+each value V of that ValuePort corresponds to a single set of outputs
+for all ports.</li>
+<li>If an obj:ValuePort contains a reference then the blob it refers to is
+constant; plugin MUST NOT modify the blob in any way.
 </ul>
-Before returning from the run method (or equivalent for the port's context),
-the plugin guarantees that:
-<ul>
-<li>All connected ObjectPort outputs have type and size set appropriately.
-If nothing was written to the output, the plugin MUST set both type and size
-to 0.
-</li>
-</ul>
+
+Intuitively, the contents of a ValuePort are values (which are computed),
+NOT commands (which are executed).
+
+Before calling a method on the plugin that writes to a ValuePort, the host
+MUST set the size field of the LV2_Object in that port to the amount of
+available memory immediately following the LV2_Object.  The plugin MUST
+write a valid LV2_Object that port (leaving it untouched is illegal).
+""" .
+
+
+obj:MessagePort a rdfs:Class ;
+    rdfs:label      "Message Port" ;
+    rdfs:subClassOf lv2:Port ;
+    rdfs:comment    """
+Ports of this type will be connected to a struct of type LV2_Object (as
+defined in object.h) aligned to 32-bits.
+
+The contents of a MessagePort are considered transient and/or time-dependent,
+and only apply for a single invocation of the run method (or equivalent).
+Unlike a ValuePort, a MessagePort may be used to manipulate and access internal
+plugin state.
+
+Intuitively, the contents of a MessagePort are commands (which are executed).
+
+Before calling a method on the plugin that writes to a MessagePort, the host
+MUST set the size field of the LV2_Object in that port to the amount of
+available memory immediately following the LV2_Object.  The plugin MUST
+write a valid LV2_Object that port (leaving it untouched is illegal).
+
+MessagePort inputs may be used as a message passing or query system with
+responses by specifying a corresponding MessagePort output for responses
+using the obj:responsePort predicate.  A MessagePort input MUST NOT
+have more than one responsePort.
 """ .
 
 
@@ -106,6 +134,7 @@ specific, and must not be copied, serialized, or otherwise interpreted by
 a plugin.
 
 References are a special case: a reference object always has type 0.
+The NULL reference has size 0.
 """ .
 
 
@@ -154,6 +183,7 @@ struct {
 """ .
 
 obj:Int32   a obj:ObjectType ; rdfs:label "Signed 32-bit Integer" .
+obj:Bool    a obj:ObjectType ; rdfs:label "Same as obj:Int32 (0 = false, 1 = true)" .
 obj:Float32 a obj:ObjectType ; rdfs:label "32-bit Floating Point Number" .
 
 

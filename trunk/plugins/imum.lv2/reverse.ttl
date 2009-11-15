@@ -20,7 +20,7 @@ imum:reverse a lv2:Plugin ;
 	doap:license <http://usefulinc.com/doap/licenses/gpl> ;
 	lv2:pluginProperty lv2:hardRtCapable ;
 	lv2:port [
-		a lv2:InputPort, obj:ObjectPort ;
+		a lv2:InputPort, obj:ValuePort ;
 		ctx:context ctx:MessageContext ;
 		lv2:name "Input" ;
 		lv2:index 0 ;
@@ -28,7 +28,7 @@ imum:reverse a lv2:Plugin ;
 		lv2:default "" ;
 		rdfs:comment """Expects a string, e.g. "hello" or "2" or "5.7".""" ;
 	] , [
-		a lv2:OutputPort, obj:ObjectPort ;
+		a lv2:OutputPort, obj:ValuePort ;
 		ctx:context ctx:MessageContext ;
 		lv2:name "Output" ;
 		lv2:index 1 ;
