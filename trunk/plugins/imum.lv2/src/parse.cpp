@@ -28,9 +28,9 @@
 using namespace std;
 
 static uint32_t bool_type;
-static uint32_t string_type;
-static uint32_t int_type;
 static uint32_t float_type;
+static uint32_t int_type;
+static uint32_t string_type;
 static uint32_t vec_type;
 
 class Parse;
@@ -48,9 +48,9 @@ public:
 		: ParseBase(2)
 	{
 		bool_type   = uri_to_id(NULL, LV2_OBJECT_URI "#Bool");
-		string_type = uri_to_id(NULL, LV2_OBJECT_URI "#String");
-		int_type    = uri_to_id(NULL, LV2_OBJECT_URI "#Int32");
 		float_type  = uri_to_id(NULL, LV2_OBJECT_URI "#Float32");
+		int_type    = uri_to_id(NULL, LV2_OBJECT_URI "#Int32");
+		string_type = uri_to_id(NULL, LV2_OBJECT_URI "#String");
 		vec_type    = uri_to_id(NULL, LV2_OBJECT_URI "#Vector");
 	}
 

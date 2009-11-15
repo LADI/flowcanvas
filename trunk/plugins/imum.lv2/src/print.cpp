@@ -27,9 +27,10 @@
 
 using namespace std;
 
-static uint32_t string_type;
-static uint32_t int_type;
+static uint32_t bool_type;
 static uint32_t float_type;
+static uint32_t int_type;
+static uint32_t string_type;
 static uint32_t vec_type;
 
 class Print;
@@ -46,9 +47,10 @@ public:
 	Print(double rate, const char* bundle, const LV2::Feature* const* features)
 		: PrintBase(1)
 	{
-		string_type = uri_to_id(NULL, LV2_OBJECT_URI "#String");
-		int_type    = uri_to_id(NULL, LV2_OBJECT_URI "#Int32");
+		bool_type   = uri_to_id(NULL, LV2_OBJECT_URI "#Bool");
 		float_type  = uri_to_id(NULL, LV2_OBJECT_URI "#Float32");
+		int_type    = uri_to_id(NULL, LV2_OBJECT_URI "#Int32");
+		string_type = uri_to_id(NULL, LV2_OBJECT_URI "#String");
 		vec_type    = uri_to_id(NULL, LV2_OBJECT_URI "#Vector");
 	}
 
@@ -58,8 +60,16 @@ public:
 	{
 		Print*      me = reinterpret_cast<Print*>(instance);
 		LV2_Object* in = me->p<LV2_Object>(0);
-		if (in->type == string_type) {
-			printf("%s\n", (char*)in->body);
+		if (in->type == 0 && in->size == 0) {
+			printf("null\n");
+		} else if (in->type == bool_type) {
+			if (*(int32_t*)in->body == 0) {
+				printf("false\n");
+			} else {
+				printf("true\n");
+			}
+		} else if (in->type == string_type) {
+			printf("\"%s\"\n", (char*)in->body);
 		} else if (in->type == int_type) {
 			printf("%d\n", *(int32_t*)in->body);
 		} else if (in->type == float_type) {
