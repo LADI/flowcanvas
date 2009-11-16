@@ -45,6 +45,7 @@ td { padding-right: 2ex; }
 .meta { font-size: small }
 
 pre { margin-left: 2em; color: #373; }
+code { color: #373; }
 
 @media aural {  
     dt { pause-before: 20% }

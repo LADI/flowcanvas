@@ -405,7 +405,7 @@ def docTerms(category, list, m):
         if label!='':
             doc += "<div property=\"rdfs:label\" class=\"label\">%s</div>" % label
         if comment!='':
-            doc += "<div property=\"rdfs:comment\">%s</div>" % comment
+            doc += "<div property=\"rdfs:comment\">%s</div>" % comment.replace('\n\n', '<br /><br />')
         if label!='' or comment != '':
             doc += "</div>"
         terminfo = ""
