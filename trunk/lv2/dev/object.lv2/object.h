@@ -29,7 +29,10 @@
 
 /** @file
  * This header defines the code portion of the LV2 Object extension with URI
- * <http://lv2plug.in/ns/dev/object>.
+ * <http://lv2plug.in/ns/dev/object>.  It defines convenience structs that
+ * should match the definition of the built-in types of the object extension.
+ * This header is NON NORMATIVE (i.e. the byte layout is defined precisely
+ * in the documentation of each RDF class), but should match anywhere.
  */
 
 /** An LV2 Object.
@@ -55,13 +58,28 @@ typedef struct _LV2_Object {
 	/** The size of this object, not including this header, in bytes. */
 	uint32_t size;
 
-	/* size bytes of data follow here */
+	/** Size bytes of data follow here */
 	uint8_t body[];
 
 } LV2_Object;
 
 /** Reference, an LV2_Object with type 0 */
 typedef LV2_Object LV2_Reference;
+
+/** The body of an LV2_Object with type sp:Vector
+ */
+typedef struct _LV2_Vector_Body {
+
+	/** The size of each element in the vector */
+	uint32_t elem_count;
+
+	/** The type of each element in the vector */
+	uint32_t elem_type;
+
+	/** Elements follow here */
+	uint8_t elems[];
+
+} LV2_Vector_Body;
 
 
 /* Everything below here is related to blobs, which are dynamically allocated

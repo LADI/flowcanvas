@@ -26,5 +26,5 @@ imum:print a lv2:Plugin ;
 		lv2:index 0 ;
 		lv2:symbol "input" ;
 	] ;
-	rdfs:comment """Print any received message to the console""" ;
+	rdfs:comment """Print any received message to the console""" .
 
