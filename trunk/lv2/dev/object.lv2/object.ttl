@@ -32,20 +32,39 @@
 	a lv2:Specification ;
     doap:name "LV2 Objects" ;
 	rdfs:comment """
-This extension defines a genic format for "objects" (e.g. integers,
+This extension defines a generic format for "objects" (e.g. integers,
 strings, buffers, data structures, etc) to be used by LV2 plugins and hosts.
 Objects may be contained directly in port buffers, or used in other ways,
-e.g. as the payload of an event or as persistent data.  Objects are very
-simple chunks of memory with a type and a size, and are (with one exception)
-POD and may be safely copied (allowing plugins and hosts to communicate
-objects of any type, even if they do not understand them).
+e.g. as an event or as shared data.  Objects are very simple chunks of
+memory with a type and a size, and are (with one exception) Plain Old Data
+(POD) and may be safely copied.  Because they are POD, hosts and plugins can
+communicate objects of any type, even if they do not understand that type.
+This allows two plugins that both understand some type to be used together in
+a host that does not itself understand that type, or allows a host to send
+objects "through" a plugin that does not understand them (for e.g. routing,
+delaying, or buffering plugins).
 
-Optionally, the host may support "Blobs", which are dynamically allocated
-chunks of memory that (unlike "Objects") are not necessarily POD.  Blobs
-are referred to by references, which are a special case of Object that
-always have type 0, are not POD, and can only be copied using host provided
-functions.  Blob support requires the host to support the
-<a href="http://lv2plug.in/ns/ext/uri-map">LV2 URI Map</a> extension.
+Objects as defined by this extension can be trivially constructed in-place
+from events as defined by the <a href="http://lv2plug.in/ns/ext/event">LV2
+Event</a> extension.  A valid LV2_Object (see object.h) is contained within
+any valid LV2_Event (see event.h).  An LV2_Event is simply an LV2_Object
+with a time stamp (relative to the current audio block).  Object ports
+are particularly useful on contexts that run for a single instant in time,
+e.g. a MessagePort (which is-a ObjectPort) can be considered the instantaneous
+equivalent of an EventPort (which reflects a range of time).  The relationship
+is similar to that of Control and Audio ports.
+
+Optionally, the host MAY support "Blobs", which are dynamically allocated
+chunks of memory that (unlike Objects) are not necessarily POD.  Blobs are
+referred to by references, which are a special case of Object that always have
+type 0, are not POD, and can only be copied using host provided functions.
+This allows plugins and hosts to work with data of any type at all.
+The address of a blob MUST NOT be used in any way by an implementation
+that does not understand that blob type (meaningful type-oblivious use is
+impossible, the address may not even point to RAM).
+
+This extension requires the host to support the <a
+href="http://lv2plug.in/ns/ext/uri-map">LV2 URI Map</a> extension.
 """ .
 
 
@@ -72,29 +91,30 @@ is no reasonable value to write to the port, the plugin MUST write null
 
 obj:asLargeAs a rdf:Property ;
     rdfs:domain  obj:ObjectPort ;
-    rdfs:range   obj:ObjectPort ;
+    rdfs:range   lv2:Symbol ;
     rdfs:label   "as large as" ;
     rdfs:comment """
 Indicates that an object port requires at least as much buffer space as
-another.  If a port is asLargeAs several ports, it is asLargeAs the largest
-such port (not the sum of those ports' sizes).
+the port with the given symbol on the same plugin instance.  If a port is
+asLargeAs several ports, it is asLargeAs the largest such port (not the sum
+of those ports' sizes).
 
-The host guarantees that whenever the run method (or equivalent) for an
-ObjectPort is called, any output O that is obj:asLargeAs an input I is
-connected to a buffer large enough to copy I, or NULL if the port is
-lv2:connectionOptional.
+The host guarantees that whenever an ObjectPort's run method is called,
+any output O that is obj:asLargeAs an input I is connected to a buffer large
+enough to copy I, or NULL if the port is lv2:connectionOptional.
 """ .
 
 
 obj:respondsWith a rdf:Property ;
     rdfs:domain  obj:MessagePort ;
-    rdfs:range   obj:MessagePort ;
+    rdfs:range   lv2:Symbol ;
     rdfs:label   "responds with" ;
     rdfs:comment """
-Indicates that an message port responds to messages via another port.
-If <pre>input obj:respondsWith output</pre> then after running the plugin
-with a message <em>m</em> in <code>input</code> the host SHOULD interpret
-the object in <code>output</code> as the response to <em>m</em>.
+Indicates that a message port responds to messages via the port with the
+given symbol on the same plugin instance.  If <pre>input obj:respondsWith
+output</pre> then after running the plugin with a message <em>m</em> in
+<code>input</code> the host SHOULD interpret the object in <code>output</code>
+as the response to <em>m</em>.
 """ .
 
 
@@ -122,17 +142,16 @@ obj:MessagePort a rdfs:Class ;
     rdfs:label      "Message Port" ;
     rdfs:subClassOf obj:ObjectPort ;
     rdfs:comment    """
-An ObjectPort that consumes or executes its value as a "message".
-The contents of a MessagePort are considered transient and/or time-dependent,
-and only apply for a single invocation of the run method (or equivalent).
-Unlike a ValuePort, a MessagePort may be used to manipulate and access internal
-plugin state.
+An ObjectPort that consumes or executes its value as a "message".  The contents
+of a MessagePort are considered transient and/or time-dependent, and only
+apply for a single invocation of its run method.  Unlike a ValuePort,
+a MessagePort may be used to manipulate and access internal plugin state.
 
 Intuitively, the contents of a MessagePort are commands (which are executed
 or consumed once).
 
-Plugins may respond to messages via another messagePort as specified by
-the obj:respondsWith property.
+Plugins may respond to messages via another messagePort as specified by the
+obj:respondsWith property.
 """ .
 
 
@@ -141,13 +160,13 @@ obj:ObjectType a rdfs:Class ;
 	rdfs:comment """
 Base class for all types of LV2 Objects.
 
-All Object types (instances of this class, which are themselves classes) must
-define a precise binary layout for that type of object, which dictates the
-format of the data following the LV2_Object header.  Pedantically, this class
-refers to the type of memory starting where the LV2_Object header starts,
-i.e. a chunk of memory with any type that is a subClassOf obj:ObjectType
-by definition starts with an LV2_Object.  The area after the header is
-referred to as the object's "body".
+All Object types (instances of this class, which are themselves classes)
+must define a precise binary layout for that type of object, which dictates
+the format of the data following the LV2_Object header.  Pedantically, this
+class refers to the type of memory starting where the LV2_Object header starts,
+i.e. a chunk of memory with any type that is a subClassOf obj:ObjectType by
+definition starts with an LV2_Object.  The area after the header is referred
+to as the object's "body".
 
 The URIs of subclasses of obj:ObjectType are mapped to integers and used as
 the type field of an LV2_Object.  If a plugin or host does not understand
@@ -165,10 +184,10 @@ obj:Reference a obj:ObjectType ;
 	rdfs:comment """
 Reference to a blob.  The actual contents of a reference are opaque and host
 specific, and must not be copied, serialized, or otherwise interpreted by
-a plugin.
+a plugin, except by using functions provided by the host.
 
 References are a special case: a reference object always has type 0.
-The NULL reference has size 0.
+The NULL reference is the unique object with type 0 and size 0.
 """ .
 
 
@@ -180,15 +199,6 @@ string in bytes (not characters).
 """ .
 
 
-obj:Tuple a obj:ObjectType ;
-	rdfs:label "Tuple" ;
-	rdfs:comment """
-A POD heterogeneous sequence of Objects.  A Tuple can contain objects of
-varying type and varying size.  The body of the tuple
-is simply the body of the first element, followed by the body of the
-second, etc., where each is aligned to 32-bits.
-""" .
-
 obj:Vector a obj:ObjectType ;
 	rdfs:label "Vector" ;
 	rdfs:comment """
@@ -196,15 +206,15 @@ A POD homogeneous sequence of objects with equivalent type and size.
 
 The body of a vector begins with
 <pre>
-uint32_t elem_count; // The number of elements in the vector
-uint32_t elem_type;  // The type of each element
+uint16_t elem_count; // The number of elements in the vector
+uint16_t elem_type;  // The type of each element
 </pre>
 followed by <code>elem_count</code> bodies of objects of type
 <code>elem_type</code>, each with equivalent size.  For variably sized
 content types, this size can be calculated using the total byte size of the
 vector, e.g.
 <pre>
-uint32_t elem_size = (vector.size - (2 * sizeof(uint32_t))) / vector.count);
+uint16_t elem_size = (vector.size - (2 * sizeof(uint16_t))) / vector.count);
 </pre>
 Note that it is possible to construct a valid Object for each element of the
 vector, even by an implementation which does not understand <code>type</code>.
@@ -212,17 +222,20 @@ vector, even by an implementation which does not understand <code>type</code>.
 For example, an obj:Vector containing 42 elements of type obj:Int32 looks
 like this in memory:
 <pre>
-uint32_t object_type  = uri_map(obj:Vector)
-uint32_t object_size  = (2 * sizeof(uint32_t)) + (42 * sizeof(int32_t))
-uint32_t elem_count   = 42
-uint32_t elem_type    = uri_map(obj:Int32)
+uint16_t object_type  = uri_map(obj:Vector)
+uint16_t object_size  = (2 * sizeof(uint16_t)) + (42 * sizeof(int32_t))
+uint16_t elem_count   = 42
+uint16_t elem_type    = uri_map(obj:Int32)
 int32_t  contents[42] = ...
 </pre>
 """ .
 
+obj:Bang    a obj:ObjectType ; rdfs:label "Bang (generic activity), size=0" .
+obj:Byte    a obj:ObjectType ; rdfs:label "A byte" .
 obj:Int32   a obj:ObjectType ; rdfs:label "Signed 32-bit Integer" .
-obj:Bool    a obj:ObjectType ; rdfs:label "Same as obj:Int32 (0 = false, 1 = true)" .
+obj:Bool    a obj:ObjectType ; rdfs:label "obj:Int32 where 0=false, 1=true" .
 obj:Float32 a obj:ObjectType ; rdfs:label "32-bit Floating Point Number" .
+obj:Float64 a obj:ObjectType ; rdfs:label "64-bit Floating Point Number" .
 
 
 obj:blobSupport a lv2:Feature ;

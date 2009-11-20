@@ -35,6 +35,8 @@
  * in the documentation of each RDF class), but should match anywhere.
  */
 
+#define LV2_OBJECT_FROM_EVENT(ev) ((LV2_Object*)&((LV2_Event*)ev)->type)
+
 /** An LV2 Object.
  *
  * An "Object" is a generic chunk of memory with a given type and size.
@@ -44,6 +46,13 @@
  * copied (e.g. with memcpy) using the size field, except objects with type 0.
  * An object with type 0 is a reference, and may only be used via the functions
  * provided in LV2_Blob_Support (e.g. it MUST NOT be manually copied).
+ *
+ * Note that an LV2_Object is the latter two fields of an LV2_Event as defined
+ * by the <a href="http://lv2plug.in/ns/ext/event">LV2 events extension</a>.
+ * The host MAY marshal an Event to an Object simply by pointing to the offset
+ * of the 'type' field of the LV2_Event, which is also the type field (i.e. start)
+ * of a valid LV2_Object.  The macro LV2_OBJECT_FROM_EVENT is provided in this
+ * header for this purpose.
  */
 typedef struct _LV2_Object {
 
@@ -53,10 +62,10 @@ typedef struct _LV2_Object {
 	 * Type 0 is a special case which indicates this object
 	 * is a reference and MUST NOT be copied manually.
 	 */
-	uint32_t type;
+	uint16_t type;
 
 	/** The size of this object, not including this header, in bytes. */
-	uint32_t size;
+	uint16_t size;
 
 	/** Size bytes of data follow here */
 	uint8_t body[];
@@ -71,10 +80,10 @@ typedef LV2_Object LV2_Reference;
 typedef struct _LV2_Vector_Body {
 
 	/** The size of each element in the vector */
-	uint32_t elem_count;
+	uint16_t elem_count;
 
 	/** The type of each element in the vector */
-	uint32_t elem_type;
+	uint16_t elem_type;
 
 	/** Elements follow here */
 	uint8_t elems[];
@@ -164,14 +173,14 @@ typedef struct {
 	 * @param destroy Function to destroy a blob of this type.  This function
 	 *     MUST clean up any resources contained in the blob, but MUST NOT
 	 *     attempt to free the memory pointed to by its LV2_Blob* parameter.
-	 * @param type Type of blob to allocate.
+	 * @param type Type of blob to allocate (URI mapped integer).
 	 * @param size Size of blob to allocate in bytes.
 	 */
 	void (*lv2_blob_new)(LV2_Blob_Support_Data data,
 	                     LV2_Reference*        reference,
 	                     LV2_Blob_Destroy      destroy_func,
 	                     uint32_t              type,
-	                     uint32_t              size);
+	                     size_t                size);
 
 	/** Return a pointer to the Blob referred to by @a ref.
 	 *
