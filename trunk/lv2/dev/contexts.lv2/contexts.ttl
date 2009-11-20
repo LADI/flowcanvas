@@ -83,6 +83,12 @@ specification of the context URI.  If a plugin has any contexts, it MUST specify
 the associated context of ALL ports, with the :context port property.""" .
 
 
+ctx:AudioContext a rdfs:Class ;
+	rdfs:subClassOf ctx:Context ;
+	rdfs:comment """
+The context of the core LV2 run method (LV2_Descriptor::run).
+""" .
+
 
 ctx:RollingContext a rdfs:Class ;
 	rdfs:subClassOf ctx:Context ;
