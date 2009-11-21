@@ -78,6 +78,7 @@ Port::Port(boost::shared_ptr<Module> module, const string& name, bool is_input, 
 	_rect = new Gnome::Canvas::Rect(*this, 0, 0, _width, _height);
 	set_border_width(0.0);
 	_rect->property_fill_color_rgba() = color;
+	_rect->property_outline_color_rgba() = color;
 
 	if (_label)
 		_label->raise_to_top();
