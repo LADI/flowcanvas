@@ -142,7 +142,7 @@ lv2ev:generic property for that port is also set.
 ev:inheritsEvent a rdf:Property ;
 	rdfs:domain  lv2:Port ;
 	rdfs:range   lv2:Port ;
-    rdfs:label   "Inherits time stamp type" ;
+    rdfs:label   "Inherits event type" ;
     rdfs:comment """
 Indicates that this output port might pass through events that arrived at some
 other input port (or generate an event of the same type as events arriving at
