@@ -20,7 +20,7 @@ imum:print a lv2:Plugin ;
 	doap:license <http://usefulinc.com/doap/licenses/gpl> ;
 	lv2:pluginProperty lv2:hardRtCapable ;
 	lv2:port [
-		a lv2:InputPort, obj:ValuePort ;
+		a lv2:InputPort, obj:MessagePort ;
 		ctx:context ctx:MessageContext ;
 		lv2:name "Input" ;
 		lv2:index 0 ;

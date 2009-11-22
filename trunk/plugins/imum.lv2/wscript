@@ -51,4 +51,5 @@ def build(bld):
 	build_plugin(bld, 'cxx', 'imum.lv2', 'reverse', ['src/reverse.cpp'])
 	build_plugin(bld, 'cxx', 'imum.lv2', 'sum',     ['src/sum.cpp'])
 	build_plugin(bld, 'cxx', 'imum.lv2', 'print',   ['src/print.cpp'])
+	build_plugin(bld, 'cxx', 'imum.lv2', 'sample',  ['src/sample.cpp'])
 	bld.install_files('${LV2DIR}/imum.lv2', 'manifest.ttl')

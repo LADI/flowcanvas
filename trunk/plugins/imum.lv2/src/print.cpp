@@ -30,6 +30,7 @@ using namespace std;
 static uint32_t bool_type;
 static uint32_t float_type;
 static uint32_t int_type;
+static uint32_t midi_type;
 static uint32_t string_type;
 static uint32_t vec_type;
 
@@ -50,6 +51,7 @@ public:
 		bool_type   = uri_to_id(NULL, LV2_OBJECT_URI "#Bool");
 		float_type  = uri_to_id(NULL, LV2_OBJECT_URI "#Float32");
 		int_type    = uri_to_id(NULL, LV2_OBJECT_URI "#Int32");
+		midi_type   = uri_to_id(NULL, "http://lv2plug.in/ns/ext/midi#MidiEvent");
 		string_type = uri_to_id(NULL, LV2_OBJECT_URI "#String");
 		vec_type    = uri_to_id(NULL, LV2_OBJECT_URI "#Vector");
 	}
@@ -76,6 +78,12 @@ public:
 			printf("%f\n", *(float*)in->body);
 		} else if (in->type == vec_type) {
 			printf("[ ... ]\n");
+		} else if (in->type == midi_type) {
+			printf("MIDI Message:");
+			for (uint16_t i = 0; i < in->size; ++i) {
+				printf(" %X", (unsigned)in->body[i]);
+			}
+			printf("\n");
 		} else {
 			printf("<LV2_Object type=%d size=%d>\n", in->type, in->size);
 		}

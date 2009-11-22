@@ -10,3 +10,4 @@ imum:parse   a lv2:Plugin ; rdfs:seeAlso <parse.ttl>   ; lv2:binary <parse.so> .
 imum:reverse a lv2:Plugin ; rdfs:seeAlso <reverse.ttl> ; lv2:binary <reverse.so> .
 imum:sum     a lv2:Plugin ; rdfs:seeAlso <sum.ttl>     ; lv2:binary <sum.so> .
 imum:print   a lv2:Plugin ; rdfs:seeAlso <print.ttl>   ; lv2:binary <print.so> .
+imum:sample  a lv2:Plugin ; rdfs:seeAlso <sample.ttl>  ; lv2:binary <sample.so> .

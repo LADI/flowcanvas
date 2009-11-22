@@ -30,6 +30,7 @@ imum:reverse a lv2:Plugin ;
 	] , [
 		a lv2:OutputPort, obj:ValuePort ;
 		ctx:context ctx:MessageContext ;
+		obj:asLargeAs "input" ;
 		lv2:name "Output" ;
 		lv2:index 1 ;
 		lv2:symbol "output" ;
