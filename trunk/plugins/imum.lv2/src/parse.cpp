@@ -16,8 +16,8 @@
  */
 
 #include <algorithm>
-#include <iostream>
 #include <ctype.h>
+#include <string.h>
 #include "object.lv2/object.h"
 #include "contexts.lv2/contexts.h"
 #include "uri-map.lv2/uri-map.h"
