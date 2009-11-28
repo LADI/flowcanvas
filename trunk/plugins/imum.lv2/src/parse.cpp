@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <ctype.h>
+#include <stdio.h>
 #include <string.h>
 #include "object.lv2/object.h"
 #include "contexts.lv2/contexts.h"
