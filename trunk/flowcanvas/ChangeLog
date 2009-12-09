@@ -1,3 +1,17 @@
+flowcanvas (0.6.0) unstable; urgency=low
+
+  * Switch to waf build system
+  * Fix compilation with GCC 4.4
+  * Make Canvas::scroll_to_center() public
+  * Add item entered/left signals
+  * Add vertical flow layout w/o port labels (pd style)
+  * Fix some stuck cursor grab issues
+  * Slightly more sophisticated port and module sizing
+  * Resize performance improvements
+  
+ -- Dave Robillard <dave@drobilla.net>  Tue, 08 Dec 2009 20:46:57 -0500
+
+
 flowcanvas (0.5.1) unstable; urgency=low
 
   * Multiple selection
