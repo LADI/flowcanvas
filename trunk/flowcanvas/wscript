@@ -15,7 +15,7 @@ FLOWCANVAS_VERSION = '0.6.0'
 #   0.5.2 = 2,0,0
 #   0.5.3 = 2,1,0
 #   0.6.0 = 3,0,0
-FLOWCANVAS_LIB_VERSION = '3.0.0'
+FLOWCANVAS_LIB_VERSION = '3.1.0'
 
 # Variables for 'waf dist'
 APPNAME = 'flowcanvas'
