@@ -681,7 +681,7 @@ Canvas::port_event(GdkEvent* event, boost::weak_ptr<Port> weak_port)
 	case GDK_BUTTON_PRESS:
 		if (event->button.button == 1) {
 			boost::shared_ptr<Module> module = port->module().lock();
-			if (module && _locked) {
+			if (module && _locked && port->is_input()) {
 				if (port->is_toggled()) {
 					port->toggle();
 					ignore_button_release = true;
