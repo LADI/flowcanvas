@@ -17,6 +17,8 @@ blddir = 'build'
 @before('apply_obj_vars_cc', 'apply_obj_vars_cxx')
 def include_lv2_h(self):
 	lv2coredir = self.bld.path.find_dir('../../lv2/core.lv2')
+	if lv2coredir == None:
+		lv2coredir = self.bld.path.find_dir('lv2/core.lv2')
 	if lv2coredir != None:
 		self.env.append_value('INC_PATHS', lv2coredir)
 
@@ -33,14 +35,16 @@ def set_options(opt):
 	opt.sub_options('ingen')
 	#opt.sub_options('machina')
 
-def sub_config_and_use(conf, name, has_objects = True):
+def sub_config_and_use(conf, name, has_objects = True, pkgname = ''):
 	conf.sub_config(name)
-	autowaf.set_local_lib(conf, name, has_objects)
+	if pkgname == '':
+		pkgname = name
+	autowaf.set_local_lib(conf, pkgname, has_objects)
 
 def configure(conf):
 	autowaf.set_recursive()
 	autowaf.configure(conf)
-	sub_config_and_use(conf, 'lv2/core.lv2', False)
+	sub_config_and_use(conf, 'lv2/core.lv2', False, 'lv2core')
 	sub_config_and_use(conf, 'lv2', False)
 	sub_config_and_use(conf, 'slv2')
 	#sub_config_and_use(conf, 'evoral')
