@@ -26,6 +26,7 @@
 #define LV2_OBJECT_REFERENCE_TYPE 0
 
 #include <stdint.h>
+#include <stddef.h>
 
 /** @file
  * This header defines the code portion of the LV2 Object extension with URI
