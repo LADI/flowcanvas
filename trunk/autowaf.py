@@ -4,11 +4,12 @@
 # Copyright (C) 2008 Dave Robillard
 # Copyright (C) 2008 Nedko Arnaudov
 
-import os
-import misc
 import Configure
 import Options
 import Utils
+import misc
+import os
+import subprocess
 import sys
 from TaskGen import feature, before, after
 
@@ -364,6 +365,56 @@ def build_version_files(header_path, source_path, domain, major, minor, micro):
 		sys.exit(-1)
 		
 	return None
+
+def run_tests(appname, tests):
+	failures = 0
+
+	os.chdir('./build/default')
+	lcov_log = open('lcov.log', 'w')
+
+	# Clear coverage data
+	subprocess.call('lcov -d ./src -z'.split(),
+			stdout=lcov_log, stderr=lcov_log)
+
+	# Run all tests
+	for i in tests:
+		print
+		Utils.pprint('BOLD', 'Running %s test %s' % (appname, i))
+		if subprocess.call(i) == 0:
+			Utils.pprint('GREEN', 'Passed %s %s' % (appname, i))
+		else:
+			failures += 1
+			Utils.pprint('RED', 'Failed %s %s' % (appname, i))
+
+	# Generate coverage data
+	coverage_lcov = open('coverage.lcov', 'w')
+	subprocess.call('lcov --path .. -d ./src -d ./test -b .. -c'.split(),
+			stdout=coverage_lcov, stderr=lcov_log)
+	coverage_lcov.close()
+	
+	# Strip out unwanted stuff
+	coverage_stripped_lcov = open('coverage-stripped.lcov', 'w')
+	subprocess.call('lcov --remove coverage.lcov *boost* c++*'.split(),
+			stdout=coverage_stripped_lcov, stderr=lcov_log)
+	coverage_stripped_lcov.close()
+
+	# Generate HTML coverage output
+	if not os.path.isdir('./coverage'):
+		os.makedirs('./coverage')
+	subprocess.call('genhtml -o coverage coverage-stripped.lcov'.split(),
+			stdout=lcov_log, stderr=lcov_log)
+
+	lcov_log.close()
+
+	print
+	Utils.pprint('BOLD', 'Summary:', sep=''),
+	if failures == 0:
+		Utils.pprint('GREEN', 'All ' + appname + ' tests passed')
+	else:
+		Utils.pprint('RED', str(failures) + ' ' + appname + ' test(s) failed')
+
+	Utils.pprint('BOLD', 'Coverage:', sep='')
+	print os.path.abspath('coverage/index.html')
 
 def shutdown():
 	# This isn't really correct (for packaging), but people asking is annoying
