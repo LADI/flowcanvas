@@ -366,10 +366,18 @@ def build_version_files(header_path, source_path, domain, major, minor, micro):
 		
 	return None
 
-def run_tests(appname, tests):
+def run_tests(ctx, appname, tests):
+	orig_dir = os.path.abspath(os.curdir)
 	failures = 0
+	base = '..'
 
-	os.chdir('./build/default')
+	top_level = os.path.abspath(ctx.curdir) != os.path.abspath(os.curdir)
+	if top_level:
+		os.chdir('./build/default/' + appname)
+		base = '../..'
+	else:
+		os.chdir('./build/default')
+
 	lcov_log = open('lcov.log', 'w')
 
 	# Clear coverage data
@@ -388,7 +396,7 @@ def run_tests(appname, tests):
 
 	# Generate coverage data
 	coverage_lcov = open('coverage.lcov', 'w')
-	subprocess.call('lcov --path .. -d ./src -d ./test -b .. -c'.split(),
+	subprocess.call(('lcov -c -d ./src -d ./test -b ' + base).split(),
 			stdout=coverage_lcov, stderr=lcov_log)
 	coverage_lcov.close()
 	
@@ -415,6 +423,8 @@ def run_tests(appname, tests):
 
 	Utils.pprint('BOLD', 'Coverage:', sep='')
 	print os.path.abspath('coverage/index.html')
+
+	os.chdir(orig_dir)
 
 def shutdown():
 	# This isn't really correct (for packaging), but people asking is annoying

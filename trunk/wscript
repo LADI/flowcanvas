@@ -60,6 +60,10 @@ def build(bld):
 	autowaf.set_recursive()
 	bld.add_subdirs('lv2/core.lv2 lv2 slv2 raul flowcanvas patchage redlandmm ingen plugins/imum.lv2')# evoral machina')
 
+def test(ctx):
+	ctx.recurse('raul')
+	ctx.recurse('slv2')
+
 def shutdown():
 	autowaf.shutdown()
 
