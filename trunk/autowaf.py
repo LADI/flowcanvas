@@ -197,7 +197,7 @@ def configure(conf):
 		append_cxx_flags('-DNDEBUG')
 	if Options.options.strict:
 		conf.env.append_value('CCFLAGS', [ '-std=c99', '-pedantic' ])
-		conf.env.append_value('CXXFLAGS', [ '-ansi', '-Woverloaded-virtual'])
+		conf.env.append_value('CXXFLAGS', [ '-ansi', '-Woverloaded-virtual', '-Wnon-virtual-dtor'])
 		append_cxx_flags('-Wall -Wextra -Wno-unused-parameter')
 	append_cxx_flags('-fPIC -DPIC -fshow-column')
 	g_step = 2
