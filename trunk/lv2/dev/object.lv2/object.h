@@ -210,5 +210,5 @@ typedef struct {
 } LV2_Blob_Support;
 
 
-#endif // LV2_OBJECT_H
+#endif /* LV2_OBJECT_H */
 

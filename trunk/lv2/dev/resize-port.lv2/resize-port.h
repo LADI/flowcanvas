@@ -42,5 +42,5 @@ typedef struct {
 
 } LV2_Resize_Port_Feature;
 
-#endif // LV2_RESIZE_PORT_H
+#endif /* LV2_RESIZE_PORT_H */
 

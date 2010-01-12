@@ -84,5 +84,5 @@ typedef struct {
 } LV2_URI_Map_Feature;
 
 
-#endif // LV2_URI_MAP_H
+#endif /* LV2_URI_MAP_H */
 

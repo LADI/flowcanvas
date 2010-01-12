@@ -61,5 +61,5 @@ typedef struct {
 } LV2_Polymorphic_Feature;
 
 
-#endif // LV2_POLYMORPHIC_PORT_H
+#endif /* LV2_POLYMORPHIC_PORT_H */
 

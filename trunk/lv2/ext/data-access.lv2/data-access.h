@@ -55,5 +55,5 @@ typedef struct {
 } LV2_Extension_Data_Feature;
 
 
-#endif // LV2_DATA_ACCESS_H
+#endif /* LV2_DATA_ACCESS_H */
 

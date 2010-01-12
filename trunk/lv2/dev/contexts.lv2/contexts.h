@@ -62,5 +62,5 @@ typedef struct {
 
 } LV2MessageContext;
 
-#endif // LV2_CONTEXTS_H
+#endif /* LV2_CONTEXTS_H */
 

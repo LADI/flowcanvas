@@ -256,5 +256,5 @@ typedef struct {
 } LV2_Event_Feature;
 
 
-#endif // LV2_EVENT_H
+#endif /* LV2_EVENT_H */
 

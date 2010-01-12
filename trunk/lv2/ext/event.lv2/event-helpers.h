@@ -239,5 +239,5 @@ lv2_event_write_event(LV2_Event_Iterator* iter,
 	return true;
 }
 
-#endif // LV2_EVENT_HELPERS_H
+#endif /* LV2_EVENT_HELPERS_H */
 
