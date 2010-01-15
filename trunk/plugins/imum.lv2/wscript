@@ -13,23 +13,22 @@ srcdir = '.'
 blddir = 'build'
 
 def set_options(opt):
-	opt.tool_options('compiler_cc')
+	autowaf.set_options(opt)
 	opt.tool_options('compiler_cxx')
 
 def configure(conf):
-	conf.check_tool('compiler_cc')
+	autowaf.configure(conf)
 	conf.check_tool('compiler_cxx')
 	autowaf.check_pkg(conf, 'lv2core', uselib_store='LV2CORE', mandatory=True)
 	conf.env.append_value('CCFLAGS', '-std=c99')
 	pat = conf.env['shlib_PATTERN']
 	ext = pat[pat.rfind('.'):]
 	conf.env.append_value('shlib_EXTENSION', ext)
-	
-def build_plugin(bld, lang, bundle, name, source):
+
+def build_plugin_lib(bld, lang, bundle, name, source):
 	penv = bld.env.copy()
 	penv['shlib_PATTERN'] = '%s' + bld.env['shlib_EXTENSION'][0]
 
-	# Library
 	ext = 'c'
 	if lang != 'cc':
 		ext = 'cpp'
@@ -42,14 +41,35 @@ def build_plugin(bld, lang, bundle, name, source):
 	obj.target       = name
 	obj.install_path = '${LV2DIR}/' + bundle
 
-	# Data
+def build_plugin_data(bld, bundle, name):
 	data_file = '%s.ttl' % name
 	bld.install_files('${LV2DIR}/' + bundle, data_file)
+
+def build_plugin(bld, lang, bundle, name, source):
+	build_plugin_lib(bld, lang, bundle, name, source)
+	build_plugin_data(bld, bundle, name)
+	
+def build_arith_data(bld, bundle, sym, operator):
+	obj              = bld.new_task_gen('subst')
+	obj.source       = 'arith.ttl.in'
+	obj.target       = sym.lower() + '.ttl'
+	obj.install_path = ''
+	obj.dict = {
+		'SYMBOL'   : sym,
+		'NAME'     : sym.title(),
+		'TINYNAME' : operator
+	}
+	build_plugin_data(bld, bundle, sym)
 
 def build(bld):
 	build_plugin(bld, 'cxx', 'imum.lv2', 'parse',   ['src/parse.cpp'])
 	build_plugin(bld, 'cxx', 'imum.lv2', 'reverse', ['src/reverse.cpp'])
-	build_plugin(bld, 'cxx', 'imum.lv2', 'sum',     ['src/sum.cpp'])
 	build_plugin(bld, 'cxx', 'imum.lv2', 'print',   ['src/print.cpp'])
 	build_plugin(bld, 'cxx', 'imum.lv2', 'sample',  ['src/sample.cpp'])
+	
+	build_plugin_lib(bld, 'cxx', 'imum.lv2', 'arith', ['src/arith.cpp'])
+	build_arith_data(bld, 'imum.lv2', 'sum', '+')
+	build_arith_data(bld, 'imum.lv2', 'difference', '-')
+	build_arith_data(bld, 'imum.lv2', 'product', '*')
+	
 	bld.install_files('${LV2DIR}/imum.lv2', 'manifest.ttl')

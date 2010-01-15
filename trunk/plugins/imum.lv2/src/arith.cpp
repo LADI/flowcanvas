@@ -30,34 +30,41 @@ static uint32_t int_type;
 static uint32_t float_type;
 static uint32_t vec_type;
 
-class Sum;
-typedef LV2::Plugin<
-	Sum,
-	LV2::Ext::UriMap<true>,
-	LV2::Ext::MessageContext<false>,
-	LV2::Ext::ResizePort<true>
-> SumBase;
+template<typename R, typename A, typename B>
+struct SumOp { static inline R op(const A* a, const B* b) { return (*a) + (*b); } };
 
-class Sum : public SumBase
+template<typename R, typename A, typename B>
+struct DiffOp { static inline R op(const A* a, const B* b) { return (*a) - (*b); } };
+
+template<typename R, typename A, typename B>
+struct ProdOp { static inline R op(const A* a, const B* b) { return (*a) * (*b); } };
+
+template<template<typename R, typename A, typename B> class Op>
+class Arith : public LV2::Plugin<
+		Arith<Op>,
+		LV2::Ext::UriMap<true>,
+		LV2::Ext::MessageContext<false>,
+		LV2::Ext::ResizePort<true> >
 {
 public:
-	Sum(double rate, const char* bundle, const LV2::Feature* const* features)
-		: SumBase(2)
+	typedef LV2::Plugin<
+			Arith<Op>,
+			LV2::Ext::UriMap<true>,
+			LV2::Ext::MessageContext<false>,
+			LV2::Ext::ResizePort<true> >
+		Base;
+
+	Arith(double rate, const char* bundle, const LV2::Feature* const* features)
+		: Base(2)
 	{
-		int_type   = uri_to_id(NULL, LV2_OBJECT_URI "#Int32");
-		float_type = uri_to_id(NULL, LV2_OBJECT_URI "#Float32");
-		vec_type   = uri_to_id(NULL, LV2_OBJECT_URI "#Vector");
+		int_type   = Base::uri_to_id(NULL, LV2_OBJECT_URI "#Int32");
+		float_type = Base::uri_to_id(NULL, LV2_OBJECT_URI "#Float32");
+		vec_type   = Base::uri_to_id(NULL, LV2_OBJECT_URI "#Vector");
 	}
 
-	template <typename R, typename A, typename B>
-	static inline R sum(A* a, B* b) {
-		cout << *a << " + " << *b << endl;
-		return *a + *b;
-	}
-
-	template <typename T>
+	template<typename T>
 	static void set_output_type(LV2_Handle instance, LV2_Object* out, uint32_t type) {
-		resize_port(instance, 2, sizeof(LV2_Object) + sizeof(T));
+		Base::resize_port(instance, 2, sizeof(LV2_Object) + sizeof(T));
 		out->type = type;
 		out->size = sizeof(T);
 	}
@@ -66,19 +73,22 @@ public:
 	                            const void* valid_inputs,
 	                            void*       valid_outputs)
 	{
-		Sum*        me  = reinterpret_cast<Sum*>(instance);
-		LV2_Object* a   = me->p<LV2_Object>(0);
-		LV2_Object* b   = me->p<LV2_Object>(1);
-		LV2_Object* out = me->p<LV2_Object>(2);
+		Arith<Op>*  me  = reinterpret_cast<Arith<Op>*>(instance);
+		//LV2_Object* a   = me->Base::p<LV2_Object>(0);
+		//LV2_Object* b   = me->Base::p<LV2_Object>(1);
+		//LV2_Object* out = me->Base::p<LV2_Object>(2);
+		LV2_Object* a   = reinterpret_cast<LV2_Object*&>(me->m_ports[0]);
+		LV2_Object* b   = reinterpret_cast<LV2_Object*&>(me->m_ports[1]);
+		LV2_Object* out = reinterpret_cast<LV2_Object*&>(me->m_ports[2]);
 
 		if (a->type == int_type) {
 			if (b->type == int_type) { // int + int => int
 				set_output_type<int32_t>(instance, out, int_type);
-				*(int32_t*)out->body = sum<int32_t,int32_t,int32_t>(
+				*(int32_t*)out->body = Op<int32_t,int32_t,int32_t>::op(
 						(int32_t*)a->body, (int32_t*)b->body);
 			} else if (b->type == float_type) { // int + float => float
 				set_output_type<float>(instance, out, float_type);
-				*(float*)out->body = sum<float,int32_t,float>(
+				*(float*)out->body = Op<float,int32_t,float>::op(
 						(int32_t*)a->body, (float*)b->body);
 			} else {
 				cout << "Unknown type for b (a is int)" << endl;
@@ -86,13 +96,13 @@ public:
 		} else if (a->type == float_type) {
 			if (b->type == int_type) { // float + int => float
 				set_output_type<float>(instance, out, float_type);
-				resize_port(instance, 2, sizeof(LV2_Object) + sizeof(float));
-				*(float*)out->body = sum<float,float,int32_t>(
+				Base::resize_port(instance, 2, sizeof(LV2_Object) + sizeof(float));
+				*(float*)out->body = Op<float,float,int32_t>::op(
 						(float*)a->body, (int32_t*)b->body);
 			} else if (b->type == float_type) { // float + float => float
 				set_output_type<float>(instance, out, float_type);
-				resize_port(instance, 2, sizeof(LV2_Object) + sizeof(float));
-				*(float*)out->body = sum<float,float,float>(
+				Base::resize_port(instance, 2, sizeof(LV2_Object) + sizeof(float));
+				*(float*)out->body = Op<float,float,float>::op(
 						(float*)a->body, (float*)b->body);
 			} else {
 				cout << "Unknown type for b (a is float)" << endl;
@@ -101,11 +111,12 @@ public:
 			cout << "Unknown type for a" << endl;
 		}
 
-
 		lv2_contexts_set_port_valid(valid_outputs, 2);
 
 		return 0;
 	}
 };
 
-static const unsigned plugin_class = Sum::register_class(IMUM_URI "/sum");
+static const unsigned sum_class        = Arith<SumOp>::register_class(IMUM_URI "/sum");
+static const unsigned difference_class = Arith<DiffOp>::register_class(IMUM_URI "/difference");
+static const unsigned product_class    = Arith<ProdOp>::register_class(IMUM_URI "/product");
