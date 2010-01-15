@@ -65,7 +65,6 @@ def build(bld):
 	build_plugin(bld, 'cxx', 'lolep.lv2', 'parse',   ['src/parse.cpp'])
 	build_plugin(bld, 'cxx', 'lolep.lv2', 'reverse', ['src/reverse.cpp'])
 	build_plugin(bld, 'cxx', 'lolep.lv2', 'print',   ['src/print.cpp'])
-	build_plugin(bld, 'cxx', 'lolep.lv2', 'sample',  ['src/sample.cpp'])
 	
 	build_plugin_lib(bld, 'cxx', 'lolep.lv2', 'arith', ['src/arith.cpp'])
 	build_arith_data(bld, 'lolep.lv2', 'sum', '+')
