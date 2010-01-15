@@ -1,0 +1,51 @@
+@prefix ctx:  <http://lv2plug.in/ns/dev/contexts#> .
+@prefix doap: <http://usefulinc.com/ns/doap#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix imum: <http://drobilla.net/software/plugins/imum.lv2/> .
+@prefix lv2:  <http://lv2plug.in/ns/lv2core#> .
+@prefix obj:  <http://lv2plug.in/ns/dev/object#> .
+@prefix pg:   <http://lv2plug.in/ns/dev/port-groups#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rsz:  <http://lv2plug.in/ns/dev/resize-port#> .
+@prefix dev:  <http://lv2plug.in/ns/dev/> .
+imum:@SYMBOL@ a lv2:Plugin ;
+	a lv2:UtilityPlugin ;
+	doap:name "@NAME@" ;
+	lv2:symbol "@SYMBOL@" ;
+	dev:tiny-name "@TINYNAME@" ;
+	doap:maintainer [
+		foaf:name "Dave Robillard" ;
+		foaf:homepage <http://drobilla.net/> ;
+		foaf:mbox <mailto:dave@drobilla.net> ;
+	] ;
+    lv2:requiredFeature ctx:MessageContext ;
+	ctx:requiredContext ctx:MessageContext ;
+	doap:license <http://usefulinc.com/doap/licenses/gpl> ;
+	lv2:pluginProperty lv2:hardRtCapable ;
+	lv2:port [
+		a lv2:InputPort, obj:ValuePort ;
+		ctx:context ctx:MessageContext ;
+		lv2:index 0 ;
+		lv2:symbol "a" ;
+		lv2:name "A" ;
+		lv2:default 0.0 ;
+		rdfs:comment """Expects a number, or a vector of numbers""" ;
+	] , [
+		a lv2:InputPort, obj:ValuePort ;
+		ctx:context ctx:MessageContext ;
+		lv2:index 1 ;
+		lv2:symbol "b" ;
+		lv2:name "B" ;
+		lv2:default 0.0 ;
+		rdfs:comment """Expects a number, or a vector of numbers""" ;
+	] , [
+		a lv2:OutputPort, obj:ValuePort ;
+		ctx:context ctx:MessageContext ;
+		rsz:asLargeAs "a" , "b" ;
+		lv2:name "A @TINYNAME@ B" ;
+		lv2:index 2 ;
+		lv2:symbol "sum" ;
+        lv2:default 0.0 ;
+		rdfs:comment """Result in the least lossy possible format.""" ;
+	] .
+
