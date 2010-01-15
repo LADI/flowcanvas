@@ -5,7 +5,7 @@ import autowaf
 IMUM_VERSION = '0.0.0'
 
 # Variables for 'waf dist'
-APPNAME = 'imum.lv2'
+APPNAME = 'lolep.lv2'
 VERSION = IMUM_VERSION
 
 # Mandatory variables
@@ -62,14 +62,14 @@ def build_arith_data(bld, bundle, sym, operator):
 	build_plugin_data(bld, bundle, sym)
 
 def build(bld):
-	build_plugin(bld, 'cxx', 'imum.lv2', 'parse',   ['src/parse.cpp'])
-	build_plugin(bld, 'cxx', 'imum.lv2', 'reverse', ['src/reverse.cpp'])
-	build_plugin(bld, 'cxx', 'imum.lv2', 'print',   ['src/print.cpp'])
-	build_plugin(bld, 'cxx', 'imum.lv2', 'sample',  ['src/sample.cpp'])
+	build_plugin(bld, 'cxx', 'lolep.lv2', 'parse',   ['src/parse.cpp'])
+	build_plugin(bld, 'cxx', 'lolep.lv2', 'reverse', ['src/reverse.cpp'])
+	build_plugin(bld, 'cxx', 'lolep.lv2', 'print',   ['src/print.cpp'])
+	build_plugin(bld, 'cxx', 'lolep.lv2', 'sample',  ['src/sample.cpp'])
 	
-	build_plugin_lib(bld, 'cxx', 'imum.lv2', 'arith', ['src/arith.cpp'])
-	build_arith_data(bld, 'imum.lv2', 'sum', '+')
-	build_arith_data(bld, 'imum.lv2', 'difference', '-')
-	build_arith_data(bld, 'imum.lv2', 'product', '*')
+	build_plugin_lib(bld, 'cxx', 'lolep.lv2', 'arith', ['src/arith.cpp'])
+	build_arith_data(bld, 'lolep.lv2', 'sum', '+')
+	build_arith_data(bld, 'lolep.lv2', 'difference', '-')
+	build_arith_data(bld, 'lolep.lv2', 'product', '*')
 	
-	bld.install_files('${LV2DIR}/imum.lv2', 'manifest.ttl')
+	bld.install_files('${LV2DIR}/lolep.lv2', 'manifest.ttl')

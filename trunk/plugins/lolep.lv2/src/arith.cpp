@@ -1,12 +1,12 @@
-/* This file is part of Imum.
+/* This file is part of Lolep.
  * Copyright (C) 2009 Dave Robillard <http://drobilla.net>
  *
- * Imum is free software; you can redistribute it and/or modify it under the
+ * Lolep is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
  * Foundation; either version 2 of the License, or (at your option) any later
  * version.
  *
- * Imum is distributed in the hope that it will be useful, but WITHOUT ANY
+ * Lolep is distributed in the hope that it will be useful, but WITHOUT ANY
  * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE.  See the GNU General Public License for details.
  *
@@ -20,7 +20,7 @@
 #include "object.lv2/object.h"
 #include "contexts.lv2/contexts.h"
 #include "uri-map.lv2/uri-map.h"
-#include "imum.hpp"
+#include "lolep.hpp"
 #include "LV2Plugin.hpp"
 #include "LV2Extensions.hpp"
 

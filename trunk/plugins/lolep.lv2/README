@@ -1,0 +1,8 @@
+Lolep (LOw LEvel Plugins) is a collection of small, low-level LV2 plugins
+to perform basic functions such as arithmetic.  Most are purely functional
+and likely most useful for building larger components (e.g. in code, or in
+a modular environment).
+
+Lolep plugins work with the LV2 Object extension to work polymorphically
+with any applicable data types (e.g. the sum plugin can sum controls, audio
+buffers, controls and audio buffers, vectors of arbitrary size, integers, etc.)

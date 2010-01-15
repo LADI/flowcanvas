@@ -1,18 +1,15 @@
-@prefix ctx:  <http://lv2plug.in/ns/dev/contexts#> .
-@prefix doap: <http://usefulinc.com/ns/doap#> .
-@prefix foaf: <http://xmlns.com/foaf/0.1/> .
-@prefix imum: <http://drobilla.net/software/plugins/imum.lv2/> .
-@prefix lv2:  <http://lv2plug.in/ns/lv2core#> .
-@prefix obj:  <http://lv2plug.in/ns/dev/object#> .
-@prefix pg:   <http://lv2plug.in/ns/dev/port-groups#> .
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix rsz:  <http://lv2plug.in/ns/dev/resize-port#> .
-@prefix dev:  <http://lv2plug.in/ns/dev/> .
-imum:@SYMBOL@ a lv2:Plugin ;
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix lolep: <http://drobilla.net/software/plugins/lolep.lv2/> .
+@prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
+@prefix obj:   <http://lv2plug.in/ns/dev/object#> .
+@prefix pg:    <http://lv2plug.in/ns/dev/port-groups#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix ctx:   <http://lv2plug.in/ns/dev/contexts#> .
+
+lolep:sum a lv2:Plugin ;
 	a lv2:UtilityPlugin ;
-	doap:name "@NAME@" ;
-	lv2:symbol "@SYMBOL@" ;
-	dev:tiny-name "@TINYNAME@" ;
+	doap:name "Sum" ;
 	doap:maintainer [
 		foaf:name "Dave Robillard" ;
 		foaf:homepage <http://drobilla.net/> ;
@@ -42,10 +39,13 @@ imum:@SYMBOL@ a lv2:Plugin ;
 		a lv2:OutputPort, obj:ValuePort ;
 		ctx:context ctx:MessageContext ;
 		rsz:asLargeAs "a" , "b" ;
-		lv2:name "A @TINYNAME@ B" ;
+		lv2:name "A + B" ;
 		lv2:index 2 ;
 		lv2:symbol "sum" ;
         lv2:default 0.0 ;
-		rdfs:comment """Result in the least lossy possible format.""" ;
-	] .
+		rdfs:comment """Sum of inputs in the least lossy format possible.""" ;
+	] ;
+    rdfs:comment """
+Sums two numbers, a number and a vector of numbers, or two vectors of numbers.
+""" .
 
