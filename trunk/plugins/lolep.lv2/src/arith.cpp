@@ -82,11 +82,11 @@ public:
 		LV2_Object* out = reinterpret_cast<LV2_Object*&>(me->m_ports[2]);
 
 		if (a->type == int_type) {
-			if (b->type == int_type) { // int + int => int
+			if (b->type == int_type) { // int (+) int => int
 				set_output_type<int32_t>(instance, out, int_type);
 				*(int32_t*)out->body = Op<int32_t,int32_t,int32_t>::op(
 						(int32_t*)a->body, (int32_t*)b->body);
-			} else if (b->type == float_type) { // int + float => float
+			} else if (b->type == float_type) { // int (+) float => float
 				set_output_type<float>(instance, out, float_type);
 				*(float*)out->body = Op<float,int32_t,float>::op(
 						(int32_t*)a->body, (float*)b->body);
@@ -94,12 +94,12 @@ public:
 				cout << "Unknown type for b (a is int)" << endl;
 			}
 		} else if (a->type == float_type) {
-			if (b->type == int_type) { // float + int => float
+			if (b->type == int_type) { // float (+) int => float
 				set_output_type<float>(instance, out, float_type);
 				Base::resize_port(instance, 2, sizeof(LV2_Object) + sizeof(float));
 				*(float*)out->body = Op<float,float,int32_t>::op(
 						(float*)a->body, (int32_t*)b->body);
-			} else if (b->type == float_type) { // float + float => float
+			} else if (b->type == float_type) { // float (+) float => float
 				set_output_type<float>(instance, out, float_type);
 				Base::resize_port(instance, 2, sizeof(LV2_Object) + sizeof(float));
 				*(float*)out->body = Op<float,float,float>::op(
