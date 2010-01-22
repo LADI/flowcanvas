@@ -115,9 +115,12 @@ Canvas::set_zoom(double pix_per_unit)
 void
 Canvas::scroll_to_center()
 {
-	int win_width, win_height;
+	int win_width  = 0;
+	int win_height = 0;
+
 	Glib::RefPtr<Gdk::Window> win = get_window();
-	win->get_size(win_width, win_height);
+	if (win)
+		win->get_size(win_width, win_height);
 
 	scroll_to((int)((_width - win_width) / 2.0),
 	          (int)((_height - win_height) / 2.0));
