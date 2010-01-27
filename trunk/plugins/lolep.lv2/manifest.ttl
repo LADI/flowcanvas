@@ -8,7 +8,6 @@
 
 lolep:parse      a lv2:Plugin ; rdfs:seeAlso <parse.ttl>      ; lv2:binary <parse.so> .
 lolep:print      a lv2:Plugin ; rdfs:seeAlso <print.ttl>      ; lv2:binary <print.so> .
-lolep:sample     a lv2:Plugin ; rdfs:seeAlso <sample.ttl>     ; lv2:binary <sample.so> .
 
 lolep:sum        a lv2:Plugin ; rdfs:seeAlso <sum.ttl>        ; lv2:binary <arith.so> .
 lolep:difference a lv2:Plugin ; rdfs:seeAlso <difference.ttl> ; lv2:binary <arith.so> .
