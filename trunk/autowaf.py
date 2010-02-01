@@ -297,7 +297,7 @@ def build_pc(bld, name, version, libs):
 	obj.dict = {
 		'prefix'           : pkg_prefix,
 		'exec_prefix'      : '${prefix}',
-		'libdir'           : '${exec_prefix}/lib',
+		'libdir'           : '${prefix}/' + bld.env['LIBDIRNAME'],
 		'includedir'       : '${prefix}/include',
 		name + '_VERSION'  : version,
 	}
