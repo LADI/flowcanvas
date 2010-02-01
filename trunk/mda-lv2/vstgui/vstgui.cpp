@@ -3755,21 +3755,24 @@ bool CBitmap::openPng (const char* path)
 	fread(header, 1, 8, fp);
 	if (png_sig_cmp(header, 0, 8)) {
 		fprintf(stderr, "File not recognized as a PNG image");
+		fclose(fp);
 		return false;
 	}
 
 	pngRead = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-    if (!pngRead) {
+	if (!pngRead) {
 		fprintf(stderr, "Unable to initialize libpng\n");
+		fclose(fp);
 		return false;
 	}
 
 	pngInfo = png_create_info_struct(pngRead);
-    if (!pngInfo) {
-        png_destroy_read_struct(&pngRead, NULL, NULL);
+	if (!pngInfo) {
+		png_destroy_read_struct(&pngRead, NULL, NULL);
 		pngRead = NULL;
-        return false;
-    }
+		fclose(fp);
+		return false;
+	}
 
 	png_init_io(pngRead, fp);
 	png_set_sig_bytes(pngRead, 8);

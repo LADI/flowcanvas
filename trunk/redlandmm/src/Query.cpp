@@ -59,6 +59,7 @@ Query::run(World& world, Model& model, Glib::ustring base_uri_str) const
 
 	if (!results) {
 		cerr << "Failed query:" << endl << _query << endl;
+		free(locale);
 		return result; /* Return an empty Results */
 	}
 
