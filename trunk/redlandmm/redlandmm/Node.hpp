@@ -77,6 +77,7 @@ public:
 	Glib::ustring to_turtle_token() const;
 
 	bool is_resource() const;
+	bool is_blank() const;
 
 	bool is_int() const;
 	int  to_int() const;

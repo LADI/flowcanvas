@@ -143,6 +143,13 @@ Node::is_resource() const
 
 
 bool
+Node::is_blank() const
+{
+	return _c_obj && librdf_node_is_blank(_c_obj);
+}
+
+
+bool
 Node::is_int() const
 {
 	if (_c_obj && librdf_node_get_type(_c_obj) == LIBRDF_NODE_TYPE_LITERAL) {
