@@ -12,3 +12,7 @@ lolep:print      a lv2:Plugin ; rdfs:seeAlso <print.ttl>      ; lv2:binary <prin
 lolep:sum        a lv2:Plugin ; rdfs:seeAlso <sum.ttl>        ; lv2:binary <arith.so> .
 lolep:difference a lv2:Plugin ; rdfs:seeAlso <difference.ttl> ; lv2:binary <arith.so> .
 lolep:product    a lv2:Plugin ; rdfs:seeAlso <product.ttl>    ; lv2:binary <arith.so> .
+
+lolep:PrimitivePlugin a rdfs:Class ;
+    rdfs:subClassOf lv2:Plugin ;
+    rdfs:label "Primitive" .

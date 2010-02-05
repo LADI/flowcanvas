@@ -8,7 +8,7 @@
 @prefix ctx:   <http://lv2plug.in/ns/dev/contexts#> .
 
 lolep:sum a lv2:Plugin ;
-	a lv2:UtilityPlugin ;
+	a lolep:PrimitivePlugin ;
 	doap:name "Sum" ;
 	doap:maintainer [
 		foaf:name "Dave Robillard" ;

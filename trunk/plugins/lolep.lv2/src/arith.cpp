@@ -96,12 +96,10 @@ public:
 		} else if (a->type == float_type) {
 			if (b->type == int_type) { // float (+) int => float
 				set_output_type<float>(instance, out, float_type);
-				Base::resize_port(instance, 2, sizeof(LV2_Object) + sizeof(float));
 				*(float*)out->body = Op<float,float,int32_t>::op(
 						(float*)a->body, (int32_t*)b->body);
 			} else if (b->type == float_type) { // float (+) float => float
 				set_output_type<float>(instance, out, float_type);
-				Base::resize_port(instance, 2, sizeof(LV2_Object) + sizeof(float));
 				*(float*)out->body = Op<float,float,float>::op(
 						(float*)a->body, (float*)b->body);
 			} else {

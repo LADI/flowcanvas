@@ -9,7 +9,7 @@
 @prefix rsz:   <http://lv2plug.in/ns/dev/resize-port#> .
 @prefix dev:   <http://lv2plug.in/ns/dev/> .
 lolep:@SYMBOL@ a lv2:Plugin ;
-	a lv2:UtilityPlugin ;
+	a lolep:PrimitivePlugin ;
 	doap:name "@NAME@" ;
 	lv2:symbol "@SYMBOL@" ;
 	dev:tiny-name "@TINYNAME@" ;
