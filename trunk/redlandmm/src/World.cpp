@@ -20,8 +20,6 @@
 #include "redlandmm/World.hpp"
 #include "redlandmm/Node.hpp"
 
-#define U(x) ((const unsigned char*)(x))
-
 using namespace std;
 
 namespace Redland {

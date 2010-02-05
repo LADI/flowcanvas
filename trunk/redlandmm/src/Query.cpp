@@ -21,6 +21,8 @@
 #include "redlandmm/Query.hpp"
 #include "redlandmm/Model.hpp"
 
+#define CUC(x) ((const unsigned char*)(x))
+
 using namespace std;
 
 namespace Redland {
@@ -41,10 +43,10 @@ Query::run(World& world, Model& model, Glib::ustring base_uri_str) const
 		base_uri_str = model.base_uri().to_c_string();
 
 	librdf_uri* base_uri = librdf_new_uri(world.world(),
-				(const unsigned char*)base_uri_str.c_str());
+				CUC(base_uri_str.c_str()));
 
 	librdf_query* q = librdf_new_query(world.world(), "sparql",
-		NULL, (unsigned char*)_query.c_str(), base_uri);
+		NULL, CUC(_query.c_str()), base_uri);
 
 	if (!q) {
 		cerr << "Unable to create query:" << endl << _query << endl;
@@ -68,7 +70,8 @@ Query::run(World& world, Model& model, Glib::ustring base_uri_str) const
 		Bindings bindings;
 
 		for (int i=0; i < librdf_query_results_get_bindings_count(results); i++) {
-			const char*  name  = (char*)librdf_query_results_get_binding_name(results, i);
+			const char* name = static_cast<const char*>(
+					librdf_query_results_get_binding_name(results, i));
 			librdf_node* value = librdf_query_results_get_binding_value(results, i);
 
 			if (name && value)

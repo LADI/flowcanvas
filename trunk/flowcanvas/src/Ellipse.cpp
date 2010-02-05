@@ -137,7 +137,7 @@ void
 Ellipse::zoom(double z)
 {
 	if (_label)
-		_label->property_size() = static_cast<int>(floor((double)9000.0f * z));
+		_label->property_size() = static_cast<int>(floor(9000.0 * z));
 }
 
 
