@@ -432,6 +432,14 @@ Canvas::remove_item(boost::shared_ptr<Item> item)
 		}
 	}
 
+	// Remove children ports from selection if item is a module
+	boost::shared_ptr<Module> module = boost::dynamic_pointer_cast<Module>(item);
+	if (module) {
+		for (PortVector::iterator i = module->ports().begin(); i != module->ports().end(); ++i) {
+			unselect_port(*i);
+		}
+	}
+
 	// Remove from items
 	for (ItemList::iterator i = _items.begin(); i != _items.end(); ++i) {
 		if (*i == item) {
