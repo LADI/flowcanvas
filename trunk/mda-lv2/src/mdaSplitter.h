@@ -12,7 +12,17 @@
 class mdaSplitterProgram
 {
 public:
-  mdaSplitterProgram();
+  mdaSplitterProgram()
+  {
+    param[0] = 0.10f;  //mode
+    param[1] = 0.50f;  //freq
+    param[2] = 0.25f;  //freq mode
+    param[3] = 0.50f;  //level (was 2)
+    param[4] = 0.50f;  //level mode
+    param[5] = 0.50f;  //envelope
+    param[6] = 0.50f;  //gain
+    strcpy(name, "Frequency/Level Splitter");
+  }
 private:
   friend class mdaSplitter;
   float param[NPARAMS];
@@ -24,19 +34,18 @@ class mdaSplitter : public AudioEffectX
 {
 public:
   mdaSplitter(audioMasterCallback audioMaster);
-  ~mdaSplitter();
 
   virtual void  process(float **inputs, float **outputs, LvzInt32 sampleFrames);
   virtual void  processReplacing(float **inputs, float **outputs, LvzInt32 sampleFrames);
   virtual void  setProgram(LvzInt32 program);
   virtual void  setProgramName(char *name);
   virtual void  getProgramName(char *name);
-	virtual bool getProgramNameIndexed (LvzInt32 category, LvzInt32 index, char* name);
-  virtual void  setParameter(LvzInt32 index, float value);
-  virtual float getParameter(LvzInt32 index);
-  virtual void  getParameterLabel(LvzInt32 index, char *label);
-  virtual void  getParameterDisplay(LvzInt32 index, char *text);
-  virtual void  getParameterName(LvzInt32 index, char *text);
+	virtual bool getProgramNameIndexed (LvzInt32 category, LvzInt32 which, char* name);
+  virtual void  setParameter(LvzInt32 which, float value);
+  virtual float getParameter(LvzInt32 which);
+  virtual void  getParameterLabel(LvzInt32 which, char *label);
+  virtual void  getParameterDisplay(LvzInt32 which, char *text);
+  virtual void  getParameterName(LvzInt32 which, char *text);
   virtual void  suspend();
   virtual void  resume();
 
@@ -46,7 +55,7 @@ public:
 	virtual LvzInt32 getVendorVersion() { return 1000; }
 
 protected:
-  mdaSplitterProgram *programs;
+  mdaSplitterProgram programs[NPROGS];
 
   ///global internal variables
   float freq, fdisp, buf0, buf1, buf2, buf3;  //filter
