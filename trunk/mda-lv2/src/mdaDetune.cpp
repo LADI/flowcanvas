@@ -16,21 +16,11 @@ AudioEffect *createEffectInstance(audioMasterCallback audioMaster)
   return new mdaDetune(audioMaster);
 }
 
-mdaDetuneProgram::mdaDetuneProgram() ///default program settings
-{
-  param[0] = 0.40f;  //fine
-  param[1] = 0.40f;  //mix
-  param[2] = 0.50f;  //output
-  param[3] = 0.50f;  //chunksize
-  strcpy(name, "Stereo Detune");
-}
-
-bool  mdaDetune::getProductString(char* text) { strcpy(text, "MDA Detune"); return true; }
+bool  mdaDetune::getProductString(char* text) { strcpy(text, "mda Detune"); return true; }
 bool  mdaDetune::getVendorString(char* text)  { strcpy(text, "mda"); return true; }
 bool  mdaDetune::getEffectName(char* name)    { strcpy(name, "Detune"); return true; }
 
 mdaDetune::mdaDetune(audioMasterCallback audioMaster): AudioEffectX(audioMaster, NPROGS, NPARAMS)
-, programs(0), buf(0), win(0)
 {
   setNumInputs(2);
   setNumOutputs(2);
@@ -39,21 +29,25 @@ mdaDetune::mdaDetune(audioMasterCallback audioMaster): AudioEffectX(audioMaster,
   canProcessReplacing();
 
   ///initialise...
-  buf = new float[BUFMAX];
-  win = new float[BUFMAX];
   buflen=0;
 
-  programs = new mdaDetuneProgram[NPROGS];
-  setProgram(0);
-
-  ///differences from default program...
+  programs[0].param[0] = 0.20f; //fine
+  programs[0].param[1] = 0.90f; //mix
+  programs[0].param[2] = 0.50f; //output
+  programs[0].param[3] = 0.50f; //chunksize
+  strcpy(programs[0].name, "Stereo Detune");
   programs[1].param[0] = 0.20f;
-  programs[3].param[0] = 0.90f;
+  programs[1].param[1] = 0.90f;
+  programs[1].param[2] = 0.50f;
+  programs[1].param[3] = 0.50f;
   strcpy(programs[1].name,"Symphonic");
   programs[2].param[0] = 0.8f;
   programs[2].param[1] = 0.7f;
+  programs[2].param[2] = 0.50f;
+  programs[2].param[3] = 0.50f;
   strcpy(programs[2].name,"Out Of Tune");
 
+  setProgram(0);
   suspend();
 }
 
@@ -75,6 +69,7 @@ void mdaDetune::resume() ///update internal parameters...
   if(tmp!=buflen) //recalculate crossfade window
   {
     buflen = tmp;
+	  if (buflen > BUFMAX) buflen = BUFMAX;
     bufres = 1000.0f * (float)buflen / getSampleRate();
 
     LvzInt32 i; //hanning half-overlap-and-add
@@ -87,49 +82,45 @@ void mdaDetune::resume() ///update internal parameters...
 void mdaDetune::suspend() ///clear any buffers...
 {
   memset(buf, 0, BUFMAX * sizeof(float));
+  memset(win, 0, BUFMAX * sizeof(float));
   pos0 = 0; pos1 = pos2 = 0.0f;
-}
-
-
-mdaDetune::~mdaDetune() ///destroy any buffers...
-{
-  if(buf) delete [] buf;
-  if(win) delete [] win;
-  if(programs) delete [] programs;
 }
 
 
 void mdaDetune::setProgram(LvzInt32 program)
 {
-  curProgram = program;
-  resume();
+	if ((unsigned int)program < NPROGS)
+	{
+		curProgram = program;
+		resume();
+	}
 }
 
 
-void  mdaDetune::setParameter(LvzInt32 index, float value)
+void  mdaDetune::setParameter(LvzInt32 which, float value)
 {
-  programs[curProgram].param[index] = value;
+  programs[curProgram].param[which] = value;
   resume();
 }
 
 
-float mdaDetune::getParameter(LvzInt32 index) { return programs[curProgram].param[index]; }
+float mdaDetune::getParameter(LvzInt32 which) { return programs[curProgram].param[which]; }
 void  mdaDetune::setProgramName(char *name) { strcpy(programs[curProgram].name, name); }
 void  mdaDetune::getProgramName(char *name) { strcpy(name, programs[curProgram].name); }
-bool mdaDetune::getProgramNameIndexed (LvzInt32 category, LvzInt32 index, char* name)
+bool mdaDetune::getProgramNameIndexed (LvzInt32 category, LvzInt32 which, char* name)
 {
-	if ((unsigned int)index < NPROGS) 
+	if ((unsigned int)which < NPROGS)
 	{
-	    strcpy(name, programs[index].name);
+	    strcpy(name, programs[which].name);
 	    return true;
 	}
 	return false;
 }
 
 
-void mdaDetune::getParameterName(LvzInt32 index, char *label)
+void mdaDetune::getParameterName(LvzInt32 which, char *label)
 {
-  switch(index)
+  switch(which)
   {
     case  0: strcpy(label, "Detune"); break;
     case  1: strcpy(label, "Mix"); break;
@@ -139,14 +130,14 @@ void mdaDetune::getParameterName(LvzInt32 index, char *label)
 }
 
 
-void mdaDetune::getParameterDisplay(LvzInt32 index, char *text)
+void mdaDetune::getParameterDisplay(LvzInt32 which, char *text)
 {
  	char string[16];
 
-  switch(index)
+  switch(which)
   {
-    case  1: sprintf(string, "%.0f", 99.0f * programs[curProgram].param[index]); break;
-    case  2: sprintf(string, "%.1f", 40.0f * programs[curProgram].param[index] - 20.0f); break;
+    case  1: sprintf(string, "%.0f", 99.0f * programs[curProgram].param[which]); break;
+    case  2: sprintf(string, "%.1f", 40.0f * programs[curProgram].param[which] - 20.0f); break;
     case  3: sprintf(string, "%.1f", bufres); break;
     default: sprintf(string, "%.1f", 100.0f * semi);
   }
@@ -155,9 +146,9 @@ void mdaDetune::getParameterDisplay(LvzInt32 index, char *text)
 }
 
 
-void mdaDetune::getParameterLabel(LvzInt32 index, char *label)
+void mdaDetune::getParameterLabel(LvzInt32 which, char *label)
 {
-  switch(index)
+  switch(which)
   {
     case  0: strcpy(label, "cents"); break;
     case  1: strcpy(label, "%"); break;

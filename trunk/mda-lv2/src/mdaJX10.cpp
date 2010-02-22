@@ -281,7 +281,7 @@ void  mdaJX10::setProgramName(char *name)   { strcpy(programs[curProgram].name, 
 void  mdaJX10::getProgramName(char *name)   { strcpy(name, programs[curProgram].name); }
 void  mdaJX10::setBlockSize(LvzInt32 blockSize) {	AudioEffectX::setBlockSize(blockSize); }
 bool  mdaJX10::getEffectName(char* name)    { strcpy(name, "MDA JX10 Synth"); return true; }
-bool  mdaJX10::getVendorString(char* text)  {	strcpy(text, "maxim digital audio"); return true; }
+bool  mdaJX10::getVendorString(char* text)  {	strcpy(text, "MDA"); return true; }
 bool  mdaJX10::getProductString(char* text) { strcpy(text, "MDA JX10 Synth"); return true; }
 
 
