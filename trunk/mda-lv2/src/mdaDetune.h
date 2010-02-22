@@ -35,7 +35,6 @@ public:
   virtual void  getParameterDisplay(LvzInt32 index, char *text);
   virtual void  getParameterName(LvzInt32 index, char *text);
   virtual void  suspend();
-  virtual void  resume();
 
 	virtual bool getEffectName(char *name);
 	virtual bool getVendorString(char *text);
