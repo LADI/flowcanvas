@@ -44,7 +44,7 @@ mdaTalkBox::mdaTalkBox(audioMasterCallback audioMaster): AudioEffectX(audioMaste
   N = 1; //trigger window recalc
   K = 0;
 
-  programs = new mdaTalkBoxProgram[numPrograms];
+  programs = new mdaTalkBoxProgram[NPROGS];
   if(programs)
   {
     ///differences from default program...
@@ -64,16 +64,17 @@ bool  mdaTalkBox::getEffectName(char* name)    { strcpy(name, "TalkBox"); return
 void mdaTalkBox::resume() ///update internal parameters...
 {
   float fs = getSampleRate();
+  float * param = programs[curProgram].param;
   if(fs <  8000.0f) fs =  8000.0f;
   if(fs > 96000.0f) fs = 96000.0f;
 
   swap = (param[2] > 0.5f)? 1 : 0;
 
-  long n = (long)(0.01633f * fs);
+  LvzInt32 n = (LvzInt32)(0.01633f * fs);
   if(n > BUF_MAX) n = BUF_MAX;
 
-  //O = (long)(0.0005f * fs);
-  O = (long)((0.0001f + 0.0004f * param[3]) * fs);
+  //O = (LvzInt32)(0.0005f * fs);
+  O = (LvzInt32)((0.0001f + 0.0004f * param[3]) * fs);
 
   if(n != N) //recalc hanning window
   {
@@ -120,25 +121,29 @@ mdaTalkBox::~mdaTalkBox() ///destroy any buffers...
 
 void mdaTalkBox::setProgram(LvzInt32 program)
 {
-  int i=0;
-
-  mdaTalkBoxProgram *p = &programs[program];
   curProgram = program;
-  for(i=0; i<NPARAMS; i++) param[i] = p->param[i];
   resume();
 }
 
 
 void  mdaTalkBox::setParameter(LvzInt32 index, float value)
 {
-  programs[curProgram].param[index] = param[index] = value; //bug was here!
+  programs[curProgram].param[index] = value; //bug was here!
   resume();
 }
 
-float mdaTalkBox::getParameter(LvzInt32 index) { return param[index]; }
+float mdaTalkBox::getParameter(LvzInt32 index) { return programs[curProgram].param[index]; }
 void  mdaTalkBox::setProgramName(char *name) { strcpy(programs[curProgram].name, name); }
 void  mdaTalkBox::getProgramName(char *name) { strcpy(name, programs[curProgram].name); }
-
+bool mdaTalkBox::getProgramNameIndexed (LvzInt32 category, LvzInt32 index, char* name)
+{
+	if ((unsigned int)index < NPROGS) 
+	{
+	    strcpy(name, programs[index].name);
+	    return true;
+	}
+	return false;
+}
 
 void mdaTalkBox::getParameterName(LvzInt32 index, char *label)
 {
@@ -156,6 +161,7 @@ void mdaTalkBox::getParameterName(LvzInt32 index, char *label)
 void mdaTalkBox::getParameterDisplay(LvzInt32 index, char *text)
 {
  	char string[16];
+ 	float * param = programs[curProgram].param;
 
   switch(index)
   {
@@ -193,7 +199,7 @@ void mdaTalkBox::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
   }
   float *out1 = outputs[0];
   float *out2 = outputs[1];
-  long  p0=pos, p1 = (pos + N/2) % N;
+  LvzInt32  p0=pos, p1 = (pos + N/2) % N;
   float e=emphasis, w, o, x, c, d, dr, fx=FX;
   float p, q, h0=0.3f, h1=0.77f;
 
@@ -266,7 +272,7 @@ void mdaTalkBox::processReplacing(float **inputs, float **outputs, LvzInt32 samp
   }
   float *out1 = outputs[0];
   float *out2 = outputs[1];
-  long  p0=pos, p1 = (pos + N/2) % N;
+  LvzInt32  p0=pos, p1 = (pos + N/2) % N;
   float e=emphasis, w, o, x, dr, fx=FX;
   float p, q, h0=0.3f, h1=0.77f;
 
@@ -325,10 +331,10 @@ void mdaTalkBox::processReplacing(float **inputs, float **outputs, LvzInt32 samp
 }
 
 
-void mdaTalkBox::lpc(float *buf, float *car, long n, long o)
+void mdaTalkBox::lpc(float *buf, float *car, LvzInt32 n, LvzInt32 o)
 {
   float z[ORD_MAX], r[ORD_MAX], k[ORD_MAX], G, x;
-  long i, j, nn=n;
+  LvzInt32 i, j, nn=n;
 
   for(j=0; j<=o; j++, nn--)  //buf[] is already emphasized and windowed
   {

@@ -13,6 +13,7 @@ public:
 	virtual void processReplacing(float **inputs, float **outputs, LvzInt32 sampleFrames);
 	virtual void setProgramName(char *name);
 	virtual void getProgramName(char *name);
+	virtual bool getProgramNameIndexed (LvzInt32 category, LvzInt32 index, char* name);
 	virtual void setParameter(LvzInt32 index, float value);
 	virtual float getParameter(LvzInt32 index);
 	virtual void getParameterLabel(LvzInt32 index, char *label);
@@ -35,7 +36,7 @@ protected:
   float fParam6;
 
   float *buffer;               //delay
-	long size, ipos, ldel, rdel; //delay max time, pointer, left time, right time
+	LvzInt32 size, ipos, ldel, rdel; //delay max time, pointer, left time, right time
   float wet, dry, fbk;         //wet & dry mix
   float lmix, hmix, fil, fil0; //low & high mix, crossover filter coeff & buffer
   

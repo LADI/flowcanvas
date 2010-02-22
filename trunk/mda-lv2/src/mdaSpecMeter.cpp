@@ -22,8 +22,10 @@ createEffectInstance (audioMasterCallback audioMaster)
 
 mdaSpecMeterProgram::mdaSpecMeterProgram ()
 {
-	param[_PARAM0] = 1.0;
-	strcpy (name, "MDA SpecMeter");
+	param[_PARAM0] = 0.5;
+	param[_PARAM1] = 0.5;
+	param[_PARAM2] = 0.75;
+	strcpy (name, "default");
 }
 
 
@@ -83,9 +85,9 @@ mdaSpecMeter::suspend ()
 	lpeak = rpeak = lrms = rrms = corr = 0.0f;
 	Lhold = Rhold = 0.0f;
 	Lmin = Rmin = 0.0000001f;
-	for (long i = 0; i < 16; i++) {
+	for (LvzInt32 i = 0; i < 16; i++) {
 		band[0][i] = band[1][i] = 0.0f;
-		for (long j = 0; j < 6; j++)
+		for (LvzInt32 j = 0; j < 6; j++)
 			lpp[j][i] = rpp[j][i] = 0.0f;
 	}
 
@@ -93,19 +95,13 @@ mdaSpecMeter::suspend ()
 }
 
 void
-mdaSpecMeter::setSampleRate (float rate)
+mdaSpecMeter::setSampleRate(float sampleRate)
 {
-	AudioEffectX::setSampleRate (rate);
-	if (rate > 64000) {
-		topband = 12;
-		kmax = 4096;
-	} else {
-		topband = 11;
-		kmax = 2048;
-	}
-	iK = 1.0f / (float) kmax;
+	AudioEffectX::setSampleRate(sampleRate);
+	if(sampleRate > 64000) { topband = 12;  kmax = 4096; }
+	else                   { topband = 11;  kmax = 2048; }
+	iK = 1.0f / (float)kmax;
 }
-
 
 mdaSpecMeter::~mdaSpecMeter ()
 {
@@ -127,10 +123,21 @@ mdaSpecMeter::getProgramName (char *name)
 	strcpy (name, programs[curProgram].name);
 }
 
+
+bool
+mdaSpecMeter::getProgramNameIndexed (LvzInt32 category, LvzInt32 index, char* name)
+{
+	if ((unsigned int)index < NPROGS) {
+		strcpy(name, programs[index].name);
+		return true;
+	}
+	return false;
+}
+
 float
 mdaSpecMeter::getParameter (LvzInt32 index)
 {
-	return param[index];
+	return programs[curProgram].param[index];
 }
 
 void
@@ -148,12 +155,11 @@ mdaSpecMeter::setProgram (LvzInt32 program)
 void
 mdaSpecMeter::setParameter (LvzInt32 index, float value)
 {
-	mdaSpecMeterProgram *p = &programs[curProgram];
-	param[index] = p->param[index] = value;
+	programs[curProgram].param[index] = value;
 
 	switch (index) {
 	case _PARAM0:
-		gain = (float) pow (10.0f, 2.0f * param[index] - 1.0f);
+		gain = (float)pow(10.0f, 2.0f * programs[curProgram].param[index] - 1.0f);
 		break;
 
 	default:
@@ -181,13 +187,17 @@ void
 mdaSpecMeter::getParameterDisplay (LvzInt32 index, char *text)
 {
 	char string[16];
+	float * param = programs[curProgram].param;
 
 	switch (index) {
 	case _PARAM0:
-		sprintf (string, "%.1f", 40.0f * param[index] - 20.0f);
+		sprintf(string, "%.1f", 40.0f * param[index] - 20.0f);
+		break;
+	case _PARAM1:
+		strcpy (string, "");
 		break;
 	default:
-		sprintf (string, "%.0f", 0.0f * param[index]);
+		sprintf(string, "%.0f", 100.0f * param[index]);
 	}
 	string[8] = 0;
 	strcpy (text, (char *) string);
@@ -199,7 +209,7 @@ mdaSpecMeter::getParameterLabel (LvzInt32 index, char *label)
 {
 	switch (index) {
 	case _PARAM0:
-		strcpy (label, "Gain");
+		strcpy (label, "");
 		break;
 	default:
 		strcpy (label, "");

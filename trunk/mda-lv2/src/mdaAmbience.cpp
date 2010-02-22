@@ -92,6 +92,16 @@ void mdaAmbience::getProgramName(char *name)
 	strcpy(name, programName);
 }
 
+bool mdaAmbience::getProgramNameIndexed (LvzInt32 category, LvzInt32 index, char* name)
+{
+	if (index == 0) 
+	{
+	    strcpy(name, programName);
+	    return true;
+	}
+	return false;
+}
+
 float mdaAmbience::getParameter(LvzInt32 index)
 {
 	float v=0;
@@ -150,14 +160,14 @@ void mdaAmbience::process(float **inputs, float **outputs, LvzInt32 sampleFrames
 	float *out2 = outputs[1];
 	float a, b, c, d, r;
 	float t, f=fil, fb=fbak, dmp=damp, y=dry, w=wet;
-  long  p=pos, d1, d2, d3, d4;
+  LvzInt32  p=pos, d1, d2, d3, d4;
 
   if(rdy==0) suspend();
 
-  d1 = (p + (long)(107 * size)) & 1023;
-  d2 = (p + (long)(142 * size)) & 1023;
-  d3 = (p + (long)(277 * size)) & 1023;
-  d4 = (p + (long)(379 * size)) & 1023;
+  d1 = (p + (LvzInt32)(107 * size)) & 1023;
+  d2 = (p + (LvzInt32)(142 * size)) & 1023;
+  d3 = (p + (LvzInt32)(277 * size)) & 1023;
+  d4 = (p + (LvzInt32)(379 * size)) & 1023;
 
   --in1;
 	--in2;
@@ -218,14 +228,14 @@ void mdaAmbience::processReplacing(float **inputs, float **outputs, LvzInt32 sam
 	float *out2 = outputs[1];
 	float a, b, r;
   float t, f=fil, fb=fbak, dmp=damp, y=dry, w=wet;
-  long  p=pos, d1, d2, d3, d4;
+  LvzInt32  p=pos, d1, d2, d3, d4;
 
   if(rdy==0) suspend();
 
-  d1 = (p + (long)(107 * size)) & 1023;
-  d2 = (p + (long)(142 * size)) & 1023;
-  d3 = (p + (long)(277 * size)) & 1023;
-  d4 = (p + (long)(379 * size)) & 1023;
+  d1 = (p + (LvzInt32)(107 * size)) & 1023;
+  d2 = (p + (LvzInt32)(142 * size)) & 1023;
+  d3 = (p + (LvzInt32)(277 * size)) & 1023;
+  d4 = (p + (LvzInt32)(379 * size)) & 1023;
 
 	--in1;
 	--in2;

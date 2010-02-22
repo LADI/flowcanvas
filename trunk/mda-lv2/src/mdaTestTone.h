@@ -13,6 +13,7 @@ public:
 	virtual void processReplacing(float **inputs, float **outputs, LvzInt32 sampleFrames);
 	virtual void setProgramName(char *name);
 	virtual void getProgramName(char *name);
+	virtual bool getProgramNameIndexed (LvzInt32 category, LvzInt32 index, char* name);
 	virtual void setParameter(LvzInt32 index, float value);
 	virtual float getParameter(LvzInt32 index);
 	virtual void getParameterLabel(LvzInt32 index, char *label);
@@ -38,7 +39,7 @@ protected:
   float thru, left, right, len;
   float zz0, zz1, zz2, zz3, zz4, zz5, phi, dphi;
   float sw, swd, swx, fscale, cal, calx;
-  long swt;
+  LvzInt32 swt;
   int mode;
 
 	char programName[32], disp1[16], disp2[16];

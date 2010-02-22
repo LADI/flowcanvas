@@ -15,8 +15,6 @@ class mdaThruZeroProgram
 {
 public:
   mdaThruZeroProgram();
-  ~mdaThruZeroProgram() {}
-
 private:
   friend class mdaThruZero;
   float param[NPARAMS];
@@ -35,6 +33,7 @@ public:
   virtual void  setProgram(LvzInt32 program);
   virtual void  setProgramName(char *name);
   virtual void  getProgramName(char *name);
+	virtual bool getProgramNameIndexed (LvzInt32 category, LvzInt32 index, char* name);
   virtual void  setParameter(LvzInt32 index, float value);
   virtual float getParameter(LvzInt32 index);
   virtual void  getParameterLabel(LvzInt32 index, char *label);
@@ -49,15 +48,13 @@ public:
 	virtual LvzInt32 getVendorVersion() { return 1000; }
 
 protected:
-  float param[NPARAMS];
-  char programName[32];
   mdaThruZeroProgram *programs;
 
   ///global internal variables
   float rat, dep, wet, dry, fb, dem; //rate, depth, wet & dry mix, feedback, mindepth
   float phi, fb1, fb2, deps;         //lfo & feedback buffers, depth change smoothing 
   float *buffer, *buffer2;           //maybe use 2D buffer?
-	long size, bufpos;
+	LvzInt32 size, bufpos;
 };
 
 #endif

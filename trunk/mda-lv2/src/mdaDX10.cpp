@@ -18,7 +18,7 @@ AudioEffect *createEffectInstance(audioMasterCallback audioMaster)
 
 mdaDX10::mdaDX10(audioMasterCallback audioMaster) : AudioEffectX(audioMaster, NPROGS, NPARAMS)
 {
-  long i=0;
+  LvzInt32 i=0;
   Fs = 44100.0f;
 
   programs = new mdaDX10Program[NPROGS];
@@ -93,6 +93,7 @@ mdaDX10::mdaDX10(audioMasterCallback audioMaster) : AudioEffectX(audioMaster, NP
 void mdaDX10::update()  //parameter change //if multitimbral would have to move all this...
 {
   float ifs = 1.0f / Fs;
+  float * param = programs[curProgram].param;
 
   tune = (float)(8.175798915644 * ifs * pow(2.0, floor(param[11] * 6.9) - 2.0));
 
@@ -101,7 +102,7 @@ void mdaDX10::update()  //parameter change //if multitimbral would have to move 
   if(param[4]<0.5f)
     ratf = 0.2f * param[4] * param[4];
   else
-    switch((long)(8.9f * param[4]))
+    switch((LvzInt32)(8.9f * param[4]))
     {
       case  4: ratf = 0.25f;       break;
       case  5: ratf = 0.33333333f; break;
@@ -154,24 +155,19 @@ mdaDX10::~mdaDX10 ()  //destroy any buffers...
 
 void mdaDX10::setProgram(LvzInt32 program)
 {
-	long i;
-
-  mdaDX10Program *p = &programs[program];
 	curProgram = program;
-	for(i=0; i<NPARAMS; i++) param[i] = p->param[i];
-  update();
+    update();
 }
 
 
 void mdaDX10::setParameter(LvzInt32 index, float value)
 {
-  mdaDX10Program *p = &programs[curProgram];
-  param[index] = p->param[index] = value;
+  programs[curProgram].param[index] = value;
   update();
 }
 
 
-void mdaDX10::fillpatch(long p, const char *name,
+void mdaDX10::fillpatch(LvzInt32 p, char *name,
                      float p0,  float p1,  float p2,  float p3,  float p4,  float p5,
                      float p6,  float p7,  float p8,  float p9,  float p10, float p11,
                      float p12, float p13, float p14, float p15)
@@ -188,7 +184,7 @@ void mdaDX10::fillpatch(long p, const char *name,
 }
 
 
-float mdaDX10::getParameter(LvzInt32 index)     { return param[index]; }
+float mdaDX10::getParameter(LvzInt32 index)     { return programs[curProgram].param[index]; }
 void  mdaDX10::setProgramName(char *name)   { strcpy(programs[curProgram].name, name); }
 void  mdaDX10::getProgramName(char *name)   { strcpy(name, programs[curProgram].name); }
 void  mdaDX10::setBlockSize(LvzInt32 blockSize) {	AudioEffectX::setBlockSize(blockSize); }
@@ -212,7 +208,7 @@ bool mdaDX10::getOutputProperties(LvzInt32 index, LvzPinProperties* properties)
 
 bool mdaDX10::getProgramNameIndexed(LvzInt32 category, LvzInt32 index, char* text)
 {
-	if(index<NPROGS)
+	if ((unsigned int)index < NPROGS)
 	{
 		strcpy(text, programs[index].name);
 		return true;
@@ -267,12 +263,13 @@ void mdaDX10::getParameterName(LvzInt32 index, char *label)
 void mdaDX10::getParameterDisplay(LvzInt32 index, char *text)
 {
 	char string[16];
+	float * param = programs[curProgram].param;
 
   switch(index)
   {
     case  3: sprintf(string, "%.0f", rati); break;
     case  4: sprintf(string, "%.3f", ratf); break;
-    case 11: sprintf(string, "%ld", (long)(param[index] * 6.9f) - 3); break;
+    case 11: sprintf(string, "%d", (LvzInt32)(param[index] * 6.9f) - 3); break;
     case 12: sprintf(string, "%.0f", 200.0f * param[index] - 100.0f); break;
     case 15: sprintf(string, "%.2f", 25.0f * param[index] * param[index]); break;
     default: sprintf(string, "%.0f", 100.0f * param[index]);
@@ -300,9 +297,9 @@ void mdaDX10::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
 {
 	float* out1 = outputs[0];
 	float* out2 = outputs[1];
-	long event=0, frame=0, frames, v;
+	LvzInt32 event=0, frame=0, frames, v;
   float o, x, e, mw=MW, w=rich, m=modmix;
-  long k=K;
+  LvzInt32 k=K;
 
   if(activevoices>0 || notes[event]<sampleFrames) //detect & bypass completely empty blocks
   {
@@ -353,8 +350,8 @@ void mdaDX10::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
 
       if(frame<sampleFrames) //next note on/off
       {
-        long note = notes[event++];
-        long vel  = notes[event++];
+        LvzInt32 note = notes[event++];
+        LvzInt32 vel  = notes[event++];
         noteOn(note, vel);
       }
     }
@@ -380,9 +377,9 @@ void mdaDX10::processReplacing(float **inputs, float **outputs, LvzInt32 sampleF
 {
 	float* out1 = outputs[0];
 	float* out2 = outputs[1];
-	long event=0, frame=0, frames, v;
+	LvzInt32 event=0, frame=0, frames, v;
   float o, x, e, mw=MW, w=rich, m=modmix;
-  long k=K;
+  LvzInt32 k=K;
 
   if(activevoices>0 || notes[event]<sampleFrames) //detect & bypass completely empty blocks
   {
@@ -437,8 +434,8 @@ void mdaDX10::processReplacing(float **inputs, float **outputs, LvzInt32 sampleF
 
       if(frame<sampleFrames) //next note on/off
       {
-        long note = notes[event++];
-        long vel  = notes[event++];
+        LvzInt32 note = notes[event++];
+        LvzInt32 vel  = notes[event++];
         noteOn(note, vel);
       }
     }
@@ -467,10 +464,11 @@ void mdaDX10::processReplacing(float **inputs, float **outputs, LvzInt32 sampleF
 }
 
 
-void mdaDX10::noteOn(long note, long velocity)
+void mdaDX10::noteOn(LvzInt32 note, LvzInt32 velocity)
 {
+  float * param = programs[curProgram].param;
   float l = 1.0f;
-  long  v, vl=0;
+  LvzInt32  v, vl=0;
 
   if(velocity>0)
   {
@@ -520,9 +518,9 @@ void mdaDX10::noteOn(long note, long velocity)
 
 LvzInt32 mdaDX10::processEvents(LvzEvents* ev)
 {
-  long npos=0;
+  LvzInt32 npos=0;
 
-  for (long i=0; i<ev->numEvents; i++)
+  for (LvzInt32 i=0; i<ev->numEvents; i++)
 	{
 		if((ev->events[i])->type != kLvzMidiType) continue;
 		LvzMidiEvent* event = (LvzMidiEvent*)ev->events[i];
@@ -566,7 +564,7 @@ LvzInt32 mdaDX10::processEvents(LvzEvents* ev)
           default:  //all notes off
             if(midiData[1]>0x7A)
             {
-              for(long v=0; v<NVOICES; v++) voice[v].cdec=0.99f;
+              for(LvzInt32 v=0; v<NVOICES; v++) voice[v].cdec=0.99f;
               sustain = 0;
             }
             break;

@@ -83,6 +83,16 @@ void mdaRoundPan::getProgramName(char *name)
 	strcpy(name, programName);
 }
 
+bool mdaRoundPan::getProgramNameIndexed (LvzInt32 category, LvzInt32 index, char* name)
+{
+	if (index == 0) 
+	{
+	    strcpy(name, programName);
+	    return true;
+	}
+	return false;
+}
+
 float mdaRoundPan::getParameter(LvzInt32 index)
 {
 	float v=0;
@@ -105,14 +115,14 @@ void mdaRoundPan::getParameterName(LvzInt32 index, char *label)
 }
 
 #include <stdio.h>
-void long2string(long value, char *string) { sprintf(string, "%ld", value); }
+void int2strng(LvzInt32 value, char *string) { sprintf(string, "%d", value); }
 
 void mdaRoundPan::getParameterDisplay(LvzInt32 index, char *text)
 {
 	switch(index)
   {
-    case 0: long2string((long)(360.0 * (fParam1 - 0.5)), text); break;
-    case 1: long2string((long)(57.296 * dphi * getSampleRate()), text); break;
+    case 0: int2strng((LvzInt32)(360.0 * (fParam1 - 0.5)), text); break;
+    case 1: int2strng((LvzInt32)(57.296 * dphi * getSampleRate()), text); break;
   }
 }
 

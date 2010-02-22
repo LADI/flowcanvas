@@ -14,8 +14,6 @@ class mdaVocInputProgram
 {
 public:
   mdaVocInputProgram();
-  ~mdaVocInputProgram() {}
-
 private:
   friend class mdaVocInput;
   float param[NPARAMS];
@@ -34,12 +32,13 @@ public:
   virtual void  setProgram(LvzInt32 program);
   virtual void  setProgramName(char *name);
   virtual void  getProgramName(char *name);
+	virtual bool getProgramNameIndexed (LvzInt32 category, LvzInt32 index, char* name);
   virtual void  setParameter(LvzInt32 index, float value);
   virtual float getParameter(LvzInt32 index);
   virtual void  getParameterLabel(LvzInt32 index, char *label);
   virtual void  getParameterDisplay(LvzInt32 index, char *text);
   virtual void  getParameterName(LvzInt32 index, char *text);
-  virtual void  midi2string(long n, char *text);
+  virtual void  midi2string(LvzInt32 n, char *text);
   virtual void  suspend();
   virtual void  resume();
 
@@ -49,12 +48,10 @@ public:
 	virtual LvzInt32 getVendorVersion() { return 1000; }
 
 protected:
-  float param[NPARAMS];
-  char programName[32];
   mdaVocInputProgram *programs;
 
   ///global internal variables
-  long  track;        //track input pitch
+  LvzInt32  track;        //track input pitch
   float pstep;        //output sawtooth inc per sample
   float pmult;        //tuning multiplier
   float sawbuf;   

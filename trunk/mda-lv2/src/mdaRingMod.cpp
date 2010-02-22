@@ -45,6 +45,16 @@ void mdaRingMod::getProgramName(char *name)
 	strcpy(name, programName);
 }
 
+bool mdaRingMod::getProgramNameIndexed (LvzInt32 category, LvzInt32 index, char* name)
+{
+	if (index == 0) 
+	{
+	    strcpy(name, programName);
+	    return true;
+	}
+	return false;
+}
+
 void mdaRingMod::setParameter(LvzInt32 index, float value)
 {
 	switch(index)
@@ -81,15 +91,15 @@ void mdaRingMod::getParameterName(LvzInt32 index, char *label)
 }
 
 #include <stdio.h>
-void long2string(long value, char *string) { sprintf(string, "%ld", value); }
+void int2strng(LvzInt32 value, char *string) { sprintf(string, "%d", value); }
 
 void mdaRingMod::getParameterDisplay(LvzInt32 index, char *text)
 {
 	switch(index)
   {
-    case 0: long2string((long)(100. * floor(160. * fParam1)), text); break;
-    case 1: long2string((long)(100. * fParam2), text); break;
-    case 2: long2string((long)(100. * fParam3), text); break;
+    case 0: int2strng((LvzInt32)(100. * floor(160. * fParam1)), text); break;
+    case 1: int2strng((LvzInt32)(100. * fParam2), text); break;
+    case 2: int2strng((LvzInt32)(100. * fParam3), text); break;
   }
 
 }

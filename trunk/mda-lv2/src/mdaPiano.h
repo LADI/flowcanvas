@@ -30,11 +30,11 @@ private:
 
 struct VOICE  //voice state
 {
-  long  delta;  //sample playback
-  long  frac;
-  long  pos;
-  long  end;
-  long  loop;
+  LvzInt32  delta;  //sample playback
+  LvzInt32  frac;
+  LvzInt32  pos;
+  LvzInt32  end;
+  LvzInt32  loop;
 
   float env;  //envelope
   float dec;
@@ -45,17 +45,17 @@ struct VOICE  //voice state
 
   float outl;
   float outr;
-  long  note; //remember what note triggered this
+  LvzInt32  note; //remember what note triggered this
 };
 
 
 struct KGRP  //keygroup
 {
-  long  root;  //MIDI root note
-  long  high;  //highest note
-  long  pos;
-  long  end;
-  long  loop;
+  LvzInt32  root;  //MIDI root note
+  LvzInt32  high;  //highest note
+  LvzInt32  pos;
+  LvzInt32  end;
+  LvzInt32  loop;
 };
 
 class mdaPiano : public AudioEffectX
@@ -90,13 +90,13 @@ public:
 
   virtual LvzInt32 getNumMidiInputChannels ()  { return 1; }
 
-  long guiUpdate;
+  LvzInt32 guiUpdate;
   void guiGetDisplay(LvzInt32 index, char *label);
 
 private:
 	void update();  //my parameter update
-  void noteOn(long note, long velocity);
-  void fillpatch(long p, const char *name, float p0, float p1, float p2, float p3, float p4,
+  void noteOn(LvzInt32 note, LvzInt32 velocity);
+  void fillpatch(LvzInt32 p, char *name, float p0, float p1, float p2, float p3, float p4,
                  float p5, float p6, float p7, float p8, float p9, float p10,float p11);
 
   float param[NPARAMS];
@@ -105,16 +105,16 @@ private:
 
   #define EVENTBUFFER 120
   #define EVENTS_DONE 99999999
-  long notes[EVENTBUFFER + 8];  //list of delta|note|velocity for current block
+  LvzInt32 notes[EVENTBUFFER + 8];  //list of delta|note|velocity for current block
 
   ///global internal variables
   KGRP  kgrp[16];
   VOICE voice[NVOICES];
-  long  activevoices, poly, cpos;
+  LvzInt32  activevoices, poly, cpos;
   short *waves;
-  long  cmax;
+  LvzInt32  cmax;
   float *comb, cdep, width, trim;
-  long  size, sustain;
+  LvzInt32  size, sustain;
   float tune, fine, random, stretch;
   float muff, muffvel, sizevel, velsens, volume;
 };

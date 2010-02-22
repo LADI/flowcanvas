@@ -13,8 +13,6 @@ class mdaSplitterProgram
 {
 public:
   mdaSplitterProgram();
-  ~mdaSplitterProgram() {}
-
 private:
   friend class mdaSplitter;
   float param[NPARAMS];
@@ -33,6 +31,7 @@ public:
   virtual void  setProgram(LvzInt32 program);
   virtual void  setProgramName(char *name);
   virtual void  getProgramName(char *name);
+	virtual bool getProgramNameIndexed (LvzInt32 category, LvzInt32 index, char* name);
   virtual void  setParameter(LvzInt32 index, float value);
   virtual float getParameter(LvzInt32 index);
   virtual void  getParameterLabel(LvzInt32 index, char *label);
@@ -47,15 +46,13 @@ public:
 	virtual LvzInt32 getVendorVersion() { return 1000; }
 
 protected:
-  float param[NPARAMS];
-  char programName[32];
   mdaSplitterProgram *programs;
 
   ///global internal variables
   float freq, fdisp, buf0, buf1, buf2, buf3;  //filter
   float level, ldisp, env, att, rel;          //level switch
   float ff, ll, pp, i2l, i2r, o2l, o2r;       //routing (freq, level, phase, output)
-  long  mode;
+  LvzInt32  mode;
 
 };
 

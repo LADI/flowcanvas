@@ -48,6 +48,16 @@ void mdaSubSynth::getProgramName(char *name)
 	strcpy(name, programName);
 }
 
+bool mdaSubSynth::getProgramNameIndexed (LvzInt32 category, LvzInt32 index, char* name)
+{
+	if (index == 0) 
+	{
+	    strcpy(name, programName);
+	    return true;
+	}
+	return false;
+}
+
 void mdaSubSynth::setProgram(LvzInt32 program)
 {
 }
@@ -112,11 +122,11 @@ void mdaSubSynth::getParameterDisplay(LvzInt32 index, char *text)
 
 	switch(index)
   {
-    case 1: sprintf(string, "%ld", (long)(100.0f * wet)); break;
-    case 2: sprintf(string, "%ld", (long)(0.0726 * getSampleRate() * pow(10.0,-2.5 + (1.5 * fParam3)))); break;
-    case 3: sprintf(string, "%ld", (long)(100. * dry)); break;
+    case 1: sprintf(string, "%d", (LvzInt32)(100.0f * wet)); break;
+    case 2: sprintf(string, "%d", (LvzInt32)(0.0726 * getSampleRate() * pow(10.0,-2.5 + (1.5 * fParam3)))); break;
+    case 3: sprintf(string, "%d", (LvzInt32)(100. * dry)); break;
     case 4: sprintf(string, "%.1f", 60.0f * fParam5 - 60.0f); break;
-    case 5: sprintf(string, "%ld", (long)(-301.03 / (getSampleRate() * log10(rls)))); break;
+    case 5: sprintf(string, "%d", (LvzInt32)(-301.03 / (getSampleRate() * log10(rls)))); break;
     
     case 0: switch(typ)
     {

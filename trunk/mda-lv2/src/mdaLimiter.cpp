@@ -55,6 +55,16 @@ void mdaLimiter::getProgramName(char *name)
 	strcpy(name, programName);
 }
 
+bool mdaLimiter::getProgramNameIndexed (LvzInt32 category, LvzInt32 index, char* name)
+{
+	if (index == 0) 
+	{
+	    strcpy(name, programName);
+	    return true;
+	}
+	return false;
+}
+
 void mdaLimiter::setParameter(LvzInt32 index, float value)
 {
 	switch(index)
@@ -107,16 +117,16 @@ void mdaLimiter::getParameterName(LvzInt32 index, char *label)
 }
 
 #include <stdio.h>
-void long2string(long value, char *string) { sprintf(string, "%ld", value); }
+void int2strng(LvzInt32 value, char *string) { sprintf(string, "%d", value); }
 
 void mdaLimiter::getParameterDisplay(LvzInt32 index, char *text)
 {
 	switch(index)
   {
-    case 0: long2string((long)(40.0*fParam1 - 40.0),text); break;
-    case 1: long2string((long)(40.0*fParam2 - 20.0),text); break;
-    case 3: long2string((long)(-301030.1 / (getSampleRate() * log10(1.0 - att))),text); break;
-    case 2: long2string((long)(-301.0301 / (getSampleRate() * log10(1.0 - rel))),text); break;
+    case 0: int2strng((LvzInt32)(40.0*fParam1 - 40.0),text); break;
+    case 1: int2strng((LvzInt32)(40.0*fParam2 - 20.0),text); break;
+    case 3: int2strng((LvzInt32)(-301030.1 / (getSampleRate() * log10(1.0 - att))),text); break;
+    case 2: int2strng((LvzInt32)(-301.0301 / (getSampleRate() * log10(1.0 - rel))),text); break;
     case 4: if(fParam5<0.5) strcpy(text, "HARD");
             else strcpy(text, "SOFT"); break;
   }
@@ -129,7 +139,7 @@ void mdaLimiter::getParameterLabel(LvzInt32 index, char *label)
   {
     case 0: strcpy(label, "dB"); break;
     case 1: strcpy(label, "dB"); break;
-    case 3: strcpy(label, "µs"); break;
+    case 3: strcpy(label, "ï¿½s"); break; 
     case 2: strcpy(label, "ms"); break;
     case 4: strcpy(label, ""); break;
   }

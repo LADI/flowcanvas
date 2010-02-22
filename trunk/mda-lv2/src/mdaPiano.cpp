@@ -48,7 +48,7 @@ mdaPiano::mdaPiano(audioMasterCallback audioMaster) : AudioEffectX(audioMaster, 
 	if(programs)
   {
     //fill patches...
-    long i=0;
+    LvzInt32 i=0;
     fillpatch(i++, "MDA Piano",        0.500f, 0.500f, 0.500f, 0.5f, 0.803f, 0.251f, 0.376f, 0.500f, 0.330f, 0.500f, 0.246f, 0.500f);
     fillpatch(i++, "Plain Piano",      0.500f, 0.500f, 0.500f, 0.5f, 0.751f, 0.000f, 0.452f, 0.000f, 0.000f, 0.500f, 0.000f, 0.500f);
     fillpatch(i++, "Compressed Piano", 0.902f, 0.399f, 0.623f, 0.5f, 1.000f, 0.331f, 0.299f, 0.499f, 0.330f, 0.500f, 0.000f, 0.500f);
@@ -92,7 +92,7 @@ mdaPiano::mdaPiano(audioMasterCallback audioMaster) : AudioEffectX(audioMaster, 
   kgrp[14].root = 93;  kgrp[14].high = 999; kgrp[14].pos = 574123;  kgrp[14].end = 586343;  kgrp[14].loop = 2399;
 
   //initialise...
-  for(long v=0; v<NVOICES; v++)
+  for(LvzInt32 v=0; v<NVOICES; v++)
   {
     voice[v].env = 0.0f;
     voice[v].dec = 0.99f; //all notes off
@@ -112,7 +112,8 @@ mdaPiano::mdaPiano(audioMasterCallback audioMaster) : AudioEffectX(audioMaster, 
 
 void mdaPiano::update()  //parameter change
 {
-  size = (long)(12.0f * param[2] - 6.0f);
+  float * param = programs[curProgram].param;
+  size = (LvzInt32)(12.0f * param[2] - 6.0f);
   sizevel = 0.12f * param[3];
   muffvel = param[5] * param[5] * 5.0f;
 
@@ -127,7 +128,7 @@ void mdaPiano::update()  //parameter change
   trim = 1.50f - 0.79f * cdep;
   width = 0.04f * param[7];  if(width > 0.03f) width = 0.03f;
 
-  poly = 8 + (long)(24.9f * param[8]);
+  poly = 8 + (LvzInt32)(24.9f * param[8]);
 }
 
 
@@ -151,19 +152,16 @@ mdaPiano::~mdaPiano ()  //destroy any buffers...
 
 void mdaPiano::setProgram(LvzInt32 program)
 {
-	long i;
-
-  mdaPianoProgram *p = &programs[program];
 	curProgram = program;
-	for(i=0; i<NPARAMS; i++) param[i] = p->param[i];
-  update();
+	update();
+
+	// TODO: guiUpdate ???
 }
 
 
 void mdaPiano::setParameter(LvzInt32 index, float value)
 {
-  mdaPianoProgram *p = &programs[curProgram];
-  param[index] = p->param[index] = value;
+  programs[curProgram].param[index] = value;
   update();
 
 //  if(editor) editor->postUpdate(); //For GUI
@@ -172,7 +170,7 @@ void mdaPiano::setParameter(LvzInt32 index, float value)
 }
 
 
-void mdaPiano::fillpatch(long p, const char *name, float p0, float p1, float p2, float p3, float p4,
+void mdaPiano::fillpatch(LvzInt32 p, char *name, float p0, float p1, float p2, float p3, float p4,
                       float p5, float p6, float p7, float p8, float p9, float p10,float p11)
 {
   strcpy(programs[p].name, name);
@@ -185,7 +183,7 @@ void mdaPiano::fillpatch(long p, const char *name, float p0, float p1, float p2,
 }
 
 
-float mdaPiano::getParameter(LvzInt32 index)     { return param[index]; }
+float mdaPiano::getParameter(LvzInt32 index)     { return programs[curProgram].param[index]; }
 void  mdaPiano::setProgramName(char *name)   { strcpy(programs[curProgram].name, name); }
 void  mdaPiano::getProgramName(char *name)   { strcpy(name, programs[curProgram].name); }
 void  mdaPiano::setBlockSize(LvzInt32 blockSize) {	AudioEffectX::setBlockSize(blockSize); }
@@ -210,7 +208,7 @@ bool mdaPiano::getOutputProperties(LvzInt32 index, LvzPinProperties* properties)
 
 bool mdaPiano::getProgramNameIndexed(LvzInt32 category, LvzInt32 index, char* text)
 {
-	if(index<NPROGS)
+	if ((unsigned int)index < NPROGS)
 	{
 		strcpy(text, programs[index].name);
 		return true;
@@ -264,12 +262,13 @@ void mdaPiano::getParameterName(LvzInt32 index, char *label)
 void mdaPiano::getParameterDisplay(LvzInt32 index, char *text)
 {
 	char string[16];
+	float * param = programs[curProgram].param;
 
   switch(index)
   {
     case  4: sprintf(string, "%.0f", 100.0f - 100.0f * param[index]); break;
     case  7: sprintf(string, "%.0f", 200.0f * param[index]); break;
-    case  8: sprintf(string, "%ld", poly); break;
+    case  8: sprintf(string, "%d", poly); break;
     case 10: sprintf(string, "%.1f",  50.0f * param[index] * param[index]); break;
     case  2:
     case  9:
@@ -308,9 +307,9 @@ void mdaPiano::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
 {
 	float* out0 = outputs[0];
 	float* out1 = outputs[1];
-	long event=0, frame=0, frames, v;
+	LvzInt32 event=0, frame=0, frames, v;
   float x, l, r;
-  long i;
+  LvzInt32 i;
 
   while(frame<sampleFrames)
   {
@@ -353,8 +352,8 @@ void mdaPiano::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
 
     if(frame<sampleFrames)
     {
-      long note = notes[event++];
-      long vel  = notes[event++];
+      LvzInt32 note = notes[event++];
+      LvzInt32 vel  = notes[event++];
       noteOn(note, vel);
     }
   }
@@ -367,9 +366,9 @@ void mdaPiano::processReplacing(float **inputs, float **outputs, LvzInt32 sample
 {
 	float* out0 = outputs[0];
 	float* out1 = outputs[1];
-	long event=0, frame=0, frames, v;
+	LvzInt32 event=0, frame=0, frames, v;
   float x, l, r;
-  long i;
+  LvzInt32 i;
 
   while(frame<sampleFrames)
   {
@@ -403,7 +402,7 @@ void mdaPiano::processReplacing(float **inputs, float **outputs, LvzInt32 sample
 
  if(!(l > -2.0f) || !(l < 2.0f))
  {
-   printf("what is this shit?   %ld,  %f,  %f\n", i, x, V->f0);
+   printf("what is this shit?   %d,  %f,  %f\n", i, x, V->f0);
    l = 0.0f;
  }
 if(!(r > -2.0f) || !(r < 2.0f))
@@ -423,8 +422,8 @@ if(!(r > -2.0f) || !(r < 2.0f))
 
     if(frame<sampleFrames)
     {
-      long note = notes[event++];
-      long vel  = notes[event++];
+      LvzInt32 note = notes[event++];
+      LvzInt32 vel  = notes[event++];
       noteOn(note, vel);
     }
   }
@@ -433,10 +432,11 @@ if(!(r > -2.0f) || !(r < 2.0f))
 }
 
 
-void mdaPiano::noteOn(long note, long velocity)
+void mdaPiano::noteOn(LvzInt32 note, LvzInt32 velocity)
 {
+  float * param = programs[curProgram].param;
   float l=99.0f;
-  long  v, vl=0, k, s;
+  LvzInt32  v, vl=0, k, s;
 
   if(velocity>0)
   {
@@ -458,14 +458,14 @@ void mdaPiano::noteOn(long note, long velocity)
     if(note > 60) l += stretch * (float)k; //stretch
 
     s = size;
-    if(velocity > 40) s += (long)(sizevel * (float)(velocity - 40));
+    if(velocity > 40) s += (LvzInt32)(sizevel * (float)(velocity - 40));
 
     k = 0;
     while(note > (kgrp[k].high + s)) k++;  //find keygroup
 
     l += (float)(note - kgrp[k].root); //pitch
     l = 22050.0f * iFs * (float)exp(0.05776226505 * l);
-    voice[vl].delta = (long)(65536.0f * l);
+    voice[vl].delta = (LvzInt32)(65536.0f * l);
     voice[vl].frac = 0;
     voice[vl].pos = kgrp[k].pos;
     voice[vl].end = kgrp[k].end;
@@ -508,9 +508,9 @@ void mdaPiano::noteOn(long note, long velocity)
 
 LvzInt32 mdaPiano::processEvents(LvzEvents* ev)
 {
-  long npos=0;
+  LvzInt32 npos=0;
 
-  for (long i=0; i<ev->numEvents; i++)
+  for (LvzInt32 i=0; i<ev->numEvents; i++)
 	{
 		if((ev->events[i])->type != kLvzMidiType) continue;
 		LvzMidiEvent* event = (LvzMidiEvent*)ev->events[i];
@@ -556,7 +556,7 @@ LvzInt32 mdaPiano::processEvents(LvzEvents* ev)
           default:  //all notes off
             if(midiData[1]>0x7A)
             {
-              for(long v=0; v<NVOICES; v++) voice[v].dec=0.99f;
+              for(LvzInt32 v=0; v<NVOICES; v++) voice[v].dec=0.99f;
               sustain = 0;
               muff = 160.0f;
             }

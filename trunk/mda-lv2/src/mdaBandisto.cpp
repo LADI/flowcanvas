@@ -82,6 +82,16 @@ void mdaBandisto::getProgramName(char *name)
 	strcpy(name, programName);
 }
 
+bool mdaBandisto::getProgramNameIndexed (LvzInt32 category, LvzInt32 index, char* name)
+{
+	if (index == 0) 
+	{
+	    strcpy(name, programName);
+	    return true;
+	}
+	return false;
+}
+
 void mdaBandisto::setParameter(LvzInt32 index, float value)
 {
 	switch(index)

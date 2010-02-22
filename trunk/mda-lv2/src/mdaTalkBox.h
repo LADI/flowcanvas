@@ -32,6 +32,7 @@ public:
   virtual void  setProgram(LvzInt32 program);
   virtual void  setProgramName(char *name);
   virtual void  getProgramName(char *name);
+	virtual bool getProgramNameIndexed (LvzInt32 category, LvzInt32 index, char* name);
   virtual void  setParameter(LvzInt32 index, float value);
   virtual float getParameter(LvzInt32 index);
   virtual void  getParameterLabel(LvzInt32 index, char *label);
@@ -46,10 +47,9 @@ public:
 	virtual LvzInt32 getVendorVersion() { return 1000; }
 
 protected:
-  float param[NPARAMS];
   mdaTalkBoxProgram *programs;
 
-  void lpc(float *buf, float *car, long n, long o);
+  void lpc(float *buf, float *car, LvzInt32 n, LvzInt32 o);
   void lpc_durbin(float *r, int p, float *k, float *g);
 
   ///global internal variables
@@ -58,7 +58,7 @@ protected:
   float *buf0, *buf1;
   
   float emphasis;
-  long K, N, O, pos, swap;
+  LvzInt32 K, N, O, pos, swap;
   float wet, dry, FX;
 
   float d0, d1, d2, d3, d4;

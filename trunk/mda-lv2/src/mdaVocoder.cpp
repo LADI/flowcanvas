@@ -38,7 +38,7 @@ mdaVocoder::mdaVocoder(audioMasterCallback audioMaster): AudioEffectX(audioMaste
   //canMono();
   canProcessReplacing();
 
-  programs = new mdaVocoderProgram[numPrograms];
+  programs = new mdaVocoderProgram[NPROGS];
   setProgram(0);
 
   ///differences from default program...
@@ -65,10 +65,11 @@ bool  mdaVocoder::getEffectName(char* name)    { strcpy(name, "Vocoder"); return
 
 void mdaVocoder::resume() ///update internal parameters...
 {
+  float * param = programs[curProgram].param;
   double tpofs = 6.2831853/getSampleRate();
   double rr, th, re;
   float sh;
-  long i;
+  LvzInt32 i;
 
   swap = 1; if(param[0]>0.5f) swap = 0;
   gain = (float)pow(10.0f, 2.0f * param[1] - 3.0f * param[5] - 2.0f);
@@ -146,7 +147,7 @@ void mdaVocoder::resume() ///update internal parameters...
 
 void mdaVocoder::suspend() ///clear any buffers...
 {
-  long i, j;
+  LvzInt32 i, j;
 
   for(i=0; i<nbnd; i++) for(j=3; j<12; j++) f[i][j] = 0.0f; //zero band filters and envelopes
   kout = 0.0f;
@@ -162,21 +163,28 @@ mdaVocoder::~mdaVocoder() ///destroy any buffers...
 
 void mdaVocoder::setProgram(LvzInt32 program)
 {
-  int i=0;
-
-  mdaVocoderProgram *p = &programs[program];
   curProgram = program;
-  setProgramName(p->name);
-  for(i=0; i<NPARAMS; i++) param[i] = p->param[i];
   resume();
 }
 
 
-void  mdaVocoder::setParameter(LvzInt32 index, float value) { param[index] = value; resume(); }
-float mdaVocoder::getParameter(LvzInt32 index) { return param[index]; }
-void  mdaVocoder::setProgramName(char *name) { strcpy(programName, name); }
-void  mdaVocoder::getProgramName(char *name) { strcpy(name, programName); }
-
+void  mdaVocoder::setParameter(LvzInt32 index, float value)
+{
+  programs[curProgram].param[index] = value;
+  resume();
+}
+float mdaVocoder::getParameter(LvzInt32 index) { return programs[curProgram].param[index]; }
+void  mdaVocoder::setProgramName(char *name) { strcpy(programs[curProgram].name, name); }
+void  mdaVocoder::getProgramName(char *name) { strcpy(name, programs[curProgram].name); }
+bool mdaVocoder::getProgramNameIndexed (LvzInt32 category, LvzInt32 index, char* name)
+{
+	if ((unsigned int)index < NPROGS) 
+	{
+	    strcpy(name, programs[index].name);
+	    return true;
+	}
+	return false;
+}
 
 void mdaVocoder::getParameterName(LvzInt32 index, char *label)
 {
@@ -197,6 +205,7 @@ void mdaVocoder::getParameterName(LvzInt32 index, char *label)
 void mdaVocoder::getParameterDisplay(LvzInt32 index, char *text)
 {
  	char string[16];
+ 	float * param = programs[curProgram].param;
 
   switch(index)
   {
@@ -235,7 +244,7 @@ void mdaVocoder::process(float **inputs, float **outputs, LvzInt32 sampleFrames)
   float *out1 = outputs[0];
   float *out2 = outputs[1];
   float a, b, c, d, o=0.0f, aa, bb, oo=kout, g=gain, ht=thru, hh=high, tmp;
-  long i, k=kval, sw=swap, nb=nbnd;
+  LvzInt32 i, k=kval, sw=swap, nb=nbnd;
 
   --in1;
   --in2;
@@ -313,7 +322,7 @@ void mdaVocoder::processReplacing(float **inputs, float **outputs, LvzInt32 samp
   float *out1 = outputs[0];
   float *out2 = outputs[1];
   float a, b, o=0.0f, aa, bb, oo=kout, g=gain, ht=thru, hh=high, tmp;
-  long i, k=kval, sw=swap, nb=nbnd;
+  LvzInt32 i, k=kval, sw=swap, nb=nbnd;
 
   --in1;
   --in2;

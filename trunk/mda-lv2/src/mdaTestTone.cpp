@@ -55,8 +55,18 @@ void mdaTestTone::getProgramName(char *name)
 	strcpy(name, programName);
 }
 
+bool mdaTestTone::getProgramNameIndexed (LvzInt32 category, LvzInt32 index, char* name)
+{
+	if (index == 0) 
+	{
+	    strcpy(name, programName);
+	    return true;
+	}
+	return false;
+}
+
 #include <stdio.h>
-void long2string(long value, char *string) { sprintf(string, "%ld", value); }
+void int2strng(LvzInt32 value, char *string) { sprintf(string, "%d", value); }
 void float2strng(float value, char *string) { sprintf(string, "%.2f", value); }
 
 void mdaTestTone::setParameter(LvzInt32 index, float value)
@@ -75,17 +85,17 @@ void mdaTestTone::setParameter(LvzInt32 index, float value)
 
 
   //just update display text...
-  int this_mode = int(8.9 * fParam0);
+  mode = int(8.9 * fParam0);
   float f, df=0.0f;
   if(fParam4>0.6) df = 1.25f*fParam4 - 0.75f;
   if(fParam4<0.4) df = 1.25f*fParam4 - 0.50f;
-  switch(this_mode)
+  switch(mode)
   {
     case 0: //MIDI note
             f = (float)floor(128.f*fParam3);
-            //long2string((long)f, disp1); //Semi
+            //int2strng((LvzInt32)f, disp1); //Semi
             midi2string(f, disp1); //Semitones
-            long2string((long)(100.f*df), disp2); //Cents
+            int2strng((LvzInt32)(100.f*df), disp2); //Cents
             break;
 
     case 1: //no frequency display
@@ -111,8 +121,8 @@ void mdaTestTone::setParameter(LvzInt32 index, float value)
     case 8: //lin sweep
             sw = 200.f * (float)floor(100.f*fParam3);
             swx = 200.f * (float)floor(100.f*fParam4);
-            long2string((long)sw, disp1); //start freq
-            long2string((long)swx, disp2); //end freq
+            int2strng((LvzInt32)sw, disp1); //start freq
+            int2strng((LvzInt32)swx, disp2); //end freq
             break; 
   }
 
@@ -134,7 +144,7 @@ void mdaTestTone::update()
   if(fParam2<0.3f) right=0.f; else right=left;
   if(fParam2>0.6f) left=0.f;
   len = 1.f + 0.5f*(float)int(62*fParam6);
-  swt=(long)(len*getSampleRate());
+  swt=(LvzInt32)(len*getSampleRate());
 
   if(fParam7>0.8) //output level trim
   {
@@ -162,9 +172,9 @@ void mdaTestTone::update()
   {
         case 0: //MIDI note
                 f = (float)floor(128.f*fParam3);
-                //long2string((long)f, disp1); //Semi
+                //int2strng((LvzInt32)f, disp1); //Semi
                 midi2string(f, disp1); //Semitones
-                long2string((long)(100.f*df), disp2); //Cents
+                int2strng((LvzInt32)(100.f*df), disp2); //Cents
                 dphi = 51.37006f*(float)pow(1.0594631f,f+df)/getSampleRate();
                 break;
 
@@ -190,19 +200,19 @@ void mdaTestTone::update()
                 if(sw>swx) { swd=swx; swx=sw; sw=swd; } //only sweep up
                 if(mode==7) swx += 1.f;
                 swd = (swx-sw) / (len*getSampleRate());
-                swt= 2 * (long)getSampleRate();
+                swt= 2 * (LvzInt32)getSampleRate();
                 break;
 
         case 8: //lin sweep
                 sw = 200.f * (float)floor(100.f*fParam3);
                 swx = 200.f * (float)floor(100.f*fParam4);
-                long2string((long)sw, disp1); //start freq
-                long2string((long)swx, disp2); //end freq
+                int2strng((LvzInt32)sw, disp1); //start freq
+                int2strng((LvzInt32)swx, disp2); //end freq
                 if(sw>swx) { swd=swx; swx=sw; sw=swd; } //only sweep up
                 sw = twopi*sw/getSampleRate();
                 swx = twopi*swx/getSampleRate();
                 swd = (swx-sw) / (len*getSampleRate());
-                swt= 2 * (long)getSampleRate();
+                swt= 2 * (LvzInt32)getSampleRate();
                 break;
   }
   thru = (float)pow(10.0f, (0.05f * (float)int(40.f*fParam5)) - 2.f);
@@ -335,7 +345,7 @@ void mdaTestTone::getParameterDisplay(LvzInt32 index, char *text)
         case 7: strcpy(text, "LOG STEP"); break;
         case 8: strcpy(text, "LIN SWP."); break;
       } break;
-    case 1: long2string((long)(int(60.f * fParam1) - 60.0 - calx), text); break;
+    case 1: int2strng((LvzInt32)(int(60.f * fParam1) - 60.0 - calx), text); break;
     case 2: if(fParam2>0.3f)
             { if(fParam2>0.7f) strcpy(text, "RIGHT");
               else strcpy(text, "CENTRE"); }
@@ -343,8 +353,8 @@ void mdaTestTone::getParameterDisplay(LvzInt32 index, char *text)
     case 3: strcpy(text, disp1); break;
     case 4: strcpy(text, disp2); break;
     case 6: if(fParam5==0) strcpy(text, "OFF");
-            else long2string((long)(40 * fParam5 - 40), text); break;
-    case 5: long2string(1000 + 500*int(62*fParam6), text); break;
+            else int2strng((LvzInt32)(40 * fParam5 - 40), text); break;
+    case 5: int2strng(1000 + 500*int(62*fParam6), text); break;
     case 7: float2strng(cal, text); break;
   }
 }
@@ -379,7 +389,7 @@ void mdaTestTone::process(float **inputs, float **outputs, LvzInt32 sampleFrames
   float z0=zz0, z1=zz1, z2=zz2, z3=zz3, z4=zz4, z5=zz5;
   float ph=phi, dph=dphi, l=left, r=right, t=thru;
   float s=sw, sx=swx, ds=swd, fsc=fscale;
-  long st=swt;
+  LvzInt32 st=swt;
   int m=mode;
 
 	--in1;
@@ -398,7 +408,7 @@ void mdaTestTone::process(float **inputs, float **outputs, LvzInt32 sampleFrames
       case 1: if(st>0) { st--; x=0.f; } else //impulse
               {
                 x=1.f;
-                st=(long)(len*getSampleRate());
+                st=(LvzInt32)(len*getSampleRate());
               }
               break;
 
@@ -470,7 +480,7 @@ void mdaTestTone::processReplacing(float **inputs, float **outputs, LvzInt32 sam
   float z0=zz0, z1=zz1, z2=zz2, z3=zz3, z4=zz4, z5=zz5;
   float ph=phi, dph=dphi, l=left, r=right, t=thru;
   float s=sw, sx=swx, ds=swd, fsc=fscale;
-  long st=swt;
+  LvzInt32 st=swt;
   int m=mode;
 
 	--in1;
@@ -487,7 +497,7 @@ void mdaTestTone::processReplacing(float **inputs, float **outputs, LvzInt32 sam
       case 1: if(st>0) { st--; x=0.f; } else //impulse
               {
                 x=1.f;
-                st=(long)(len*getSampleRate());
+                st=(LvzInt32)(len*getSampleRate());
               }
               break;
 
