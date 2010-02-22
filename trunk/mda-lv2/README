@@ -9,7 +9,7 @@ v2 or later, or the MIT license.  Thanks, Paul!
 This port is by Dave Robillard, and is 100% Free Software (including the only
 dependency lv2.h) released under the GPL v2 or later. See COPYING for details.
 
-This port is based on revision 1 of the MDA SVN repository at:
+This port is based on revision 10 of the MDA SVN repository at:
 https://mda-vst.svn.sourceforge.net/svnroot/mda-vst
 
 
