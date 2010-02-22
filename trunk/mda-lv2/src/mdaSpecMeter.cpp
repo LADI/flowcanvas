@@ -23,8 +23,8 @@ createEffectInstance (audioMasterCallback audioMaster)
 mdaSpecMeterProgram::mdaSpecMeterProgram ()
 {
 	param[_PARAM0] = 0.5;
-	param[_PARAM1] = 0.5;
-	param[_PARAM2] = 0.75;
+	//param[_PARAM1] = 0.5;
+	//param[_PARAM2] = 0.75;
 	strcpy (name, "default");
 }
 
@@ -193,9 +193,9 @@ mdaSpecMeter::getParameterDisplay (LvzInt32 index, char *text)
 	case _PARAM0:
 		sprintf(string, "%.1f", 40.0f * param[index] - 20.0f);
 		break;
-	case _PARAM1:
+	/*case _PARAM1:
 		strcpy (string, "");
-		break;
+		break;*/
 	default:
 		sprintf(string, "%.0f", 100.0f * param[index]);
 	}

@@ -13,10 +13,11 @@
 #define SILENCE 0.00000001f
 
 enum {
-	_PARAM0, //peak decay
-	_PARAM1, //RMS speed
-	_PARAM2, //spectrum speed
-	_PARAM3, //peak reset?
+	_PARAM0, //gain
+//	_PARAM0, //peak decay
+//	_PARAM1, //RMS speed
+//	_PARAM2, //spectrum speed
+//	_PARAM3, //peak reset?
 
 	NPARAMS
 };
