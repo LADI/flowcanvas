@@ -18,13 +18,12 @@ lolep:@SYMBOL@ a lv2:Plugin ;
 		foaf:homepage <http://drobilla.net/> ;
 		foaf:mbox <mailto:dave@drobilla.net> ;
 	] ;
-    lv2:requiredFeature ctx:MessageContext ;
-	ctx:requiredContext ctx:MessageContext ;
+	lv2:optionalFeature lv2:hardRTCapable ;
+	ctx:optionalContext ctx:StatelessAudioContext ;
 	doap:license <http://usefulinc.com/doap/licenses/gpl> ;
-	lv2:pluginProperty lv2:hardRtCapable ;
 	lv2:port [
 		a lv2:InputPort, obj:ValuePort ;
-		ctx:context ctx:MessageContext ;
+		obj:supports obj:Float32 , obj:Int32, obj:Vector ;
 		lv2:index 0 ;
 		lv2:symbol "a" ;
 		lv2:name "A" ;
@@ -32,7 +31,7 @@ lolep:@SYMBOL@ a lv2:Plugin ;
 		rdfs:comment """Expects a number, or a vector of numbers""" ;
 	] , [
 		a lv2:InputPort, obj:ValuePort ;
-		ctx:context ctx:MessageContext ;
+		obj:supports obj:Float32 , obj:Int32, obj:Vector ;
 		lv2:index 1 ;
 		lv2:symbol "b" ;
 		lv2:name "B" ;
@@ -40,7 +39,7 @@ lolep:@SYMBOL@ a lv2:Plugin ;
 		rdfs:comment """Expects a number, or a vector of numbers""" ;
 	] , [
 		a lv2:OutputPort, obj:ValuePort ;
-		ctx:context ctx:MessageContext ;
+		obj:supports obj:Float32 , obj:Int32, obj:Vector ;
 		rsz:asLargeAs "a" , "b" ;
 		lv2:name "A @TINYNAME@ B" ;
 		lv2:index 2 ;

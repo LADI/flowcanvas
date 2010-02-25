@@ -83,13 +83,6 @@ specification of the context URI.  If a plugin has any contexts, it MUST specify
 the associated context of ALL ports, with the :context port property.""" .
 
 
-ctx:AudioContext a rdfs:Class ;
-	rdfs:subClassOf ctx:Context ;
-	rdfs:comment """
-The context of the core LV2 run method (LV2_Descriptor::run).
-""" .
-
-
 ctx:RollingContext a rdfs:Class ;
 	rdfs:subClassOf ctx:Context ;
 	rdfs:comment """
@@ -167,79 +160,43 @@ If no context is specified, the port is considered part of the default LV2
 audio context.""" .
 
 
-###################
-## Context Hints ##
-###################
-
-ctx:ContextHint a rdfs:Class ;
-    rdfs:label      "Context hint" ;
-    rdfs:subClassOf lv2:Hint ;
-    rdfs:comment    "Hint for a plugin context." .
-
-ctx:contextHint a rdf:Property ;
-    rdfs:domain  ctx:Context ;
-    rdfs:range   ctx:ContextHint ;
-    rdfs:label   "Context hint" ;
-    rdfs:comment "Relates Contexts to ContextHints." .
-
-ctx:hardRTCapable a ctx:ContextHint ;
-    rdfs:label   "Hard realtime capable" ;
-    rdfs:comment """
-Indicates that the context is capable of running in a "hard real-time"
-environment, with identical conditions as lv2:hardRTCapable.
-""" .
-
-
-########################
-## Context Priorities ##
-########################
-
-ctx:ContextPriority a rdfs:Class ;
-	rdfs:label "Context priority" ;
-	rdfs:comment """
-The scheduling priority of a context.
-""" .
-
-ctx:AudioPriority a rdfs:Class ;
-	rdfs:subClassOf ctx:ContextPriority ;
-	rdfs:label "Audio context priority" ;
-	rdfs:comment """
-Signifies a context should be run with priority equal to that of the
-standard LV2 run callback.
-""" .
-
-ctx:MainPriority a rdfs:Class ;
-	rdfs:subClassOf ctx:ContextPriority ;
-	rdfs:label "Main context priority" ;
-	rdfs:comment """
-Signifies a context should be run with priority equal to that of the
-main context of the host (typically non-realtime default system priority).
-""" .
-
-
-ctx:HighPriorityWorker a rdfs:Class ;
-	rdfs:subClassOf ctx:Context ;
-	rdfs:comment """
-A worker context with a high priority, just below that of the main run
-callback.  If the run callback is run with realtime priority, the host
-should run this context with (slighly lower) realtime priority as well.
-""" .
-
-ctx:LowPriorityWorker a rdfs:Class ;
-	rdfs:subClassOf ctx:Context ;
-	rdfs:comment """
-A worker context with a low non-realtime priority, lower then that of the
-standard LV2 run callback.
-""" .
-
-
 ##################################
 ## Specific context definitions ##
 ##################################
 
+
+ctx:AudioContext a rdfs:Class ;
+	rdfs:subClassOf ctx:Context ;
+	rdfs:comment """
+The context of the core LV2 run method (LV2_Descriptor::run).
+""" .
+
+
+ctx:StatelessAudioContext a rdfs:Class ;
+	rdfs:subClassOf ctx:Context ;
+	rdfs:comment """
+The usual LV2 run context (ctx:AudioContext), with the additional property
+that the plugin has no internal state whatsoever (other than the sample rate
+and the locations ports are currently connected to).  On a plugin with a
+ctx:StatelessAudioContext, the nframes parameter to run is meaningless and
+ignored by the plugin, and the host may assume that any call to run with
+a given set of inputs will produce the exact same set of outputs (i.e.
+the plugin's run method is purely functional).  This context inherently
+conflicts with lv2:isLive, a plugin MUST NOT have both a
+ctx:StatelessAudioContext and the lv2:isLive feature.
+
+For easy compatibility with hosts that don't care whether the audio context
+is stateless or not, this context should be listed as a ctx:optionalContext
+(since the default LV2 context is implicitly present).
+""" .
+
+
 ctx:MessageContext a rdfs:Class ;
 	rdfs:subClassOf ctx:BlockingContext ;
 	rdfs:comment """
-A blocking context for on-demand message-like processing.
+A blocking context for on-demand message-like processing.  The plugin's
+lv2:hardRTCapable property does not apply to the message context, there are
+no realtime restrictions on the plugin's message context, and no
+syncronisation guarantees between the message context and any other context.
 """ .
 

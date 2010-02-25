@@ -179,6 +179,18 @@ implementation does not understand the actual type of that object.
 """ .
 
 
+obj:supports a rdf:Property ;
+	rdfs:domain  lv2:Port ;
+	rdfs:range   obj:ObjectType ;
+	rdfs:label   "supports" ;
+	rdfs:comment """
+Indicates that a port supports a certain value type.  This is distinct from
+the port type - e.g. the port type ValuePort can hold objects with many
+different types.  This property is used to describe which object types
+a port ``understands''.
+""" .
+
+
 obj:Reference a obj:ObjectType ;
 	rdfs:label   "Reference" ;
 	rdfs:comment """
