@@ -1344,7 +1344,7 @@ Canvas::render_to_dot(const string& dot_output_filename)
 
 
 void
-Canvas::arrange(bool use_length_hints)
+Canvas::arrange(bool use_length_hints, bool center)
 {
 #ifdef HAVE_AGRAPH
 	GVNodes nodes = layout_dot(use_length_hints, "");
@@ -1388,17 +1388,39 @@ Canvas::arrange(bool use_length_hints)
 	if (graph_height + 10 > _height)
 		resize(_width, graph_height + 10);
 
-	static const double border_width = 64.0;
-	for (GVNodes::iterator i = nodes.begin(); i != nodes.end(); ++i) {
-		i->first->move(
-				border_width - least_x,
-				border_width - least_y);
-	}
-
 	nodes.cleanup();
 
-	scroll_to(0, 0);
+	if (center) {
+		move_contents_to_internal(
+				_width / 2.0 - (graph_width / 2.0),
+				_height / 2.0 - (graph_height / 2.0), least_x, least_y);
+		scroll_to_center();
+	} else {
+		static const double border_width = 64.0;
+		move_contents_to_internal(border_width, border_width, least_x, least_y);
+		scroll_to(0, 0);
+	}
 #endif
+}
+
+
+void
+Canvas::move_contents_to(double x, double y)
+{
+	double min_x=HUGE_VAL, min_y=HUGE_VAL;
+	for (ItemList::const_iterator i = _items.begin(); i != _items.end(); ++i) {
+		min_x = std::min(min_x, double((*i)->property_x()));
+		min_y = std::min(min_y, double((*i)->property_y()));
+	}
+	move_contents_to_internal(x, y, min_x, min_y);
+}
+
+
+void
+Canvas::move_contents_to_internal(double x, double y, double min_x, double min_y)
+{
+	for (ItemList::const_iterator i = _items.begin(); i != _items.end(); ++i)
+		(*i)->move(x - min_x, y - min_y);
 }
 
 

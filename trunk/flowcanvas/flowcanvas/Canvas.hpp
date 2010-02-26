@@ -99,7 +99,9 @@ public:
 	void   zoom_full();
 
 	void render_to_dot(const std::string& filename);
-	virtual void arrange(bool use_length_hints=false);
+	virtual void arrange(bool use_length_hints=false, bool center=true);
+
+	void move_contents_to(double x, double y);
 
 	double width() const  { return _width; }
 	double height() const { return _height; }
@@ -166,6 +168,8 @@ private:
 
 	void ports_joined(boost::shared_ptr<Port> port1, boost::shared_ptr<Port> port2);
 	bool animate_selected();
+
+	void move_contents_to_internal(double x, double y, double min_x, double min_y);
 
 	void on_parent_changed(Gtk::Widget* old_parent);
 	sigc::connection _parent_event_connection;
