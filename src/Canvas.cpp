@@ -115,9 +115,12 @@ Canvas::set_zoom(double pix_per_unit)
 void
 Canvas::scroll_to_center()
 {
-	int win_width, win_height;
+	int win_width  = 0;
+	int win_height = 0;
+
 	Glib::RefPtr<Gdk::Window> win = get_window();
-	win->get_size(win_width, win_height);
+	if (win)
+		win->get_size(win_width, win_height);
 
 	scroll_to((int)((_width - win_width) / 2.0),
 	          (int)((_height - win_height) / 2.0));
@@ -429,6 +432,14 @@ Canvas::remove_item(boost::shared_ptr<Item> item)
 		}
 	}
 
+	// Remove children ports from selection if item is a module
+	boost::shared_ptr<Module> module = boost::dynamic_pointer_cast<Module>(item);
+	if (module) {
+		for (PortVector::iterator i = module->ports().begin(); i != module->ports().end(); ++i) {
+			unselect_port(*i);
+		}
+	}
+
 	// Remove from items
 	for (ItemList::iterator i = _items.begin(); i != _items.end(); ++i) {
 		if (*i == item) {
@@ -681,7 +692,7 @@ Canvas::port_event(GdkEvent* event, boost::weak_ptr<Port> weak_port)
 	case GDK_BUTTON_PRESS:
 		if (event->button.button == 1) {
 			boost::shared_ptr<Module> module = port->module().lock();
-			if (module && _locked) {
+			if (module && _locked && port->is_input()) {
 				if (port->is_toggled()) {
 					port->toggle();
 					ignore_button_release = true;
@@ -1333,7 +1344,7 @@ Canvas::render_to_dot(const string& dot_output_filename)
 
 
 void
-Canvas::arrange(bool use_length_hints)
+Canvas::arrange(bool use_length_hints, bool center)
 {
 #ifdef HAVE_AGRAPH
 	GVNodes nodes = layout_dot(use_length_hints, "");
@@ -1377,16 +1388,39 @@ Canvas::arrange(bool use_length_hints)
 	if (graph_height + 10 > _height)
 		resize(_width, graph_height + 10);
 
-	// Center on canvas
-	for (GVNodes::iterator i = nodes.begin(); i != nodes.end(); ++i) {
-		i->first->move((_width / 2.0) - graph_width/2.0,
-		              ((_height / 2.0) + graph_height/2.0));
-	}
-
-	scroll_to_center();
-
 	nodes.cleanup();
+
+	if (center) {
+		move_contents_to_internal(
+				_width / 2.0 - (graph_width / 2.0),
+				_height / 2.0 - (graph_height / 2.0), least_x, least_y);
+		scroll_to_center();
+	} else {
+		static const double border_width = 64.0;
+		move_contents_to_internal(border_width, border_width, least_x, least_y);
+		scroll_to(0, 0);
+	}
 #endif
+}
+
+
+void
+Canvas::move_contents_to(double x, double y)
+{
+	double min_x=HUGE_VAL, min_y=HUGE_VAL;
+	for (ItemList::const_iterator i = _items.begin(); i != _items.end(); ++i) {
+		min_x = std::min(min_x, double((*i)->property_x()));
+		min_y = std::min(min_y, double((*i)->property_y()));
+	}
+	move_contents_to_internal(x, y, min_x, min_y);
+}
+
+
+void
+Canvas::move_contents_to_internal(double x, double y, double min_x, double min_y)
+{
+	for (ItemList::const_iterator i = _items.begin(); i != _items.end(); ++i)
+		(*i)->move(x - min_x, y - min_y);
 }
 
 

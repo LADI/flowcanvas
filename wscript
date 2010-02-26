@@ -3,7 +3,7 @@ import autowaf
 import Options
 
 # Version of this package (even if built as a child)
-FLOWCANVAS_VERSION = '0.6.0'
+FLOWCANVAS_VERSION = '0.6.3'
 
 # Library version (UNIX style major, minor, micro)
 # major increment <=> incompatible changes
@@ -15,7 +15,8 @@ FLOWCANVAS_VERSION = '0.6.0'
 #   0.5.2 = 2,0,0
 #   0.5.3 = 2,1,0
 #   0.6.0 = 3,0,0
-FLOWCANVAS_LIB_VERSION = '3.0.0'
+#   0.6.3 = 4,0,0 (unreleased)
+FLOWCANVAS_LIB_VERSION = '4.0.0'
 
 # Variables for 'waf dist'
 APPNAME = 'flowcanvas'
@@ -32,6 +33,7 @@ def set_options(opt):
 
 def configure(conf):
 	autowaf.configure(conf)
+	autowaf.display_header('FlowCanvas Configuration')
 	conf.check_tool('compiler_cxx')
 	autowaf.check_pkg(conf, 'libgvc', uselib_store='AGRAPH', atleast_version='2.8', mandatory=False)
 	autowaf.check_pkg(conf, 'gtkmm-2.4', uselib_store='GLIBMM', atleast_version='2.10.0', mandatory=True)
@@ -45,7 +47,6 @@ def configure(conf):
 	conf.env['ANTI_ALIAS'] = bool(Options.options.anti_alias)
 
 	autowaf.print_summary(conf)
-	autowaf.display_header('FlowCanvas Configuration')
 	autowaf.display_msg(conf, "Auto-arrange", str(conf.env['HAVE_AGRAPH'] == 1))
 	autowaf.display_msg(conf, "Anti-Aliasing", str(bool(conf.env['ANTI_ALIAS'])))
 	print

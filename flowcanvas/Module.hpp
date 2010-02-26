@@ -46,7 +46,8 @@ public:
 
 	virtual ~Module();
 
-	const PortVector& ports()  const { return _ports; }
+	const PortVector& ports() const { return _ports; }
+	PortVector&       ports()       { return _ports; }
 
 	inline boost::shared_ptr<Port> get_port(const std::string& name) const;
 
