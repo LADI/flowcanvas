@@ -1388,13 +1388,12 @@ Canvas::arrange(bool use_length_hints)
 	if (graph_height + 10 > _height)
 		resize(_width, graph_height + 10);
 
-	// Center on canvas
+	static const double border_width = 64.0;
 	for (GVNodes::iterator i = nodes.begin(); i != nodes.end(); ++i) {
-		i->first->move((_width / 2.0) - graph_width/2.0,
-		              ((_height / 2.0) + graph_height/2.0));
+		i->first->move(
+				border_width - least_x,
+				border_width - least_y);
 	}
-
-	scroll_to_center();
 
 	nodes.cleanup();
 #endif
