@@ -1396,6 +1396,8 @@ Canvas::arrange(bool use_length_hints)
 	}
 
 	nodes.cleanup();
+
+	scroll_to(0, 0);
 #endif
 }
 
