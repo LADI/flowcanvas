@@ -32,6 +32,10 @@
 <http://lv2plug.in/ns/dev/presets> a lv2:Specification ;
 	doap:license <http://usefulinc.com/doap/licenses/mit> ;
 	doap:name    "LV2 Presets" ;
+	doap:release [
+		doap:revision "2" ;
+		doap:created "2010-03-02"
+	] ;
 	doap:maintainer [
 		a foaf:Person ;
 		foaf:name     "Dave Robillard" ;
@@ -59,7 +63,7 @@ pset:value property.
 """ .
 
 pset:appliesTo a rdf:Property ;
-	rdfs:domain  lv2:Preset ;
+	rdfs:domain  pset:Preset ;
 	rdfs:range   lv2:Plugin ;
 	rdfs:label   "Applies to" ;
 	rdfs:comment """
