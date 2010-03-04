@@ -829,7 +829,8 @@ Canvas::canvas_event(GdkEvent* event)
 				clear_selection();
 			}
 			break;
-		default: break;
+		default:
+            return false;
 		}
 		scroll_to(scroll_x, scroll_y);
 		return true;
