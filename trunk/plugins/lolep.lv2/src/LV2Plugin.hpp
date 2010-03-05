@@ -168,7 +168,6 @@ public:
 	}
 
 protected:
-
 	/** Use this function to access and cast port buffers, for example
 	 *  like this:
 	 *
@@ -194,11 +193,8 @@ protected:
 	std::vector<void*> m_ports;
 
 private:
-
-	static void _connect_port(LV2_Handle instance, uint32_t port,
-	                          void* data_location)
-	{
-		reinterpret_cast<Derived*>(instance)->connect_port(port, data_location);
+	static void _connect_port(LV2_Handle instance, uint32_t port, void* buf) {
+		reinterpret_cast<Derived*>(instance)->connect_port(port, buf);
 	}
 
 	static void _activate(LV2_Handle instance) {
@@ -244,13 +240,11 @@ private:
 	}
 
 private:
-
 	LV2::Feature const* const* m_features;
 	char const*                m_bundle_path;
 
 	static LV2::Feature const* const* s_features;
 	static char const*                s_bundle_path;
-
 };
 
 

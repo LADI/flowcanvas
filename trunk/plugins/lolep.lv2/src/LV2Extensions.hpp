@@ -36,7 +36,6 @@ template<bool Required>
 struct FixedSize {
 	template<class Derived>
 	struct I : Extension<Required> {
-
 		I() : m_buffer_size(0) {}
 
 		static void map_feature_handlers(FeatureHandlerMap& hmap) {
@@ -68,7 +67,6 @@ template<bool Required>
 struct FixedP2Size {
 	template<class Derived>
 	struct I : Extension<Required> {
-
 		I() : m_buffer_size(0) {}
 
 		static void map_feature_handlers(FeatureHandlerMap& hmap) {
@@ -98,7 +96,6 @@ struct FixedP2Size {
 template <bool Required>
 struct UriMap {
 	template <class Derived> struct I : Extension<Required> {
-
 		I() : m_uri_map_feature(0) {}
 
 		static void map_feature_handlers(FeatureHandlerMap& hmap) {
@@ -119,9 +116,7 @@ struct UriMap {
 		}
 
 		LV2_URI_Map_Feature* m_uri_map_feature;
-
 	};
-
 };
 
 
@@ -134,7 +129,6 @@ struct UriMap {
 template <bool Required>
 struct MessageContext {
 	template <class Derived> struct I : Extension<Required> {
-
 		I() {}
 
 		static const void* extension_data(const char* uri) {
@@ -142,7 +136,6 @@ struct MessageContext {
 			context.message_run = &Derived::message_run;
 			return &context;
 		}
-
 	};
 };
 
@@ -151,7 +144,6 @@ struct MessageContext {
 template <bool Required>
 struct ResizePort {
 	template <class Derived> struct I : Extension<Required> {
-
 		I() : m_resize_port_feature(0) {}
 
 		static void map_feature_handlers(FeatureHandlerMap& hmap) {
@@ -172,11 +164,8 @@ struct ResizePort {
 		}
 
 	protected:
-
 		LV2_Resize_Port_Feature* m_resize_port_feature;
-
 	};
-
 };
 
 
