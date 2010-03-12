@@ -108,14 +108,6 @@ def check_pkg(conf, name, **args):
 			if args['mandatory'] == True:
 				conf.fatal("Required package " + name + " not found")
 
-def chop_prefix(conf, var):
-	name = conf.env[var][len(conf.env['PREFIX']):]
-	if len(name) > 0 and name[0] == '/':
-		name = name[1:]
-	if name == "":
-		name = "/"
-	return name;
-
 def configure(conf):
 	global g_step
 	if g_step > 1:
@@ -185,11 +177,11 @@ def configure(conf):
 				else:
 					conf.env['LV2DIR'] = os.path.join(conf.env['LIBDIR'], 'lv2')
 		
-	conf.env['BINDIRNAME'] = chop_prefix(conf, 'BINDIR')
-	conf.env['LIBDIRNAME'] = chop_prefix(conf, 'LIBDIR')
-	conf.env['DATADIRNAME'] = chop_prefix(conf, 'DATADIR')
-	conf.env['CONFIGDIRNAME'] = chop_prefix(conf, 'CONFIGDIR')
-	conf.env['LV2DIRNAME'] = chop_prefix(conf, 'LV2DIR')
+	conf.env['BINDIRNAME'] = os.path.basename(conf.env['BINDIR'])
+	conf.env['LIBDIRNAME'] = os.path.basename(conf.env['LIBDIR'])
+	conf.env['DATADIRNAME'] = os.path.basename(conf.env['DATADIR'])
+	conf.env['CONFIGDIRNAME'] = os.path.basename(conf.env['CONFIGDIR'])
+	conf.env['LV2DIRNAME'] = os.path.basename(conf.env['LV2DIR'])
 	
 	if Options.options.debug:
 		conf.env['CCFLAGS'] = [ '-O0', '-g' ]
