@@ -42,34 +42,34 @@ public:
 
 	Widget<Gtk::AboutDialog> about_dialog;
 	Widget<Gtk::MenuItem>    about_menuitem;
-	Widget<Gtk::Button>      execute_button;
-	Widget<Gtk::MenuItem>    open_menuitem;
-	Widget<Gtk::Button>      stop_button;
-	Widget<Gtk::CheckButton> greedy_mutation_check;
-	Widget<Gtk::ComboBox>    selection_combo;
 	Widget<Gtk::Label>       best_generation_label;
-	Widget<Gtk::Label>       generation_label;
-	Widget<Gtk::Label>       selection_probability_label;
-	Widget<Gtk::Label>       shortest_path_label;
-	Widget<Gtk::Label>       trial_size_label;
 	Widget<Gtk::Scale>       crossover_probability_scale;
+	Widget<Gtk::SpinButton>  elites_spin;
+	Widget<Gtk::Button>      execute_button;
+	Widget<Gtk::Label>       generation_label;
+	Widget<Gtk::CheckButton> greedy_mutation_check;
 	Widget<Gtk::Scale>       injection_scale;
+	Widget<Gtk::Window>      main_win;
 	Widget<Gtk::Scale>       mutation_scale;
+	Widget<Gtk::MenuItem>    open_menuitem;
 	Widget<Gtk::Scale>       order_scale;
 	Widget<Gtk::Scale>       partially_mapped_scale;
 	Widget<Gtk::Scale>       permute_gene_scale;
+	Widget<Gtk::SpinButton>  population_spin;
 	Widget<Gtk::Scale>       position_based_scale;
 	Widget<Gtk::Scale>       random_flip_scale;
 	Widget<Gtk::Scale>       random_swap_scale;
 	Widget<Gtk::Scale>       reverse_scale;
-	Widget<Gtk::Scale>       single_point_scale;
-	Widget<Gtk::Scale>       swap_range_scale;
-	Widget<Gtk::SpinButton>  elites_spin;
-	Widget<Gtk::SpinButton>  population_spin;
+	Widget<Gtk::ComboBox>    selection_combo;
+	Widget<Gtk::Label>       selection_probability_label;
 	Widget<Gtk::SpinButton>  selection_probability_spin;
+	Widget<Gtk::Label>       shortest_path_label;
+	Widget<Gtk::Scale>       single_point_scale;
+	Widget<Gtk::Button>      stop_button;
+	Widget<Gtk::Scale>       swap_range_scale;
+	Widget<Gtk::Label>       trial_size_label;
 	Widget<Gtk::SpinButton>  trial_size_spin;
 	Widget<Gtk::Viewport>    viewport;
-	Widget<Gtk::Window>      main_win;
 
 private:
 	void ga_run();

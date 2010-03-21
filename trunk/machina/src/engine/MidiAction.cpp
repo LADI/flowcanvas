@@ -105,7 +105,7 @@ MidiAction::write_state(Redland::Model& model)
 	// FIXME: Assumes note on/note off
 	model.add_statement(_id,
 			Redland::Node(model.world(), Redland::Node::RESOURCE, "machina:midiNote"),
-			AtomRDF::atom_to_node(model.world(), Atom((int)(_event.get()[1]))));
+			AtomRDF::atom_to_node(model, Atom((int)(_event.get()[1]))));
 }
 
 

@@ -55,7 +55,7 @@ Edge::write_state(Redland::Model& model)
 
 	model.add_statement(_id,
 			"machina:probability",
-			AtomRDF::atom_to_node(model.world(), Atom(_probability.get())));
+			AtomRDF::atom_to_node(model, Atom(_probability.get())));
 }
 
 

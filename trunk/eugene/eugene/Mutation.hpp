@@ -25,6 +25,7 @@ namespace Eugene {
 
 template <typename G>
 struct Mutation {
+	virtual ~Mutation() {}
 	virtual void mutate(G& g) = 0;
 };
 

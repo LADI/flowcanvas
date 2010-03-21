@@ -32,6 +32,7 @@ template <typename G> class Mutation;
 class GA {
 public:
 	GA() : _generation(0) {}
+	virtual ~GA() {}
 
 	virtual void set_mutation_probability(float p) {}
 	virtual void set_crossover_probability(float p) {}

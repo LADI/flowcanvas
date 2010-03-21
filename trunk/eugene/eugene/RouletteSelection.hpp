@@ -24,7 +24,6 @@ namespace Eugene {
 
 template <typename G>
 struct RouletteSelection : public Selection<G> {
-
 	RouletteSelection(shared_ptr< Problem<G> > problem) : Selection<G>(problem) {}
 
 	void prepare(shared_ptr<typename Problem<G>::Population> pop) const {

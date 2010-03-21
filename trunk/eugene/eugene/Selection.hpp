@@ -31,10 +31,11 @@ template <typename G>
 class Selection {
 public:
 	typedef std::pair<typename Problem<G>::Population::iterator,
-    	              typename Problem<G>::Population::iterator>
+		              typename Problem<G>::Population::iterator>
 		GenePair;
 
 	Selection(shared_ptr< Problem<G> > problem) : _problem(problem), _evaluations(0) {}
+	virtual ~Selection() {}
 
 	virtual GenePair select_parents(shared_ptr<typename Problem<G>::Population> pop) const = 0;
 	virtual void     prepare(shared_ptr<typename Problem<G>::Population> pop) const {}

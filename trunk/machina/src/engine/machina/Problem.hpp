@@ -29,6 +29,7 @@ namespace Machina {
 class Problem : public Eugene::Problem<Machine> {
 public:
 	Problem(TimeUnit unit, const std::string& target_midi, SharedPtr<Machine> seed = SharedPtr<Machine>());
+	virtual ~Problem() {}
 
 	void seed(SharedPtr<Machine> parent) { _seed = parent; }
 

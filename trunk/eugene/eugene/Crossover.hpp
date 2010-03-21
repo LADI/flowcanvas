@@ -23,6 +23,8 @@ namespace Eugene {
 
 template <typename G>
 struct Crossover {
+	virtual ~Crossover() {}
+
 	virtual std::pair<G,G> crossover(const G& parent_1, const G& parent_2) = 0;
 
 	template <typename A>

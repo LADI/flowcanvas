@@ -24,7 +24,7 @@
 	#include "eugene/Mutation.hpp"
 	#define SUPER : public Eugene::Mutation<Machine>
 #else
-	#define SUPER
+	#define SUPER : public Mutation
 #endif
 
 namespace Machina {
@@ -33,7 +33,7 @@ class Machine;
 
 namespace Mutation {
 
-struct Mutation { virtual void mutate(Machine& machine) = 0; };
+struct Mutation { virtual ~Mutation() {}; virtual void mutate(Machine& machine) = 0; };
 
 struct Compress   SUPER { void mutate(Machine& machine); };
 struct AddNode    SUPER { void mutate(Machine& machine); };

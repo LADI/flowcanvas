@@ -227,7 +227,7 @@ Node::write_state(Redland::Model& model)
 
 	model.add_statement(_id,
 			"machina:duration",
-			AtomRDF::atom_to_node(model.world(), Atom((float)_duration.to_double())));
+			AtomRDF::atom_to_node(model, Atom((float)_duration.to_double())));
 
 	if (_enter_action) {
 		_enter_action->write_state(model);

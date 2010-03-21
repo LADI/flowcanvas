@@ -16,6 +16,7 @@
  */
 
 #pragma once
+#include <stdint.h>
 #include <iostream>
 #include <vector>
 #include <boost/shared_ptr.hpp>
@@ -32,6 +33,7 @@ template <typename G>
 class Problem {
 public:
 	Problem(size_t gene_size=0) : _gene_size(gene_size) {}
+	virtual ~Problem() {}
 
 	typedef std::vector<G> Population;
 
