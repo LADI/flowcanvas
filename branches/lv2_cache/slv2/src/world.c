@@ -87,8 +87,11 @@ slv2_world_new_internal(SLV2World world)
 	stat(dir_path, &dir);
 	if (!S_ISDIR(dir.st_mode))
 		mkdir(dir_path, 0777);
+	free(dir_path);
 
-	world->storage = slv2_world_new_persistent_storage(world, "/home/dave/.cache/slv2/world");
+	char* world_path = slv2_world_cache_location("world", false);
+	world->storage = slv2_world_new_persistent_storage(world, world_path);
+	free(world_path);
 	if (!world->storage)
 		goto fail;
 
@@ -339,7 +342,7 @@ slv2_world_load_file(SLV2World world, librdf_uri* file_uri)
 			free(cache_time_str);
 			return;
 		} else {
-			printf("CACHE REPLACE %s\n", file_uri_str);
+			//printf("CACHE REPLACE %s\n", file_uri_str);
 			librdf_statement* s = librdf_new_statement_from_nodes(world->world,
 					librdf_new_node_from_uri(world->world, file_uri),
 					librdf_new_node_from_node(world->dcterms_modified_node),
@@ -356,7 +359,7 @@ slv2_world_load_file(SLV2World world, librdf_uri* file_uri)
 		}
 	}
 
-	printf("PARSE %s @ %s\n", file_uri_str, file_time_str);
+	//printf("PARSE %s @ %s\n", file_uri_str, file_time_str);
 
 	librdf_statement* s = librdf_new_statement_from_nodes(world->world,
 			librdf_new_node_from_uri(world->world, file_uri),
