@@ -99,6 +99,7 @@ def build(bld):
 
 	lib_source = '''
 		src/collections.c
+		src/md5.c
 		src/plugin.c
 		src/pluginclass.c
 		src/plugininstance.c
