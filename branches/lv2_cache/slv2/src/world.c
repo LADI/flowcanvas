@@ -28,6 +28,7 @@
 #include <sys/types.h>
 #include <time.h>
 #include <wordexp.h>
+#include "md5.h"
 #include "slv2/types.h"
 #include "slv2/world.h"
 #include "slv2/slv2.h"
@@ -130,8 +131,8 @@ slv2_world_new_internal(SLV2World world)
 	world->xsd_decimal_node = librdf_new_node_from_uri_string(world->world,
 			(const unsigned char*)"http://www.w3.org/2001/XMLSchema#decimal");
 
-	world->dcterms_modified_node = librdf_new_node_from_uri_string(world->world,
-			(const unsigned char*)"http://purl.org/dc/terms/modified");
+	world->slv2_digest_node = librdf_new_node_from_uri_string(world->world,
+			(const unsigned char*)"http://www.w3.org/2000/10/swap/crypto#md5");
 
 	world->lv2_plugin_class = slv2_plugin_class_new(world, NULL,
 			librdf_node_get_uri(world->lv2_plugin_node), "Plugin");
@@ -250,7 +251,7 @@ slv2_world_free(SLV2World world)
 	librdf_free_node(world->rdf_a_node);
 	librdf_free_node(world->xsd_integer_node);
 	librdf_free_node(world->xsd_decimal_node);
-	librdf_free_node(world->dcterms_modified_node);
+	librdf_free_node(world->slv2_digest_node);
 
 	for (int i=0; i < raptor_sequence_size(world->plugins); ++i)
 		slv2_plugin_free(raptor_sequence_get_at(world->plugins, i));
@@ -284,22 +285,21 @@ slv2_world_free(SLV2World world)
 }
 
 
-/** @return cached file's modification time (in ISO 8601 string format),
- * or NULL if file is not cached. */
+/** @return cached file's MD5 sum or NULL if file is not cached. */
 static librdf_node*
-slv2_world_cache_time(SLV2World world, librdf_uri* file_uri)
+slv2_world_cache_sum(SLV2World world, librdf_uri* file_uri)
 {
 	assert(file_uri);
-	librdf_node* uri_node = librdf_new_node_from_uri(world->world, file_uri);
-	librdf_node* time_node = librdf_new_node_from_node(world->dcterms_modified_node);
-	librdf_node* file_time_node = librdf_model_get_target(world->files, uri_node, time_node);
+	librdf_node* uri_node      = librdf_new_node_from_uri(world->world, file_uri);
+	librdf_node* sum_node      = librdf_new_node_from_node(world->slv2_digest_node);
+	librdf_node* file_sum_node = librdf_model_get_target(world->files, uri_node, sum_node);
 	librdf_free_node(uri_node);
-	librdf_free_node(time_node);
-	if (file_time_node && !librdf_node_is_literal(file_time_node)) {
-		librdf_free_node(file_time_node);
+	librdf_free_node(sum_node);
+	if (file_sum_node && !librdf_node_is_literal(file_sum_node)) {
+		librdf_free_node(file_sum_node);
 		return NULL;
 	}
-	return file_time_node;
+	return file_sum_node;
 }
 
 
@@ -312,64 +312,64 @@ slv2_world_load_file(SLV2World world, librdf_uri* file_uri)
 		return;
 
 	const char* file_uri_str = (const char*)librdf_uri_as_string(file_uri);
-	const char* file_path = slv2_uri_to_path(file_uri_str);
+	const char* file_path    = slv2_uri_to_path(file_uri_str);
 	if (!file_path) {
 		SLV2_ERROR("Unable to load non-local file\n");
 		return;
 	}
 
-	librdf_node* cache_file_time = slv2_world_cache_time(world, file_uri);
+	librdf_node* cache_file_sum = slv2_world_cache_sum(world, file_uri);
 
-	struct stat file_stat;
-	stat(file_path, &file_stat);
-	const size_t max_stamp_len = 128;
-	char file_time_str[max_stamp_len];
-	struct tm time;
-	gmtime_r(&file_stat.st_mtime, &time);
-	//printf("Nanoseconds: %lu\n", file_stat.st_atimensec);
+	md5_byte_t sum[MD5_DIGEST_LENGTH];
+	if (!md5_file(file_path, sum)) {
+		SLV2_ERROR("Unable to calculate MD5 sum of file\n");
+		return;
+	}
 
-	// UTC time in ISO 8601 format
-	strftime(file_time_str, max_stamp_len, "%FT%TZ", &time);
+	// Convert binary sum into hex
+	static const char* hex = "0123456789abcdef";
+	char file_sum_str[MD5_DIGEST_LENGTH * 2 + 1];
+	for (int i = 0; i < MD5_DIGEST_LENGTH; ++i) {
+		file_sum_str[i * 2]     = hex[sum[i] >> 4];
+		file_sum_str[i * 2 + 1] = hex[sum[i] & 0x0F];
+	}
+	file_sum_str[MD5_DIGEST_LENGTH * 2] = '\0';
 
-	//printf("FILE %s TIME   %s\n", file_uri_str, file_time_str);
-
-	if (cache_file_time) {
-		char* cache_time_str = (char*)librdf_node_to_string(cache_file_time);
-		//printf("CACHED %s TIME %s\n", file_uri_str, cache_time_str);
-		const int cmp = strcmp(cache_time_str, file_time_str);
+	if (cache_file_sum) {
+		char* cache_sum_str = (char*)librdf_node_to_string(cache_file_sum);
+		const int cmp = strcmp(cache_sum_str, file_sum_str);
 		if (!cmp) {
-			//printf("CACHE HIT %s\n", file_uri_str);
-			free(cache_time_str);
+			//printf("slv2: Cache hit %s\n", file_path);
+			free(cache_sum_str);
 			return;
 		} else {
-			//printf("CACHE REPLACE %s\n", file_uri_str);
+			//printf("slv2: Cache replace %s\n", file_path);
 			librdf_statement* s = librdf_new_statement_from_nodes(world->world,
 					librdf_new_node_from_uri(world->world, file_uri),
-					librdf_new_node_from_node(world->dcterms_modified_node),
+					librdf_new_node_from_node(world->slv2_digest_node),
 					librdf_new_node_from_literal(world->world,
-						(const unsigned char*)cache_time_str, NULL, 0));
+						(const unsigned char*)cache_sum_str, NULL, 0));
 			if (librdf_model_remove_statement(world->files, s)) {
-				fprintf(stderr, "Failed to remove cache time statement\n");
+				fprintf(stderr, "Failed to remove cache digest statement\n");
 			}
 			librdf_free_statement(s);
-			free(cache_time_str);
+			free(cache_sum_str);
 
 			librdf_model_context_remove_statements(world->model,
 					librdf_new_node_from_uri(world->world, file_uri));
 		}
 	}
 
-	//printf("PARSE %s @ %s\n", file_uri_str, file_time_str);
+	//printf("slv2: Parse %s\n", file_uri_str);
 
 	librdf_statement* s = librdf_new_statement_from_nodes(world->world,
 			librdf_new_node_from_uri(world->world, file_uri),
-			librdf_new_node_from_node(world->dcterms_modified_node),
+			librdf_new_node_from_node(world->slv2_digest_node),
 			librdf_new_node_from_literal(world->world,
-				(const unsigned char*)file_time_str, NULL, 0));
+				(const unsigned char*)file_sum_str, NULL, 0));
 	librdf_model_add_statement(world->files, s);
 	librdf_free_statement(s);
 
-	//librdf_parser_parse_into_model(world->parser, file_uri, file_uri, world->model);
 	librdf_stream* file_stream = librdf_parser_parse_as_stream(world->parser, file_uri, file_uri);
 	librdf_model_context_add_statements(world->model,
 			librdf_new_node_from_uri(world->world, file_uri),

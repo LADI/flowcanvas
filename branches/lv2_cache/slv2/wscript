@@ -43,8 +43,10 @@ def set_options(opt):
 	autowaf.set_options(opt)
 	opt.add_option('--no-jack', action='store_true', default=False, dest='no_jack',
 			help="Do not build JACK clients")
+	opt.add_option('--no-mmap', action='store_true', default=False, dest='no_mmap',
+			help="Don't use mmap for reading file checksums (even if it is available)")
 	opt.add_option('--dyn-manifest', action='store_true', default=False, dest='dyn_manifest',
-			help="Build support for dynamic manifest extension [false]")
+			help="Build support for dynamic manifest extension")
 	opt.add_option('--test', action='store_true', default=False, dest='build_tests',
 			help="Build unit tests")
 	opt.add_option('--bash-completion', action='store_true', default=False, dest='bash_completion',
@@ -77,11 +79,16 @@ def configure(conf):
 	conf.env['BASH_COMPLETION'] = Options.options.bash_completion
 	conf.define('SLV2_DEFAULT_LV2_PATH', Options.options.default_lv2_path)
 	
+	if not Options.options.no_mmap:
+		conf.check(function_name='mmap', uselib_store='HAVE_MMAP',
+			header_name=['fcntl.h','sys/mman.h','sys/stat.h','sys/types.h'])
+
 	conf.write_config_header('slv2-config.h')
 
 	autowaf.print_summary(conf)
 	autowaf.display_msg(conf, "Jack clients", str(conf.env['USE_JACK']))
 	autowaf.display_msg(conf, "Unit tests", str(conf.env['BUILD_TESTS']))
+	autowaf.display_msg(conf, "Use mmap to read checksums", bool(conf.env['HAVE_MMAP']))
 	autowaf.display_msg(conf, "Dynamic Manifest Support", str(conf.env['SLV2_DYN_MANIFEST'] == 1))
 	autowaf.display_msg(conf, "Default LV2_PATH", str(conf.env['SLV2_DEFAULT_LV2_PATH']))
 	print
@@ -124,6 +131,8 @@ def build(bld):
 	obj.vnum         = SLV2_LIB_VERSION
 	obj.install_path = '${LIBDIR}'
 	obj.ccflags      = [ '-ldl', '-fvisibility=hidden', '-DSLV2_SHARED', '-DSLV2_INTERNAL' ]
+	if bld.env['HAVE_MMAP']:
+		obj.ccflags += [ '-DMD5_USE_MMAP' ]
 	autowaf.use_lib(bld, obj, 'REDLAND LV2CORE')
 
 	if bld.env['BUILD_TESTS']:

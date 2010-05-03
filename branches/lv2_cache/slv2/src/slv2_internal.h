@@ -150,7 +150,7 @@ struct _SLV2World {
 	librdf_node*      rdf_a_node;
 	librdf_node*      xsd_integer_node;
 	librdf_node*      xsd_decimal_node;
-	librdf_node*      dcterms_modified_node;
+	librdf_node*      slv2_digest_node;
 	bool              local_world;
 };
 
