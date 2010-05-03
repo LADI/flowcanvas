@@ -38,6 +38,10 @@
 #ifndef MD5_H_INCLUDED
 #define MD5_H_INCLUDED
 
+#include <stdint.h>
+
+#define MD5_DIGEST_LENGTH 16
+
 /* This package supports both compile-time and run-time determination of CPU
  * byte order.  If ARCH_IS_BIG_ENDIAN is defined as 0, the code will be
  * compiled to run only on little-endian CPUs; if ARCH_IS_BIG_ENDIAN is
@@ -47,8 +51,14 @@
  * efficiently on either one than if ARCH_IS_BIG_ENDIAN is defined.
  */
 
-typedef unsigned char md5_byte_t; /* 8-bit byte */
-typedef unsigned int  md5_word_t; /* 32-bit word */
+/* This code is written in portable C99, but md5_file also has an
+ * implementation which uses POSIX mmap which may be faster.
+ * Compiling with MD5_USE_MMAP will build this code if mmap is available,
+ * otherwise standard C file I/O is used for md5_file.
+ */
+
+typedef uint8_t  md5_byte_t; /* 8-bit byte */
+typedef uint32_t md5_word_t; /* 32-bit word */
 
 /* Define the state of the MD5 Algorithm. */
 typedef struct md5_state_s {
@@ -68,7 +78,10 @@ void md5_init(md5_state_t* pms);
 void md5_append(md5_state_t* pms, const md5_byte_t* data, int nbytes);
 
 /* Finish the message and return the digest. */
-void md5_finish(md5_state_t* pms, md5_byte_t digest[16]);
+void md5_finish(md5_state_t* pms, md5_byte_t digest[MD5_DIGEST_LENGTH]);
+
+/* Calculate the digest of an entire file.  Returns NULL on failure. */
+md5_byte_t* md5_file(const char* filename, md5_byte_t digest[MD5_DIGEST_LENGTH]);
 
 #ifdef __cplusplus
 } /* extern "C" */

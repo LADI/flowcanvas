@@ -32,7 +32,17 @@
  * original is available at <http://libmd5-rfc.sourceforge.net/>.
  */
 
+#ifdef MD5_USE_MMAP
+#define _XOPEN_SOURCE 600
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+#endif
+
 #include "md5.h"
+#include <stdio.h>
 #include <string.h>
 
 #undef BYTE_ORDER /* 1 = big-endian, -1 = little-endian, 0 = unknown */
@@ -365,4 +375,58 @@ md5_finish(md5_state_t* pms, md5_byte_t digest[16])
 	for (i = 0; i < 16; ++i) {
 		digest[i] = (md5_byte_t)(pms->abcd[i >> 2] >> ((i & 3) << 3));
 	}
+}
+
+md5_byte_t*
+md5_file(const char* filename, md5_byte_t digest[MD5_DIGEST_LENGTH])
+{
+	md5_state_t state;
+	md5_init(&state);
+
+#ifdef MD5_USE_MMAP /* Map entire file with POSIX mmap */
+
+	int fd = open(filename, O_RDONLY);
+	if (!fd) {
+		fprintf(stderr, "md5: Failed to open file %s\n", filename);
+		return NULL;
+	}
+
+	struct stat info;
+	if (fstat(fd, &info)) {
+		fprintf(stderr, "md5: Failed to stat file %s\n", filename);
+		return NULL;
+	}
+
+	void* file = mmap(NULL, info.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+	if (!file || file == MAP_FAILED) {
+		fprintf(stderr, "md5: Failed to mmap file %s\n", filename);
+		return NULL;
+	}
+
+	posix_madvise(file, info.st_size, POSIX_MADV_SEQUENTIAL);
+	md5_append(&state, file, info.st_size);
+	posix_madvise(file, info.st_size, POSIX_MADV_NORMAL);
+
+	munmap(file, info.st_size);
+	close(fd);
+
+#else /* !MD5_USE_MMAP (Use standard C file I/O) */
+
+	FILE* fd = fopen(filename, "r");
+	if (!fd) {
+		fprintf(stderr, "md5: Failed to open file %s\n", filename);
+		return NULL;
+	}
+
+	size_t  bytes_read;
+	uint8_t buf[4096];
+	while ((bytes_read = fread(buf, 1, sizeof(buf), fd)) > 0)
+		md5_append(&state, buf, bytes_read);
+
+	fclose(fd);
+
+#endif /* MD5_USE_MMAP */
+
+	md5_finish(&state, digest);
+	return digest;
 }
