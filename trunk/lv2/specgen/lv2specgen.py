@@ -689,7 +689,7 @@ def specgen(specloc, template, instances=False, mode="spec"):
     if revision:
         template = template.replace('@REVISION@', revision[0] + " (" + revision[1] + ")")
     else:
-        template = template.replace('@REVISION@', '0')
+        template = template.replace('@REVISION@', '<span style="color: red; font-weight: bold">UNRELEASED PROPOSAL</span>')
 
     other_files = '<p>See also:</p>\n<ul>'
     #other_files += '<li><a href=".">Bundle</a></li>'

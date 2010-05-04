@@ -19,7 +19,7 @@
 #include <iostream>
 #include <ctype.h>
 #include <stdio.h>
-#include "object.lv2/object.h"
+#include "atom.lv2/atom.h"
 #include "contexts.lv2/contexts.h"
 #include "uri-map.lv2/uri-map.h"
 #include "lolep.hpp"
@@ -49,20 +49,20 @@ public:
 	Print(double rate, const char* bundle, const LV2::Feature* const* features)
 		: PrintBase(1)
 	{
-		bool_type   = uri_to_id(NULL, LV2_OBJECT_URI "#Bool");
-		float_type  = uri_to_id(NULL, LV2_OBJECT_URI "#Float32");
-		int_type    = uri_to_id(NULL, LV2_OBJECT_URI "#Int32");
+		bool_type   = uri_to_id(NULL, LV2_ATOM_URI "#Bool");
+		float_type  = uri_to_id(NULL, LV2_ATOM_URI "#Float32");
+		int_type    = uri_to_id(NULL, LV2_ATOM_URI "#Int32");
 		midi_type   = uri_to_id(NULL, "http://lv2plug.in/ns/ext/midi#MidiEvent");
-		string_type = uri_to_id(NULL, LV2_OBJECT_URI "#String");
-		vec_type    = uri_to_id(NULL, LV2_OBJECT_URI "#Vector");
+		string_type = uri_to_id(NULL, LV2_ATOM_URI "#String");
+		vec_type    = uri_to_id(NULL, LV2_ATOM_URI "#Vector");
 	}
 
 	static uint32_t message_run(LV2_Handle  instance,
 	                            const void* valid_inputs,
 	                            void*       valid_outputs)
 	{
-		Print*      me = reinterpret_cast<Print*>(instance);
-		LV2_Object* in = me->p<LV2_Object>(0);
+		Print*    me = reinterpret_cast<Print*>(instance);
+		LV2_Atom* in = me->p<LV2_Atom>(0);
 		if (in->type == 0 && in->size == 0) {
 			printf("null\n");
 		} else if (in->type == bool_type) {
@@ -86,7 +86,7 @@ public:
 			}
 			printf("\n");
 		} else {
-			printf("<LV2_Object type=%d size=%d>\n", in->type, in->size);
+			printf("<LV2_Atom type=%d size=%d>\n", in->type, in->size);
 		}
 		return 0;
 	}

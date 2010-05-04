@@ -71,9 +71,9 @@ def build(bld):
 		build_extension(bld, e, './ext')
 	
 	dev = '''
+		atom
 		contexts
 		host-info
-		object
 		osc
 		polymorphic-port
 		port-groups

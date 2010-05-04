@@ -1,5 +1,4 @@
-/* lv2_object.h - C header file for the LV2 Object extension.
- *
+/* lv2_atom.h - C header file for the LV2 Atom extension.
  * Copyright (C) 2008-2009 Dave Robillard <http://drobilla.net>
  *
  * This header is free software; you can redistribute it and/or modify it
@@ -17,66 +16,68 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 01222-1307 USA
  */
 
-#ifndef LV2_OBJECT_H
-#define LV2_OBJECT_H
+#ifndef LV2_ATOM_H
+#define LV2_ATOM_H
 
-#define LV2_OBJECT_URI       "http://lv2plug.in/ns/dev/object"
-#define LV2_BLOB_SUPPORT_URI "http://lv2plug.in/ns/dev/object#blobSupport"
+#define LV2_ATOM_URI       "http://lv2plug.in/ns/dev/atom"
+#define LV2_BLOB_SUPPORT_URI "http://lv2plug.in/ns/dev/atom#blobSupport"
 
-#define LV2_OBJECT_REFERENCE_TYPE 0
+#define LV2_ATOM_REFERENCE_TYPE 0
 
 #include <stdint.h>
 #include <stddef.h>
 
 /** @file
- * This header defines the code portion of the LV2 Object extension with URI
- * <http://lv2plug.in/ns/dev/object>.  It defines convenience structs that
- * should match the definition of the built-in types of the object extension.
- * This header is NON NORMATIVE (i.e. the byte layout is defined precisely
- * in the documentation of each RDF class), but should match anywhere.
+ * This header defines the code portion of the LV2 Atom extension with URI
+ * <http://lv2plug.in/ns/dev/atom>.  It defines convenience structs that
+ * should match the definition of the built-in types of the atom extension.
+ * The layout of atoms in this header must match the description in RDF.
+ * The RDF description of an atom type should be considered normative.
+ * This header is a non-normative (but hopefully accurate) implementation
+ * of that specification.
  */
 
-#define LV2_OBJECT_FROM_EVENT(ev) ((LV2_Object*)&((LV2_Event*)ev)->type)
+#define LV2_ATOM_FROM_EVENT(ev) ((LV2_Atom*)&((LV2_Event*)ev)->type)
 
-/** An LV2 Object.
+/** An LV2 Atom.
  *
- * An "Object" is a generic chunk of memory with a given type and size.
- * The type field defines how to interpret an object.
+ * An "Atom" is a generic chunk of memory with a given type and size.
+ * The type field defines how to interpret an atom.
  *
- * All objects are by definition Plain Old Data (POD) and may be safely
- * copied (e.g. with memcpy) using the size field, except objects with type 0.
- * An object with type 0 is a reference, and may only be used via the functions
+ * All atoms are by definition Plain Old Data (POD) and may be safely
+ * copied (e.g. with memcpy) using the size field, except atoms with type 0.
+ * An atom with type 0 is a reference, and may only be used via the functions
  * provided in LV2_Blob_Support (e.g. it MUST NOT be manually copied).
  *
- * Note that an LV2_Object is the latter two fields of an LV2_Event as defined
+ * Note that an LV2_Atom is the latter two fields of an LV2_Event as defined
  * by the <a href="http://lv2plug.in/ns/ext/event">LV2 events extension</a>.
- * The host MAY marshal an Event to an Object simply by pointing to the offset
+ * The host MAY marshal an Event to an Atom simply by pointing to the offset
  * of the 'type' field of the LV2_Event, which is also the type field (i.e. start)
- * of a valid LV2_Object.  The macro LV2_OBJECT_FROM_EVENT is provided in this
+ * of a valid LV2_Atom.  The macro LV2_ATOM_FROM_EVENT is provided in this
  * header for this purpose.
  */
-typedef struct _LV2_Object {
+typedef struct _LV2_Atom {
 
-	/** The type of this object.  This number represents a URI, mapped to an
+	/** The type of this atom.  This number represents a URI, mapped to an
 	 * integer using the extension <http://lv2plug.in/ns/ext/uri-map>
-	 * with "http://lv2plug.in/ns/dev/object" as the 'map' argument.
-	 * Type 0 is a special case which indicates this object
+	 * with "http://lv2plug.in/ns/dev/atom" as the 'map' argument.
+	 * Type 0 is a special case which indicates this atom
 	 * is a reference and MUST NOT be copied manually.
 	 */
 	uint16_t type;
 
-	/** The size of this object, not including this header, in bytes. */
+	/** The size of this atom, not including this header, in bytes. */
 	uint16_t size;
 
 	/** Size bytes of data follow here */
 	uint8_t body[];
 
-} LV2_Object;
+} LV2_Atom;
 
-/** Reference, an LV2_Object with type 0 */
-typedef LV2_Object LV2_Reference;
+/** Reference, an LV2_Atom with type 0 */
+typedef LV2_Atom LV2_Reference;
 
-/** The body of an LV2_Object with type sp:Vector
+/** The body of an LV2_Atom with type sp:Vector
  */
 typedef struct _LV2_Vector_Body {
 
@@ -93,8 +94,8 @@ typedef struct _LV2_Vector_Body {
 
 
 /* Everything below here is related to blobs, which are dynamically allocated
- * objects that are not necessarily POD.  This functionality is optional,
- * hosts may support objects without implementing blob support.
+ * atoms that are not necessarily POD.  This functionality is optional,
+ * hosts may support atoms without implementing blob support.
  * Blob support is an LV2 Feature.
  */
 
@@ -104,8 +105,8 @@ typedef void* LV2_Blob_Data;
 /** Dynamically Allocated LV2 Blob.
  *
  * This is a blob of data of any type, dynamically allocated in memory.
- * Unlike an LV2_Object, a blob is not necessarily POD.  Plugins may only
- * refer to blobs via a Reference (an LV2_Object with type 0), there is no
+ * Unlike an LV2_Atom, a blob is not necessarily POD.  Plugins may only
+ * refer to blobs via a Reference (an LV2_Atom with type 0), there is no
  * way for a plugin to directly create, copy, or destroy a Blob.
  */
 typedef struct _LV2_Blob {
@@ -120,8 +121,8 @@ typedef struct _LV2_Blob {
 	/** Get blob's type as a URI mapped to an integer.
 	 *
 	 * The return value may be any type URI, mapped to an integer with the
-	 * URI Map extension.  If this type is an LV2_Object type, get returns
-	 * a pointer to the LV2_Object header (e.g. a blob with type obj:Int32
+	 * URI Map extension.  If this type is an LV2_Atom type, get returns
+	 * a pointer to the LV2_Atom header (e.g. a blob with type atom:Int32
 	 * does NOT return a pointer to a int32_t).
 	 */
 	uint32_t (*type)(struct _LV2_Blob* blob);
@@ -141,10 +142,10 @@ typedef void* LV2_Blob_Support_Data;
 
 typedef void (*LV2_Blob_Destroy)(LV2_Blob* blob);
 
-/** The data field of the LV2_Feature for the LV2 Object extension.
+/** The data field of the LV2_Feature for the LV2 Atom extension.
  *
  * A host which supports this extension must pass an LV2_Feature struct to the
- * plugin's instantiate method with 'URI' "http://lv2plug.in/ns/dev/object" and
+ * plugin's instantiate method with 'URI' "http://lv2plug.in/ns/dev/atom" and
  * 'data' pointing to an instance of this struct.  All fields of this struct,
  * MUST be set to non-NULL values by the host (except possibly data).
  */
@@ -210,5 +211,5 @@ typedef struct {
 } LV2_Blob_Support;
 
 
-#endif /* LV2_OBJECT_H */
+#endif /* LV2_ATOM_H */
 

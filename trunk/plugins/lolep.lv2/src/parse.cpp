@@ -19,7 +19,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
-#include "object.lv2/object.h"
+#include "atom.lv2/atom.h"
 #include "contexts.lv2/contexts.h"
 #include "uri-map.lv2/uri-map.h"
 #include "lolep.hpp"
@@ -48,15 +48,15 @@ public:
 	Parse(double rate, const char* bundle, const LV2::Feature* const* features)
 		: ParseBase(2)
 	{
-		bool_type   = uri_to_id(NULL, LV2_OBJECT_URI "#Bool");
-		float_type  = uri_to_id(NULL, LV2_OBJECT_URI "#Float32");
-		int_type    = uri_to_id(NULL, LV2_OBJECT_URI "#Int32");
-		string_type = uri_to_id(NULL, LV2_OBJECT_URI "#String");
-		vec_type    = uri_to_id(NULL, LV2_OBJECT_URI "#Vector");
+		bool_type   = uri_to_id(NULL, LV2_ATOM_URI "#Bool");
+		float_type  = uri_to_id(NULL, LV2_ATOM_URI "#Float32");
+		int_type    = uri_to_id(NULL, LV2_ATOM_URI "#Int32");
+		string_type = uri_to_id(NULL, LV2_ATOM_URI "#String");
+		vec_type    = uri_to_id(NULL, LV2_ATOM_URI "#Vector");
 	}
 
 	template <typename T>
-	static void set_output_type(LV2_Handle instance, LV2_Object* out, uint32_t type) {
+	static void set_output_type(LV2_Handle instance, LV2_Atom* out, uint32_t type) {
 		out->type = type;
 		out->size = sizeof(T);
 	}
@@ -99,10 +99,10 @@ public:
 	                            const void* valid_inputs,
 	                            void*       valid_outputs)
 	{
-		Parse*      me    = reinterpret_cast<Parse*>(instance);
-		LV2_Object* in    = me->p<LV2_Object>(0);
-		LV2_Object* out   = me->p<LV2_Object>(1);
-		char*       str   = (char*)in->body;
+		Parse*    me  = reinterpret_cast<Parse*>(instance);
+		LV2_Atom* in  = me->p<LV2_Atom>(0);
+		LV2_Atom* out = me->p<LV2_Atom>(1);
+		char*     str = (char*)in->body;
 
 		if (in->type != string_type) {
 			out->type = 0;
@@ -128,7 +128,7 @@ public:
 		} else if (str[0] == '"') {
 			size_t len = strlen(str);
 			if (str[len-1] == '"') {
-				resize_port(instance, 1, sizeof(LV2_Object) + len - 1);
+				resize_port(instance, 1, sizeof(LV2_Atom) + len - 1);
 				out->type = string_type;
 				out->size = len - 2;
 				memcpy(out->body, str + 1, len - 2);

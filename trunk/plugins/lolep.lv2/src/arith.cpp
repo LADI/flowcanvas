@@ -17,7 +17,7 @@
 
 #include <algorithm>
 #include <iostream>
-#include "object.lv2/object.h"
+#include "atom.lv2/atom.h"
 #include "contexts.lv2/contexts.h"
 #include "uri-map.lv2/uri-map.h"
 #include "lolep.hpp"
@@ -55,23 +55,23 @@ public:
 	Arith(double rate, const char* bundle, const LV2::Feature* const* features)
 		: Base(2)
 	{
-		int_type   = Base::uri_to_id(NULL, LV2_OBJECT_URI "#Int32");
-		float_type = Base::uri_to_id(NULL, LV2_OBJECT_URI "#Float32");
-		vec_type   = Base::uri_to_id(NULL, LV2_OBJECT_URI "#Vector");
+		int_type   = Base::uri_to_id(NULL, LV2_ATOM_URI "#Int32");
+		float_type = Base::uri_to_id(NULL, LV2_ATOM_URI "#Float32");
+		vec_type   = Base::uri_to_id(NULL, LV2_ATOM_URI "#Vector");
 	}
 
 	template<typename T>
-	void set_output_type(LV2_Object* out, uint32_t type) {
+	void set_output_type(LV2_Atom* out, uint32_t type) {
 		Base::resize_port(reinterpret_cast<LV2_Handle>(this),
-				2, sizeof(LV2_Object) + sizeof(T));
+				2, sizeof(LV2_Atom) + sizeof(T));
 		out->type = type;
 		out->size = sizeof(T);
 	}
 
 	void run(uint32_t sample_count) {
-		LV2_Object* a   = reinterpret_cast<LV2_Object*&>(this->m_ports[0]);
-		LV2_Object* b   = reinterpret_cast<LV2_Object*&>(this->m_ports[1]);
-		LV2_Object* out = reinterpret_cast<LV2_Object*&>(this->m_ports[2]);
+		LV2_Atom* a   = reinterpret_cast<LV2_Atom*&>(this->m_ports[0]);
+		LV2_Atom* b   = reinterpret_cast<LV2_Atom*&>(this->m_ports[1]);
+		LV2_Atom* out = reinterpret_cast<LV2_Atom*&>(this->m_ports[2]);
 
 		if (a->type == int_type) {
 			if (b->type == int_type) { // int (+) int => int
