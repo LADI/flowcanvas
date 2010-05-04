@@ -1,9 +1,8 @@
-/* In-process UI extension for LV2
- *
+/* LV2 UI Extension
  * Copyright (C) 2006-2008 Lars Luthman <lars.luthman@gmail.com>
+ * Copyright (C) 2009-2010 Dave Robillard <dave@drobilla.net>
  *
  * Based on lv2.h, which was
- *
  * Copyright (C) 2000-2002 Richard W.E. Furse, Paul Barton-Davis,
  *                         Stefan Westerfeld
  * Copyright (C) 2006 Steve Harris, Dave Robillard.
@@ -23,7 +22,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301
  * USA.
  *
- ***********************************************************************/
+ */
 
 #ifndef LV2_UI_H
 #define LV2_UI_H
@@ -47,21 +46,21 @@ extern "C" {
 typedef void* LV2UI_Widget;
 
 
-/** This handle indicates a particular instance of a UI.
+/** A pointer to a particular instance of a UI.
     It is valid to compare this to NULL (0 for C++) but otherwise the
     host MUST not attempt to interpret it. The UI plugin may use it to
     reference internal instance data. */
 typedef void* LV2UI_Handle;
 
 
-/** This handle indicates a particular plugin instance, provided by the host.
+/** A pointer to a particular plugin controller, provided by the host.
     It is valid to compare this to NULL (0 for C++) but otherwise the
     UI plugin MUST not attempt to interpret it. The host may use it to
-    reference internal plugin instance data. */
+    reference internal instance data. */
 typedef void* LV2UI_Controller;
 
 
-/** This is the type of the host-provided function that the UI can use to
+/** The type of the host-provided function that the UI can use to
     send data to a plugin's input ports. The @c buffer parameter must point
     to a block of data, @c buffer_size bytes large. The contents of this buffer
     and what the host should do with it depends on the value of the @c format
@@ -102,7 +101,7 @@ typedef void (*LV2UI_Write_Function)(LV2UI_Controller controller,
                                      const void*      buffer);
 
 
-/** This struct contains the implementation of an UI. A pointer to an
+/** This struct contains the implementation of a UI. A pointer to an
     object of this type is returned by the lv2ui_descriptor() function.
 */
 typedef struct _LV2UI_Descriptor {
@@ -122,18 +121,18 @@ typedef struct _LV2UI_Descriptor {
                             use to send data to the plugin's input ports.
       @param controller A handle for the plugin instance that should be passed
                         as the first parameter of @c write_function.
-      @param widget     A pointer to an LV2UI_Widget. The UI will write a
-                        widget pointer to this location (what type of widget
-                        depends on the RDF class of the UI) that will be the
-                        main UI widget.
-      @param features   An array of LV2_Feature pointers. The host must pass
-                        all feature URIs that it and the UI supports and any
-                        additional data, just like in the LV2 plugin
-                        instantiate() function. Note that UI features and plugin
-			features are NOT necessarily the same, they just share
-			the same data structure - this will probably not be the
-			same array as the one the plugin host passes to a
-			plugin.
+      @param widget A pointer to an LV2UI_Widget. The UI will write a
+                    widget pointer to this location (what type of widget
+                    depends on the RDF class of the UI) that will be the
+                    main UI widget.
+      @param features An array of LV2_Feature pointers. The host must pass
+                      all feature URIs that it and the UI supports and any
+                      additional data, just like in the LV2 plugin
+                      instantiate() function. Note that UI features and plugin
+                      features are NOT necessarily the same, they just share
+                      the same data structure - this will probably not be the
+                      same array as the one the plugin host passes to a
+                      plugin.
   */
   LV2UI_Handle (*instantiate)(const struct _LV2UI_Descriptor* descriptor,
                               const char*                     plugin_uri,
@@ -155,10 +154,9 @@ typedef struct _LV2UI_Descriptor {
       meaning as in LV2UI_Write_Function. The only exception is ports of the
       class lv2:ControlPort, for which this function should be called
       when the port value changes (it does not have to be called for every
-      single change if the host's UI thread has problems keeping up with
-      the thread the plugin is running in), @c buffer_size should be 4 and the
-      buffer should contain a single IEEE-754 float. In this case the @c format
-      parameter should be 0.
+      single change if the host's UI thread has problems keeping up with the
+      thread the plugin is running in), @c buffer_size should be 4, the buffer
+      should contain a single IEEE-754 float, and @c format should be 0.
 
       By default, the host should only call this function for input ports of
       the lv2:ControlPort class. However, the default setting can be modified
@@ -199,12 +197,12 @@ typedef struct _LV2UI_Descriptor {
 
   /** Returns a data structure associated with an extension URI, for example
       a struct containing additional function pointers. Avoid returning
-      function pointers directly since standard C++ has no valid way of
+      function pointers directly since standard C/C++ has no valid way of
       casting a void* to a function pointer. This member may be set to NULL
       if the UI is not interested in supporting any extensions. This is similar
       to the extension_data() member in LV2_Descriptor.
   */
-  const void* (*extension_data)(const char*  uri);
+  const void* (*extension_data)(const char* uri);
 
 } LV2UI_Descriptor;
 
