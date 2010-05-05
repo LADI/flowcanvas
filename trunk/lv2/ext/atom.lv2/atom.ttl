@@ -19,7 +19,7 @@
 # ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-@prefix atom: <http://lv2plug.in/ns/dev/atom#> .
+@prefix atom: <http://lv2plug.in/ns/ext/atom#> .
 @prefix lv2:  <http://lv2plug.in/ns/lv2core#> .
 @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
@@ -27,7 +27,7 @@
 @prefix doap: <http://usefulinc.com/ns/doap#> .
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 
-<http://lv2plug.in/ns/dev/atom>
+<http://lv2plug.in/ns/ext/atom>
 	a lv2:Specification ;
     doap:name "LV2 Atom" ;
     doap:maintainer [
@@ -217,6 +217,33 @@ string in bytes (not characters).
 """ .
 
 
+atom:URIInt a atom:AtomType ;
+	rdfs:label "URI mapped to an integer" ;
+	rdfs:comment """
+A uint32_t interpreted as a URI mapped to an integer using the LV2
+URI map extension &lt;http://lv2plug.in/ns/ext/uri-map&gt;.  Size is
+always 4.
+""" .
+
+
+
+atom:Message a atom:AtomType ;
+	rdfs:label "Message" ;
+	rdfs:comment """
+A message is a communication from one component to another.  Messages
+consist of a selector URI, and a set of RDF triples.  The selector URI
+dictates how the triples are to be interpreted (e.g. the selector can
+be used as a "verb" to build commands).
+
+The payload of a message is always an atom:Triples so hosts and plugins can
+always work with message data (e.g. to serialise for saved state or an undo
+stack), even if they do not specifically understand a particular message.
+
+In memory, a Message is simply a uint32_t selector (a URI mapped integer)
+followed by an atom:Triples.
+""" .
+
+
 atom:Vector a atom:AtomType ;
 	rdfs:label "Vector" ;
 	rdfs:comment """
@@ -248,6 +275,72 @@ int32_t  contents[42] = ...
 </pre>
 """ .
 
+
+atom:Triple a atom:AtomType ;
+	rdfs:label "RDF triple" ;
+	rdfs:comment """
+A single RDF triple.
+
+The subject and predicate of an RDF triple are implicitly URIs, this in an
+atom:Triple they are stored as URI mapped integers with type tags and sizes
+omitted.
+
+An atom:Triple in memory is two uint32_t's followed by an LV2_Atom:
+<pre>
+uint32_t subject;
+uint32_t predicate;
+LV2_Atom object;
+</pre>
+""" .
+
+
+atom:Triples a atom:AtomType ;
+	rdfs:label "RDF triple set" ;
+	rdfs:comment """
+A description in RDF (i.e. a set of triples).
+
+An atom:Triples contains any number of RDF triples, describing one or
+several resources.  The subject and predicate of all triples are implicitly
+URI mapped integers, type tags are omitted.  The object of triples may be
+any atom.
+
+An atom:Triples in memory is a sequence of atom:Triple where each atom:Triple
+is immediately followed by the next (without time stamps or sizes), with
+padding to ensure each subject is 32-bit aligned, e.g.:
+<pre>
+uint32_t subject1;
+uint32_t predicate1;
+LV2_Atom object1;
+uint8_t  pad[1]; /* e.g. if object1.size == 3 */
+uint32_t subject2;
+uint32_t predicate2;
+LV2_Atom object2;
+...
+</pre>
+""" .
+
+
+atom:Blank a atom:AtomType ;
+	rdfs:label "Blank (anonymous resource)" ;
+	rdfs:comment """
+A description of an RDF resource with no URI (a resource with blank node
+ID), e.g. the resource of type ex:Foo in the following Turtle description:
+<code>&lt;&gt; ex:hasThing [ a ex:Thing ]</code>
+
+An atom:Blank is conceptually a dictionary where keys (RDF predicates) are
+URI mapped integers, and values (RDF objects) are any atom.
+
+An atom:Blank in memory is like an atom:Triples, but with subjects omitted:
+<pre>
+uint32_t predicate1;
+LV2_Atom object1;
+uint32_t predicate2;
+LV2_Atom object2;
+...
+</pre>
+""" .
+
+
 atom:Bang    a atom:AtomType ; rdfs:label "Bang (generic activity), size=0" .
 atom:Byte    a atom:AtomType ; rdfs:label "A byte" .
 atom:Int32   a atom:AtomType ; rdfs:label "Signed 32-bit Integer" .
@@ -260,7 +353,7 @@ atom:blobSupport a lv2:Feature ;
 	rdfs:label "Blob support" ;
 	rdfs:comment """
 Support for dynamically allocated blobs.  If a host supports this feature, it
-MUST pass an LV2_Feature with URI http://lv2plug.in/ns/dev/atom#blobSupport
+MUST pass an LV2_Feature with URI http://lv2plug.in/ns/ext/atom#blobSupport
 and a pointer to LV2_Blob_Support as data to the plugin's instantiate method.
 See atom.h for details.
 """ .

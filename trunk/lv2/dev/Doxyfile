@@ -566,7 +566,6 @@ WARN_LOGFILE           =
 
 INPUT =  \
 	contexts.lv2/contexts.h \
-	object.lv2/object.h \
 	osc.lv2/osc-print.h \
 	osc.lv2/osc.h \
 	polymorphic-port.lv2/polymorphic-port.h \

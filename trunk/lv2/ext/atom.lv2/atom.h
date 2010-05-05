@@ -19,8 +19,8 @@
 #ifndef LV2_ATOM_H
 #define LV2_ATOM_H
 
-#define LV2_ATOM_URI       "http://lv2plug.in/ns/dev/atom"
-#define LV2_BLOB_SUPPORT_URI "http://lv2plug.in/ns/dev/atom#blobSupport"
+#define LV2_ATOM_URI       "http://lv2plug.in/ns/ext/atom"
+#define LV2_BLOB_SUPPORT_URI "http://lv2plug.in/ns/ext/atom#blobSupport"
 
 #define LV2_ATOM_REFERENCE_TYPE 0
 
@@ -29,7 +29,7 @@
 
 /** @file
  * This header defines the code portion of the LV2 Atom extension with URI
- * <http://lv2plug.in/ns/dev/atom>.  It defines convenience structs that
+ * <http://lv2plug.in/ns/ext/atom>.  It defines convenience structs that
  * should match the definition of the built-in types of the atom extension.
  * The layout of atoms in this header must match the description in RDF.
  * The RDF description of an atom type should be considered normative.
@@ -60,7 +60,7 @@ typedef struct _LV2_Atom {
 
 	/** The type of this atom.  This number represents a URI, mapped to an
 	 * integer using the extension <http://lv2plug.in/ns/ext/uri-map>
-	 * with "http://lv2plug.in/ns/dev/atom" as the 'map' argument.
+	 * with "http://lv2plug.in/ns/ext/atom" as the 'map' argument.
 	 * Type 0 is a special case which indicates this atom
 	 * is a reference and MUST NOT be copied manually.
 	 */
@@ -145,7 +145,7 @@ typedef void (*LV2_Blob_Destroy)(LV2_Blob* blob);
 /** The data field of the LV2_Feature for the LV2 Atom extension.
  *
  * A host which supports this extension must pass an LV2_Feature struct to the
- * plugin's instantiate method with 'URI' "http://lv2plug.in/ns/dev/atom" and
+ * plugin's instantiate method with 'URI' "http://lv2plug.in/ns/ext/atom" and
  * 'data' pointing to an instance of this struct.  All fields of this struct,
  * MUST be set to non-NULL values by the host (except possibly data).
  */

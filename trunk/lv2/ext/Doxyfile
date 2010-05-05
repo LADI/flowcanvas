@@ -25,7 +25,7 @@ DOXYFILE_ENCODING      = UTF-8
 # The PROJECT_NAME tag is a single word (or a sequence of words surrounded 
 # by quotes) that should identify the project.
 
-PROJECT_NAME           = LV2 Good Extensions
+PROJECT_NAME           = LV2Plug.in Extensions
 
 # The PROJECT_NUMBER tag can be used to enter a project or revision number. 
 # This could be handy for archiving the generated documentation or 
@@ -565,6 +565,7 @@ WARN_LOGFILE           =
 # with spaces.
 
 INPUT =  \
+	atom.lv2/atom.h \
 	data-access.lv2/data-access.h \
 	dyn-manifest.lv2/dyn-manifest.h \
 	event.lv2/event-helpers.h \

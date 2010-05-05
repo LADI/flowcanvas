@@ -60,6 +60,7 @@ def build_extension(bld, name, dir):
 
 def build(bld):
 	ext = '''
+		atom
 		data-access
 		dyn-manifest
 		event
@@ -71,7 +72,6 @@ def build(bld):
 		build_extension(bld, e, './ext')
 	
 	dev = '''
-		atom
 		contexts
 		host-info
 		osc

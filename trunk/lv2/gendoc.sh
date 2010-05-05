@@ -14,11 +14,10 @@ cp core.lv2/manifest.ttl upload/lv2core
 cp index.php upload/lv2core
 $SPECGENDIR/lv2specgen.py core.lv2/lv2.ttl $SPECGENDIR/template.html $SPECGENDIR/style.css upload/lv2core/lv2core.html -i;
 cd core.lv2
-doxygen
+doxygen > /dev/null
 cd ..
 
 for dir in ext dev extensions; do
-	echo
 	echo "**** Generating $dir documentation"
 
 	mkdir upload/$dir
@@ -28,7 +27,7 @@ for dir in ext dev extensions; do
 	cd upload/$dir
 	SPECGENDIR=../../specgen
 
-	doxygen Doxyfile
+	doxygen Doxyfile > /dev/null
 	
 	echo "<?xml version=\"1.0\" encoding=\"utf-8\"?>" > index.html 
 	echo "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML+RDFa 1.0//EN\" \"http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd\">" >> index.html
@@ -59,15 +58,14 @@ SELECT ?rev FROM <$b.lv2/$b.ttl> WHERE { <$ext> doap:release [ doap:revision ?re
 			fi
 			tar -czf releases/$b.lv2-$rev.tgz $b.lv2
 		fi
+		echo "**** $b"
 		if [ -e $b.lv2/$b.ttl ]; then
-			echo
-			echo "**** Generating XHTML schema documentation for $b"
+			echo "  ** Generating ontology documentation $b.lv2/$b.html"
 			$SPECGENDIR/lv2specgen.py $b.lv2/$b.ttl $SPECGENDIR/template.html $SPECGENDIR/style.css $b.lv2/$b.html -i;
 			echo "<li><a rel=\"rdfs:seeAlso\" href=\"$b\">$b</a></li>" >> index.html;
 		fi
 		if [ -e $b.lv2/$b.h ]; then
-			echo
-			echo "**** Copying code documentation $b.h.html"
+			echo "  ** Copying code documentation $b.h.html"
 		fi
         mv $b.lv2 $b
 		cp ../../index.php $b
