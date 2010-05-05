@@ -61,11 +61,13 @@ def build_extension(bld, name, dir):
 def build(bld):
 	ext = '''
 		atom
+		command
 		data-access
 		dyn-manifest
 		event
 		instance-access
 		midi
+		parameter
 		uri-map
 	'''
 	for e in ext.split():

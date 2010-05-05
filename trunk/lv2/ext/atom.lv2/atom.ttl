@@ -96,22 +96,6 @@ is no reasonable value to write to the port, the plugin MUST write null
 """ .
 
 
-atom:asLargeAs a rdf:Property ;
-    rdfs:domain  atom:AtomPort ;
-    rdfs:range   lv2:Symbol ;
-    rdfs:label   "as large as" ;
-    rdfs:comment """
-Indicates that an atom port requires at least as much buffer space as
-the port with the given symbol on the same plugin instance.  If a port is
-asLargeAs several ports, it is asLargeAs the largest such port (not the sum
-of those ports' sizes).
-
-The host guarantees that whenever an AtomPort's run method is called,
-any output O that is atom:asLargeAs an input I is connected to a buffer large
-enough to copy I, or NULL if the port is lv2:connectionOptional.
-""" .
-
-
 atom:respondsWith a rdf:Property ;
     rdfs:domain  atom:MessagePort ;
     rdfs:range   lv2:Symbol ;

@@ -77,7 +77,7 @@ typedef struct _LV2_Atom {
 /** Reference, an LV2_Atom with type 0 */
 typedef LV2_Atom LV2_Reference;
 
-/** The body of an LV2_Atom with type sp:Vector
+/** The body of an LV2_Atom with type atom:Vector
  */
 typedef struct _LV2_Vector_Body {
 
@@ -91,6 +91,23 @@ typedef struct _LV2_Vector_Body {
 	uint8_t elems[];
 
 } LV2_Vector_Body;
+
+
+/** The body of an LV2_Atom with type atom:Triple
+ */
+typedef struct _LV2_Triple_Body {
+	uint32_t subject;
+	uint32_t predicate;
+	LV2_Atom object;
+} LV2_Triple_Body;
+
+
+/** The body of an LV2_Atom with type atom:Message
+ */
+typedef struct _LV2_Message_Body {
+	uint32_t selector; /***< Selector URI mapped to integer */
+	LV2_Atom triples; /***< Always an atom:Triples */
+} LV2_Message_Body;
 
 
 /* Everything below here is related to blobs, which are dynamically allocated
