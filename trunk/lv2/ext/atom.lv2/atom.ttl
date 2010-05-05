@@ -137,7 +137,7 @@ are also fixed regardless of the number of times the plugin is run.</li>
 each value V of that ValuePort corresponds to a single set of outputs
 for all ports.</li>
 <li>If an atom:ValuePort contains a reference then the blob it refers to is
-constant; plugin MUST NOT modify the blob in any way.
+constant; plugin MUST NOT modify the blob in any way.</li>
 </ul>
 Intuitively, a ValuePort contains a "value" or "signal" (which is computed
 with), NOT a "command" or "event" (which is reacted to).
