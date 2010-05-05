@@ -20,12 +20,12 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 
 @prefix atom: <http://lv2plug.in/ns/ext/atom#> .
+@prefix doap: <http://usefulinc.com/ns/doap#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix lv2:  <http://lv2plug.in/ns/lv2core#> .
 @prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd:  <http://www.w3.org/2001/XMLSchema> .
-@prefix doap: <http://usefulinc.com/ns/doap#> .
-@prefix foaf: <http://xmlns.com/foaf/0.1/> .
 
 <http://lv2plug.in/ns/ext/atom>
 	a lv2:Specification ;
@@ -54,12 +54,9 @@ Atoms as defined by this extension can be trivially constructed in-place
 from events as defined by the <a href="http://lv2plug.in/ns/ext/event">LV2
 Event</a> extension.  A valid LV2_Atom (see atom.h) is contained within
 any valid LV2_Event (see event.h).  An LV2_Event is simply an LV2_Atom
-with a time stamp header prepended.  For contexts that run in a single
-instant of time (where Event ports and time stamps don't make sense), an
-AtomPort or MessagePort can be used, which contains a single atom.
-Atoms can also be used by hosts in many scenarios, e.g. a queue for control
-events from a different thread would contain atoms (and thus be able to
-queue things of any type).
+with a time stamp header prepended.  Atoms should be used anywhere a "value"
+needs to be stored or communicated, which allows implementations to be
+polymorphic and extensible.
 
 Optionally, the host MAY support "Blobs", which are dynamically allocated
 chunks of memory that (unlike Atoms) are not necessarily POD.  Blobs are
@@ -72,76 +69,6 @@ e.g. the blob pointer may not point to actual memory).
 
 This extension requires the host to support the <a
 href="http://lv2plug.in/ns/ext/uri-map">LV2 URI Map</a> extension.
-""" .
-
-
-atom:AtomPort a rdfs:Class ;
-    rdfs:label      "Atom Port" ;
-    rdfs:subClassOf lv2:Port ;
-    rdfs:comment    """
-Ports of this type will be connected to a region of 32-bit aligned memory
-that starts with a uint32_t type, immediately followed by a uint32_t size,
-immediately followed by that many bytes of data (see LV2_Atom in atom.h).
-
-This is an abstract port type.  A port that is a atom:AtomPort MUST also
-have a more descriptive type that is a subClassOf atom:AtomPort which
-defines the port's semantics (probably atom:ValuePort or atom:MessagePort).
-
-Before calling a method on the plugin that writes to an AtomPort output,
-the host MUST set the size of the Atom in that output to the amount of
-available memory immediately following the Atom header.  The plugin MUST
-write a valid Atom that port (leaving it untouched is illegal).  If there
-is no reasonable value to write to the port, the plugin MUST write null
-(the atom with both type and size equal to zero).
-""" .
-
-
-atom:respondsWith a rdf:Property ;
-    rdfs:domain  atom:MessagePort ;
-    rdfs:range   lv2:Symbol ;
-    rdfs:label   "responds with" ;
-    rdfs:comment """
-Indicates that a message port responds to messages via the port with the
-given symbol on the same plugin instance.  If
-<pre>input atom:respondsWith output</pre> then after running the plugin with
-a message <em>m</em> in <code>input</code> the host SHOULD interpret the atom
-in <code>output</code> as the response to <em>m</em>.
-""" .
-
-
-atom:ValuePort a rdfs:Class ;
-    rdfs:label      "Value Port" ;
-    rdfs:subClassOf atom:AtomPort ;
-    rdfs:comment    """
-The contents of a ValuePort are considered persistent and time-independent.
-<ul>
-<li>If a plugin has fixed input values for all ports, all ValuePort outputs
-are also fixed regardless of the number of times the plugin is run.</li>
-<li>If a plugin has fixed input values for all ports except a ValuePort,
-each value V of that ValuePort corresponds to a single set of outputs
-for all ports.</li>
-<li>If an atom:ValuePort contains a reference then the blob it refers to is
-constant; plugin MUST NOT modify the blob in any way.</li>
-</ul>
-Intuitively, a ValuePort contains a "value" or "signal" (which is computed
-with), NOT a "command" or "event" (which is reacted to).
-""" .
-
-
-atom:MessagePort a rdfs:Class ;
-    rdfs:label      "Message Port" ;
-    rdfs:subClassOf atom:AtomPort ;
-    rdfs:comment    """
-An AtomPort that consumes or executes its value as a "message".  The contents
-of a MessagePort are considered transient and/or time-dependent, and only
-apply for a single invocation of its run method.  Unlike a ValuePort,
-a MessagePort may be used to manipulate and access internal plugin state.
-
-Intuitively, a MessagePort contains a "command" or "event" (which is reacted
-to), NOT a "value" or "signal" (which is computed with).
-
-Plugins may respond to messages via another MessagePort as specified by the
-atom:respondsWith property.
 """ .
 
 
@@ -160,24 +87,13 @@ to as the atom's "body".
 
 The URIs of subclasses of atom:AtomType are mapped to integers and used as
 the type field of an LV2_Atom.  If a plugin or host does not understand
-the type of an LV2_Atom, that atom SHOULD simply be ignored.
+the type of an LV2_Atom, that atom SHOULD simply be ignored (though it
+MAY be simply copied if it is not a reference).
 
 All atoms are POD by definition, except references, which have type 0.
 An atom MUST NOT contain a reference.  It is safe to copy any type of
 atom except type 0 with a simple memcpy using the size field, even if the
 implementation does not understand the actual type of that atom.
-""" .
-
-
-atom:supports a rdf:Property ;
-	rdfs:domain  lv2:Port ;
-	rdfs:range   atom:AtomType ;
-	rdfs:label   "supports" ;
-	rdfs:comment """
-Indicates that a port supports a certain value type.  This is distinct from
-the port type - e.g. the port type ValuePort can hold atoms with many
-different types.  This property is used to describe which atom types
-a port ``understands''.
 """ .
 
 
