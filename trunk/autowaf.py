@@ -116,6 +116,7 @@ def configure(conf):
 		conf.env.append_value('CCFLAGS', vals.split())
 		conf.env.append_value('CXXFLAGS', vals.split())
 	conf.line_just = 43
+	display_header('Global Configuration')
 	conf.check_tool('misc')
 	conf.check_tool('compiler_cc')
 	conf.check_tool('compiler_cxx')
@@ -193,6 +194,13 @@ def configure(conf):
 		conf.env.append_value('CXXFLAGS', [ '-ansi', '-Woverloaded-virtual', '-Wnon-virtual-dtor'])
 		append_cxx_flags('-Wall -Wextra -Wno-unused-parameter')
 	append_cxx_flags('-fPIC -DPIC -fshow-column')
+
+	display_msg(conf, "Install prefix", conf.env['PREFIX'])
+	display_msg(conf, "Debuggable build", str(conf.env['DEBUG']))
+	display_msg(conf, "Strict compiler flags", str(conf.env['STRICT']))
+	display_msg(conf, "Build documentation", str(conf.env['BUILD_DOCS']))
+	print
+
 	g_step = 2
 	
 def set_local_lib(conf, name, has_objects):
@@ -239,23 +247,8 @@ def display_msg(conf, msg, status = None, color = None):
 		color = 'GREEN'
 	elif type(status) == bool and not status or status == "False":
 		color = 'YELLOW'
-	Utils.pprint('NORMAL', "%s :" % msg.ljust(conf.line_just), sep='')
+	Utils.pprint('BOLD', "%s :" % msg.ljust(conf.line_just), sep='')
 	Utils.pprint(color, status)
-
-def print_summary(conf):
-	global g_step
-	if g_step > 2:
-		print
-		return
-	e = conf.env
-	print
-	display_header('Global configuration')
-	display_msg(conf, "Install prefix", conf.env['PREFIX'])
-	display_msg(conf, "Debuggable build", str(conf.env['DEBUG']))
-	display_msg(conf, "Strict compiler flags", str(conf.env['STRICT']))
-	display_msg(conf, "Build documentation", str(conf.env['BUILD_DOCS']))
-	print
-	g_step = 3
 
 def link_flags(env, lib):
 	return ' '.join(map(lambda x: env['LIB_ST'] % x, env['LIB_' + lib]))

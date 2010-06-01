@@ -44,8 +44,6 @@ def configure(conf):
 	conf.define('DATA_DIR', os.path.join(conf.env['PREFIX'], 'share', 'eugene'))
 	conf.write_config_header('eugene-config.h')
 
-	autowaf.print_summary(conf)
-
 def build(bld):
 	# Headers
 	bld.install_files('${INCLUDEDIR}/eugene', 'eugene/*.h')
