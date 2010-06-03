@@ -18,7 +18,7 @@
 
 #include "slv2-config.h"
 
-#define _XOPEN_SOURCE 500
+#define _XOPEN_SOURCE 600
 #include <dirent.h>
 #include <librdf.h>
 #include <stdlib.h>
@@ -172,11 +172,18 @@ slv2_world_new_memory_storage(SLV2World world, bool index)
 librdf_storage*
 slv2_world_new_persistent_storage(SLV2World world, const char* path)
 {
+#define OPTIONS "index-spo='yes',index-gspo='yes',index-ops='yes',index-gops='yes'"
+
 	char* world_path = slv2_world_cache_location("world", false);
-	librdf_storage* ret = librdf_new_storage(world->world, "tokr", world_path, NULL);
+	librdf_storage* ret = librdf_new_storage(
+		world->world, "qure", world_path, OPTIONS);
+	if (!ret) {
+		printf("Opening new storage %s\n", path);
+		ret = librdf_new_storage(world->world, "qure", world_path, OPTIONS ",new='yes'");
+	}
 	free(world_path);
 	if (!ret) {
-		SLV2_ERROR("Unable to create persistent RDF storage.\n");
+		SLV2_ERRORF("Unable to create persistent RDF storage %s\n", path);
 	}
 	return ret;
 }
@@ -305,17 +312,17 @@ slv2_world_cache_sum(SLV2World world, librdf_uri* file_uri)
 
 /** Load the entire contents of a file into the world model.
  */
-void
-slv2_world_load_file(SLV2World world, librdf_uri* file_uri)
+librdf_node*
+slv2_world_load_file(SLV2World world, librdf_uri* file_uri, bool* transaction)
 {
 	if (!file_uri)
-		return;
+		return NULL;
 
 	const char* file_uri_str = (const char*)librdf_uri_as_string(file_uri);
 	const char* file_path    = slv2_uri_to_path(file_uri_str);
 	if (!file_path) {
 		SLV2_ERROR("Unable to load non-local file\n");
-		return;
+		return NULL;
 	}
 
 	librdf_node* cache_file_sum = slv2_world_cache_sum(world, file_uri);
@@ -323,9 +330,11 @@ slv2_world_load_file(SLV2World world, librdf_uri* file_uri)
 	md5_byte_t sum[MD5_DIGEST_LENGTH];
 	if (!md5_file(file_path, sum)) {
 		SLV2_ERROR("Unable to calculate MD5 sum of file\n");
-		return;
+		return NULL;
 	}
 
+	librdf_node* context = librdf_new_node_from_uri(world->world, file_uri);
+				
 	// Convert binary sum into hex
 	static const char* hex = "0123456789abcdef";
 	char file_sum_str[MD5_DIGEST_LENGTH * 2 + 1];
@@ -341,39 +350,47 @@ slv2_world_load_file(SLV2World world, librdf_uri* file_uri)
 		if (!cmp) {
 			//printf("slv2: Cache hit %s\n", file_path);
 			free(cache_sum_str);
-			return;
+			return context;
 		} else {
 			//printf("slv2: Cache replace %s\n", file_path);
-			librdf_statement* s = librdf_new_statement_from_nodes(world->world,
-					librdf_new_node_from_uri(world->world, file_uri),
-					librdf_new_node_from_node(world->slv2_digest_node),
-					librdf_new_node_from_literal(world->world,
-						(const unsigned char*)cache_sum_str, NULL, 0));
+			librdf_statement* s = librdf_new_statement_from_nodes(
+				world->world,
+				context,
+				librdf_new_node_from_node(world->slv2_digest_node),
+				librdf_new_node_from_literal(world->world,
+											 (const unsigned char*)cache_sum_str, NULL, 0));
 			if (librdf_model_remove_statement(world->files, s)) {
 				fprintf(stderr, "Failed to remove cache digest statement\n");
 			}
 			librdf_free_statement(s);
 			free(cache_sum_str);
 
-			librdf_model_context_remove_statements(world->model,
-					librdf_new_node_from_uri(world->world, file_uri));
+			librdf_model_context_remove_statements(world->model, context);
 		}
 	}
 
 	//printf("slv2: Parse %s\n", file_uri_str);
 
-	librdf_statement* s = librdf_new_statement_from_nodes(world->world,
-			librdf_new_node_from_uri(world->world, file_uri),
-			librdf_new_node_from_node(world->slv2_digest_node),
-			librdf_new_node_from_literal(world->world,
-				(const unsigned char*)file_sum_str, NULL, 0));
+	librdf_statement* s = librdf_new_statement_from_nodes(
+		world->world,
+		context,
+		librdf_new_node_from_node(world->slv2_digest_node),
+		librdf_new_node_from_literal(world->world,
+									 (const unsigned char*)file_sum_str, NULL, 0));
+
 	librdf_model_add_statement(world->files, s);
 	librdf_free_statement(s);
 
 	librdf_stream* file_stream = librdf_parser_parse_as_stream(world->parser, file_uri, file_uri);
-	librdf_model_context_add_statements(world->model,
-			librdf_new_node_from_uri(world->world, file_uri),
-			file_stream);
+
+	if (!*transaction) {
+		librdf_model_transaction_start(world->model);
+		*transaction = true;
+	}
+
+	librdf_model_context_add_statements(world->model, context, file_stream);
+
+	return context;
 }
 
 
@@ -388,25 +405,24 @@ slv2_world_load_bundle(SLV2World world, SLV2Value bundle_uri)
 	librdf_uri* manifest_uri = librdf_new_uri_relative_to_base(
 			bundle_uri->val.uri_val, (const unsigned char*)"manifest.ttl");
 
-	/* Parse the manifest into a temporary model */
-	librdf_storage* manifest_storage = slv2_world_new_memory_storage(world, true);
-
-	librdf_model* manifest_model = librdf_new_model(world->world,
-			manifest_storage, NULL);
-	librdf_parser_parse_into_model(world->parser, manifest_uri,
-			manifest_uri, manifest_model);
+	bool transaction = false;
+	librdf_node* context = slv2_world_load_file(world, manifest_uri, &transaction);
+	if (!transaction)
+		return; // Cached manifest, do nothing
 
 #ifdef SLV2_DYN_MANIFEST
 	typedef void* LV2_Dyn_Manifest_Handle;
 	LV2_Dyn_Manifest_Handle handle = NULL;
 
-	const unsigned char* const query_str = (const unsigned char* const)
+	char* query_str = slv2_strjoin(
 		"PREFIX : <http://lv2plug.in/ns/lv2core#>\n"
 		"PREFIX dynman: <http://lv2plug.in/ns/ext/dynmanifest#>\n"
-		"SELECT DISTINCT ?dynman ?binary WHERE {\n"
+		"SELECT DISTINCT ?dynman ?binary\n",
+		"FROM <", librdf_uri_as_string(manifest_uri), ">\n"
+		"WHERE {\n"
 		"?dynman a       dynman:DynManifest ;\n"
 		"        :binary ?binary .\n"
-		"}";
+		"}", NULL);
 
 	librdf_query* query = librdf_new_query(world->world, "sparql", NULL, query_str, NULL);
 	librdf_query_results* query_results = librdf_query_execute(query, manifest_model);
@@ -479,6 +495,7 @@ slv2_world_load_bundle(SLV2World world, SLV2Value bundle_uri)
 	}
 	librdf_free_query_results(query_results);
 	librdf_free_query(query);
+	free(query_str);
 #endif // SLV2_DYN_MANIFEST
 
 	/* ?plugin a lv2:Plugin */
@@ -486,7 +503,7 @@ slv2_world_load_bundle(SLV2World world, SLV2Value bundle_uri)
 			NULL, librdf_new_node_from_node(world->rdf_a_node),
 			      librdf_new_node_from_node(world->lv2_plugin_node));
 
-	librdf_stream* results = librdf_model_find_statements(manifest_model, q);
+	librdf_stream* results = librdf_model_find_statements_in_context(world->model, q, context);
 	while (!librdf_stream_end(results)) {
 		librdf_statement* s = librdf_stream_get_object(results);
 
@@ -519,7 +536,7 @@ slv2_world_load_bundle(SLV2World world, SLV2Value bundle_uri)
 			NULL, librdf_new_node_from_node(world->rdf_a_node),
 			      librdf_new_node_from_node(world->lv2_specification_node));
 
-	results = librdf_model_find_statements(manifest_model, q);
+	results = librdf_model_find_statements_in_context(world->model, q, context);
 	while (!librdf_stream_end(results)) {
 		librdf_statement* s = librdf_stream_get_object(results);
 
@@ -547,13 +564,8 @@ slv2_world_load_bundle(SLV2World world, SLV2Value bundle_uri)
 	librdf_free_stream(results);
 	librdf_free_statement(q);
 
-	/* Join the temporary model to the main model */
-	librdf_stream* manifest_stream = librdf_model_as_stream(manifest_model);
-	librdf_model_add_statements(world->model, manifest_stream);
-	librdf_free_stream(manifest_stream);
+	librdf_model_transaction_commit(world->model);
 
-	librdf_free_model(manifest_model);
-	librdf_free_storage(manifest_storage);
 	librdf_free_uri(manifest_uri);
 }
 
@@ -642,7 +654,7 @@ slv2_plugin_class_compare_by_uri(const void* a, const void* b)
 void
 slv2_world_load_specifications(SLV2World world)
 {
-	unsigned char* query_string = (unsigned char*)
+	const unsigned char* query_string = (const unsigned char*)
 		"PREFIX : <http://lv2plug.in/ns/lv2core#>\n"
 		"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n"
 		"SELECT DISTINCT ?spec ?data WHERE {\n"
@@ -659,7 +671,10 @@ slv2_world_load_specifications(SLV2World world)
 		librdf_node* data_node = librdf_query_results_get_binding_value(results, 1);
 		librdf_uri*  data_uri  = librdf_node_get_uri(data_node);
 
-		slv2_world_load_file(world, data_uri);
+		bool transaction = false;
+		slv2_world_load_file(world, data_uri, &transaction);
+		if (transaction)
+			librdf_model_transaction_commit(world->model);
 
 		librdf_free_node(spec_node);
 		librdf_free_node(data_node);

@@ -177,13 +177,14 @@ slv2_plugin_load_ports_if_necessary(SLV2Plugin p)
 void
 slv2_plugin_load(SLV2Plugin p)
 {
+	bool transaction = false;
 	// Parse all the plugin's data files into RDF model
 	for (unsigned i=0; i < slv2_values_size(p->data_uris); ++i) {
 		SLV2Value data_uri_val = slv2_values_get_at(p->data_uris, i);
 		librdf_uri* data_uri = slv2_value_as_librdf_uri(data_uri_val);
-		slv2_world_load_file(p->world, data_uri);
+		slv2_world_load_file(p->world, data_uri, &transaction);
 	}
-
+			
 #ifdef SLV2_DYN_MANIFEST
 	typedef void* LV2_Dyn_Manifest_Handle;
 	// Load and parse dynamic manifest data, if this is a library
@@ -209,6 +210,10 @@ slv2_plugin_load(SLV2Plugin p)
 			FILE* fd = tmpfile();
 			get_data_func(handle, fd, slv2_value_as_string(p->plugin_uri));
 			rewind(fd);
+			if (!transaction) {
+				librdf_model_transaction_begin(p->world->model);
+				transaction = true;
+			}
 			librdf_parser_parse_file_handle_into_model(p->world->parser,
 					fd, 0, slv2_value_as_librdf_uri(p->bundle_uri), p->world->model);
 			fclose(fd);
@@ -220,6 +225,10 @@ slv2_plugin_load(SLV2Plugin p)
 			close_func(handle);
 	}
 #endif
+
+	if (transaction)
+		librdf_model_transaction_commit(p->world->model);
+
 	p->loaded = true;
 }
 
@@ -421,10 +430,8 @@ SLV2Values
 slv2_plugin_get_value(SLV2Plugin p,
                       SLV2Value  predicate)
 {
-	char* query = NULL;
-
 	/* Hack around broken RASQAL, full URI predicates don't work :/ */
-	query = slv2_strjoin(
+	char* query = slv2_strjoin(
 		"PREFIX slv2predicate: <", slv2_value_as_string(predicate), ">\n",
 		"SELECT DISTINCT ?value WHERE {\n"
 		"<> slv2predicate: ?value .\n"

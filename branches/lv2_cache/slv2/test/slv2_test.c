@@ -83,20 +83,22 @@ write_file(const char *name, const char *content)
 	fclose(f);
 }
 
-int
+bool
 init_world()
 {
 	world = slv2_world_new();
 	return world != NULL;
 }
 
-int
+bool
 load_all_bundles()
 {
-	if (!init_world())
-		return 0;
+	if (!init_world()) {
+		fprintf(stderr, "Failed to init world\n");
+		return false;
+	}
 	slv2_world_load_all(world);
-	return 1;
+	return true;
 }
 
 void
@@ -108,7 +110,7 @@ create_bundle(char *manifest, char *content)
 	write_file(content_name, content);
 }
 
-int
+bool
 start_bundle(char *manifest, char *content)
 {
 	create_bundle(manifest, content);
