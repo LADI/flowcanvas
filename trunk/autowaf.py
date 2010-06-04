@@ -77,10 +77,13 @@ def check_header(conf, name, define='', mandatory=False):
 	checked = conf.env['AUTOWAF_HEADERS']
 	if not name in checked:
 		checked[name] = True
+		includes = '' # search default system include paths
+		if sys.platform == "darwin":
+			includes = '/opt/local/include'
 		if define != '':
-			conf.check(header_name=name, define_name=define, mandatory=mandatory)
+			conf.check(header_name=name, includes=includes, define_name=define, mandatory=mandatory)
 		else:
-			conf.check(header_name=name, mandatory=mandatory)
+			conf.check(header_name=name, includes=includes, mandatory=mandatory)
 
 def nameify(name):
 	return name.replace('/', '_').replace('++', 'PP').replace('-', '_').replace('.', '_')
@@ -363,11 +366,16 @@ def run_tests(ctx, appname, tests):
 	else:
 		os.chdir('./build/default')
 
+	lcov = True
 	lcov_log = open('lcov.log', 'w')
+	try:
+		# Clear coverage data
+		subprocess.call('lcov -d ./src -z'.split(),
+				stdout=lcov_log, stderr=lcov_log)
+	except:
+		lcov = False
+		print "Failed to run lcov, no coverage report will be generated"
 
-	# Clear coverage data
-	subprocess.call('lcov -d ./src -z'.split(),
-			stdout=lcov_log, stderr=lcov_log)
 
 	# Run all tests
 	for i in tests:
@@ -379,24 +387,25 @@ def run_tests(ctx, appname, tests):
 			failures += 1
 			Utils.pprint('RED', 'Failed %s %s' % (appname, i))
 
-	# Generate coverage data
-	coverage_lcov = open('coverage.lcov', 'w')
-	subprocess.call(('lcov -c -d ./src -d ./test -b ' + base).split(),
-			stdout=coverage_lcov, stderr=lcov_log)
-	coverage_lcov.close()
+	if lcov:
+		# Generate coverage data
+		coverage_lcov = open('coverage.lcov', 'w')
+		subprocess.call(('lcov -c -d ./src -d ./test -b ' + base).split(),
+				stdout=coverage_lcov, stderr=lcov_log)
+		coverage_lcov.close()
+		
+		# Strip out unwanted stuff
+		coverage_stripped_lcov = open('coverage-stripped.lcov', 'w')
+		subprocess.call('lcov --remove coverage.lcov *boost* c++*'.split(),
+				stdout=coverage_stripped_lcov, stderr=lcov_log)
+		coverage_stripped_lcov.close()
 	
-	# Strip out unwanted stuff
-	coverage_stripped_lcov = open('coverage-stripped.lcov', 'w')
-	subprocess.call('lcov --remove coverage.lcov *boost* c++*'.split(),
-			stdout=coverage_stripped_lcov, stderr=lcov_log)
-	coverage_stripped_lcov.close()
-
-	# Generate HTML coverage output
-	if not os.path.isdir('./coverage'):
-		os.makedirs('./coverage')
-	subprocess.call('genhtml -o coverage coverage-stripped.lcov'.split(),
-			stdout=lcov_log, stderr=lcov_log)
-
+		# Generate HTML coverage output
+		if not os.path.isdir('./coverage'):
+			os.makedirs('./coverage')
+		subprocess.call('genhtml -o coverage coverage-stripped.lcov'.split(),
+				stdout=lcov_log, stderr=lcov_log)
+	
 	lcov_log.close()
 
 	print
