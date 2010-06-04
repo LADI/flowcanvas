@@ -194,6 +194,22 @@ slv2_world_new()
 {
 	SLV2World world = (SLV2World)malloc(sizeof(struct _SLV2World));
 
+	// Kludge REDLAND_MODULE_PATH in the environment to add PREFIX/lib/redland
+	// where PREFIX is the prefix SLV2 was configured (and thus likely the prefix that
+	// Qure was configured as well).  This is needed for now especially since released
+	// Redland doesn't search /usr/local/lib by default
+	const char* module_path = getenv("REDLAND_MODULE_PATH");
+	const char* add_path    = SLV2_REDLAND_MODULE_PATH;
+	if (module_path) {
+		if (strstr(module_path, add_path) == NULL) {
+			char* new_module_path = slv2_strjoin(module_path, ":", add_path, NULL);
+			setenv("REDLAND_MODULE_PATH", new_module_path, 1);
+			free(new_module_path);
+		}
+	} else {
+		setenv("REDLAND_MODULE_PATH", add_path, 1);
+	}
+
 	world->world = librdf_new_world();
 	if (!world->world) {
 		free(world);
