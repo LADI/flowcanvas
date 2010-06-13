@@ -41,7 +41,7 @@ def set_options(opt):
 			help="Build debuggable binaries [Default: False]")
 	opt.add_option('--strict', action='store_true', default=False, dest='strict',
 			help="Use strict compiler flags and show all warnings [Default: False]")
-	opt.add_option('--build-docs', action='store_true', default=False, dest='build_docs',
+	opt.add_option('--docs', action='store_true', default=False, dest='docs',
 			help="Build documentation - requires doxygen [Default: False]")
 	opt.add_option('--bundle', action='store_true', default=False,
 			help="Build a self-contained bundle [Default: False]")
@@ -123,7 +123,7 @@ def configure(conf):
 	conf.check_tool('misc')
 	conf.check_tool('compiler_cc')
 	conf.check_tool('compiler_cxx')
-	conf.env['BUILD_DOCS'] = Options.options.build_docs
+	conf.env['DOCS'] = Options.options.docs
 	conf.env['DEBUG'] = Options.options.debug
 	conf.env['STRICT'] = Options.options.strict
 	conf.env['PREFIX'] = os.path.abspath(os.path.expanduser(os.path.normpath(conf.env['PREFIX'])))
@@ -186,22 +186,33 @@ def configure(conf):
 	conf.env['DATADIRNAME'] = os.path.basename(conf.env['DATADIR'])
 	conf.env['CONFIGDIRNAME'] = os.path.basename(conf.env['CONFIGDIR'])
 	conf.env['LV2DIRNAME'] = os.path.basename(conf.env['LV2DIR'])
-	
+
+	if Options.options.docs:
+		doxygen = conf.find_program('doxygen')
+		if not doxygen:
+			conf.fatal("Doxygen is required to build documentation, configure without --docs")
+
+		dot = conf.find_program('dot')
+		if not dot:
+			conf.fatal("Graphviz (dot) is required to build documentation, configure without --docs")
+		
 	if Options.options.debug:
 		conf.env['CCFLAGS'] = [ '-O0', '-g' ]
 		conf.env['CXXFLAGS'] = [ '-O0',  '-g' ]
 	else:
 		append_cxx_flags('-DNDEBUG')
+
 	if Options.options.strict:
 		conf.env.append_value('CCFLAGS', [ '-std=c99', '-pedantic' ])
 		conf.env.append_value('CXXFLAGS', [ '-ansi', '-Woverloaded-virtual', '-Wnon-virtual-dtor'])
 		append_cxx_flags('-Wall -Wextra -Wno-unused-parameter')
+
 	append_cxx_flags('-fPIC -DPIC -fshow-column')
 
 	display_msg(conf, "Install prefix", conf.env['PREFIX'])
 	display_msg(conf, "Debuggable build", str(conf.env['DEBUG']))
 	display_msg(conf, "Strict compiler flags", str(conf.env['STRICT']))
-	display_msg(conf, "Build documentation", str(conf.env['BUILD_DOCS']))
+	display_msg(conf, "Build documentation", str(conf.env['DOCS']))
 	print
 
 	g_step = 2
@@ -297,7 +308,7 @@ def build_pc(bld, name, version, libs):
 
 # Doxygen API documentation
 def build_dox(bld, name, version, srcdir, blddir):
-	if not bld.env['BUILD_DOCS']:
+	if not bld.env['DOCS']:
 		return
 	obj = bld.new_task_gen('subst')
 	obj.source = 'doc/reference.doxygen.in'
