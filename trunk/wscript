@@ -27,7 +27,6 @@ def set_options(opt):
 	opt.sub_options('lv2/core.lv2')
 	opt.sub_options('lv2')
 	opt.sub_options('slv2')
-	#opt.sub_options('evoral')
 	opt.sub_options('raul')
 	opt.sub_options('flowcanvas')
 	opt.sub_options('patchage')
@@ -47,7 +46,6 @@ def configure(conf):
 	sub_config_and_use(conf, 'lv2/core.lv2', False, 'lv2core')
 	sub_config_and_use(conf, 'lv2', False)
 	sub_config_and_use(conf, 'slv2')
-	#sub_config_and_use(conf, 'evoral')
 	sub_config_and_use(conf, 'raul')
 	sub_config_and_use(conf, 'flowcanvas')
 	sub_config_and_use(conf, 'patchage')
@@ -58,7 +56,7 @@ def configure(conf):
 
 def build(bld):
 	autowaf.set_recursive()
-	bld.add_subdirs('lv2/core.lv2 lv2 slv2 raul flowcanvas patchage redlandmm ingen plugins/lolep.lv2')# evoral machina')
+	bld.add_subdirs('lv2/core.lv2 lv2 slv2 raul flowcanvas patchage redlandmm ingen plugins/lolep.lv2')# machina')
 
 def test(ctx):
 	ctx.recurse('raul')
