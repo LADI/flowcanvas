@@ -1,7 +1,9 @@
 This repository contains several projects.  Most are related, and many have
 direct dependencies.  They all share a unified build system (based on waf)
 that can be used to build the entire repository at once, or each project
-separately.  See INSTALL file for details.
+separately.  The /common directory must be checked out to build any
+component, e.g. to build raul you need both /common and /raul checked
+out into the same directory.  See INSTALL file for details.
 
 Information on the web about this software lives at <http://drobilla.net/>
 
