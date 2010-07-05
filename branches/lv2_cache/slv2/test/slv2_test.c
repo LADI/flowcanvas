@@ -55,7 +55,9 @@ void
 init_tests()
 {
 	strncpy(bundle_dir_name, getenv("HOME"), 900);
-	strcat(bundle_dir_name, "/.lv2/slv2-test.lv2");
+	strcat(bundle_dir_name, "/.lv2");
+	mkdir(bundle_dir_name, 0700);
+	strcat(bundle_dir_name, "/slv2-test.lv2");
 	sprintf(bundle_dir_uri, "file://%s/", bundle_dir_name);
 	sprintf(manifest_name, "%s/manifest.ttl", bundle_dir_name);
 	sprintf(content_name, "%s/plugin.ttl", bundle_dir_name);
