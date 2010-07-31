@@ -79,7 +79,7 @@ def configure(conf):
 	conf.env['BUILD_TESTS'] = Options.options.build_tests
 	conf.env['BASH_COMPLETION'] = Options.options.bash_completion
 	conf.define('SLV2_DEFAULT_LV2_PATH', Options.options.default_lv2_path)
-	conf.define('REDLAND_MODULE_DIR', os.path.join(conf.env['LIBDIR'], "redland"))
+	conf.define('SLV2_REDLAND_MODULE_PATH', os.path.join(conf.env['LIBDIR'], "redland"))
 	
 	if not Options.options.no_mmap:
 		conf.check(function_name='mmap', uselib_store='HAVE_MMAP',
