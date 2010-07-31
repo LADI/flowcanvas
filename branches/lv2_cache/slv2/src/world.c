@@ -389,7 +389,7 @@ slv2_world_load_file(SLV2World world, librdf_uri* file_uri, bool* transaction)
 
 	librdf_statement* s = librdf_new_statement_from_nodes(
 		world->world,
-		context,
+		librdf_new_node_from_node(context),
 		librdf_new_node_from_node(world->slv2_digest_node),
 		librdf_new_node_from_literal(world->world,
 									 (const unsigned char*)file_sum_str, NULL, 0));
