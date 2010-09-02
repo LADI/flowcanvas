@@ -126,8 +126,7 @@ Item::on_event(GdkEvent* event)
 			ungrab(event->button.time);
 			dragging = false;
 			if (click_x != drag_start_x || click_y != drag_start_y) {
-				store_location();
-				signal_dropped.emit(click_x, click_y);
+				on_drop();
 			} else if (!double_click) {
 				on_click(&event->button);
 			}
@@ -210,6 +209,24 @@ Item::on_drag(double dx, double dy)
 	}
 
 	signal_dragged.emit(dx, dy);
+}
+
+
+void
+Item::on_drop()
+{
+	boost::shared_ptr<Canvas> canvas = _canvas.lock();
+	if (!canvas)
+		return;
+
+	if (_selected) {
+		for (list<boost::shared_ptr<Item> >::iterator i = canvas->selected_items().begin();
+				i != canvas->selected_items().end(); ++i) {
+			(*i)->store_location();
+		}
+	} else {
+		store_location();
+	}
 }
 
 } // namespace FlowCanvas
