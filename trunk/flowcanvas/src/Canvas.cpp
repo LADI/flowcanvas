@@ -1401,6 +1401,10 @@ Canvas::arrange(bool use_length_hints, bool center)
 		move_contents_to_internal(border_width, border_width, least_x, least_y);
 		scroll_to(0, 0);
 	}
+
+	for (ItemList::const_iterator i = _items.begin(); i != _items.end(); ++i)
+		(*i)->store_location();
+
 #endif
 }
 
