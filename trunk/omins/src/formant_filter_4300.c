@@ -1,4 +1,4 @@
-/* Formant filter plugin.  Copyright (C) 2005-2009 Dave Robillard.
+/* Formant filter plugin.  Copyright (C) 2005-2009 David Robillard.
  *
  * Based on SSM formant filter,
  * Copyright (C) 2001 David Griffiths <dave@pawfal.org>
@@ -231,7 +231,7 @@ _init()
 		formant_vc_desc->Label = strdup("formant_vc");
 		formant_vc_desc->Properties = LADSPA_PROPERTY_HARD_RT_CAPABLE;
 		formant_vc_desc->Name = strdup("Formant Filter (CR vowel)");
-		formant_vc_desc->Maker = strdup("Dave Robillard");
+		formant_vc_desc->Maker = strdup("David Robillard");
 		formant_vc_desc->Copyright = strdup("GPL");
 		formant_vc_desc->PortCount = FORMANT_NUM_PORTS;
 		port_descriptors = (LADSPA_PortDescriptor*)calloc(FORMANT_NUM_PORTS, sizeof(LADSPA_PortDescriptor));
@@ -269,7 +269,7 @@ _init()
 		formant_va_desc->Label = strdup("formant_va");
 		formant_va_desc->Properties = LADSPA_PROPERTY_HARD_RT_CAPABLE;
 		formant_va_desc->Name = strdup("Formant Filter (AR vowel)");
-		formant_va_desc->Maker = strdup("Dave Robillard");
+		formant_va_desc->Maker = strdup("David Robillard");
 		formant_va_desc->Copyright = strdup("GPL");
 		formant_va_desc->PortCount = FORMANT_NUM_PORTS;
 		port_descriptors = (LADSPA_PortDescriptor*)calloc(FORMANT_NUM_PORTS, sizeof(LADSPA_PortDescriptor));

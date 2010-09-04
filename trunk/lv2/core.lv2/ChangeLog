@@ -4,7 +4,7 @@ lv2core (4.0) unstable; urgency=low
   * Loosen domain restriction of lv2:optionalFeature and lv2:requiredFeature
     (to allow re-use in extensions)
  
- -- Dave Robillard <dave@drobilla.net>  Fri, 10 Jul 2009 17:27:57 -0400
+ -- David Robillard <d@drobilla.net>  Fri, 10 Jul 2009 17:27:57 -0400
 
 lv2core (3.0) unstable; urgency=low
 
@@ -12,5 +12,5 @@ lv2core (3.0) unstable; urgency=low
   * Minor stylistic changes to lv2.ttl
   * No header changes
  
- -- Dave Robillard <dave@drobilla.net>  Sat, 08 Nov 2008 14:27:10 -0500
+ -- David Robillard <d@drobilla.net>  Sat, 08 Nov 2008 14:27:10 -0500
 

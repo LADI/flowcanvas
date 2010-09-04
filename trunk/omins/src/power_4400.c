@@ -1,5 +1,5 @@
 /* Base to the power of Exponent plugin.  Copyright (C) 2005 Thorsten Wilms.
- * Based on Dave Robillard's "Hz to AMS style V/Oct" plugin for the skeleton,
+ * Based on David Robillard's "Hz to AMS style V/Oct" plugin for the skeleton,
  * and there's not much else in here :).
  *
  * This plugin is free software; you can redistribute it and/or modify it under

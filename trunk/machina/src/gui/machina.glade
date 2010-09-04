@@ -614,7 +614,7 @@
   <widget class="GtkAboutDialog" id="about_win">
     <property name="destroy_with_parent">True</property>
     <property name="type_hint">GDK_WINDOW_TYPE_HINT_NORMAL</property>
-    <property name="copyright" translatable="yes">© 2007 Dave Robillard &lt;http://drobilla.net&gt;</property>
+    <property name="copyright" translatable="yes">© 2007 David Robillard &lt;http://drobilla.net&gt;</property>
     <property name="comments" translatable="yes">A MIDI sequencer based on
  probabilistic finite-state automata</property>
     <property name="website">http://drobilla.net/software/machina</property>
@@ -633,7 +633,7 @@ You should have received a copy of the GNU General Public License
 along with Machina; if not, write to the Free Software Foundation, Inc.,
 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 </property>
-    <property name="authors">Dave Robillard &lt;dave@drobilla.net&gt;</property>
+    <property name="authors">David Robillard &lt;d@drobilla.net&gt;</property>
     <property name="translator_credits" translatable="yes" comments="TRANSLATORS: Replace this string with your names, one name per line.">translator-credits</property>
     <property name="logo">machina.svg</property>
     <child internal-child="vbox">

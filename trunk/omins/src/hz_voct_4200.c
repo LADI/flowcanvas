@@ -1,4 +1,4 @@
-/* Hz to AMS style V/Oct plugin.  Copyright (C) 2005-2009 Dave Robillard.
+/* Hz to AMS style V/Oct plugin.  Copyright (C) 2005-2009 David Robillard.
  *
  * This plugin is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free
@@ -138,7 +138,7 @@ _init()
 		hz_voct_cr_desc->Label = strdup("hz_voct_cr");
 		hz_voct_cr_desc->Properties = LADSPA_PROPERTY_HARD_RT_CAPABLE;
 		hz_voct_cr_desc->Name = strdup("Hz to V/Oct Converter (CR)");
-		hz_voct_cr_desc->Maker = strdup("Dave Robillard");
+		hz_voct_cr_desc->Maker = strdup("David Robillard");
 		hz_voct_cr_desc->Copyright = strdup("GPL");
 		hz_voct_cr_desc->PortCount = HZVOCT_NUM_PORTS;
 		port_descriptors = (LADSPA_PortDescriptor*)calloc(HZVOCT_NUM_PORTS, sizeof(LADSPA_PortDescriptor));
@@ -170,7 +170,7 @@ _init()
 		hz_voct_ar_desc->Label = strdup("hz_voct_ar");
 		hz_voct_ar_desc->Properties = LADSPA_PROPERTY_HARD_RT_CAPABLE;
 		hz_voct_ar_desc->Name = strdup("Hz to V/Oct Converter (AR)");
-		hz_voct_ar_desc->Maker = strdup("Dave Robillard");
+		hz_voct_ar_desc->Maker = strdup("David Robillard");
 		hz_voct_ar_desc->Copyright = strdup("GPL");
 		hz_voct_ar_desc->PortCount = HZVOCT_NUM_PORTS;
 		port_descriptors = (LADSPA_PortDescriptor*)calloc(HZVOCT_NUM_PORTS, sizeof(LADSPA_PortDescriptor));

@@ -1,6 +1,6 @@
 /*  Masher
  *  Copyright (C) 2001 David Griffiths <dave@pawfal.org>
- *  LADSPAfication (C) 2005 Dave Robillard <drobilla@connect.carelton.ca>
+ *  LADSPAfication (C) 2005 David Robillard <drobilla@connect.carelton.ca>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by

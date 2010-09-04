@@ -1,5 +1,5 @@
 # LV2 MIDI Extension
-# Copyright (C) 2008 Dave Robillard <dave@drobilla.net>
+# Copyright (C) 2008 David Robillard <d@drobilla.net>
 #
 # Based on lv2-midiport.h:
 #     Copyright (C) 2006 Lars Luthman <lars.luthman@gmail.com>
@@ -39,7 +39,7 @@
     ] ;
 	doap:maintainer [
 		a foaf:Person ;
-		foaf:name "Dave Robillard" ;
+		foaf:name "David Robillard" ;
 		foaf:homepage <http://drobilla.net/> ;
 		rdfs:seeAlso <http://drobilla.net/drobilla.xrdf>
 	] , [

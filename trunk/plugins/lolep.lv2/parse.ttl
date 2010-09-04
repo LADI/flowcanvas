@@ -11,9 +11,9 @@ lolep:parse a lv2:Plugin ;
 	a lv2:UtilityPlugin ;
 	doap:name "Parse" ;
 	doap:maintainer [
-		foaf:name "Dave Robillard" ;
+		foaf:name "David Robillard" ;
 		foaf:homepage <http://drobilla.net/> ;
-		foaf:mbox <mailto:dave@drobilla.net> ;
+		foaf:mbox <mailto:d@drobilla.net> ;
 	] ;
     lv2:requiredFeature ctx:MessageContext ;
 	ctx:requiredContext ctx:MessageContext ;

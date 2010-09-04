@@ -1,5 +1,5 @@
 /* Multiplxer plugin.  Copyright (C) 2005 Thorsten Wilms.
- * GATEd on Dave Robillard's "Hz to AMS style V/Oct" plugin for the skeleton.
+ * GATEd on David Robillard's "Hz to AMS style V/Oct" plugin for the skeleton.
  *
  * This plugin is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free

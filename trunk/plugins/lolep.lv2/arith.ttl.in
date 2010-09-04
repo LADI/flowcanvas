@@ -14,9 +14,9 @@ lolep:@SYMBOL@ a lv2:Plugin ;
 	lv2:symbol "@SYMBOL@" ;
 	dev:tiny-name "@TINYNAME@" ;
 	doap:maintainer [
-		foaf:name "Dave Robillard" ;
+		foaf:name "David Robillard" ;
 		foaf:homepage <http://drobilla.net/> ;
-		foaf:mbox <mailto:dave@drobilla.net> ;
+		foaf:mbox <mailto:d@drobilla.net> ;
 	] ;
 	lv2:optionalFeature lv2:hardRTCapable ;
 	ctx:optionalContext ctx:StatelessAudioContext ;

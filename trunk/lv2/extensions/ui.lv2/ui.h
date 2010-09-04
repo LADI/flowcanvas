@@ -1,11 +1,11 @@
 /* LV2 UI Extension
  * Copyright (C) 2006-2008 Lars Luthman <lars.luthman@gmail.com>
- * Copyright (C) 2009-2010 Dave Robillard <dave@drobilla.net>
+ * Copyright (C) 2009-2010 David Robillard <d@drobilla.net>
  *
  * Based on lv2.h, which was
  * Copyright (C) 2000-2002 Richard W.E. Furse, Paul Barton-Davis,
  *                         Stefan Westerfeld
- * Copyright (C) 2006 Steve Harris, Dave Robillard.
+ * Copyright (C) 2006 Steve Harris, David Robillard.
  *
  * This header is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published

@@ -1,6 +1,6 @@
 # LV2 UI Extension
 # Copyright (C) 2006-2008 Lars Luthman <lars.luthman@gmail.com>
-# Copyright (C) 2009-2010 Dave Robillard <dave@drobilla.net>
+# Copyright (C) 2009-2010 David Robillard <d@drobilla.net>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -42,7 +42,7 @@
         foaf:mbox <mailto:lars.luthman@gmail.com>
     ] , [
         a foaf:Person ;
-        foaf:name     "Dave Robillard" ;
+        foaf:name     "David Robillard" ;
         foaf:homepage <http://drobilla.net/> ;
         rdfs:seeAlso  <http://drobilla.net/drobilla.rdf>
     ] ;

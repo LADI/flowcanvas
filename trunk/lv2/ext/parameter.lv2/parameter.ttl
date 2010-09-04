@@ -1,5 +1,5 @@
 # LV2 Parameter Extension
-# Copyright (C) 2010 Dave Robillard <dave@drobilla.net>
+# Copyright (C) 2010 David Robillard <d@drobilla.net>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -33,7 +33,7 @@
     doap:name "LV2 Parameter" ;
     doap:maintainer [
         a foaf:Person ;
-        foaf:name     "Dave Robillard" ;
+        foaf:name     "David Robillard" ;
         foaf:homepage <http://drobilla.net/> ;
         rdfs:seeAlso  <http://drobilla.net/drobilla.rdf>
     ] ;

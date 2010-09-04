@@ -1,5 +1,5 @@
 /* Crossfade with AR Level plugin.  Copyright (C) 2005 Thorsten Wilms.
- * Based on Dave Robillard's "Hz to AMS style V/Oct" plugin for the skeleton.
+ * Based on David Robillard's "Hz to AMS style V/Oct" plugin for the skeleton.
  * Thanks to Florian Schmidt for explaining how to calculate the scale values
  * before I could work it out myself! ;-)
  *

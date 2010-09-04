@@ -3,7 +3,7 @@
 #
 # lv2compatgen
 # Generates compatiblity documentation for LV2 hosts and plugins.
-# Copyright (c) 2009 Dave Robillard <dave@drobilla.net>
+# Copyright (c) 2009 David Robillard <d@drobilla.net>
 # 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-__authors__ = "Dave Robillard"
+__authors__ = "David Robillard"
 __license__ = "MIT License <http://www.opensource.org/licenses/mit-license.php>"
 __contact__ = "devel@lists.lv2plug.in"
 __date__    = "2009-11-08"

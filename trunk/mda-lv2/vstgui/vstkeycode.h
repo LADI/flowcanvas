@@ -1,6 +1,6 @@
 /* ----------------------------------------------------------------------------
  * VSTGUI for X11/LV2/PNG
- * Author: Dave Robillard
+ * Author: David Robillard
  * Released under the revised BSD license, as below
  * ----------------------------------------------------------------------------
  *

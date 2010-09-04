@@ -3,7 +3,7 @@
  *
  * Copyright (C) 2000-2002 Richard W.E. Furse, Paul Barton-Davis,
  *                         Stefan Westerfeld.
- * Copyright (C) 2006-2008 Steve Harris, Dave Robillard.
+ * Copyright (C) 2006-2008 Steve Harris, David Robillard.
  *
  * This header is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published

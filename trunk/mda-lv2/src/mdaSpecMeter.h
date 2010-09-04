@@ -2,7 +2,7 @@
 // Plug-in: "MDA SpecMeter"
 //
 // Copyright(c)1999-2000 Paul Kellett (maxim digital audio)
-// Copyright (C) 2008-2009 Dave Robillard
+// Copyright (C) 2008-2009 David Robillard
 //
 
 #include "audioeffectx.h"

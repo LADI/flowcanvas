@@ -1,4 +1,4 @@
-/* This file is an audio plugin.  Copyright (C) 2005-2009 Dave Robillard.
+/* This file is an audio plugin.  Copyright (C) 2005-2009 David Robillard.
  *
  * This plugin is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free
@@ -153,7 +153,7 @@ _init()
 		range_trans_cr_desc->Label = strdup("range_trans_cr");
 		range_trans_cr_desc->Properties = LADSPA_PROPERTY_HARD_RT_CAPABLE;
 		range_trans_cr_desc->Name = strdup("Range Translator (CR Controls)");
-		range_trans_cr_desc->Maker = strdup("Dave Robillard");
+		range_trans_cr_desc->Maker = strdup("David Robillard");
 		range_trans_cr_desc->Copyright = strdup("GPL");
 		range_trans_cr_desc->PortCount = RANGETRANS_NUM_PORTS;
 		port_descriptors = (LADSPA_PortDescriptor*)calloc(RANGETRANS_NUM_PORTS, sizeof(LADSPA_PortDescriptor));
@@ -197,7 +197,7 @@ _init()
 		range_trans_ar_desc->Label = strdup("range_trans_ar");
 		range_trans_ar_desc->Properties = LADSPA_PROPERTY_HARD_RT_CAPABLE;
 		range_trans_ar_desc->Name = strdup("Range Translator (AR Controls)");
-		range_trans_ar_desc->Maker = strdup("Dave Robillard");
+		range_trans_ar_desc->Maker = strdup("David Robillard");
 		range_trans_ar_desc->Copyright = strdup("GPL");
 		range_trans_ar_desc->PortCount = RANGETRANS_NUM_PORTS;
 		port_descriptors = (LADSPA_PortDescriptor*)calloc(RANGETRANS_NUM_PORTS, sizeof(LADSPA_PortDescriptor));

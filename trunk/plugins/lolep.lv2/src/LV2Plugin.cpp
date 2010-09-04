@@ -3,7 +3,7 @@
     lv2plugin.cpp - support file for writing LV2 plugins in C++
 
     Copyright (C) 2006-2007 Lars Luthman <lars.luthman@gmail.com>
-        Modified by Dave Robillard, 2008
+        Modified by David Robillard, 2008
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

@@ -1,6 +1,6 @@
 /* LV2Plugin - C++ wrapper class for LV2 plugins
  * Copyright (C) 2006-2007 Lars Luthman <lars.luthman@gmail.com>
- * Copyright (C) 2009      Dave Robillard <dave@drobilla.net>
+ * Copyright (C) 2009      David Robillard <d@drobilla.net>
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free

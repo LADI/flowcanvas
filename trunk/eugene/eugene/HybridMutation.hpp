@@ -1,5 +1,5 @@
 /* This file is part of Eugene
- * Copyright (C) 2007-2009 Dave Robillard <http://drobilla.net>
+ * Copyright (C) 2007-2009 David Robillard <http://drobilla.net>
  *
  * Eugene is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free

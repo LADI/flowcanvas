@@ -5,7 +5,7 @@ flowcanvas (0.6.4) unstable; urgency=low
   * Fix centering (e.g. on arrange, initial view)
   * Upgrade to waf 1.5.18
 
-  -- Dave Robillard <dave@drobilla.net>  Fri, 03 Sep 2010 20:24:36 -0400
+  -- David Robillard <d@drobilla.net>  Fri, 03 Sep 2010 20:24:36 -0400
 
 flowcanvas (0.6.0) unstable; urgency=low
 
@@ -18,7 +18,7 @@ flowcanvas (0.6.0) unstable; urgency=low
   * Slightly more sophisticated port and module sizing
   * Resize performance improvements
 
- -- Dave Robillard <dave@drobilla.net>  Tue, 08 Dec 2009 20:46:57 -0500
+ -- David Robillard <d@drobilla.net>  Tue, 08 Dec 2009 20:46:57 -0500
 
 
 flowcanvas (0.5.1) unstable; urgency=low
@@ -26,12 +26,12 @@ flowcanvas (0.5.1) unstable; urgency=low
   * Multiple selection
   * Gray background when canvas is locked
 
- -- Dave Robillard <dave@drobilla.net>  Sun, 07 Sep 2008 14:10:32 -0400
+ -- David Robillard <d@drobilla.net>  Sun, 07 Sep 2008 14:10:32 -0400
 
 
 flowcanvas (0.5.0) unstable; urgency=low
 
   * Initial Debian release
 
- -- Dave Robillard <dave@drobilla.net>  Sun, 06 Jul 2008 16:35:31 -0400
+ -- David Robillard <d@drobilla.net>  Sun, 06 Jul 2008 16:35:31 -0400
 
