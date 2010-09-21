@@ -93,10 +93,11 @@ SELECT ?rev FROM <%s.lv2/%s.ttl> WHERE { <%s> doap:release [ doap:revision ?rev 
             rev = re.sub('^result: \[rev=string\("', '', rev)
             rev = re.sub('"\)\]$', '', rev).strip()
         else:
-            rev = '1'
-            
+            rev = '0'
+
         subprocess.call(['tar', '-czf', outdir + '/releases/%s.lv2-%s.tgz' % (b, rev),
-                          outdir + '/%s.lv2' % b])
+                         outdir + '/%s.lv2' % b])
+            
 
         print '****', b
         specgendir = '../../specgen/'
@@ -108,7 +109,11 @@ SELECT ?rev FROM <%s.lv2/%s.ttl> WHERE { <%s> doap:release [ doap:revision ?rev 
                              specgendir + 'style.css',
                              '%s.lv2/%s.html' % (b, b),
                              '-i'], cwd=outdir);
-            index_html += '<li><a rel="rdfs:seeAlso" href="%s">%s</a></li>\n' % (b, b);
+
+            index_html += '<li><a rel="rdfs:seeAlso" href="%s">%s</a>' % (b, b)
+            if rev == '0':
+                index_html += '<span style="color: red;"> (proposal)</span>'
+            index_html += '</li>\n'
 
         shutil.copy('index.php', os.path.join(outdir, b + '.lv2', 'index.php'))
     
@@ -123,7 +128,7 @@ SELECT ?rev FROM <%s.lv2/%s.ttl> WHERE { <%s> doap:release [ doap:revision ?rev 
 
     index_html += '</body></html>\n'
 
-    index_file = open(os.path.join(dir, 'index.html'), 'w')
+    index_file = open(os.path.join(outdir, 'index.html'), 'w')
     print >>index_file, index_html
     index_file.close()
 
