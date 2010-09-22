@@ -17,10 +17,7 @@
  */
 
 /** @file
- * This header defines the LV2 URI Map Extension with the URI
- * <http://lv2plug.in/ns/ext/persist> ('lv2persist').
- *
- * For more information, see http://lv2plug.in/ns/ext/persist
+ * C header for the LV2 Persist extension <http://lv2plug.in/ns/ext/persist>.
  */
 
 #ifndef LV2_PERSIST_H

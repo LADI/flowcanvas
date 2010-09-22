@@ -6,13 +6,17 @@ import subprocess
 import glob
 import re
 
-shutil.rmtree('upload')
+try:
+    shutil.rmtree('upload')
+except:
+    pass
+    
 os.mkdir('upload')
 
 URIPREFIX  = 'http://lv2plug.in/ns/'
 SPECGENDIR = './specgen'
 
-print '**** Generating core documentation'
+print '** Generating core documentation'
 
 os.mkdir('upload/lv2core')
 shutil.copy('core.lv2/lv2.h',        'upload/lv2core')
@@ -29,23 +33,21 @@ def gendoc(specgen_dir, bundle_dir, ttl_filename, html_filename):
               os.path.join(specgen_dir, 'style.css'),
               os.path.join('upload', html_filename),
               '-i'])
-    subprocess.call('doxygen', cwd=bundle_dir, stdout=devnull)
 
 gendoc('./specgen', 'core.lv2', 'lv2.ttl', 'lv2core/lv2core.html')
 
 style = open('./specgen/style.css', 'r')
 footer = open('./specgen/footer.html', 'r')
 
+# Generate main (ontology) documentation and indices
 for dir in ['ext', 'dev', 'extensions']:
-    print "**** Generating %s documentation" % dir
+    print "** Generating %s%s documentation" % (URIPREFIX, dir)
 
     outdir = os.path.join('upload', dir)
 
     shutil.copytree(dir, outdir, ignore = lambda src, names: '.svn')
     os.mkdir(os.path.join(outdir, 'releases'))
 
-    subprocess.call(['doxygen', 'Doxyfile'], cwd=outdir, stdout=devnull)
-    
     index_html = """
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">
@@ -98,11 +100,9 @@ SELECT ?rev FROM <%s.lv2/%s.ttl> WHERE { <%s> doap:release [ doap:revision ?rev 
         subprocess.call(['tar', '-czf', outdir + '/releases/%s.lv2-%s.tgz' % (b, rev),
                          outdir + '/%s.lv2' % b])
             
-
-        print '****', b
         specgendir = '../../specgen/'
         if (os.access(outdir + '/%s.lv2/%s.ttl' % (b, b), os.R_OK)):
-            print '  ** Generating ontology documentation %s/%s.html' % (b, b)
+            print ' * Calling lv2specgen for %s%s/%s' %(URIPREFIX, dir, b)
             subprocess.call([specgendir + 'lv2specgen.py',
                              '%s.lv2/%s.ttl' % (b, b),
                              specgendir + 'template.html',
@@ -132,7 +132,11 @@ SELECT ?rev FROM <%s.lv2/%s.ttl> WHERE { <%s> doap:release [ doap:revision ?rev 
     print >>index_file, index_html
     index_file.close()
 
-    os.remove(os.path.join(outdir, 'Doxyfile'))
+# Generate code (headers) documentation
+print "** Generating header documentation"
+#shutil.copy('Doxyfile', os.path.join('upload', 'Doxyfile'))
+print ' * Calling doxygen in ' + os.getcwd()
+subprocess.call('doxygen', stdout=devnull)
 
 devnull.close()
 style.close()

@@ -28,8 +28,8 @@
 #include "event.lv2/event.h"
 
 /** @file
- * This header defines some helper functions for the the LV2 events extension
- * with URI <http://lv2plug.in/ns/ext/event> ('lv2ev').
+ * Helper functions for the LV2 Event extension
+ * <http://lv2plug.in/ns/ext/event>.
  *
  * These functions are provided for convenience only, use of them is not
  * required for supporting lv2ev (i.e. the events extension is defined by the

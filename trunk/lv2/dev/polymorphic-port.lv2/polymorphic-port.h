@@ -16,20 +16,18 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 01222-1307 USA
  */
 
-#ifndef LV2_POLYMORPHIC_PORT_H
-#define LV2_POLYMORPHIC_PORT_H
-
-#define LV2_POLYMORPHIC_PORT_URI "http://lv2plug.in/ns/dev/polymorphic-port"
-
-
 /** @file
- * This header defines the LV2 Polymorphic Port extension with the URI
+ * C header for the LV2 Polymorphic Port extension
  * <http://lv2plug.in/ns/dev/polymorphic-port>.
  *
  * This extension defines a buffer format for ports that can take on
  * various types dynamically at runtime.
  */
 
+#ifndef LV2_POLYMORPHIC_PORT_H
+#define LV2_POLYMORPHIC_PORT_H
+
+#define LV2_POLYMORPHIC_PORT_URI "http://lv2plug.in/ns/dev/polymorphic-port"
 
 /** The data field of the LV2_Feature for this extension.
  *

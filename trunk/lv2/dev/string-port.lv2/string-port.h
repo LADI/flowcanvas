@@ -17,6 +17,11 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 01222-1307 USA
  */
 
+/** @file
+ * C header for the LV2 String Port extension
+ * <http://lv2plug.in/ns/dev/string-port#StringTransfer>.
+ */
+
 #ifndef LV2_STRING_PORT_H
 #define LV2_STRING_PORT_H
 

@@ -35,7 +35,7 @@ extern "C" {
 
 
 /** @file lv2.h
- *
+ * C header for the LV2 specification <http://lv2plug.in/ns/lv2core>.
  * Revision: 1
  *
  * == Overview ==

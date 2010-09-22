@@ -26,7 +26,8 @@ extern "C" {
 #endif
 
 /** @file
- * This is an LV2 message port specification, which uses (raw) OSC messages
+ * C header for the LV2 OSC extension <http://lv2plug.in/ns/dev/osc>.
+ * This extension uses (raw) OSC messages
  * and a buffer format which contains a sequence of timestamped messages.
  * Additional (ie beyond raw OSC) indexing information is stored in the buffer
  * for performance, so that accessors for messages and arguments are very fast:

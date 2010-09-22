@@ -24,6 +24,10 @@
  *
  */
 
+/** @file
+ * C header for the LV2 UI extension <http://lv2plug.in/ns/extensions/ui>.
+ */
+
 #ifndef LV2_UI_H
 #define LV2_UI_H
 

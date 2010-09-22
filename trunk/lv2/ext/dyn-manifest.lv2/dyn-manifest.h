@@ -41,8 +41,9 @@ extern "C" {
 /* ************************************************************************* */
 
 
-/** @file lv2_dyn_manifest.h
- *
+/** @file
+ * C header for the LV2 Dynamic Manifest extension
+ * <http://lv2plug.in/ns/ext/dyn-manifest>.
  * Revision: 1
  *
  * == Overview ==

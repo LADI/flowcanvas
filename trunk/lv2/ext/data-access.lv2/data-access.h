@@ -16,20 +16,18 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 01222-1307 USA
  */
 
-#ifndef LV2_DATA_ACCESS_H
-#define LV2_DATA_ACCESS_H
-
-#define LV2_DATA_ACCESS_URI "http://lv2plug.in/ns/ext/data-access"
-
-
 /** @file
- * This header defines the LV2 Extension Data extension with the URI
+ * C header for the LV2 Extension Data extension
  * <http://lv2plug.in/ns/ext/data-access>.
  *
  * This extension defines a method for (e.g.) plugin UIs to have (possibly
  * marshalled) access to the extension_data function on a plugin instance.
  */
 
+#ifndef LV2_DATA_ACCESS_H
+#define LV2_DATA_ACCESS_H
+
+#define LV2_DATA_ACCESS_URI "http://lv2plug.in/ns/ext/data-access"
 
 /** The data field of the LV2_Feature for this extension.
  *

@@ -16,6 +16,16 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 01222-1307 USA
  */
 
+/** @file
+ * C header for the LV2 Atom extension <http://lv2plug.in/ns/ext/atom>.
+ * This extension defines convenience structs that
+ * should match the definition of the built-in types of the atom extension.
+ * The layout of atoms in this header must match the description in RDF.
+ * The RDF description of an atom type should be considered normative.
+ * This header is a non-normative (but hopefully accurate) implementation
+ * of that specification.
+ */
+
 #ifndef LV2_ATOM_H
 #define LV2_ATOM_H
 
@@ -26,16 +36,6 @@
 
 #include <stdint.h>
 #include <stddef.h>
-
-/** @file
- * This header defines the code portion of the LV2 Atom extension with URI
- * <http://lv2plug.in/ns/ext/atom>.  It defines convenience structs that
- * should match the definition of the built-in types of the atom extension.
- * The layout of atoms in this header must match the description in RDF.
- * The RDF description of an atom type should be considered normative.
- * This header is a non-normative (but hopefully accurate) implementation
- * of that specification.
- */
 
 #define LV2_ATOM_FROM_EVENT(ev) ((LV2_Atom*)&((LV2_Event*)ev)->type)
 

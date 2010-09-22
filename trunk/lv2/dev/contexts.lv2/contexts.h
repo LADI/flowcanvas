@@ -16,6 +16,11 @@
  * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+/** @file
+ * C header for the LV2 Contexts extension
+ * <http://lv2plug.in/ns/dev/contexts>.
+ */
+
 #ifndef LV2_CONTEXTS_H
 #define LV2_CONTEXTS_H
 

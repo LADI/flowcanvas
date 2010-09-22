@@ -23,7 +23,7 @@
 
 
 /** @file
- * This header defines the LV2 Instance Access extension with the URI
+ * C header for the LV2 Instance Access extension
  * <http://lv2plug.in/ns/ext/instance-access>.
  *
  * This extension defines a method for (e.g.) plugin UIs to get a direct

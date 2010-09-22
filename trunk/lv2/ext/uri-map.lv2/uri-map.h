@@ -17,16 +17,8 @@
  * Inc., 59 Temple Place, Suite 330, Boston, MA 01222-1307 USA
  */
 
-#ifndef LV2_URI_MAP_H
-#define LV2_URI_MAP_H
-
-#define LV2_URI_MAP_URI "http://lv2plug.in/ns/ext/uri-map"
-
-#include <stdint.h>
-
 /** @file
- * This header defines the LV2 URI Map extension with the URI
- * <http://lv2plug.in/ns/ext/uri-map> ('lv2urimap').
+ * C header for the LV2 URI Map extension <http://lv2plug.in/ns/ext/uri-map>.
  *
  * This extension defines a simple mechanism for plugins to map URIs to
  * integers, usually for performance reasons (e.g. processing events
@@ -36,6 +28,13 @@
  * comparison.  This allows the extensibility of RDF with the performance of
  * integers (or centrally defined enumerations).
  */
+
+#ifndef LV2_URI_MAP_H
+#define LV2_URI_MAP_H
+
+#define LV2_URI_MAP_URI "http://lv2plug.in/ns/ext/uri-map"
+
+#include <stdint.h>
 
 
 /** Opaque pointer to host data. */

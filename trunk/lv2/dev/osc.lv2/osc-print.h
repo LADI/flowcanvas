@@ -15,6 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/** @file
+ * Helper functions for printing LV2 OSC messages as defined by the
+ * LV2 OSC extension <http://lv2plug.in/ns/dev/osc>.
+ */
+
 #ifndef LV2_OSC_PRINT_H
 #define LV2_OSC_PRINT_H
 

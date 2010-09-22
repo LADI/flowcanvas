@@ -27,8 +27,7 @@
 #include <stdint.h>
 
 /** @file
- * This header defines the code portion of the LV2 events extension with URI
- * <http://lv2plug.in/ns/ext/event> ('lv2ev').
+ * C header for the LV2 Event extension <http://lv2plug.in/ns/ext/event>.
  *
  * This extension is a generic transport mechanism for time stamped events
  * of any type (e.g. MIDI, OSC, ramps, etc).  Each port can transport mixed
