@@ -42,6 +42,7 @@ def sub_config_and_use(conf, name, has_objects = True, pkgname = ''):
 
 def configure(conf):
 	autowaf.set_recursive()
+	conf.line_just = 43
 	autowaf.configure(conf)
 	sub_config_and_use(conf, 'lv2/core.lv2', False, 'lv2core')
 	sub_config_and_use(conf, 'lv2', False)

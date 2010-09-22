@@ -118,7 +118,6 @@ def configure(conf):
 	def append_cxx_flags(vals):
 		conf.env.append_value('CCFLAGS', vals.split())
 		conf.env.append_value('CXXFLAGS', vals.split())
-	conf.line_just = 43
 	display_header('Global Configuration')
 	conf.check_tool('misc')
 	conf.check_tool('compiler_cc')
