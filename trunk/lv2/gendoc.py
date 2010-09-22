@@ -127,7 +127,6 @@ SELECT ?rev FROM <%s.lv2/%s.ttl> WHERE { <%s> doap:release [ doap:revision ?rev 
         # Remove .lv2 suffix from bundle name (to make URI resolvable)
         os.rename(outdir + '/%s.lv2' % b, outdir + '/%s' % b)
 
-    print extensions
     extensions.sort()
     for i in extensions:
         index_html += i + '\n'
