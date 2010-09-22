@@ -63,29 +63,24 @@ def build(bld):
 		atom
 		atom-port
 		command
+		contexts
 		data-access
 		dyn-manifest
 		event
+		host-info
 		instance-access
 		midi
-		parameter
-		uri-map
-	'''
-	for e in ext.split():
-		build_extension(bld, e, './ext')
-	
-	dev = '''
-		contexts
-		host-info
 		osc
+		parameter
 		polymorphic-port
 		port-groups
 		presets
 		string-port
+		uri-map
 		variables
 	'''
-	for e in dev.split():
-		build_extension(bld, e, './dev')
+	for e in ext.split():
+		build_extension(bld, e, './ext')
 	
 	extensions = '''
 		ui
