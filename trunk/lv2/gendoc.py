@@ -41,7 +41,7 @@ style = open('./specgen/style.css', 'r')
 footer = open('./specgen/footer.html', 'r')
 
 # Generate main (ontology) documentation and indices
-for dir in ['ext', 'dev', 'extensions']:
+for dir in ['ext', 'extensions']:
     print "** Generating %s%s documentation" % (URIPREFIX, dir)
 
     outdir = os.path.join('upload', dir)
@@ -65,6 +65,8 @@ for dir in ['ext', 'dev', 'extensions']:
 </style></head>
 <body><h1>LV2 Extensions</h1>
 <h2>""" + URIPREFIX + dir + "/</h2><ul>\n"
+
+    extensions = []
 
     for bundle in glob.glob(os.path.join(dir, '*.lv2')):
         b = bundle.replace('.lv2', '')
@@ -100,7 +102,7 @@ SELECT ?rev FROM <%s.lv2/%s.ttl> WHERE { <%s> doap:release [ doap:revision ?rev 
 
         subprocess.call(['tar', '-czf', outdir + '/releases/%s.lv2-%s.tgz' % (b, rev),
                          outdir + '/%s.lv2' % b])
-            
+
         specgendir = '../../specgen/'
         if (os.access(outdir + '/%s.lv2/%s.ttl' % (b, b), os.R_OK)):
             print ' * Calling lv2specgen for %s%s/%s' %(URIPREFIX, dir, b)
@@ -112,15 +114,23 @@ SELECT ?rev FROM <%s.lv2/%s.ttl> WHERE { <%s> doap:release [ doap:revision ?rev 
                              os.path.join('..', '..', 'doc'),
                              '-i'], cwd=outdir);
 
-            index_html += '<li><a rel="rdfs:seeAlso" href="%s">%s</a>' % (b, b)
+            li = '<li>'
             if rev == '0':
-                index_html += '<span style="color: red;"> (experimental)</span>'
-            index_html += '</li>\n'
+                li += '<span style="color: red;">Experimental: </span>'
+            li += '<a rel="rdfs:seeAlso" href="%s">%s</a>' % (b, b)
+            li += '</li>'
+
+            extensions.append(li)
 
         shutil.copy('index.php', os.path.join(outdir, b + '.lv2', 'index.php'))
     
         # Remove .lv2 suffix from bundle name (to make URI resolvable)
         os.rename(outdir + '/%s.lv2' % b, outdir + '/%s' % b)
+
+    print extensions
+    extensions.sort()
+    for i in extensions:
+        index_html += i + '\n'
     
     index_html += '</ul>\n'
     index_html += '<div><a href="./releases">Releases</a></div>\n'
