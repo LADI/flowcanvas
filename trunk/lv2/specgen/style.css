@@ -10,9 +10,9 @@ a:active { color: #C00; background: transparent }
 
 
 h1, h2, h3, h4, h5, h6 { text-align: left; }
-h1, h2 { background-color: #f9fafc; margin-top: 0; color: #000; border-bottom: 1px solid #b2c0dd; }
-h1 { border-top: 1px solid #c4cfe5; padding: 1ex; margin-bottom: 0; }
-h2 { border-top: 1px solid #b2c0dd; border-bottom: 1px solid #b2c0dd; padding: 0.5ex; }
+h1, h2 { background-color: #f2f2f2; margin-top: 0; color: #000; border-bottom: 1px solid #cccccc; }
+h1 { /*border-top: 1px solid #c4cfe5;*/ padding: 1ex; margin-bottom: 0; }
+h2 { /*border-top: 1px solid #b2c0dd;*/ border-bottom: 1px solid #b2c0dd; padding: 0.5ex; }
 h3, h4, h5, h6 { padding: 0; margin: 0.5ex 0 0.5ex 0 }
 
 h2 { margin: 3ex 0 1ex 0 }
