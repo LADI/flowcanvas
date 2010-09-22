@@ -695,22 +695,20 @@ def specgen(specloc, docdir, template, instances=False, mode="spec"):
     bundle_path = os.path.split(specloc[specloc.find(':')+1:])[0]
     header_path = bundle_path + '/' + basename + '.h'
 
-    other_files = '<div>See also:</div><ul>'
-    #other_files += '<li><a href=".">Bundle</a></li>'
-    other_files += '<li><a href="../releases">Releases</a></li>'
+    other_files = '<li><a href=".">Bundle</a></li>\n'
+    other_files += '<li><a href="../releases">Releases</a></li>\n'
     if os.path.exists(os.path.abspath(header_path)):
-        other_files += '<li><a href="' + docdir + '/html/%s">Header Documentation</a></li>' % (
+        other_files += '<li><a href="' + docdir + '/html/%s">Header Documentation</a></li>\n' % (
             basename + '_8h.html')
 
         other_files += '<li><a href="%s">Header</a> %s</li>' % (basename + '.h', basename + '.h')
 
-    other_files += '<li><a href="%s">Ontology</a> %s</li>' % (filename, filename)
+    other_files += '<li><a href="%s">Ontology</a> %s</li>\n' % (filename, filename)
 
     see_also_files = specProperties(m, spec_url, rdfs.seeAlso)
     for f in see_also_files:
         other_files += '<li><a href="%s">%s</a></li>' % (f, f)
 
-    other_files += '</ul>'
     template = template.replace('@FILES@', other_files);
 
     comment = specProperty(m, spec_url, rdfs.comment)
