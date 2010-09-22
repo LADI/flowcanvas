@@ -32,6 +32,7 @@ def gendoc(specgen_dir, bundle_dir, ttl_filename, html_filename):
               os.path.join(specgen_dir, 'template.html'),
               os.path.join(specgen_dir, 'style.css'),
               os.path.join('upload', html_filename),
+              os.path.join('..', 'doc'),
               '-i'])
 
 gendoc('./specgen', 'core.lv2', 'lv2.ttl', 'lv2core/lv2core.html')
@@ -108,6 +109,7 @@ SELECT ?rev FROM <%s.lv2/%s.ttl> WHERE { <%s> doap:release [ doap:revision ?rev 
                              specgendir + 'template.html',
                              specgendir + 'style.css',
                              '%s.lv2/%s.html' % (b, b),
+                             os.path.join('..', '..', 'doc'),
                              '-i'], cwd=outdir);
 
             index_html += '<li><a rel="rdfs:seeAlso" href="%s">%s</a>' % (b, b)

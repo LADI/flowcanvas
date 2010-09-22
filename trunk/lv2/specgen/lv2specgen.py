@@ -598,7 +598,7 @@ def getInstances(model, classes, properties):
     return instances
    
  
-def specgen(specloc, template, instances=False, mode="spec"):
+def specgen(specloc, docdir, template, instances=False, mode="spec"):
     """The meat and potatoes: Everything starts here."""
 
     global spec_url
@@ -699,7 +699,7 @@ def specgen(specloc, template, instances=False, mode="spec"):
     #other_files += '<li><a href=".">Bundle</a></li>'
     other_files += '<li><a href="../releases">Releases</a></li>'
     if os.path.exists(os.path.abspath(header_path)):
-        other_files += '<li><a href="../doc/html/%s">Header Documentation</a></li>' % (
+        other_files += '<li><a href="' + docdir + '/html/%s">Header Documentation</a></li>' % (
             basename + '_8h.html')
 
         other_files += '<li><a href="%s">Header</a> %s</li>' % (basename + '.h', basename + '.h')
@@ -773,13 +773,14 @@ def usage():
         TEMPLATE : HTML template path
         STYLE    : CSS style path
         OUTPUT   : HTML output path
+        DOCDIR   : Doxygen documentation directory
 
         Optional flags:
                 -i        : Document class/property instances (disabled by default)
                 -p PREFIX : Set ontology namespace prefix from command line
 
 Example:
-    %s lv2_foos.ttl template.html style.css lv2_foos.html -i -p foos
+    %s lv2_foos.ttl template.html style.css lv2_foos.html ../docs -i -p foos
 
 """ % (script, script)
     sys.exit(-1)
@@ -832,11 +833,14 @@ if __name__ == "__main__":
 
         # Destination
         dest = args[3]
- 
+
+        # Doxygen documentation directory
+        docdir = args[4]
+        
         # Flags
         instances = False
-        if len(args) > 3:
-            flags = args[3:]
+        if len(args) > 4:
+            flags = args[4:]
             i = 0
             while i < len(flags):
                 if flags[i] == '-i':
@@ -846,5 +850,5 @@ if __name__ == "__main__":
                     i += 1
                 i += 1
         
-        save(dest, specgen(specloc, template, instances=instances))
+        save(dest, specgen(specloc, docdir, template, instances=instances))
 
