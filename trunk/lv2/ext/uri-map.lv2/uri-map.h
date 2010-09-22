@@ -26,7 +26,7 @@
 
 /** @file
  * This header defines the LV2 URI Map extension with the URI
- * <http://lv2plug.in/ns/ext/uri-map> (preferred prefix 'lv2urimap').
+ * <http://lv2plug.in/ns/ext/uri-map> ('lv2urimap').
  *
  * This extension defines a simple mechanism for plugins to map URIs to
  * integers, usually for performance reasons (e.g. processing events

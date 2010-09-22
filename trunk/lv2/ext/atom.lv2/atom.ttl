@@ -126,7 +126,6 @@ always 4.
 """ .
 
 
-
 atom:Message a atom:AtomType ;
 	rdfs:label "Message" ;
 	rdfs:comment """
