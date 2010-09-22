@@ -35,7 +35,7 @@ if ($turtle or $x_turtle or $text_turtle) {
 	}
 	$name = basename($_SERVER['REQUEST_URI']); 
 	passthru("cat ./$name.html | sed '
-s/<\/body>/<div style=\"font-size: smaller; color: gray\"><br\/>This document is content-negotiated.  If you request it with <code>Accept: application\/x-turtle<\/code> you will get the description in Turtle.  Also supported: <code>application\/rdf+xml<\/code>, <code>application\/json<\/code>, <code>text\/plain<\/code><\/div><\/body>/'");
+s/<\/body>/<div style=\"font-size: smaller; color: gray; text-align: right; margin: 1ex;\">This document is content-negotiated.  If you request it with <code>Accept: application\/x-turtle<\/code> you will get the description in Turtle.  Also supported: <code>application\/rdf+xml<\/code>, <code>application\/json<\/code>, <code>text\/plain<\/code><\/div><\/body>/'");
 
 # Return NTriples (text/plain)
 } else if ($text_plain) {

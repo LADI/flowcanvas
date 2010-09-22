@@ -99,7 +99,7 @@ mda_ui_instantiate(const struct _LV2UI_Descriptor* descriptor,
 				LV2_DataAccess* ext_data = (LV2_DataAccess*)feature->data;
 				extension_data_func func = (extension_data_func)feature->data;
 				get_effect = (get_effect_func)ext_data->extension_data(
-						"http://drobilla.net/ns/dev/vstgui");
+						"http://drobilla.net/ns/ext/vstgui");
 			}
 		}
 	}

@@ -1,13 +1,13 @@
-@prefix ctx:   <http://lv2plug.in/ns/dev/contexts#> .
+@prefix ctx:   <http://lv2plug.in/ns/ext/contexts#> .
 @prefix doap:  <http://usefulinc.com/ns/doap#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 @prefix lolep: <http://drobilla.net/software/plugins/lolep.lv2/> .
 @prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
-@prefix obj:   <http://lv2plug.in/ns/dev/object#> .
-@prefix pg:    <http://lv2plug.in/ns/dev/port-groups#> .
+@prefix obj:   <http://lv2plug.in/ns/ext/object#> .
+@prefix pg:    <http://lv2plug.in/ns/ext/port-groups#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix rsz:   <http://lv2plug.in/ns/dev/resize-port#> .
-@prefix dev:   <http://lv2plug.in/ns/dev/> .
+@prefix rsz:   <http://lv2plug.in/ns/ext/resize-port#> .
+@prefix dev:   <http://lv2plug.in/ns/ext/> .
 lolep:@SYMBOL@ a lv2:Plugin ;
 	a lolep:PrimitivePlugin ;
 	doap:name "@NAME@" ;

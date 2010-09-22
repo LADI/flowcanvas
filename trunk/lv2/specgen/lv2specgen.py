@@ -673,6 +673,10 @@ def specgen(specloc, docdir, template, instances=False, mode="spec"):
     template = template.replace('@NAME@', specProperty(m, spec_url, doap.name))
     template = template.replace('@URI@', spec_url)
     template = template.replace('@PREFIX@', spec_pre)
+    if spec_pre == 'lv2':
+        template = template.replace('@XMLNS@', '')
+    else:
+        template = template.replace('@XMLNS@', '      xmlns:%s="%s"' % (spec_pre, spec_ns_str))
 
     filename = os.path.basename(specloc)
     basename = filename[0:filename.rfind('.')]

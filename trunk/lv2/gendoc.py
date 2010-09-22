@@ -5,6 +5,7 @@ import shutil
 import subprocess
 import glob
 import re
+import datetime
 
 try:
     shutil.rmtree('upload')
@@ -49,8 +50,7 @@ for dir in ['ext', 'extensions']:
     shutil.copytree(dir, outdir, ignore = lambda src, names: '.svn')
     os.mkdir(os.path.join(outdir, 'releases'))
 
-    index_html = """
-<?xml version="1.0" encoding="utf-8"?>
+    index_html = """<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML+RDFa 1.0//EN" "http://www.w3.org/MarkUp/DTD/xhtml-rdfa-1.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -132,10 +132,13 @@ SELECT ?rev FROM <%s.lv2/%s.ttl> WHERE { <%s> doap:release [ doap:revision ?rev 
         index_html += i + '\n'
     
     index_html += '</ul>\n'
-    index_html += '<div><a href="./releases">Releases</a></div>\n'
-    index_html += '<hr/>\n'
+    index_html += '<div class="content"><a href="./releases">Releases</a></div>\n'
 
-    index_html += footer.read()
+    index_html += '<div class="footer">'
+    index_html += '<span class="footer-text">Generated on '
+    index_html += datetime.datetime.utcnow().strftime('%F %H:%M UTC')
+    index_html += ' by LV2 gendoc.py</span>'
+    index_html += footer.read() + '</div>'
 
     index_html += '</body></html>\n'
 

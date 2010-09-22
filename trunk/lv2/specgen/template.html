@@ -6,7 +6,7 @@
       xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
       xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
       xmlns:lv2="http://lv2plug.in/ns/lv2core#"
-      xmlns:@PREFIX@="@BASE@"
+      @XMLNS@
       xml:lang="en">
   <head>
     <title>@NAME@</title>
@@ -41,10 +41,10 @@
   <div class="content">
     <h3>This Document</h3>
     <ol id="toc">
-      <li><a href="#description">Description</a></li>
-      <li><a href="#sec-glance">Index</a></li>
-      <li><a href="#documentation">Documentation</a></li>
-      <li><a href="#references">References</a></li>
+      <li><a href="#sec-description">Description</a></li>
+      <li><a href="#sec-index">Index</a></li>
+      <li><a href="#sec-documentation">Documentation</a></li>
+      <li><a href="#sec-references">References</a></li>
     </ol>
     <h3>Other Resources</h3>
 	<ul>
@@ -55,13 +55,13 @@
 
   <!-- DESCRIPTION -->
 
-  <h2 id="description">1. Description</h2>
+  <h2 id="sec-description">1. Description</h2>
   <div class="content">@COMMENT@</div>
 
 
   <!-- INDEX -->
 
-  <h2 id="sec-glance">2. Index</h2>
+  <h2 id="sec-index">2. Index</h2>
   <div class="content">
   @INDEX@
   </div>
@@ -69,14 +69,14 @@
 
   <!-- REFERENCE -->
 
-  <h2 id="documentation">3. Documentation</h2>
+  <h2 id="sec-documentation">3. Documentation</h2>
   <div class="content">
   @REFERENCE@
   </div>
 
   <!-- REFERENCES -->
 
-  <h2 id="references">4. References</h2>
+  <h2 id="sec-references">4. References</h2>
   <div class="content">
   <dl>
     <dt class="label" id="ref-rfc2119">IETF RFC 2119</dt>
