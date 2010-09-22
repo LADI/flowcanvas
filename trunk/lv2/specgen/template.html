@@ -18,58 +18,62 @@
   </head>
   <body>
   <h1 id="title">@NAME@</h1>
-
-  <dl class="meta">
-    <dt>URI:</dt>
-    <dd><a href="@URI@">@URI@</a></dd>
-    <dt>Revision:</dt>
-    <dd>@REVISION@</dd>
-    <dt>Maintainer(s):</dt>
-    <dd>@MAINTAINERS@</dd>
-    <dt>Namespaces:</dt>
-    <dd><table>@PREFIXES@</table></dd>
-  </dl>
+  <div class="meta">
+  <table>
+    <tr><th class="metahead">URI</th><td><a href="@URI@">@URI@</a></td></tr>
+    <tr><th class="metahead">Revision</th><td>@REVISION@</td></tr>
+    <tr><th class="metahead">Maintainer(s)</th><td>@MAINTAINERS@</td></tr>
+    <tr><th class="metahead">Namespaces</th><td>@PREFIXES@</td></tr>
+  </table>
+  </div>
   
   
   <!-- META -->
 
-  <h2 id="status">About this Document</h2>
-  <p>This document describes "@NAME@" (<a href="@URI@">@URI@</a>),
-  an <a href="http://lv2plug.in/ns/lv2core">LV2</a> related
-  specification.  Comments are welcome, please direct discussion to <a
+  <div class="content">
+  <p>This document describes <a href="@URI@">@NAME@</a>,
+  an <a href="http://lv2plug.in/ns/lv2core">LV2</a> extension.
+  Comments are welcome, please direct discussion to <a
   href="mailto:@MAIL@">@MAIL@</a>.</p>
-  
   @FILES@
+  </div>
 
   <h2 id="contents">Contents</h2>
+  <div class="content">
   <ol id="toc">
     <li><a href="#description">Description</a></li>
     <li><a href="#sec-glance">Index</a></li>
     <li><a href="#reference">Documentation</a></li>
     <li><a href="#references">References</a></li>
   </ol>
+  </div>
 
 
   <!-- DESCRIPTION -->
 
   <h2 id="description">1. Description</h2>
-  <div>@COMMENT@</div>
+  <div class="content">@COMMENT@</div>
 
 
   <!-- INDEX -->
 
   <h2 id="sec-glance">2. Index</h2>
-  @INDEX@ 
+  <div class="content">
+  @INDEX@
+  </div>
 
 
   <!-- REFERENCE -->
 
   <h2 id="reference">3. Reference</h2>
+  <div class="content">
   @REFERENCE@
+  </div>
 
   <!-- REFERENCES -->
 
   <h2 id="references">4. References</h2>
+  <div class="content">
   <dl>
     <dt class="label" id="ref-rfc2119">IETF RFC 2119</dt>
     <dd>
@@ -79,18 +83,15 @@
       </em>.  Internet Engineering Task Force, 1997.
     </dd>
   </dl>
+  </div>
 
 
   <!-- FOOTER -->
 
-  <hr />
-  @FOOTER@
-
-  <div>
-    <br />
-    <span>Automatically generated from <a href="./@FILENAME@">@FILENAME@</a>
-    by <a href="http://drobilla.net/software/lv2specgen">lv2specgen</a>
-    at @TIME@</span>
+  <div class="footer">
+	<span class="footer-text">Generated on @TIME@ from <a href="./@FILENAME@">@FILENAME@</a>
+    by <a href="http://drobilla.net/software/lv2specgen">lv2specgen</a></span>
+	@FOOTER@
   </div>
 
   </body>

@@ -628,13 +628,14 @@ def specgen(specloc, template, instances=False, mode="spec"):
     namespaces = getNamespaces(p)
     keys = namespaces.keys()
     keys.sort()
-    prefixes_html = ""
+    prefixes_html = "<span>"
     for i in keys:
         uri = namespaces[i]
         if spec_pre is None and str(uri) == str(spec_url + '#'):
             spec_pre = i
-        prefixes_html += '\n    <tr><td>%s</td><td><a href="%s">%s</a></td></tr>' % (i, uri, uri)
-
+        prefixes_html += '<a href="%s">%s</a> ' % (uri, i)
+    prefixes_html += "</span>"
+    
     if spec_pre is None:
         print 'No namespace prefix for specification defined'
         sys.exit(1)
@@ -694,9 +695,9 @@ def specgen(specloc, template, instances=False, mode="spec"):
     bundle_path = os.path.split(specloc[specloc.find(':')+1:])[0]
     header_path = bundle_path + '/' + basename + '.h'
 
-    other_files = '<p>See also:</p>\n<ul>'
+    other_files = '<div>See also:</div><ul>'
     #other_files += '<li><a href=".">Bundle</a></li>'
-    other_files += '<li><a href="../releases">Releases</a>'
+    other_files += '<li><a href="../releases">Releases</a></li>'
     if os.path.exists(os.path.abspath(header_path)):
         other_files += '<li><a href="../doc/html/%s">Header Documentation</a></li>' % (
             basename + '_8h.html')
