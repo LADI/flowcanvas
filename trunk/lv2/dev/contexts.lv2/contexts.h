@@ -47,6 +47,7 @@ lv2_contexts_port_is_valid(const void* flags, uint32_t index) {
 
 #include "lv2.h"
 
+
 typedef struct {
 
 	/** The message run function.  This is called once to process a set of
@@ -65,7 +66,7 @@ typedef struct {
 	                        const void* valid_inputs,
 	                        void*       valid_outputs);
 
-} LV2MessageContext;
+} LV2_Contexts_MessageContext;
 
 #endif /* LV2_CONTEXTS_H */
 

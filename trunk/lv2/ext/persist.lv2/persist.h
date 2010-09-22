@@ -152,6 +152,28 @@ typedef struct _LV2_Persist {
 
 } LV2_Persist;
 
+typedef void* LV2_Persist_FileSupport_Data;
+
+/** Feature structure passed by host to instantiate with feature URI
+ * <http://lv2plug.in/ns/ext/persist#FileSupport>.
+ */
+typedef struct {
+
+	LV2_Persist_FileSupport_Data data;
+	
+	/** Return the full path that should be used for a file owned by this
+	 * plugin called @a name.
+	 *
+	 * @param data MUST be the @a data member of this struct.
+	 * @param name The name of the file.
+	 * @return A newly allocated path which the plugin may use to create a new
+	 *         file.  The plugin is responsible for freeing the returned string.
+	 */
+	char* new_file_path(LV2_Persist_FileSupport_Data data,
+	                    const char*                  name);
+	
+} LV2_Persist_FileSupport;
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif

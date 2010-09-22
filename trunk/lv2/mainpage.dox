@@ -17,9 +17,9 @@
  * \li <a href="files.html">Files Index</a>
  *
  * \par Extension Documentation
- * \li <a href="http://lv2plug.in/ns/lv2core">LV2 core documentation</a>
- * \li <a hre="http://lv2plug.in/ns/ext">Index for http://lv2plug.in/ns/ext</a>
- * \li <a hre="http://lv2plug.in/ns/dev">Index for http://lv2plug.in/ns/dev</a>
- * \li <a hre="http://lv2plug.in/ns/extensions">Index for http://lv2plug.in/ns/extensions</a>
+ * \li <a href="../../lv2core">LV2 core documentation</a>
+ * \li <a href="../../ext">Index for lv2plug.in/ns/ext</a>
+ * \li <a href="../../dev">Index for lv2plug.in/ns/dev</a>
+ * \li <a href="../../extensions">Index for lv2plug.in/ns/extensions</a>
  */
 

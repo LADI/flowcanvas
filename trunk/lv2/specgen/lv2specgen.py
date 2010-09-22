@@ -690,7 +690,7 @@ def specgen(specloc, template, instances=False, mode="spec"):
     if revision:
         template = template.replace('@REVISION@', revision[0] + " (" + revision[1] + ")")
     else:
-        template = template.replace('@REVISION@', '<span style="color: red; font-weight: bold">UNRELEASED PROPOSAL</span>')
+        template = template.replace('@REVISION@', '<span style="color: red; font-weight: bold">EXPERIMENTAL</span>')
 
     bundle_path = os.path.split(specloc[specloc.find(':')+1:])[0]
     header_path = bundle_path + '/' + basename + '.h'

@@ -42,3 +42,21 @@ This extension provides a mechanism for plugins to save and restore internal
 state across plugin instances, allowing hosts to save configuration/state/data
 with a project or clone a plugin including internal state.
 """ .
+
+persist:FileSupport a lv2:Feature ;
+   rdfs:label "Support for creating and/or persisting files" ;
+   rdfs:comment """
+This feature allows plugins to use pre-existing or newly created files,
+and persist them (e.g. across project saves and restores).  If a host supports
+this feature it passes a LV2_Persist_FileSupport structure to the plugins
+instantiate method as a feature (with URI
+http://lv2plug.in/ns/ext/persist#FileSupport).  This structure provides
+a function the plugin can use to create new file names.  If and only if the
+host supports this feature, the plugin MAY persist and restore values of
+type LV2_PERSIST_FILENAME.
+
+A plugin SHOULD use this facility to create any new files it may need
+(e.g. samples, waveforms for recording), but MAY persist and restore
+any filename.
+""" .
+

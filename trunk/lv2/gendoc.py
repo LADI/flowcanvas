@@ -112,7 +112,7 @@ SELECT ?rev FROM <%s.lv2/%s.ttl> WHERE { <%s> doap:release [ doap:revision ?rev 
 
             index_html += '<li><a rel="rdfs:seeAlso" href="%s">%s</a>' % (b, b)
             if rev == '0':
-                index_html += '<span style="color: red;"> (proposal)</span>'
+                index_html += '<span style="color: red;"> (experimental)</span>'
             index_html += '</li>\n'
 
         shutil.copy('index.php', os.path.join(outdir, b + '.lv2', 'index.php'))
