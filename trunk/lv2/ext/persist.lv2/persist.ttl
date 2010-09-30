@@ -38,25 +38,79 @@
         rdfs:seeAlso  <http://drobilla.net/drobilla.rdf>
     ] ;
 	rdfs:comment """
-This extension provides a mechanism for plugins to save and restore internal
-state across plugin instances, allowing hosts to save configuration/state/data
-with a project or clone a plugin including internal state.
+This extension provides a mechanism for plugins to save and restore state
+across instances, allowing hosts to save configuration/state/data with a
+project or fully clone a plugin instance (including internal state).
+
+The motivating idea behind this extension is that a plugin instance's state
+is entirely represented by port values and a single key/value dictionary.
+This makes state well-defined and easily manageable by hosts.  Keys are URIs,
+avoiding conflicts and allowing the same dictionary to be used to store plugin
+state in any context.  Values are typed tagged (by URI mapped integers),
+but otherwise are simple binary blobs.
+
+This extension defines plugin instance state and provides a mechanism
+for saving/restoring it, but otherwise makes no restrictions on how a
+plugin works with state.  For example, other extensions may define dynamic
+ways to control plugin state at runtime.  The idea is that <em>all</em>
+plugin state can be represented with a single (conceptual) dictionary.
+This state representation is tried-and-true, universal, and works well with
+many existing technologies.  Accordingly, plugins/extensions that deal with
+instance state in any way SHOULD represent it in a way compatible with this
+extension, i.e. URI keys with URI-typed values.  Similarly, plugins SHOULD NOT
+use any other mechanism to store/restore state; this <strong>will</strong>
+cause serious problems, don't do it!  Note that you can store values of any
+format whatsoever, so if you have an existing state representation to use
+(e.g. XML), simply store it as a single value under some key.
+
+Files may be persisted using this extension in conjunction with the
+<a href="http://lv2plug.in/ns/ext/files">LV2 Files</a> extension.
+
+Instance state as defined by this extension is RDF compatible, allowing for
+simple and seamless integration with existing technology (LV2 or otherwise).
+An obvious benefit of this is that plugin state can be elegantly described
+in Turtle files; the persist:instanceState predicate is provided for this
+purpose.  RDF compatibility is also convenient since LV2 hosts are likely
+to already have mechanisms for working with RDF-style data.  Note, however,
+that hosts may store state in any way, and are not required to use any
+specific technology or file format to support this extension.
 """ .
 
-persist:FileSupport a lv2:Feature ;
-   rdfs:label "Support for creating and/or persisting files" ;
-   rdfs:comment """
-This feature allows plugins to use pre-existing or newly created files,
-and persist them (e.g. across project saves and restores).  If a host supports
-this feature it passes a LV2_Persist_FileSupport structure to the plugins
-instantiate method as a feature (with URI
-http://lv2plug.in/ns/ext/persist#FileSupport).  This structure provides
-a function the plugin can use to create new file names.  If and only if the
-host supports this feature, the plugin MAY persist and restore values of
-type LV2_PERSIST_FILENAME.
-
-A plugin SHOULD use this facility to create any new files it may need
-(e.g. samples, waveforms for recording), but MAY persist and restore
-any filename.
+persist:InstanceState
+    a rdfs:Class ;
+    rdfs:label "Plugin Instance State" ;
+    rdfs:comment """
+This class is used to express a plugin instance's state in RDF.  The key/value
+properties of the instance form the predicate/object (respectively) of triples
+with a persist:InstanceState as the subject (see persist:instanceState
+for an example).  This may be used wherever it is useful to express a
+plugin instance's state in RDF (e.g. for serialisation, storing in a model, or
+transmitting over a network).  Note that this class is provided because it
+may be useful for hosts, plugins, or extensions that work with instance state,
+but its use is not required to support the LV2 Persist extension.
 """ .
 
+
+persist:instanceState
+    a rdf:Property ;
+    rdfs:range persist:InstanceState ;
+    rdfs:comment """
+Predicate to relate a plugin instance to an InstanceState.  This may be used
+wherever the state of a particular plugin instance needs to be represented.
+Note that the domain of this property is unspecified, since LV2 does not
+define any RDF class for plugin instance.  This predicate may be used
+wherever it makes sense to do so, e.g.:
+<pre>
+@prefix eg: &lt;http://example.org/&gt .
+
+&lt;plugininstance&gt; persist:instanceState [
+    eg:somekey "some value" ;
+    eg:someotherkey "some other value" ;
+    eg:favouritenumber 2 .
+]
+</pre>
+Note that this property is provided because it may be useful for hosts,
+plugins, or extensions that work with instance state, but its use is not
+required to support the LV2 Persist extension.
+""" .
+ 

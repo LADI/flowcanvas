@@ -29,85 +29,77 @@ extern "C" {
 
 #define LV2_PERSIST_URI "http://lv2plug.in/ns/ext/persist"
 
-/** Type of a persistent piece of data. */
-enum DataType {
-	LV2_PERSIST_BLOB,    ///< http://lv2plug.in/ns/ext/persist#Blob
-	LV2_PERSIST_STRING,  ///< http://lv2plug.in/ns/ext/persist#String
-	LV2_PERSIST_FILENAME ///< http://lv2plug.in/ns/ext/persist#FileName
-};
-
 /** Causes the host to store a value under a given key.
  *
  * This callback is passed by the host to LV2_Persist.save().
- * @param callback_data Must be the callback_data argument passed to save().
- * @param key A private string or URI under which the data is to be stored.
- * @param type The type of @a value.
- * @param value Pointer to the value to be stored.
- * @param size The size of the data at @a value in bytes.  If @a size is 0
+ * @param callback_data Must be the callback_data passed to LV2_Persist.save().
+ * @param key The URI key (RDF predicate) under which the value is to be stored.
+ * @param value Pointer to the value (RDF object) to be stored.
+ * @param size The size of the data at @a value in bytes.
+ * @param type The type of @a value, as a URI mapped to an integer.
  *
- * If @a type is LV2_PERSIST BLOB, @a value points to an opaque region of
- * memory @a size bytes long.
+ * Unless @a type is 0, @a value is guaranteed to be POD (i.e. a region
+ * of memory that does not contain pointers and can safely be copied
+ * and persisted indefinitely with a simple memcpy).  If @a type is 0,
+ * then @a value is a reference, as defined by the LV2 Atom extension
+ * <http://lv2plug.in/ns/ext/atom/>.  Hosts are not required to support
+ * references, a plugin MUST NOT expect a host to persist references unless
+ * the host supports the feature <http://lv2plug.in/ns/ext/atom#blobSupport>.
  *
- * If @a type is LV2_PERSIST_STRING or LV2_PERSIST_FILENAME, @a value points
- * to a null-terminated string and @a size is ignored.
- *
- * If @a type is LV2_PERSIST_FILENAME, the host may store the file in any
- * way (e.g. linking, deep copying) and plugin MUST NOT expect the same
- * filename to be restored (though the same file contents are guaranteed
- * to be restored.  This allows hosts to avoid copying very large files
- * by linking local projects while retaining the ability to export/archive
- * projects by deep copying.
- *
- * A 'size' of 0 is valid. The host may choose to store nothing.
+ * Note that @a size MUST be > 0, and @a value MUST point to a valid region of
+ * memory @a size bytes long (this is required to make restore unambiguous).
+ * If only the key is of interest, store the empty string (which has size 1).
  */
 typedef void (*LV2_Persist_Store_Function)(
 	void*       callback_data,
 	const char* key,
-	DataType    type,
 	const void* value,
-	size_t      size);
+	size_t      size,
+	uint32_t    type);
 
 /** Causes the host to retrieve a value under a given key.
  *
  * This callback is passed by the host to LV2_Persist.restore().
- * @param callback_data' Must be the callback_data argument passed to restore().
- * @param key A private string or URI under which a value has been stored.
- * @param type (Output) Set to the type of the restored value.
+ * @param callback_data Must be the callback_data passed to LV2_Persist.restore().
+ * @param key The URI key (RDF predicate) under which a value has been stored.
  * @param size (Output) If non-NULL, set to the size of the restored value.
- * @return A pointer to the restored value, or NULL if no value has been
- *         stored under that key.
+ * @param type (Output) If non-NULL, set to the type of the restored value.
+ * @return A pointer to the restored value (RDF object), or NULL if no value
+ *         has been stored under @a key.
  *
- * The returned value MUST remain valid until restore() returns.  The plugin
- * MUST NOT attempt to access a returned pointer outside of the restore()
- * context (it must make a copy in order to do so).
+ * The returned value MUST remain valid until LV2_Persist.restore() returns.  The plugin
+ * MUST NOT attempt to access a returned pointer outside of the LV2_Persist.restore()
+ * context (it MUST make a copy in order to do so).
  */
 typedef const void* (*LV2_Persist_Retrieve_Function)(
 	void*       callback_data,
 	const char* key,
-	DataType*   type,
-	size_t*     size);
+	size_t*     size,
+	uint32_t*   type);
 
 /** When the plugin's extension_data is called with argument LV2_PERSIST_URI,
- * the plugin is expected to return an LV2_Persist structure, which remains
- * valid indefinitely.
+ * the plugin MUST return an LV2_Persist structure, which remains valid for
+ * the lifetime of the plugin.
  *
- * The host can use the exposed function pointers to save and restore
- * the state of a plugin to a map of string keys to binary blobs at any
- * time.
+ * The host can use the contained function pointers to save and restore the
+ * state of a plugin instance at any time (provided the threading restrictions
+ * for the given function are met).
  *
- * The usual application would be to save the plugins state when the
- * project document is to be saved, and to restore the state when
- * a project document has been loaded. Other applications are possible.
+ * The typical use case is to save the plugin's state when a project is
+ * saved, and to restore the state when a project has been loaded.  Other
+ * uses are possible (e.g. cloning plugin instances or taking a snapshot
+ * of plugin state).
  *
- * Blob maps are meant to be only compatible between instances of the
- * same plugin. However, should a future extension require persistent
- * data to follow an URI key naming scheme, this restriction no longer
- * applies.
+ * Stored data is only guaranteed to be compatible between instances of plugins
+ * with the same URI (i.e. if a change to a plugin would cause a fatal error
+ * when restoring state saved by a previous version of that plugin, the plugin
+ * URI must change just as it must when a plugin's ports change).  Plugin
+ * authors should consider this possibility, and always store sensible data
+ * with meaningful types to avoid such compatibility issues in the future.
  */
 typedef struct _LV2_Persist {
-	/** Causes the plugin to save state data which it wants to preserve
-	 * across plugin lifetime using a store callback provided by
-	 * the host.
+	/** Causes the plugin to save state data using a host-provided
+	 * @a store callback.
 	 *
 	 * @param instance The instance handle of the plugin.
 	 * @param store The host-provided store callback.
@@ -115,64 +107,68 @@ typedef struct _LV2_Persist {
 	 *        file where the values are to be stored.  If @a store is called,
 	 *        this MUST be passed as its callback_data parameter.
 	 *
-	 * The map on which save() operates must always be empty before
-	 * the first call to store(). The plugin is expected to store all
-	 * blobs of interest.
+	 * The plugin is expected to store everything necessary to completely
+	 * restore its state later (possibly much later, in a different
+	 * process, on a completely different machine, etc.)
 	 *
-	 * The @a callback_data pointer and @a store function MUST NOT be used
-	 * beyond the scope of save().
+	 * The @a callback_data pointer and @a store function MUST NOT be
+	 * used beyond the scope of save().
+	 *
+	 * This function has its own special threading class: it may not be
+	 * called concurrently with any "Instantiation" function, but it
+	 * may be called concurrently with functions in any other class,
+	 * unless the definition of that class prohibits it (e.g. it may
+	 * not be called concurrently with a "Discovery" function, but it
+	 * may be called concurrently with an "Audio" function.  The plugin
+	 * is responsible for any locking or lock-free techniques necessary
+	 * to make this possible.
+	 *
+	 * Note that in the simple case where state is only modified by
+	 * restore(), there are no synchronization issues since save() is
+	 * never called concurrently with restore() (though run() may read
+	 * it during a save).
+	 *
+	 * Plugins that dynamically modify state while running, however,
+	 * must take care to do so in such a way that a concurrent call to
+	 * save() will save a consistent representation of plugin state for a
+	 * single point in time.  The simplest way to do this is to modify a
+	 * copy of the state map and atomically swap a pointer to the entire
+	 * map once the changes are complete (for very large state maps,
+	 * a purely functional map data structure would be more appropriate
+	 * since a complete copy is not necessary).
 	 */
 	void (*save)(LV2_Handle                 instance,
 	             LV2_Persist_Store_Function store,
 	             void*                      callback_data);
 
-	/** Causes the plugin to restore state data using a retrieve callback
-	 * provided by the host.
+	/** Causes the plugin to restore state data using a host-provided
+	 * @a retrieve callback.
 	 *
 	 * @param instance The instance handle of the plugin.
-	 * @param retrieve The host-provided restore callback.
+	 * @param retrieve The host-provided retrieve callback.
 	 * @param callback_data	An opaque pointer to host data, e.g. the map or
 	 *        file from which the values are to be restored.  If @a retrieve is
 	 *        called, this MUST be passed as its callback_data parameter.
 	 *
-	 * The map on which restore() operates must contain values stored
-	 * by an instance of a plugin with the same URI as this instance, or be
-	 * empty.
+	 * The plugin MAY assume a restored value was set by a previous call to
+	 * LV2_Persist.save() by a plugin with the same URI.
 	 *
-	 * The plugin MUST gracefully fall back to a default value
-	 * when a blob can not be retrieved. This allows the host to reset
-	 * the plugin state with an empty map.
+	 * The plugin MUST gracefully fall back to a default value when a
+	 * value can not be retrieved.	This allows the host to reset the
+	 * plugin state with an empty map.
 	 *
 	 * The @a callback_data pointer and @a store function MUST NOT be used
 	 * beyond the scope of restore().
+	 *
+	 * This function is in the "Instantiation" threading class as defined
+	 * by LV2.  This means it MUST NOT be called concurrently with any other
+	 * function on the same plugin instance.
 	 */
 	void (*restore)(LV2_Handle                    instance,
 	                LV2_Persist_Retrieve_Function retrieve,
 	                void*                         callback_data);
 
 } LV2_Persist;
-
-typedef void* LV2_Persist_FileSupport_Data;
-
-/** Feature structure passed by host to instantiate with feature URI
- * <http://lv2plug.in/ns/ext/persist#FileSupport>.
- */
-typedef struct {
-
-	LV2_Persist_FileSupport_Data data;
-	
-	/** Return the full path that should be used for a file owned by this
-	 * plugin called @a name.
-	 *
-	 * @param data MUST be the @a data member of this struct.
-	 * @param name The name of the file.
-	 * @return A newly allocated path which the plugin may use to create a new
-	 *         file.  The plugin is responsible for freeing the returned string.
-	 */
-	char* new_file_path(LV2_Persist_FileSupport_Data data,
-	                    const char*                  name);
-	
-} LV2_Persist_FileSupport;
 
 #ifdef __cplusplus
 } /* extern "C" */
