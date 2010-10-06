@@ -1,8 +1,13 @@
 #!/usr/bin/env python
-import string
 import os
+import string
+import sys
+
 import autowaf
 from TaskGen import feature, before, after
+
+sys.path.append("./lv2/lv2include")
+import lv2include
 
 # Variables for 'waf dist'
 VERSION = '0.0.1'
@@ -57,6 +62,9 @@ def configure(conf):
 
 def build(bld):
 	autowaf.set_recursive()
+	cwd = os.getcwd()
+	lv2_path = os.path.join(cwd, 'lv2', 'ext') + os.pathsep + os.path.join(cwd, 'lv2', 'extensions') + os.pathsep + os.path.join(cwd, 'lv2')
+	lv2include.build_tree(lv2_path, "./build/default/lv2")
 	bld.add_subdirs('lv2/core.lv2 lv2 slv2 raul flowcanvas patchage redlandmm ingen plugins/lolep.lv2')# machina')
 
 def test(ctx):
