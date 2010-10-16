@@ -21,7 +21,7 @@
 #include <stdexcept>
 #include <string>
 #include <set>
-#include <librdf.h>
+#include <redland.h>
 #include <boost/utility.hpp>
 #include <glibmm/thread.h>
 #include "redlandmm/Wrapper.hpp"

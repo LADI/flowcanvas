@@ -20,7 +20,7 @@
 
 #include <stdexcept>
 #include <string>
-#include <librdf.h>
+#include <redland.h>
 #include <glibmm/ustring.h>
 #include <boost/utility.hpp>
 #include "redlandmm/Namespaces.hpp"
