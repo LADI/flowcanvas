@@ -81,42 +81,5 @@
 /* Define to 1 if you have the `vsyslog' function. */
 #define HAVE_VSYSLOG 1
 
-/* Define to the sub-directory in which libtool stores uninstalled libraries.
-   */
-#define LT_OBJDIR ".libs/"
-
-/* Name of package */
-#define PACKAGE "json-c"
-
-/* Define to the address where bug reports for this package should be sent. */
-#define PACKAGE_BUGREPORT "michael@metaparadigm.com"
-
-/* Define to the full name of this package. */
-#define PACKAGE_NAME "json-c"
-
-/* Define to the full name and version of this package. */
-#define PACKAGE_STRING "json-c 0.9"
-
-/* Define to the one symbol short name of this package. */
-#define PACKAGE_TARNAME "json-c"
-
-/* Define to the version of this package. */
-#define PACKAGE_VERSION "0.9"
-
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
-
-/* Version number of package */
-#define VERSION "0.9"
-
-/* Define to empty if `const' does not conform to ANSI C. */
-/* #undef const */
-
-/* Define to rpl_malloc if the replacement function should be used. */
-/* #undef malloc */
-
-/* Define to rpl_realloc if the replacement function should be used. */
-/* #undef realloc */
-
-/* Define to `unsigned int' if <sys/types.h> does not define. */
-/* #undef size_t */
