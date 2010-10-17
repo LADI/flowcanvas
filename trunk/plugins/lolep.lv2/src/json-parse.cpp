@@ -177,7 +177,7 @@ public:
 			return 0;
 
 		json_tokener* tok = json_tokener_new();
-		json_object*  obj = json_tokener_parse_ex(tok, str, in->size - 1);
+		json_object*  obj = json_tokener_parse_ex(tok, str, in->size);
 
 		if (tok->err != json_tokener_success)
 			cerr << "JSON parse error: " << json_tokener_errors[tok->err] << endl;
