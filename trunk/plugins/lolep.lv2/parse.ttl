@@ -1,11 +1,12 @@
+@prefix aport: <http://lv2plug.in/ns/ext/atom-port#> .
+@prefix atom:  <http://lv2plug.in/ns/ext/atom#> .
+@prefix ctx:   <http://lv2plug.in/ns/ext/contexts#> .
 @prefix doap:  <http://usefulinc.com/ns/doap#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 @prefix lolep: <http://drobilla.net/software/plugins/lolep.lv2/> .
 @prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
-@prefix obj:   <http://lv2plug.in/ns/ext/object#> .
 @prefix pg:    <http://lv2plug.in/ns/ext/port-groups#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix ctx:   <http://lv2plug.in/ns/ext/contexts#> .
 
 lolep:parse a lv2:Plugin ;
 	a lv2:UtilityPlugin ;
@@ -16,13 +17,12 @@ lolep:parse a lv2:Plugin ;
 		foaf:mbox <mailto:d@drobilla.net> ;
 	] ;
     lv2:requiredFeature ctx:MessageContext ;
-	ctx:requiredContext ctx:MessageContext ;
 	doap:license <http://usefulinc.com/doap/licenses/gpl> ;
 	lv2:pluginProperty lv2:hardRtCapable ;
 	lv2:port [
-		a lv2:InputPort, obj:ValuePort ;
+		a lv2:InputPort, aport:ValuePort ;
 		ctx:context ctx:MessageContext ;
-		obj:supports obj:String ;
+		aport:supports atom:String ;
 		lv2:name "Input" ;
 		lv2:index 0 ;
 		lv2:symbol "input" ;
@@ -32,20 +32,20 @@ Expects a string which will be parsed into an Object.
 
 Understood syntax examples:
 <dl>
-<dt>2</dt><dd>obj:Int32</dd>
-<dt>3.5</dt><dd>obj:Float32</dd>
-<dt>true</dt><dd>obj:Bool</dd>
-<dt>false</dt><dd>obj:Bool</dd>
-<dt>"hello"</dt><dd>obj:String</dd>
-<dt>[1 2 3]</dt><dd>obj:Vector of obj:Int32</dd>
-<dt>[1.0 2.3 3.7]</dt><dd>obj:Vector of obj:Float32</dd>
+<dt>2</dt><dd>atom:Int32</dd>
+<dt>3.5</dt><dd>atom:Float32</dd>
+<dt>true</dt><dd>atom:Bool</dd>
+<dt>false</dt><dd>atom:Bool</dd>
+<dt>"hello"</dt><dd>atom:String</dd>
+<dt>[1 2 3]</dt><dd>atom:Vector of atom:Int32</dd>
+<dt>[1.0 2.3 3.7]</dt><dd>atom:Vector of atom:Float32</dd>
 </dl>
 
 Note that vectors must always contain the same type, and that type
-must have a fixed size (e.g. there is no obj:Vector of obj:String).
+must have a fixed size (e.g. there is no atom:Vector of atom:String).
 """
 	] , [
-		a lv2:OutputPort, obj:ValuePort ;
+		a lv2:OutputPort, aport:ValuePort ;
 		ctx:context ctx:MessageContext ;
 		lv2:name "Output" ;
 		lv2:index 1 ;

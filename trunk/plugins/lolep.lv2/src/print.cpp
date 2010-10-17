@@ -39,8 +39,7 @@ class Print;
 typedef LV2::Plugin<
 	Print,
 	LV2::Ext::UriMap<true>,
-	LV2::Ext::MessageContext<false>,
-	LV2::Ext::ResizePort<true>
+	LV2::Ext::MessageContext<false>
 > PrintBase;
 
 class Print : public PrintBase

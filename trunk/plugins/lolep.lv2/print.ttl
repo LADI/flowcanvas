@@ -1,11 +1,11 @@
+@prefix aport: <http://lv2plug.in/ns/ext/atom-port#> .
+@prefix ctx:   <http://lv2plug.in/ns/ext/contexts#> .
 @prefix doap:  <http://usefulinc.com/ns/doap#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
 @prefix lolep: <http://drobilla.net/software/plugins/lolep.lv2/> .
 @prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
-@prefix obj:   <http://lv2plug.in/ns/ext/object#> .
 @prefix pg:    <http://lv2plug.in/ns/ext/port-groups#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix ctx:   <http://lv2plug.in/ns/ext/contexts#> .
 
 lolep:print a lv2:Plugin ;
 	a lv2:UtilityPlugin ;
@@ -16,11 +16,9 @@ lolep:print a lv2:Plugin ;
 		foaf:mbox <mailto:d@drobilla.net> ;
 	] ;
     lv2:requiredFeature ctx:MessageContext ;
-	ctx:requiredContext ctx:MessageContext ;
 	doap:license <http://usefulinc.com/doap/licenses/gpl> ;
-	lv2:pluginProperty lv2:hardRtCapable ;
 	lv2:port [
-		a lv2:InputPort, obj:MessagePort ;
+		a lv2:InputPort, aport:MessagePort ;
 		ctx:context ctx:MessageContext ;
 		lv2:name "Input" ;
 		lv2:index 0 ;

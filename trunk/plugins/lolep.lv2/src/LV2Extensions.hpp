@@ -133,7 +133,7 @@ struct MessageContext {
 
 		static const void* extension_data(const char* uri) {
 			static LV2_Contexts_MessageContext context;
-			context.message_run = &Derived::message_run;
+			context.run = &Derived::message_run;
 			return &context;
 		}
 	};
