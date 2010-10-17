@@ -8,9 +8,9 @@
 @prefix pg:    <http://lv2plug.in/ns/ext/port-groups#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 
-lolep:parse a lv2:Plugin ;
-	a lv2:UtilityPlugin ;
-	doap:name "Parse" ;
+lolep:json-parse a lv2:Plugin ;
+	a lolep:TextPlugin ;
+	doap:name "JSON Parse" ;
 	doap:maintainer [
 		foaf:name "David Robillard" ;
 		foaf:homepage <http://drobilla.net/> ;
@@ -28,7 +28,7 @@ lolep:parse a lv2:Plugin ;
 		lv2:symbol "input" ;
 		lv2:default "" ;
 		rdfs:comment """
-Expects a string which will be parsed into an Object.
+Expects a JSON formatted string which will be parsed into an Atom.
 
 Understood syntax examples:
 <dl>
@@ -39,6 +39,8 @@ Understood syntax examples:
 <dt>"hello"</dt><dd>atom:String</dd>
 <dt>[1 2 3]</dt><dd>atom:Vector of atom:Int32</dd>
 <dt>[1.0 2.3 3.7]</dt><dd>atom:Vector of atom:Float32</dd>
+<dt>{ "http://example.org/greeting" : "Hello",<br/>
+  "http://example.org/name" : "World"<br/>}</dt><dd>atom:Dict</dd>
 </dl>
 
 Note that vectors must always contain the same type, and that type

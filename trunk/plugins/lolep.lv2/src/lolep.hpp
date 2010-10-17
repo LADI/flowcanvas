@@ -15,4 +15,4 @@
  * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#define IMUM_URI "http://drobilla.net/software/plugins/lolep.lv2"
+#define LOLEP_URI "http://drobilla.net/software/plugins/lolep.lv2"

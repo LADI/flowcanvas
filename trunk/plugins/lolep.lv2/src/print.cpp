@@ -92,4 +92,4 @@ public:
 
 };
 
-static const unsigned plugin_class = Print::register_class(IMUM_URI "/print");
+static const unsigned plugin_class = Print::register_class(LOLEP_URI "/print");

@@ -111,6 +111,6 @@ public:
 	}
 };
 
-static const unsigned sum_class        = Arith<SumOp>::register_class(IMUM_URI "/sum");
-static const unsigned difference_class = Arith<DiffOp>::register_class(IMUM_URI "/difference");
-static const unsigned product_class    = Arith<ProdOp>::register_class(IMUM_URI "/product");
+static const unsigned sum_class        = Arith<SumOp>::register_class(LOLEP_URI "/sum");
+static const unsigned difference_class = Arith<DiffOp>::register_class(LOLEP_URI "/difference");
+static const unsigned product_class    = Arith<ProdOp>::register_class(LOLEP_URI "/product");

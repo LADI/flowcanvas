@@ -2,11 +2,11 @@
 import autowaf
 
 # Version of this package (even if built as a child)
-IMUM_VERSION = '0.0.0'
+LOLEP_VERSION = '0.0.0'
 
 # Variables for 'waf dist'
 APPNAME = 'lolep.lv2'
-VERSION = IMUM_VERSION
+VERSION = LOLEP_VERSION
 
 # Mandatory variables
 srcdir = '.'
@@ -39,6 +39,7 @@ def build_plugin_lib(bld, lang, bundle, name, source):
 	obj.includes     = ['.','./src']
 	obj.name         = name
 	obj.target       = name
+	obj.ccflags      = '-D_GNU_SOURCE'
 	obj.install_path = '${LV2DIR}/' + bundle
 
 def build_plugin_data(bld, bundle, name):
@@ -62,8 +63,21 @@ def build_arith_data(bld, bundle, sym, operator):
 	build_plugin_data(bld, bundle, sym)
 
 def build(bld):
-	build_plugin(bld, 'cxx', 'lolep.lv2', 'parse',   ['src/parse.cpp'])
-	build_plugin(bld, 'cxx', 'lolep.lv2', 'print',   ['src/print.cpp'])
+	json_sources = [
+		'src/json-c/arraylist.c',
+		'src/json-c/json_object.c',
+		'src/json-c/json_tokener.c',
+		'src/json-c/json_util.c',
+		'src/json-c/linkhash.c',
+		'src/json-c/printbuf.c'
+		]
+		
+	build_plugin(bld, 'cxx', 'lolep.lv2', 'json-parse',
+		     json_sources + ['src/json-parse.cpp'])
+	build_plugin(bld, 'cxx', 'lolep.lv2', 'json-serialise',
+		     json_sources + ['src/json-serialise.cpp'])
+	build_plugin(bld, 'cxx', 'lolep.lv2', 'print',
+		     ['src/print.cpp'])
 	
 	build_plugin_lib(bld, 'cxx', 'lolep.lv2', 'arith', ['src/arith.cpp'])
 	build_arith_data(bld, 'lolep.lv2', 'sum', '+')
