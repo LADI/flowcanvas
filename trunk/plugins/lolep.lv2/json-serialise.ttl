@@ -16,6 +16,8 @@ lolep:json-serialise a lv2:Plugin ;
 		foaf:mbox <mailto:d@drobilla.net> ;
 	] ;
     lv2:requiredFeature ctx:MessageContext ;
+    lv2:requiredFeature <http://lv2plug.in/ns/ext/uri-map> ;
+    lv2:requiredFeature <http://lv2plug.in/ns/ext/uri-unmap> ;       
 	doap:license <http://usefulinc.com/doap/licenses/gpl> ;
 	lv2:port [
 		a lv2:InputPort, aport:ValuePort ;

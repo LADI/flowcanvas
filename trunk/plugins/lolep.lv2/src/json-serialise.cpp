@@ -41,6 +41,7 @@ class Print;
 typedef LV2::Plugin<
 	Print,
 	LV2::Ext::UriMap<true>,
+	LV2::Ext::UriUnmap<true>,
 	LV2::Ext::MessageContext<false>,
 	LV2::Ext::ResizePort<true>
 > PrintBase;
@@ -59,7 +60,7 @@ public:
 		string_type = uri_to_id(NULL, LV2_ATOM_URI "#String");
 	}
 
-	static json_object* atom_to_object(const LV2_Atom* atom)
+	static json_object* atom_to_object(Print* me, const LV2_Atom* atom)
 	{
 		json_object* obj = NULL;
 		if (atom->type == bool_type) {
@@ -74,7 +75,7 @@ public:
 			obj = json_object_new_array();
 			LV2_Atom* elem = (LV2_Atom*)atom->body;
 			while (elem < (LV2_Atom*)(atom->body + atom->size)) {
-				json_object_array_add(obj, atom_to_object(elem));
+				json_object_array_add(obj, atom_to_object(me, elem));
 				elem = (LV2_Atom*)(elem->body + elem->size);
 			}
 		} else if (atom->type == dict_type) {
@@ -83,9 +84,12 @@ public:
 			     !lv2_atom_dict_iter_is_end(atom, i);
 			     i = lv2_atom_dict_iter_next(i)) {
 				LV2_Atom_Property* prop = lv2_atom_dict_iter_get(i);
-				char key_str[20];
-				snprintf(key_str, 20, "%u", prop->predicate);
-				json_object_object_add(obj, key_str, atom_to_object(&prop->object));
+				const char* key_str = me->id_to_uri(NULL, prop->predicate);
+				if (key_str) {
+					json_object_object_add(obj, key_str, atom_to_object(me, &prop->object));
+				} else {
+					fprintf(stderr, "Failed to unmap URI ID %d\n", prop->predicate);
+				}
 			}
 			/*
 		} else if (in->type == midi_type) {
@@ -107,7 +111,7 @@ public:
 	{
 		Print*         me  = reinterpret_cast<Print*>(instance);
 		LV2_Atom*      in  = me->p<LV2_Atom>(0);
-		json_object*   obj = atom_to_object(in);
+		json_object*   obj = atom_to_object(me, in);
 		const char*    str = json_object_to_json_string(obj);
 		const uint16_t len = strlen(str);
 

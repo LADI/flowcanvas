@@ -22,6 +22,7 @@
 
 #include "LV2Plugin.hpp"
 #include "uri-map.lv2/uri-map.h"
+#include "uri-unmap.lv2/uri-unmap.h"
 #include "contexts.lv2/contexts.h"
 #include "resize-port.lv2/resize-port.h"
 
@@ -116,6 +117,34 @@ struct UriMap {
 		}
 
 		LV2_URI_Map_Feature* m_uri_map_feature;
+	};
+};
+
+
+/** The URI unmap extension. */
+template <bool Required>
+struct UriUnmap {
+	template <class Derived> struct I : Extension<Required> {
+		I() : m_uri_unmap_feature(0) {}
+
+		static void map_feature_handlers(FeatureHandlerMap& hmap) {
+			hmap[LV2_URI_UNMAP_URI] = &I<Derived>::handle_feature;
+		}
+
+		static void handle_feature(void* instance, void* data) {
+			Derived* d = reinterpret_cast<Derived*>(instance);
+			I<Derived>* fe = static_cast<I<Derived>*>(d);
+			fe->m_uri_unmap_feature = reinterpret_cast<LV2_URI_Unmap_Feature*>(data);
+			fe->m_ok = true;
+		}
+
+	protected:
+		const char* id_to_uri(const char* map, uint32_t id) const {
+			return m_uri_unmap_feature->id_to_uri(
+					m_uri_unmap_feature->callback_data, map, id);
+		}
+
+		LV2_URI_Unmap_Feature* m_uri_unmap_feature;
 	};
 };
 

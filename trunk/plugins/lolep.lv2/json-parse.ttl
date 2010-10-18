@@ -1,5 +1,4 @@
 @prefix aport: <http://lv2plug.in/ns/ext/atom-port#> .
-@prefix atom:  <http://lv2plug.in/ns/ext/atom#> .
 @prefix ctx:   <http://lv2plug.in/ns/ext/contexts#> .
 @prefix doap:  <http://usefulinc.com/ns/doap#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
@@ -17,6 +16,7 @@ lolep:json-parse a lv2:Plugin ;
 		foaf:mbox <mailto:d@drobilla.net> ;
 	] ;
     lv2:requiredFeature ctx:MessageContext ;
+    lv2:requiredFeature <http://lv2plug.in/ns/ext/uri-map> ;
 	doap:license <http://usefulinc.com/doap/licenses/gpl> ;
 	lv2:pluginProperty lv2:hardRtCapable ;
 	lv2:port [

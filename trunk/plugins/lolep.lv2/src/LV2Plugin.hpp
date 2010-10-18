@@ -173,10 +173,7 @@ protected:
 	 *
 	 *  @code
 	 * LV2_MIDI* midibuffer = p<LV2_MIDI>(midiport_index);
-	 *  @endcode
-	 *
-	 *  If you want to access a port buffer as a pointer-to-float (i.e. an audio
-	 *  or control port) you can use the non-template version instead. */
+	 *  @endcode */
 	template<typename T>
 	T*& p(uint32_t port) {
 		return reinterpret_cast<T*&>(m_ports[port]);
