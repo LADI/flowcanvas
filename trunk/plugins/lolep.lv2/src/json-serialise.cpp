@@ -91,14 +91,6 @@ public:
 					fprintf(stderr, "Failed to unmap URI ID %d\n", prop->predicate);
 				}
 			}
-			/*
-		} else if (in->type == midi_type) {
-			printf("MIDI Message:");
-			for (uint16_t i = 0; i < in->size; ++i) {
-				printf(" %X", (unsigned)in->body[i]);
-			}
-			printf("\n");
-			*/
 		} else {
 			obj = json_object_new_object(); // null
 		}
