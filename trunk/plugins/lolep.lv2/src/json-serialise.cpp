@@ -76,7 +76,7 @@ public:
 			LV2_Atom* elem = (LV2_Atom*)atom->body;
 			while (elem < (LV2_Atom*)(atom->body + atom->size)) {
 				json_object_array_add(obj, atom_to_object(me, elem));
-				elem = (LV2_Atom*)(elem->body + elem->size);
+				elem = (LV2_Atom*)(elem->body + lv2_atom_pad_size(elem->size));
 			}
 		} else if (atom->type == dict_type) {
 			obj = json_object_new_object();

@@ -16,11 +16,13 @@
  */
 
 #include <algorithm>
+#include <cassert>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "atom.lv2/atom.h"
+#include "atom.lv2/atom-helpers.h"
 #include "contexts.lv2/contexts.h"
 #include "uri-map.lv2/uri-map.h"
 #include "lolep.hpp"
@@ -75,7 +77,9 @@ public:
 	static LV2_Atom*
 	append_atom(Parse* me, uint32_t index, uint16_t* offset, uint16_t type, uint16_t size)
 	{
-		void* ptr = append_blob(me, index, offset, sizeof(LV2_Atom) + size);
+		assert((*offset % 4) == 0); // Atoms are 4 byte (32-bit) aligned
+		const uint16_t blob_size = lv2_atom_pad_size(size);
+		void* ptr = append_blob(me, index, offset, sizeof(LV2_Atom) + blob_size);
 		if (!ptr)
 			return NULL;
 
@@ -85,13 +89,13 @@ public:
 		return atom;
 	}
 	
-	static uint16_t
+	static LV2_Atom*
 	append_json_object(Parse* me, uint32_t index, uint16_t* offset, json_object* obj)
 	{
 		LV2_Atom* out = NULL;
 		if (!obj) {
 			out = append_atom(me, index, offset, 0, 0);
-			return sizeof(LV2_Atom);
+			return out;
 		}
 
 		switch (json_object_get_type(obj)) {
@@ -125,9 +129,9 @@ public:
 
 			for (int i = 0; i < json_object_array_length(obj); ++i) {
 				// Append element
-				const uint16_t elem_size = append_json_object(
+				LV2_Atom* const elem = append_json_object(
 					me, index, offset, json_object_array_get_idx(obj, i));
-				out_size += elem_size;
+				out_size += sizeof(LV2_Atom) + lv2_atom_pad_size(elem->size);
 			}
 
 			// Update size in header
@@ -148,7 +152,8 @@ public:
 				out_size += sizeof(uint32_t);
 
 				// Append value
-				out_size += append_json_object(me, index, offset, val);
+				LV2_Atom* const value = append_json_object(me, index, offset, val);
+				out_size += sizeof(LV2_Atom) + lv2_atom_pad_size(value->size);
 			}
 			
 			// Update size in header
@@ -157,8 +162,8 @@ public:
 			break;
 		}
 		}
-		
-		return sizeof(LV2_Atom) + out->size;
+
+		return out;
 	}
 
 	static uint32_t message_run(LV2_Handle  instance,
