@@ -1,0 +1,36 @@
+@prefix aport: <http://lv2plug.in/ns/ext/atom-port#> .
+@prefix ctx:   <http://lv2plug.in/ns/ext/contexts#> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix lolep: <http://drobilla.net/software/plugins/lolep.lv2/> .
+@prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
+@prefix pg:    <http://lv2plug.in/ns/ext/port-groups#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix msg:   <http://lv2plug.in/ns/ext/msg#> .
+
+lolep:object a lv2:Plugin ;
+	a lolep:DataStructurePlugin ;
+	doap:name "Object" ;
+	doap:maintainer [
+		foaf:name "David Robillard" ;
+		foaf:homepage <http://drobilla.net/> ;
+		foaf:mbox <mailto:d@drobilla.net> ;
+	] ;
+    lv2:requiredFeature ctx:MessageContext ;
+    #lv2:requiredFeature <http://lv2plug.in/ns/ext/persist> ;
+	doap:license <http://usefulinc.com/doap/licenses/gpl> ;
+	lv2:port [
+		a lv2:InputPort, aport:MessagePort , msg:ControlPort ;
+		ctx:context ctx:MessageContext ;
+		lv2:name "Control" ;
+		lv2:index 0 ;
+		lv2:symbol "control" ;
+	] , [
+		a lv2:OutputPort, aport:MessagePort , msg:ResponsePort ;
+		ctx:context ctx:MessageContext ;
+		lv2:name "Response" ;
+		lv2:index 1 ;
+		lv2:symbol "response" ;
+	] ;
+	rdfs:comment """Dynamic Object (Key/Value)""" .
+
