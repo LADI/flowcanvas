@@ -30,9 +30,9 @@
 
 using namespace std;
 
-static uint32_t array_type;
+static uint32_t tuple_type;
 static uint32_t bool_type;
-static uint32_t dict_type;
+static uint32_t object_type;
 static uint32_t float_type;
 static uint32_t int_type;
 static uint32_t string_type;
@@ -52,9 +52,9 @@ public:
 	Print(double rate, const char* bundle, const LV2::Feature* const* features)
 		: PrintBase(1)
 	{
-		array_type  = uri_to_id(NULL, LV2_ATOM_URI "#Array");
+		tuple_type  = uri_to_id(NULL, LV2_ATOM_URI "#Tuple");
 		bool_type   = uri_to_id(NULL, LV2_ATOM_URI "#Bool");
-		dict_type   = uri_to_id(NULL, LV2_ATOM_URI "#Dict");
+		object_type = uri_to_id(NULL, LV2_ATOM_URI "#Object");
 		float_type  = uri_to_id(NULL, LV2_ATOM_URI "#Float32");
 		int_type    = uri_to_id(NULL, LV2_ATOM_URI "#Int32");
 		string_type = uri_to_id(NULL, LV2_ATOM_URI "#String");
@@ -71,20 +71,20 @@ public:
 			obj = json_object_new_int(*(int32_t*)atom->body);
 		} else if (atom->type == float_type) {
 			obj = json_object_new_double(*(float*)atom->body);
-		} else if (atom->type == array_type) {
+		} else if (atom->type == tuple_type) {
 			obj = json_object_new_array();
 			LV2_Atom* elem = (LV2_Atom*)atom->body;
 			while (elem < (LV2_Atom*)(atom->body + atom->size)) {
 				json_object_array_add(obj, atom_to_object(me, elem));
 				elem = (LV2_Atom*)(elem->body + lv2_atom_pad_size(elem->size));
 			}
-		} else if (atom->type == dict_type) {
+		} else if (atom->type == object_type) {
 			obj = json_object_new_object();
-			for (LV2_Atom_Dict_Iter i = lv2_atom_dict_get_iter((LV2_Atom_Property*)atom->body);
-			     !lv2_atom_dict_iter_is_end(atom, i);
-			     i = lv2_atom_dict_iter_next(i)) {
-				LV2_Atom_Property* prop = lv2_atom_dict_iter_get(i);
-				const char* key_str = me->id_to_uri(NULL, prop->predicate);
+			for (LV2_Atom_Object_Iter i = lv2_atom_object_get_iter((LV2_Atom_Property*)atom->body);
+			     !lv2_atom_object_iter_is_end(atom, i);
+			     i = lv2_atom_object_iter_next(i)) {
+				LV2_Atom_Property* prop    = lv2_atom_object_iter_get(i);
+				const char*        key_str = me->id_to_uri(NULL, prop->predicate);
 				if (key_str) {
 					json_object_object_add(obj, key_str, atom_to_object(me, &prop->object));
 				} else {

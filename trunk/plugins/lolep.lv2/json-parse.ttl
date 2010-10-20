@@ -37,14 +37,10 @@ Understood syntax examples:
 <dt>true</dt><dd>atom:Bool</dd>
 <dt>false</dt><dd>atom:Bool</dd>
 <dt>"hello"</dt><dd>atom:String</dd>
-<dt>[1 2 3]</dt><dd>atom:Vector of atom:Int32</dd>
-<dt>[1.0 2.3 3.7]</dt><dd>atom:Vector of atom:Float32</dd>
+<dt>[1 2.0 "three"]</dt><dd>atom:Tuple</dd>
 <dt>{ "http://example.org/greeting" : "Hello",<br/>
   "http://example.org/name" : "World"<br/>}</dt><dd>atom:Dict</dd>
 </dl>
-
-Note that vectors must always contain the same type, and that type
-must have a fixed size (e.g. there is no atom:Vector of atom:String).
 """
 	] , [
 		a lv2:OutputPort, aport:ValuePort ;

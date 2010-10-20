@@ -32,9 +32,9 @@
 
 using namespace std;
 
-static uint32_t array_type;
+static uint32_t tuple_type;
 static uint32_t bool_type;
-static uint32_t dict_type;
+static uint32_t object_type;
 static uint32_t float_type;
 static uint32_t int_type;
 static uint32_t string_type;
@@ -53,9 +53,9 @@ public:
 	Parse(double rate, const char* bundle, const LV2::Feature* const* features)
 		: ParseBase(2)
 	{
-		array_type  = uri_to_id(NULL, LV2_ATOM_URI "#Array");
+		tuple_type  = uri_to_id(NULL, LV2_ATOM_URI "#Tuple");
 		bool_type   = uri_to_id(NULL, LV2_ATOM_URI "#Bool");
-		dict_type   = uri_to_id(NULL, LV2_ATOM_URI "#Dict");
+		object_type = uri_to_id(NULL, LV2_ATOM_URI "#Object");
 		float_type  = uri_to_id(NULL, LV2_ATOM_URI "#Float32");
 		int_type    = uri_to_id(NULL, LV2_ATOM_URI "#Int32");
 		string_type = uri_to_id(NULL, LV2_ATOM_URI "#String");
@@ -122,10 +122,10 @@ public:
 			break;
 		}
 		case json_type_array: {
-			// Append array header
+			// Append tuple header
 			uint16_t out_offset = *offset;
 			uint16_t out_size   = 0;
-			append_atom(me, index, offset, array_type, 0);
+			append_atom(me, index, offset, tuple_type, 0);
 
 			for (int i = 0; i < json_object_array_length(obj); ++i) {
 				// Append element
@@ -143,7 +143,7 @@ public:
 			// Append object header
 			uint16_t out_offset = *offset;
 			uint16_t out_size   = 0;
-			out = append_atom(me, index, offset, dict_type, out_size);
+			out = append_atom(me, index, offset, object_type, out_size);
 			
 			json_object_object_foreach(obj, key, val) {
 				// Append key
