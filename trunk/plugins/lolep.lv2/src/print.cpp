@@ -28,12 +28,7 @@
 
 using namespace std;
 
-static uint32_t bool_type;
-static uint32_t float_type;
-static uint32_t int_type;
-static uint32_t midi_type;
-static uint32_t string_type;
-static uint32_t vec_type;
+#define LV2_MIDI_URI "http://lv2plug.in/ns/ext/midi"
 
 class Print;
 typedef LV2::Plugin<
@@ -47,13 +42,14 @@ class Print : public PrintBase
 public:
 	Print(double rate, const char* bundle, const LV2::Feature* const* features)
 		: PrintBase(1)
+		, atom_Bool(uri_to_id(NULL,   LV2_ATOM_URI "#Bool"))
+		, atom_Float(uri_to_id(NULL,  LV2_ATOM_URI "#Float32"))
+		, atom_Int32(uri_to_id(NULL,  LV2_ATOM_URI "#Int32"))
+		, atom_String(uri_to_id(NULL, LV2_ATOM_URI "#String"))
+		, atom_Tuple(uri_to_id(NULL,  LV2_ATOM_URI "#Tuple"))
+		, atom_Vector(uri_to_id(NULL,  LV2_ATOM_URI "#Vector"))
+		, midi_MidiEvent(uri_to_id(NULL, LV2_MIDI_URI "#MidiEvent"))
 	{
-		bool_type   = uri_to_id(NULL, LV2_ATOM_URI "#Bool");
-		float_type  = uri_to_id(NULL, LV2_ATOM_URI "#Float32");
-		int_type    = uri_to_id(NULL, LV2_ATOM_URI "#Int32");
-		midi_type   = uri_to_id(NULL, "http://lv2plug.in/ns/ext/midi#MidiEvent");
-		string_type = uri_to_id(NULL, LV2_ATOM_URI "#String");
-		vec_type    = uri_to_id(NULL, LV2_ATOM_URI "#Vector");
 	}
 
 	static uint32_t message_run(LV2_Handle  instance,
@@ -64,32 +60,41 @@ public:
 		LV2_Atom* in = me->p<LV2_Atom>(0);
 		if (in->type == 0 && in->size == 0) {
 			printf("null\n");
-		} else if (in->type == bool_type) {
+		} else if (in->type == me->atom_Bool) {
 			if (*(int32_t*)in->body == 0) {
 				printf("false\n");
 			} else {
 				printf("true\n");
 			}
-		} else if (in->type == string_type) {
+		} else if (in->type == me->atom_String) {
 			printf("\"%s\"\n", (char*)in->body);
-		} else if (in->type == int_type) {
+		} else if (in->type == me->atom_Int32) {
 			printf("%d\n", *(int32_t*)in->body);
-		} else if (in->type == float_type) {
+		} else if (in->type == me->atom_Float) {
 			printf("%f\n", *(float*)in->body);
-		} else if (in->type == vec_type) {
+		} else if (in->type == me->atom_Tuple) {
+			printf("( ... )\n");
+		} else if (in->type == me->atom_Vector) {
 			printf("[ ... ]\n");
-		} else if (in->type == midi_type) {
-			printf("MIDI Message:");
+		} else if (in->type == me->midi_MidiEvent) {
+			printf("(MIDI ");
 			for (uint16_t i = 0; i < in->size; ++i) {
 				printf(" %X", (unsigned)in->body[i]);
 			}
-			printf("\n");
+			printf(")\n");
 		} else {
-			printf("<LV2_Atom type=%d size=%d>\n", in->type, in->size);
+			printf("(Atom type: %d size: %d)\n", in->type, in->size);
 		}
 		return 0;
 	}
-
+	
+	const uint32_t atom_Bool;
+	const uint32_t atom_Float;
+	const uint32_t atom_Int32;
+	const uint32_t atom_String;
+	const uint32_t atom_Tuple;
+	const uint32_t atom_Vector;
+	const uint32_t midi_MidiEvent;
 };
 
 static const unsigned plugin_class = Print::register_class(LOLEP_URI "/print");

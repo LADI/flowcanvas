@@ -32,13 +32,6 @@
 
 using namespace std;
 
-static uint32_t tuple_type;
-static uint32_t bool_type;
-static uint32_t object_type;
-static uint32_t float_type;
-static uint32_t int_type;
-static uint32_t string_type;
-
 class Parse;
 typedef LV2::Plugin<
 	Parse,
@@ -52,13 +45,13 @@ class Parse : public ParseBase
 public:
 	Parse(double rate, const char* bundle, const LV2::Feature* const* features)
 		: ParseBase(2)
+		, atom_Bool(uri_to_id(NULL,   LV2_ATOM_URI "#Bool"))
+		, atom_Float(uri_to_id(NULL,  LV2_ATOM_URI "#Float32"))
+		, atom_Int32(uri_to_id(NULL,  LV2_ATOM_URI "#Int32"))
+		, atom_Object(uri_to_id(NULL, LV2_ATOM_URI "#Object"))
+		, atom_String(uri_to_id(NULL, LV2_ATOM_URI "#String"))
+		, atom_Tuple(uri_to_id(NULL,  LV2_ATOM_URI "#Tuple"))
 	{
-		tuple_type  = uri_to_id(NULL, LV2_ATOM_URI "#Tuple");
-		bool_type   = uri_to_id(NULL, LV2_ATOM_URI "#Bool");
-		object_type = uri_to_id(NULL, LV2_ATOM_URI "#Object");
-		float_type  = uri_to_id(NULL, LV2_ATOM_URI "#Float32");
-		int_type    = uri_to_id(NULL, LV2_ATOM_URI "#Int32");
-		string_type = uri_to_id(NULL, LV2_ATOM_URI "#String");
 	}
 
 	static void*
@@ -103,21 +96,21 @@ public:
 			out = append_atom(me, index, offset, 0, 0);
 			break;
 		case json_type_boolean:
-			out = append_atom(me, index, offset, bool_type, sizeof(int32_t));
+			out = append_atom(me, index, offset, me->atom_Bool, sizeof(int32_t));
 			*(int32_t*)out->body = json_object_get_boolean(obj) ? 1 : 0;
 			break;
 		case json_type_double:
-			out = append_atom(me, index, offset, float_type, sizeof(float));
+			out = append_atom(me, index, offset, me->atom_Float, sizeof(float));
 			*((float*)out->body) = json_object_get_double(obj);
 			break;
 		case json_type_int:
-			out = append_atom(me, index, offset, int_type, sizeof(int32_t));
+			out = append_atom(me, index, offset, me->atom_Int32, sizeof(int32_t));
 			*(int32_t*)out->body = json_object_get_int(obj);
 			break;
 		case json_type_string: {
 			const char*  str = json_object_get_string(obj);
 			const size_t len = strlen(str);
-			out = append_atom(me, index, offset, string_type, len + 1);
+			out = append_atom(me, index, offset, me->atom_String, len + 1);
 			memcpy(out->body, str, len + 1);
 			break;
 		}
@@ -125,7 +118,7 @@ public:
 			// Append tuple header
 			uint16_t out_offset = *offset;
 			uint16_t out_size   = 0;
-			append_atom(me, index, offset, tuple_type, 0);
+			append_atom(me, index, offset, me->atom_Tuple, 0);
 
 			for (int i = 0; i < json_object_array_length(obj); ++i) {
 				// Append element
@@ -143,7 +136,7 @@ public:
 			// Append object header
 			uint16_t out_offset = *offset;
 			uint16_t out_size   = 0;
-			out = append_atom(me, index, offset, object_type, out_size);
+			out = append_atom(me, index, offset, me->atom_Object, out_size);
 			
 			json_object_object_foreach(obj, key, val) {
 				// Append key
@@ -178,7 +171,7 @@ public:
 		out->type = 0;
 		out->size = 0;
 		
-		if (in->type != string_type)
+		if (in->type != me->atom_String)
 			return 0;
 
 		json_tokener* tok = json_tokener_new();
@@ -198,6 +191,13 @@ public:
 		json_tokener_free(tok);
 		return 0;
 	}
+
+	const uint32_t atom_Bool;
+	const uint32_t atom_Float;
+	const uint32_t atom_Int32;
+	const uint32_t atom_Object;
+	const uint32_t atom_String;
+	const uint32_t atom_Tuple;
 };
 
 static const unsigned plugin_class = Parse::register_class(LOLEP_URI "/json-parse");

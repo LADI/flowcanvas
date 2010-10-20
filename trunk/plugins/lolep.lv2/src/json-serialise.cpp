@@ -30,13 +30,6 @@
 
 using namespace std;
 
-static uint32_t tuple_type;
-static uint32_t bool_type;
-static uint32_t object_type;
-static uint32_t float_type;
-static uint32_t int_type;
-static uint32_t string_type;
-
 class Serialise;
 typedef LV2::Plugin<
 	Serialise,
@@ -50,35 +43,35 @@ class Serialise : public SerialiseBase
 {
 public:
 	Serialise(double rate, const char* bundle, const LV2::Feature* const* features)
-		: SerialiseBase(1)
+		: SerialiseBase(2)
+		, atom_Bool(uri_to_id(NULL,   LV2_ATOM_URI "#Bool"))
+		, atom_Float(uri_to_id(NULL,  LV2_ATOM_URI "#Float32"))
+		, atom_Int32(uri_to_id(NULL,  LV2_ATOM_URI "#Int32"))
+		, atom_Object(uri_to_id(NULL, LV2_ATOM_URI "#Object"))
+		, atom_String(uri_to_id(NULL, LV2_ATOM_URI "#String"))
+		, atom_Tuple(uri_to_id(NULL,  LV2_ATOM_URI "#Tuple"))
 	{
-		tuple_type  = uri_to_id(NULL, LV2_ATOM_URI "#Tuple");
-		bool_type   = uri_to_id(NULL, LV2_ATOM_URI "#Bool");
-		object_type = uri_to_id(NULL, LV2_ATOM_URI "#Object");
-		float_type  = uri_to_id(NULL, LV2_ATOM_URI "#Float32");
-		int_type    = uri_to_id(NULL, LV2_ATOM_URI "#Int32");
-		string_type = uri_to_id(NULL, LV2_ATOM_URI "#String");
 	}
 
 	static json_object* atom_to_object(Serialise* me, const LV2_Atom* atom)
 	{
 		json_object* obj = NULL;
-		if (atom->type == bool_type) {
+		if (atom->type == me->atom_Bool) {
 			obj = json_object_new_boolean(*(int32_t*)atom->body);
-		} else if (atom->type == string_type) {
+		} else if (atom->type == me->atom_String) {
 			obj = json_object_new_string((char*)atom->body);
-		} else if (atom->type == int_type) {
+		} else if (atom->type == me->atom_Int32) {
 			obj = json_object_new_int(*(int32_t*)atom->body);
-		} else if (atom->type == float_type) {
+		} else if (atom->type == me->atom_Float) {
 			obj = json_object_new_double(*(float*)atom->body);
-		} else if (atom->type == tuple_type) {
+		} else if (atom->type == me->atom_Tuple) {
 			obj = json_object_new_array();
 			LV2_Atom* elem = (LV2_Atom*)atom->body;
 			while (elem < (LV2_Atom*)(atom->body + atom->size)) {
 				json_object_array_add(obj, atom_to_object(me, elem));
 				elem = (LV2_Atom*)(elem->body + lv2_atom_pad_size(elem->size));
 			}
-		} else if (atom->type == object_type) {
+		} else if (atom->type == me->atom_Object) {
 			obj = json_object_new_object();
 			for (LV2_Atom_Object_Iter i = lv2_atom_object_get_iter((LV2_Atom_Property*)atom->body);
 			     !lv2_atom_object_iter_is_end(atom, i);
@@ -110,13 +103,20 @@ public:
 		resize_port(me, 1, len + 1);
 		LV2_Atom* out = me->p<LV2_Atom>(1);
 
-		out->type = string_type;
+		out->type = me->atom_String;
 		out->size = len + 1;
 		memcpy(out->body, str, len + 1);
 		lv2_contexts_set_port_valid(valid_outputs, 1);
 
 		return 0;
 	}
+	
+	const uint32_t atom_Bool;
+	const uint32_t atom_Float;
+	const uint32_t atom_Int32;
+	const uint32_t atom_Object;
+	const uint32_t atom_String;
+	const uint32_t atom_Tuple;
 };
 
 static const unsigned plugin_class = Serialise::register_class(LOLEP_URI "/json-serialise");
