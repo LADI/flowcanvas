@@ -37,20 +37,20 @@ static uint32_t float_type;
 static uint32_t int_type;
 static uint32_t string_type;
 
-class Print;
+class Serialise;
 typedef LV2::Plugin<
-	Print,
+	Serialise,
 	LV2::Ext::UriMap<true>,
 	LV2::Ext::UriUnmap<true>,
 	LV2::Ext::MessageContext<false>,
 	LV2::Ext::ResizePort<true>
-> PrintBase;
+> SerialiseBase;
 
-class Print : public PrintBase
+class Serialise : public SerialiseBase
 {
 public:
-	Print(double rate, const char* bundle, const LV2::Feature* const* features)
-		: PrintBase(1)
+	Serialise(double rate, const char* bundle, const LV2::Feature* const* features)
+		: SerialiseBase(1)
 	{
 		tuple_type  = uri_to_id(NULL, LV2_ATOM_URI "#Tuple");
 		bool_type   = uri_to_id(NULL, LV2_ATOM_URI "#Bool");
@@ -60,7 +60,7 @@ public:
 		string_type = uri_to_id(NULL, LV2_ATOM_URI "#String");
 	}
 
-	static json_object* atom_to_object(Print* me, const LV2_Atom* atom)
+	static json_object* atom_to_object(Serialise* me, const LV2_Atom* atom)
 	{
 		json_object* obj = NULL;
 		if (atom->type == bool_type) {
@@ -101,7 +101,7 @@ public:
 	                            const void* valid_inputs,
 	                            void*       valid_outputs)
 	{
-		Print*         me  = reinterpret_cast<Print*>(instance);
+		Serialise*     me  = reinterpret_cast<Serialise*>(instance);
 		LV2_Atom*      in  = me->p<LV2_Atom>(0);
 		json_object*   obj = atom_to_object(me, in);
 		const char*    str = json_object_to_json_string(obj);
@@ -119,4 +119,4 @@ public:
 	}
 };
 
-static const unsigned plugin_class = Print::register_class(LOLEP_URI "/json-serialise");
+static const unsigned plugin_class = Serialise::register_class(LOLEP_URI "/json-serialise");
