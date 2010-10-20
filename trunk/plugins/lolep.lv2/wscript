@@ -76,8 +76,9 @@ def build(bld):
 		     json_sources + ['src/json-parse.cpp'])
 	build_plugin(bld, 'cxx', 'lolep.lv2', 'json-serialise',
 		     json_sources + ['src/json-serialise.cpp'])
-	build_plugin(bld, 'cxx', 'lolep.lv2', 'print',
-		     ['src/print.cpp'])
+
+	build_plugin(bld, 'cxx', 'lolep.lv2', 'print', ['src/print.cpp'])
+	build_plugin(bld, 'cxx', 'lolep.lv2', 'object', ['src/object.cpp'])
 	
 	build_plugin_lib(bld, 'cxx', 'lolep.lv2', 'arith', ['src/arith.cpp'])
 	build_arith_data(bld, 'lolep.lv2', 'sum', '+')

@@ -13,6 +13,10 @@ lolep:json-serialise a lv2:Plugin ;
     rdfs:seeAlso <json-serialise.ttl> ;
     lv2:binary <json-serialise.so> .
 
+lolep:object a lv2:Plugin ;
+    rdfs:seeAlso <object.ttl> ;
+    lv2:binary <object.so> .
+
 lolep:print a lv2:Plugin ;
     rdfs:seeAlso <print.ttl> ;
     lv2:binary <print.so> .
@@ -28,4 +32,8 @@ lolep:MathPlugin a rdfs:Class ;
 lolep:TextPlugin a rdfs:Class ;
     rdfs:subClassOf lv2:Plugin ;
     rdfs:label "Text Processor" .
+
+lolep:DataStructurePlugin a rdfs:Class ;
+    rdfs:subClassOf lv2:Plugin ;
+    rdfs:label "Data Structure" .
 

@@ -45,12 +45,13 @@ class Parse : public ParseBase
 public:
 	Parse(double rate, const char* bundle, const LV2::Feature* const* features)
 		: ParseBase(2)
-		, atom_Bool(uri_to_id(NULL,   LV2_ATOM_URI "#Bool"))
-		, atom_Float(uri_to_id(NULL,  LV2_ATOM_URI "#Float32"))
-		, atom_Int32(uri_to_id(NULL,  LV2_ATOM_URI "#Int32"))
-		, atom_Object(uri_to_id(NULL, LV2_ATOM_URI "#Object"))
-		, atom_String(uri_to_id(NULL, LV2_ATOM_URI "#String"))
-		, atom_Tuple(uri_to_id(NULL,  LV2_ATOM_URI "#Tuple"))
+		, atom_Bool(uri_to_id(NULL,    LV2_ATOM_URI "#Bool"))
+		, atom_Float(uri_to_id(NULL,   LV2_ATOM_URI "#Float32"))
+		, atom_Int32(uri_to_id(NULL,   LV2_ATOM_URI "#Int32"))
+		, atom_Object(uri_to_id(NULL,  LV2_ATOM_URI "#Object"))
+		, atom_String(uri_to_id(NULL,  LV2_ATOM_URI "#String"))
+		, atom_Tuple(uri_to_id(NULL,   LV2_ATOM_URI "#Tuple"))
+		, atom_URIInt(uri_to_id(NULL,  LV2_ATOM_URI "#URIInt"))
 	{
 	}
 
@@ -110,8 +111,17 @@ public:
 		case json_type_string: {
 			const char*  str = json_object_get_string(obj);
 			const size_t len = strlen(str);
-			out = append_atom(me, index, offset, me->atom_String, len + 1);
-			memcpy(out->body, str, len + 1);
+			if (str[0] == '<' && str[len - 1] == '>') { // URI
+				char* uri = (char*)malloc(len - 1);
+				memcpy(uri, str + 1, len - 2);
+				uri[len - 2] = '\0';
+				const uint32_t id = me->uri_to_id(NULL, uri);
+				out = append_atom(me, index, offset, me->atom_URIInt, sizeof(uint32_t));
+				memcpy(out->body, &id, sizeof(uint32_t));
+			} else { // String
+				out = append_atom(me, index, offset, me->atom_String, len + 1);
+				memcpy(out->body, str, len + 1);
+			}
 			break;
 		}
 		case json_type_array: {
@@ -198,6 +208,7 @@ public:
 	const uint32_t atom_Object;
 	const uint32_t atom_String;
 	const uint32_t atom_Tuple;
+	const uint32_t atom_URIInt;
 };
 
 static const unsigned plugin_class = Parse::register_class(LOLEP_URI "/json-parse");
