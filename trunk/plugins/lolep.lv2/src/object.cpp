@@ -49,12 +49,20 @@ public:
 		, atom_Object(uri_to_id(NULL, LV2_ATOM_URI "#Object"))
 		, atom_URIInt(uri_to_id(NULL, LV2_ATOM_URI "#URIInt"))
 		, msg_diff(uri_to_id(NULL,  LV2_MESSAGE_URI "#diff"))
+		, msg_key(uri_to_id(NULL, LV2_MESSAGE_URI "#key"))
 		, msg_set(uri_to_id(NULL, LV2_MESSAGE_URI "#set"))
 		, msg_unset(uri_to_id(NULL, LV2_MESSAGE_URI "#unset"))
+		, msg_value(uri_to_id(NULL, LV2_MESSAGE_URI "#value"))
 		, rdf_type(uri_to_id(NULL, "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"))
 	{
 	}
 
+	~Object()
+	{
+		for (Map::iterator i = _map.begin(); i != _map.end(); ++i)
+			free(i->second);
+	}
+	
 	static uint32_t message_run(LV2_Handle  instance,
 	                            const void* valid_inputs,
 	                            void*       valid_outputs)
@@ -63,36 +71,63 @@ public:
 		LV2_Atom* in  = me->p<LV2_Atom>(0);
 		LV2_Atom* out = me->p<LV2_Atom>(1);
 
-		if (lv2_atom_is_a(in, me->rdf_type, me->atom_URIInt, me->atom_Object, me->msg_set)) {
-			printf("SET:\n");
-			for (LV2_Atom_Object_Iter i = lv2_atom_object_get_iter((LV2_Atom_Property*)in->body);
-			     !lv2_atom_object_iter_is_end(in, i);
-			     i = lv2_atom_object_iter_next(i)) {
-				LV2_Atom_Property* prop = lv2_atom_object_iter_get(i);
-				printf("\t%u :: %u\n", prop->predicate, prop->object.type);
-			}
-
-			out->type = me->msg_diff;
-			out->size = 0;
-			lv2_contexts_set_port_valid(valid_outputs, 1);
-		} else if (lv2_atom_is_a(in, me->rdf_type, me->atom_URIInt, me->atom_Object, me->msg_unset)) {
-			printf("UNSET:\n");
-			for (LV2_Atom_Object_Iter i = lv2_atom_object_get_iter((LV2_Atom_Property*)in->body);
-			     !lv2_atom_object_iter_is_end(in, i);
-			     i = lv2_atom_object_iter_next(i)) {
-				LV2_Atom_Property* prop = lv2_atom_object_iter_get(i);
-				printf("\t%u :: %u\n", prop->predicate, prop->object.type);
-			}
-
-			out->type = me->msg_diff;
-			out->size = 0;
-			lv2_contexts_set_port_valid(valid_outputs, 1);
-		} else {
-			printf("Unknown message type %u\n", in->type);
-		}
-
 		out->type = 0;
 		out->size = 0;
+
+		if (lv2_atom_is_a(in, me->rdf_type, me->atom_URIInt, me->atom_Object, me->msg_set)) {
+			LV2_Atom_Object_Query q[] = {
+				{ me->msg_key,   NULL },
+				{ me->msg_value, NULL },
+				{ 0, NULL }
+			};
+			
+			if (lv2_atom_object_query(in, q)) {
+				LV2_Atom* key   = q[0].value;
+				LV2_Atom* value = q[1].value;
+				
+				if (key->type != me->atom_URIInt) {
+					fprintf(stderr, "error: Key is not a URI\n");
+					return 0;
+				}
+
+				const size_t copy_size = sizeof(LV2_Atom) + value->size;
+				LV2_Atom*    copy      = (LV2_Atom*)malloc(copy_size);
+				memcpy(copy, value, copy_size);
+
+				printf("SET %u\n", *(uint32_t*)key->body);
+				me->_map.insert(make_pair(*(uint32_t*)key->body, copy));
+
+				out->type = me->msg_diff;
+				lv2_contexts_set_port_valid(valid_outputs, 1);
+				return 0;
+			} else {
+				fprintf(stderr, "error: received invalid set message\n");
+			}
+		} else if (lv2_atom_is_a(in, me->rdf_type, me->atom_URIInt, me->atom_Object, me->msg_unset)) {
+			LV2_Atom_Object_Query q[] = {
+				{ me->msg_key, NULL },
+				{ 0, NULL }
+			};
+			
+			if (lv2_atom_object_query(in, q)) {
+				LV2_Atom* key   = q[0].value;
+
+				if (key->type != me->atom_URIInt) {
+					fprintf(stderr, "error: Key is not a URI\n");
+					return 0;
+				}
+
+				printf("UNSET %u\n", *(uint32_t*)key->body);
+				me->_map.erase(*(uint32_t*)key->body);
+
+				out->type = me->msg_diff;
+				lv2_contexts_set_port_valid(valid_outputs, 1);
+				return 0;
+			} else {
+				fprintf(stderr, "error: received invalid unset message\n");
+			}
+		}
+
 		lv2_contexts_unset_port_valid(valid_outputs, 1);
 		return 0;
 	}
@@ -100,11 +135,14 @@ public:
 	uint32_t atom_Object;
 	uint32_t atom_URIInt;
 	uint32_t msg_diff;
+	uint32_t msg_key;
 	uint32_t msg_set;
 	uint32_t msg_unset;
+	uint32_t msg_value;
 	uint32_t rdf_type;
 
-	std::map<uint32_t, LV2_Atom*> _map;
+	typedef std::map<uint32_t, LV2_Atom*> Map;
+	Map _map;
 };
 
 static const unsigned plugin_class = Object::register_class(LOLEP_URI "/object");
