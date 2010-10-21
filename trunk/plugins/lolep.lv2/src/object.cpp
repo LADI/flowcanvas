@@ -75,13 +75,13 @@ public:
 		out->size = 0;
 
 		if (lv2_atom_is_a(in, me->rdf_type, me->atom_URIInt, me->atom_Object, me->msg_set)) {
-			LV2_Atom_Object_Query q[] = {
+			LV2_Object_Query q[] = {
 				{ me->msg_key,   NULL },
 				{ me->msg_value, NULL },
 				{ 0, NULL }
 			};
 			
-			if (lv2_atom_object_query(in, q)) {
+			if (lv2_object_query(in, q)) {
 				LV2_Atom* key   = q[0].value;
 				LV2_Atom* value = q[1].value;
 				
@@ -104,12 +104,12 @@ public:
 				fprintf(stderr, "error: received invalid set message\n");
 			}
 		} else if (lv2_atom_is_a(in, me->rdf_type, me->atom_URIInt, me->atom_Object, me->msg_unset)) {
-			LV2_Atom_Object_Query q[] = {
+			LV2_Object_Query q[] = {
 				{ me->msg_key, NULL },
 				{ 0, NULL }
 			};
 			
-			if (lv2_atom_object_query(in, q)) {
+			if (lv2_object_query(in, q)) {
 				LV2_Atom* key   = q[0].value;
 
 				if (key->type != me->atom_URIInt) {
