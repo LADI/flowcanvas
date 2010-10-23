@@ -73,15 +73,15 @@ public:
 			}
 		} else if (atom->type == me->atom_Object) {
 			obj = json_object_new_object();
-			for (LV2_Atom_Object_Iter i = lv2_atom_object_get_iter((LV2_Atom_Property*)atom->body);
-			     !lv2_atom_object_iter_is_end(atom, i);
-			     i = lv2_atom_object_iter_next(i)) {
-				LV2_Atom_Property* prop    = lv2_atom_object_iter_get(i);
-				const char*        key_str = me->id_to_uri(NULL, prop->predicate);
+			for (LV2_Object_Iter i = lv2_object_get_iter((LV2_Atom_Property*)atom->body);
+			     !lv2_object_iter_is_end(atom, i);
+			     i = lv2_object_iter_next(i)) {
+				LV2_Atom_Property* prop    = lv2_object_iter_get(i);
+				const char*        key_str = me->id_to_uri(NULL, prop->key);
 				if (key_str) {
-					json_object_object_add(obj, key_str, atom_to_object(me, &prop->object));
+					json_object_object_add(obj, key_str, atom_to_object(me, &prop->value));
 				} else {
-					fprintf(stderr, "Failed to unmap URI ID %d\n", prop->predicate);
+					fprintf(stderr, "Failed to unmap URI ID %d\n", prop->key);
 				}
 			}
 		} else {
