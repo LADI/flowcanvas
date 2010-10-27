@@ -18,14 +18,18 @@ def set_options(opt):
 
 def configure(conf):
 	autowaf.configure(conf)
+	autowaf.display_header('Lolep Configuration')
 	conf.check_tool('compiler_cxx')
 	autowaf.check_pkg(conf, 'lv2core', uselib_store='LV2CORE', mandatory=True)
+	autowaf.check_pkg(conf, 'raptor', uselib_store='RAPTOR', atleast_version="1.4.19", mandatory=False)
 	conf.env.append_value('CCFLAGS', '-std=c99')
 	pat = conf.env['shlib_PATTERN']
 	ext = pat[pat.rfind('.'):]
 	conf.env.append_value('shlib_EXTENSION', ext)
 
-def build_plugin_lib(bld, lang, bundle, name, source):
+	autowaf.display_msg(conf, "RDF Serialisation", str(conf.env['HAVE_RAPTOR'] == 1))
+
+def build_plugin_lib(bld, lang, bundle, name, source, libs=[]):
 	penv = bld.env.copy()
 	penv['shlib_PATTERN'] = '%s' + bld.env['shlib_EXTENSION'][0]
 
@@ -40,14 +44,16 @@ def build_plugin_lib(bld, lang, bundle, name, source):
 	obj.name         = name
 	obj.target       = name
 	obj.ccflags      = '-D_GNU_SOURCE'
+	if libs != []:
+		obj.uselib = libs
 	obj.install_path = '${LV2DIR}/' + bundle
 
 def build_plugin_data(bld, bundle, name):
 	data_file = '%s.ttl' % name
 	bld.install_files('${LV2DIR}/' + bundle, data_file)
 
-def build_plugin(bld, lang, bundle, name, source):
-	build_plugin_lib(bld, lang, bundle, name, source)
+def build_plugin(bld, lang, bundle, name, source, libs=[]):
+	build_plugin_lib(bld, lang, bundle, name, source, libs)
 	build_plugin_data(bld, bundle, name)
 	
 def build_arith_data(bld, bundle, sym, operator):
@@ -77,8 +83,11 @@ def build(bld):
 	build_plugin(bld, 'cxx', 'lolep.lv2', 'json-serialise',
 		     json_sources + ['src/json-serialise.cpp'])
 
-	build_plugin(bld, 'cxx', 'lolep.lv2', 'print', ['src/print.cpp'])
-	build_plugin(bld, 'cxx', 'lolep.lv2', 'object', ['src/object.cpp'])
+	build_plugin(bld, 'cxx', 'lolep.lv2', 'rdf-read', ['src/rdf-read.cpp'])
+	build_plugin(bld, 'cxx', 'lolep.lv2', 'rdf-write', ['src/rdf-write.cpp'])
+
+	build_plugin(bld, 'cxx', 'lolep.lv2', 'print', ['src/print.cpp'], 'RAPTOR')
+	build_plugin(bld, 'cxx', 'lolep.lv2', 'object', ['src/object.cpp'], 'RAPTOR')
 	
 	build_plugin_lib(bld, 'cxx', 'lolep.lv2', 'arith', ['src/arith.cpp'])
 	build_arith_data(bld, 'lolep.lv2', 'sum', '+')

@@ -7,35 +7,39 @@
 @prefix pg:    <http://lv2plug.in/ns/ext/port-groups#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 
-lolep:json-serialise a lv2:Plugin ;
+lolep:rdf-read a lv2:Plugin ;
 	a lolep:TextPlugin ;
-	doap:name "JSON Serialise" ;
+	doap:name "RDF Read" ;
 	doap:maintainer [
 		foaf:name "David Robillard" ;
 		foaf:homepage <http://drobilla.net/> ;
 		foaf:mbox <mailto:d@drobilla.net> ;
 	] ;
-    lv2:requiredFeature ctx:MessageContext ;
-    lv2:requiredFeature <http://lv2plug.in/ns/ext/uri-map> ;
-    lv2:requiredFeature <http://lv2plug.in/ns/ext/uri-unmap> ;       
+	lv2:requiredFeature ctx:MessageContext ;
+	lv2:requiredFeature <http://lv2plug.in/ns/ext/uri-map> ;
+	lv2:requiredFeature <http://lv2plug.in/ns/ext/uri-unmap> ;
 	doap:license <http://usefulinc.com/doap/licenses/gpl> ;
+	lv2:pluginProperty lv2:hardRtCapable ;
 	lv2:port [
 		a lv2:InputPort, atom:ValuePort ;
 		ctx:context ctx:MessageContext ;
+		atom:supports atom:String ;
 		lv2:name "Input" ;
 		lv2:index 0 ;
 		lv2:symbol "input" ;
 		lv2:default "" ;
+		rdfs:comment """
+Expects an atom:String with <code>lang</code> set to some RDF syntax.
+If <code>lang = 0</code>, the syntax will be guessed.
+"""
 	] , [
 		a lv2:OutputPort, atom:ValuePort ;
 		ctx:context ctx:MessageContext ;
-		atom:supports atom:String ;
 		lv2:name "Output" ;
 		lv2:index 1 ;
 		lv2:symbol "output" ;
-	] ;
-	rdfs:comment """
-Serialise any received atom to a string in JSON format.
+		rdfs:comment """Input in parsed form""" ;
+	] ; rdfs:comment """
+Parses a serialised RDF string into an Atom.
 """ .
-
 

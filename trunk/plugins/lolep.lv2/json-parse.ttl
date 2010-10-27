@@ -1,4 +1,4 @@
-@prefix aport: <http://lv2plug.in/ns/ext/atom-port#> .
+@prefix atom:  <http://lv2plug.in/ns/ext/atom#> .
 @prefix ctx:   <http://lv2plug.in/ns/ext/contexts#> .
 @prefix doap:  <http://usefulinc.com/ns/doap#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
@@ -20,9 +20,9 @@ lolep:json-parse a lv2:Plugin ;
 	doap:license <http://usefulinc.com/doap/licenses/gpl> ;
 	lv2:pluginProperty lv2:hardRtCapable ;
 	lv2:port [
-		a lv2:InputPort, aport:ValuePort ;
+		a lv2:InputPort, atom:ValuePort ;
 		ctx:context ctx:MessageContext ;
-		aport:supports atom:String ;
+		atom:supports atom:String ;
 		lv2:name "Input" ;
 		lv2:index 0 ;
 		lv2:symbol "input" ;
@@ -43,7 +43,7 @@ Understood syntax examples:
 </dl>
 """
 	] , [
-		a lv2:OutputPort, aport:ValuePort ;
+		a lv2:OutputPort, atom:ValuePort ;
 		ctx:context ctx:MessageContext ;
 		lv2:name "Output" ;
 		lv2:index 1 ;

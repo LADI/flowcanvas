@@ -1,4 +1,4 @@
-@prefix aport: <http://lv2plug.in/ns/ext/atom-port#> .
+@prefix atom:  <http://lv2plug.in/ns/ext/atom#> .
 @prefix ctx:   <http://lv2plug.in/ns/ext/contexts#> .
 @prefix doap:  <http://usefulinc.com/ns/doap#> .
 @prefix foaf:  <http://xmlns.com/foaf/0.1/> .
@@ -21,24 +21,24 @@ lolep:@SYMBOL@ a lv2:Plugin ;
 	ctx:optionalContext ctx:StatelessAudioContext ;
 	doap:license <http://usefulinc.com/doap/licenses/gpl> ;
 	lv2:port [
-		a lv2:InputPort, aport:ValuePort ;
-		aport:supports atom:Float32 , atom:Int32, atom:Vector ;
+		a lv2:InputPort, atom:ValuePort ;
+		atom:supports atom:Float32 , atom:Int32, atom:Vector ;
 		lv2:index 0 ;
 		lv2:symbol "a" ;
 		lv2:name "A" ;
 		lv2:default 0.0 ;
 		rdfs:comment """Expects a number, or a vector of numbers""" ;
 	] , [
-		a lv2:InputPort, aport:ValuePort ;
-		aport:supports atom:Float32 , atom:Int32, atom:Vector ;
+		a lv2:InputPort, atom:ValuePort ;
+		atom:supports atom:Float32 , atom:Int32, atom:Vector ;
 		lv2:index 1 ;
 		lv2:symbol "b" ;
 		lv2:name "B" ;
 		lv2:default 0.0 ;
 		rdfs:comment """Expects a number, or a vector of numbers""" ;
 	] , [
-		a lv2:OutputPort, aport:ValuePort ;
-		aport:supports atom:Float32 , atom:Int32, atom:Vector ;
+		a lv2:OutputPort, atom:ValuePort ;
+		atom:supports atom:Float32 , atom:Int32, atom:Vector ;
 		rsz:asLargeAs "a" , "b" ;
 		lv2:name "A @TINYNAME@ B" ;
 		lv2:index 2 ;

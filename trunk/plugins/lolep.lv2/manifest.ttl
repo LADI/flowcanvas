@@ -13,6 +13,14 @@ lolep:json-serialise a lv2:Plugin ;
     rdfs:seeAlso <json-serialise.ttl> ;
     lv2:binary <json-serialise.so> .
 
+lolep:rdf-read a lv2:Plugin ;
+    rdfs:seeAlso <rdf-read.ttl> ;
+    lv2:binary <rdf-read.so> .
+
+lolep:rdf-write a lv2:Plugin ;
+    rdfs:seeAlso <rdf-write.ttl> ;
+    lv2:binary <rdf-write.so> .
+
 lolep:object a lv2:Plugin ;
     rdfs:seeAlso <object.ttl> ;
     lv2:binary <object.so> .

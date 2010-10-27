@@ -7,17 +7,17 @@
 @prefix pg:    <http://lv2plug.in/ns/ext/port-groups#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 
-lolep:json-serialise a lv2:Plugin ;
+lolep:rdf-write a lv2:Plugin ;
 	a lolep:TextPlugin ;
-	doap:name "JSON Serialise" ;
+	doap:name "RDF Write" ;
 	doap:maintainer [
 		foaf:name "David Robillard" ;
 		foaf:homepage <http://drobilla.net/> ;
 		foaf:mbox <mailto:d@drobilla.net> ;
 	] ;
-    lv2:requiredFeature ctx:MessageContext ;
-    lv2:requiredFeature <http://lv2plug.in/ns/ext/uri-map> ;
-    lv2:requiredFeature <http://lv2plug.in/ns/ext/uri-unmap> ;       
+	lv2:requiredFeature ctx:MessageContext ;
+	lv2:requiredFeature <http://lv2plug.in/ns/ext/uri-map> ;
+	lv2:requiredFeature <http://lv2plug.in/ns/ext/uri-unmap> ;
 	doap:license <http://usefulinc.com/doap/licenses/gpl> ;
 	lv2:port [
 		a lv2:InputPort, atom:ValuePort ;
@@ -35,7 +35,7 @@ lolep:json-serialise a lv2:Plugin ;
 		lv2:symbol "output" ;
 	] ;
 	rdfs:comment """
-Serialise any received atom to a string in JSON format.
+Serialise any received atom to a string in a number of RDF syntaxes.
 """ .
 
 

@@ -67,7 +67,7 @@ public:
 				printf("true\n");
 			}
 		} else if (in->type == me->atom_String) {
-			printf("\"%s\"\n", (char*)in->body);
+			printf("\"%s\"\n", ((LV2_Atom_String*)in->body)->str);
 		} else if (in->type == me->atom_Int32) {
 			printf("%d\n", *(int32_t*)in->body);
 		} else if (in->type == me->atom_Float) {
