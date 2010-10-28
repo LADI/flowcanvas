@@ -69,11 +69,11 @@ def build_arith_data(bld, bundle, sym, operator):
 	build_plugin_data(bld, bundle, sym)
 
 def build(bld):
-	build_plugin(bld, 'cxx', 'lolep.lv2', 'rdf-read', ['src/rdf-read.cpp'])
-	build_plugin(bld, 'cxx', 'lolep.lv2', 'rdf-write', ['src/rdf-write.cpp'])
+	build_plugin(bld, 'cxx', 'lolep.lv2', 'rdf-read', ['src/rdf-read.cpp'], 'RAPTOR')
+	build_plugin(bld, 'cxx', 'lolep.lv2', 'rdf-write', ['src/rdf-write.cpp'], 'RAPTOR')
 
-	build_plugin(bld, 'cxx', 'lolep.lv2', 'print', ['src/print.cpp'], 'RAPTOR')
-	build_plugin(bld, 'cxx', 'lolep.lv2', 'object', ['src/object.cpp'], 'RAPTOR')
+	build_plugin(bld, 'cxx', 'lolep.lv2', 'print', ['src/print.cpp'])
+	build_plugin(bld, 'cxx', 'lolep.lv2', 'object', ['src/object.cpp'])
 	
 	build_plugin_lib(bld, 'cxx', 'lolep.lv2', 'arith', ['src/arith.cpp'])
 	build_arith_data(bld, 'lolep.lv2', 'sum', '+')
