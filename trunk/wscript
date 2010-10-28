@@ -6,7 +6,7 @@ import sys
 import autowaf
 from TaskGen import feature, before, after
 
-sys.path.append("./lv2/core.lv2/lv2config")
+sys.path.append("./lv2/core.lv2/")
 import lv2config
 
 # Variables for 'waf dist'
