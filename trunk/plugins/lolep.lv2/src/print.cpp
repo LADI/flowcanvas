@@ -19,9 +19,9 @@
 #include <iostream>
 #include <ctype.h>
 #include <stdio.h>
-#include "atom.lv2/atom.h"
-#include "contexts.lv2/contexts.h"
-#include "uri-map.lv2/uri-map.h"
+#include "lv2/http/lv2plug.in/ns/ext/atom/atom.h"
+#include "lv2/http/lv2plug.in/ns/ext/contexts/contexts.h"
+#include "lv2/http/lv2plug.in/ns/ext/uri-map/uri-map.h"
 #include "lolep.hpp"
 #include "LV2Plugin.hpp"
 #include "LV2Extensions.hpp"

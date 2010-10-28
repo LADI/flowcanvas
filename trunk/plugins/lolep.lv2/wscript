@@ -69,20 +69,6 @@ def build_arith_data(bld, bundle, sym, operator):
 	build_plugin_data(bld, bundle, sym)
 
 def build(bld):
-	json_sources = [
-		'src/json-c/arraylist.c',
-		'src/json-c/json_object.c',
-		'src/json-c/json_tokener.c',
-		'src/json-c/json_util.c',
-		'src/json-c/linkhash.c',
-		'src/json-c/printbuf.c'
-		]
-		
-	build_plugin(bld, 'cxx', 'lolep.lv2', 'json-parse',
-		     json_sources + ['src/json-parse.cpp'])
-	build_plugin(bld, 'cxx', 'lolep.lv2', 'json-serialise',
-		     json_sources + ['src/json-serialise.cpp'])
-
 	build_plugin(bld, 'cxx', 'lolep.lv2', 'rdf-read', ['src/rdf-read.cpp'])
 	build_plugin(bld, 'cxx', 'lolep.lv2', 'rdf-write', ['src/rdf-write.cpp'])
 

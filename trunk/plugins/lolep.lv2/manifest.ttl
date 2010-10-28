@@ -5,14 +5,6 @@
 @prefix pg:    <http://lv2plug.in/ns/ext/port-groups#> .
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 
-lolep:json-parse a lv2:Plugin ;
-    rdfs:seeAlso <json-parse.ttl> ;
-    lv2:binary <json-parse.so> .
-
-lolep:json-serialise a lv2:Plugin ;
-    rdfs:seeAlso <json-serialise.ttl> ;
-    lv2:binary <json-serialise.so> .
-
 lolep:rdf-read a lv2:Plugin ;
     rdfs:seeAlso <rdf-read.ttl> ;
     lv2:binary <rdf-read.so> .
