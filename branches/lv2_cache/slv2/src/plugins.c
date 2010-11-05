@@ -1,5 +1,5 @@
 /* SLV2
- * Copyright (C) 2007-2009 Dave Robillard <http://drobilla.net>
+ * Copyright (C) 2007-2009 David Robillard <http://drobilla.net>
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <librdf.h>
+#include <redland.h>
 #include "slv2/types.h"
 #include "slv2/plugin.h"
 #include "slv2/collections.h"

@@ -1,5 +1,5 @@
 /* SLV2
- * Copyright (C) 2008-2009 Dave Robillard <http://drobilla.net>
+ * Copyright (C) 2008-2009 David Robillard <http://drobilla.net>
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -16,8 +16,8 @@
  * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#ifndef __SLV2_PLUGINS_H__
-#define __SLV2_PLUGINS_H__
+#ifndef __SLV2_COLLECTIONS_H__
+#define __SLV2_COLLECTIONS_H__
 
 #ifdef __cplusplus
 extern "C" {

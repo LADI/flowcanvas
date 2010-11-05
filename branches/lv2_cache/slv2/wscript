@@ -131,7 +131,8 @@ def build(bld):
 	obj.target       = 'slv2'
 	obj.vnum         = SLV2_LIB_VERSION
 	obj.install_path = '${LIBDIR}'
-	obj.ccflags      = [ '-ldl', '-fvisibility=hidden', '-DSLV2_SHARED', '-DSLV2_INTERNAL' ]
+	obj.ccflags      = [ '-fvisibility=hidden', '-DSLV2_SHARED', '-DSLV2_INTERNAL' ]
+	obj.ldflags      = [ '-ldl' ]
 	if bld.env['HAVE_MMAP']:
 		obj.ccflags += [ '-DMD5_USE_MMAP' ]
 	autowaf.use_lib(bld, obj, 'REDLAND LV2CORE')
@@ -145,7 +146,8 @@ def build(bld):
 		obj.target       = 'slv2_static'
 		obj.install_path = ''
 		obj.ccflags      = [ '-fprofile-arcs',  '-ftest-coverage' ]
-
+		autowaf.use_lib(bld, obj, 'REDLAND LV2CORE')
+		
 		# Unit tests
 		for i in tests.split():
 			obj = bld.new_task_gen('cc', 'program')

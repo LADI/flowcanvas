@@ -1,5 +1,5 @@
 /* SLV2
- * Copyright (C) 2007-2009 Dave Robillard <http://drobilla.net>
+ * Copyright (C) 2007-2009 David Robillard <http://drobilla.net>
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -23,7 +23,7 @@
 extern "C" {
 #endif
 
-#include <librdf.h>
+#include <redland.h>
 #include "slv2/collections.h"
 
 /** \defgroup slv2_world Global library state

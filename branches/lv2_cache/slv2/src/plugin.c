@@ -1,5 +1,5 @@
 /* SLV2
- * Copyright (C) 2007-2009 Dave Robillard <http://drobilla.net>
+ * Copyright (C) 2007-2009 David Robillard <http://drobilla.net>
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -22,7 +22,10 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
-#include <librdf.h>
+#ifdef SLV2_DYN_MANIFEST
+#include <dlfcn.h>
+#endif
+#include <redland.h>
 #include "slv2/types.h"
 #include "slv2/collections.h"
 #include "slv2/plugin.h"
@@ -30,9 +33,6 @@
 #include "slv2/query.h"
 #include "slv2/util.h"
 #include "slv2_internal.h"
-#ifdef SLV2_DYN_MANIFEST
-#include <dlfcn.h>
-#endif
 
 
 /* private
@@ -54,10 +54,6 @@ slv2_plugin_new(SLV2World world, SLV2Value uri, librdf_uri* bundle_uri)
 	plugin->ports = NULL;
 	plugin->num_ports = 0;
 	plugin->loaded = false;
-
-	/*printf("PLUGIN %s DATA URIs: %p\n",
-			slv2_value_as_string(plugin->plugin_uri),
-			(void*)plugin->data_uris);*/
 
 	return plugin;
 }
