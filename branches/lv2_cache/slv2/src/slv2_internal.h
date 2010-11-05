@@ -172,7 +172,7 @@ void
 slv2_world_load_specifications(SLV2World world);
 
 librdf_node*
-slv2_world_load_file(SLV2World world, librdf_uri* file_uri, bool* transaction);
+slv2_world_load_file(SLV2World world, librdf_uri* file_uri, bool* loaded);
 
 librdf_storage*
 slv2_world_new_memory_storage(SLV2World world, bool index);

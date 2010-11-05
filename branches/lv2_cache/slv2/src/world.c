@@ -194,22 +194,6 @@ slv2_world_new()
 {
 	SLV2World world = (SLV2World)malloc(sizeof(struct _SLV2World));
 
-	// Kludge REDLAND_MODULE_PATH in the environment to add PREFIX/lib/redland
-	// where PREFIX is the prefix SLV2 was configured (and thus likely the prefix that
-	// Qure was configured as well).  This is needed for now especially since released
-	// Redland doesn't search /usr/local/lib by default
-	const char* module_path = getenv("REDLAND_MODULE_PATH");
-	const char* add_path    = SLV2_REDLAND_MODULE_PATH;
-	if (module_path) {
-		if (strstr(module_path, add_path) == NULL) {
-			char* new_module_path = slv2_strjoin(module_path, ":", add_path, NULL);
-			setenv("REDLAND_MODULE_PATH", new_module_path, 1);
-			free(new_module_path);
-		}
-	} else {
-		setenv("REDLAND_MODULE_PATH", add_path, 1);
-	}
-
 	world->world = librdf_new_world();
 	if (!world->world) {
 		free(world);
@@ -329,8 +313,9 @@ slv2_world_cache_sum(SLV2World world, librdf_uri* file_uri)
 /** Load the entire contents of a file into the world model.
  */
 librdf_node*
-slv2_world_load_file(SLV2World world, librdf_uri* file_uri, bool* transaction)
+slv2_world_load_file(SLV2World world, librdf_uri* file_uri, bool* loaded)
 {
+	*loaded = false;
 	if (!file_uri)
 		return NULL;
 
@@ -386,6 +371,7 @@ slv2_world_load_file(SLV2World world, librdf_uri* file_uri, bool* transaction)
 	}
 
 	//printf("slv2: Parse %s\n", file_uri_str);
+	*loaded = true;
 
 	librdf_statement* s = librdf_new_statement_from_nodes(
 		world->world,
@@ -399,19 +385,13 @@ slv2_world_load_file(SLV2World world, librdf_uri* file_uri, bool* transaction)
 
 	librdf_stream* file_stream = librdf_parser_parse_as_stream(world->parser, file_uri, file_uri);
 
-	if (!*transaction) {
-		librdf_model_transaction_start(world->model);
-		*transaction = true;
-	}
-
 	librdf_model_context_add_statements(world->model, context, file_stream);
 
 	return context;
 }
 
-
-void
-slv2_world_load_bundle(SLV2World world, SLV2Value bundle_uri)
+static void
+slv2_world_load_bundle_internal(SLV2World world, SLV2Value bundle_uri)
 {
 	if (!slv2_value_is_uri(bundle_uri)) {
 		SLV2_ERROR("Bundle 'URI' is not a URI\n");
@@ -421,9 +401,9 @@ slv2_world_load_bundle(SLV2World world, SLV2Value bundle_uri)
 	librdf_uri* manifest_uri = librdf_new_uri_relative_to_base(
 			bundle_uri->val.uri_val, (const unsigned char*)"manifest.ttl");
 
-	bool transaction = false;
-	librdf_node* context = slv2_world_load_file(world, manifest_uri, &transaction);
-	if (!transaction)
+	bool loaded = false;
+	librdf_node* context = slv2_world_load_file(world, manifest_uri, &loaded);
+	if (!loaded)
 		return; // Cached manifest, do nothing
 
 #ifdef SLV2_DYN_MANIFEST
@@ -579,10 +559,17 @@ slv2_world_load_bundle(SLV2World world, SLV2Value bundle_uri)
 	}
 	librdf_free_stream(results);
 	librdf_free_statement(q);
-
-	librdf_model_transaction_commit(world->model);
-
+	
 	librdf_free_uri(manifest_uri);
+}
+
+
+void
+slv2_world_load_bundle(SLV2World world, SLV2Value bundle_uri)
+{
+	librdf_model_transaction_start(world->model);
+	slv2_world_load_bundle_internal(world, bundle_uri);
+	librdf_model_transaction_commit(world->model);
 }
 
 
@@ -609,7 +596,7 @@ slv2_world_load_directory(SLV2World world, const char* dir)
 		if (bundle_dir != NULL) {
 			closedir(bundle_dir);
 			SLV2Value uri_val = slv2_value_new_uri(world, uri);
-			slv2_world_load_bundle(world, uri_val);
+			slv2_world_load_bundle_internal(world, uri_val);
 			slv2_value_free(uri_val);
 		}
 
@@ -682,15 +669,13 @@ slv2_world_load_specifications(SLV2World world)
 
 	librdf_query_results* results = librdf_query_execute(q, world->model);
 
+	bool loaded = false;
 	while (!librdf_query_results_finished(results)) {
 		librdf_node* spec_node = librdf_query_results_get_binding_value(results, 0);
 		librdf_node* data_node = librdf_query_results_get_binding_value(results, 1);
 		librdf_uri*  data_uri  = librdf_node_get_uri(data_node);
 
-		bool transaction = false;
-		slv2_world_load_file(world, data_uri, &transaction);
-		if (transaction)
-			librdf_model_transaction_commit(world->model);
+		slv2_world_load_file(world, data_uri, &loaded);
 
 		librdf_free_node(spec_node);
 		librdf_free_node(data_node);
@@ -801,6 +786,7 @@ slv2_world_load_all(SLV2World world)
 
 	/* 1. Read all manifest files into model */
 
+	librdf_model_transaction_start(world->model);
 	if (lv2_path) {
 		slv2_world_load_path(world, lv2_path);
 	} else {
@@ -942,6 +928,8 @@ slv2_world_load_all(SLV2World world)
 
 		librdf_query_results_next(results);
 	}
+
+	librdf_model_transaction_commit(world->model);
 
 	if (results)
 		librdf_free_query_results(results);

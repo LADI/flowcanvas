@@ -178,11 +178,12 @@ void
 slv2_plugin_load(SLV2Plugin p)
 {
 	bool transaction = false;
+	bool loaded = false;
 	// Parse all the plugin's data files into RDF model
 	for (unsigned i=0; i < slv2_values_size(p->data_uris); ++i) {
 		SLV2Value data_uri_val = slv2_values_get_at(p->data_uris, i);
 		librdf_uri* data_uri = slv2_value_as_librdf_uri(data_uri_val);
-		slv2_world_load_file(p->world, data_uri, &transaction);
+		slv2_world_load_file(p->world, data_uri, &loaded);
 	}
 			
 #ifdef SLV2_DYN_MANIFEST
