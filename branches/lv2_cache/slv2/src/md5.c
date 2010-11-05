@@ -42,6 +42,7 @@
 #endif
 
 #include "md5.h"
+#include <errno.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -387,19 +388,21 @@ md5_file(const char* filename, md5_byte_t digest[MD5_DIGEST_LENGTH])
 
 	int fd = open(filename, O_RDONLY);
 	if (!fd) {
-		fprintf(stderr, "md5: Failed to open file %s\n", filename);
+		fprintf(stderr, "md5: Failed to open file %s (%s)\n", filename, strerror(errno));
 		return NULL;
 	}
 
 	struct stat info;
 	if (fstat(fd, &info)) {
-		fprintf(stderr, "md5: Failed to stat file %s\n", filename);
+		fprintf(stderr, "md5: Failed to stat file %s (%s)\n", filename, strerror(errno));
+		close(fd);
 		return NULL;
 	}
 
 	void* file = mmap(NULL, info.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
 	if (!file || file == MAP_FAILED) {
-		fprintf(stderr, "md5: Failed to mmap file %s\n", filename);
+		fprintf(stderr, "md5: Failed to mmap file %s (%s)\n", filename, strerror(errno));
+		close(fd);
 		return NULL;
 	}
 
@@ -414,7 +417,7 @@ md5_file(const char* filename, md5_byte_t digest[MD5_DIGEST_LENGTH])
 
 	FILE* fd = fopen(filename, "r");
 	if (!fd) {
-		fprintf(stderr, "md5: Failed to open file %s\n", filename);
+		fprintf(stderr, "md5: Failed to open file %s (%s)\n", filename, strerror(errno));
 		return NULL;
 	}
 
