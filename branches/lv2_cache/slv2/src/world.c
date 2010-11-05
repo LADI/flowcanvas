@@ -382,9 +382,9 @@ slv2_world_load_file(SLV2World world, librdf_uri* file_uri, bool* loaded)
 	librdf_free_statement(s);
 
 	librdf_stream* file_stream = librdf_parser_parse_as_stream(world->parser, file_uri, file_uri);
-
 	librdf_model_context_add_statements(world->model, context, file_stream);
-
+	librdf_free_stream(file_stream);
+	
 	return context;
 }
 
