@@ -344,11 +344,10 @@ slv2_world_load_file(SLV2World world, librdf_uri* file_uri, bool* loaded)
 	file_sum_str[MD5_DIGEST_LENGTH * 2] = '\0';
 
 	if (cache_file_sum) {
-		char* cache_sum_str = (char*)librdf_node_to_string(cache_file_sum);
+		const char* cache_sum_str = (const char*)librdf_node_get_literal_value(cache_file_sum);
 		const int cmp = strcmp(cache_sum_str, file_sum_str);
 		if (!cmp) {
 			//printf("slv2: Cache hit %s\n", file_path);
-			free(cache_sum_str);
 			return context;
 		} else {
 			//printf("slv2: Cache replace %s\n", file_path);
@@ -362,7 +361,6 @@ slv2_world_load_file(SLV2World world, librdf_uri* file_uri, bool* loaded)
 				fprintf(stderr, "Failed to remove cache digest statement\n");
 			}
 			librdf_free_statement(s);
-			free(cache_sum_str);
 
 			librdf_model_context_remove_statements(world->model, context);
 		}
