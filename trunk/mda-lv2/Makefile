@@ -19,7 +19,7 @@ endif
 BUILD_GUI = ! `pkg-config --exists gtk+-2.0`
 GUI_CFLAGS = $(CFLAGS) -Ivstgui `pkg-config --cflags gtk+-2.0 libpng`
 
-all: lvz/gendata libs data gui_libs
+all: lvz/gendata libs data # gui_libs
 
 bundle:
 	mkdir -p ./mda.lv2
@@ -60,8 +60,8 @@ libs: bundle \
 	mda.lv2/mdaTracker.so \
 	mda.lv2/mdaTransient.so \
 	mda.lv2/mdaVocInput.so \
-	mda.lv2/mdaVocoder.so \
-	mda.lv2/mdaSpecMeter.so
+	mda.lv2/mdaVocoder.so
+#	mda.lv2/mdaSpecMeter.so
 
 pixmaps:
 	cp src/mdaSpecMeter.png mda.lv2
@@ -69,9 +69,9 @@ pixmaps:
 gui_libs: bundle pixmaps \
 	mda.lv2/mdaSpecMeterGUI.so
 
-data: libs gui_libs lvz/gendata
+data: libs lvz/gendata #gui_libs
 	cd ./mda.lv2 && ../lvz/gendata ./*.so > manifest.ttl
-	@echo "*** Ignore the above non-error about loading images! ***"
+#	@echo "*** Ignore the above non-error about loading images! ***"
 
 install:
 	if [ "x$(INSTALL_DIR)" = "x" ]; then \
@@ -82,9 +82,9 @@ install:
 	else \
 		install -d $(INSTALL_DIR)/mda.lv2; \
 		install -m 644 ./mda.lv2/*.ttl $(INSTALL_DIR)/mda.lv2; \
-		install -m 644 ./mda.lv2/*.png $(INSTALL_DIR)/mda.lv2; \
 		install -m 755 ./mda.lv2/*.so $(INSTALL_DIR)/mda.lv2; \
 	fi
+#		install -m 644 ./mda.lv2/*.png $(INSTALL_DIR)/mda.lv2; \
 
 install-user:
 	INSTALL_DIR=$(USER_INSTALL_DIR) make install
