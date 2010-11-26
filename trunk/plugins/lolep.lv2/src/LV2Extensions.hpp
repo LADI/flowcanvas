@@ -21,10 +21,10 @@
 #define LV2EXTENSIONS_HPP
 
 #include "LV2Plugin.hpp"
-#include "lv2/http/lv2plug.in/ns/ext/contexts/contexts.h"
-#include "lv2/http/lv2plug.in/ns/ext/resize-port/resize-port.h"
-#include "lv2/http/lv2plug.in/ns/ext/uri-map/uri-map.h"
-#include "lv2/http/lv2plug.in/ns/ext/uri-unmap/uri-unmap.h"
+#include "lv2/lv2plug.in/ns/ext/contexts/contexts.h"
+#include "lv2/lv2plug.in/ns/ext/resize-port/resize-port.h"
+#include "lv2/lv2plug.in/ns/ext/uri-map/uri-map.h"
+#include "lv2/lv2plug.in/ns/ext/uri-unmap/uri-unmap.h"
 
 namespace LV2 {
 namespace Ext {

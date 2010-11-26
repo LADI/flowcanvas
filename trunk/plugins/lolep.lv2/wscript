@@ -22,7 +22,19 @@ def configure(conf):
 	conf.check_tool('compiler_cxx')
 	autowaf.check_pkg(conf, 'lv2core', uselib_store='LV2CORE', mandatory=True)
 	autowaf.check_pkg(conf, 'raptor', uselib_store='RAPTOR', atleast_version="1.4.19", mandatory=False)
+
+	autowaf.check_header(conf, 'lv2/lv2plug.in/ns/lv2core/lv2.h')
+	autowaf.check_header(conf, 'lv2/lv2plug.in/ns/ext/atom/atom.h')
+	autowaf.check_header(conf, 'lv2/lv2plug.in/ns/ext/atom/atom-helpers.h')
+	autowaf.check_header(conf, 'lv2/lv2plug.in/ns/ext/contexts/contexts.h')
+	autowaf.check_header(conf, 'lv2/lv2plug.in/ns/ext/event/event-helpers.h')
+	autowaf.check_header(conf, 'lv2/lv2plug.in/ns/ext/event/event.h')
+	autowaf.check_header(conf, 'lv2/lv2plug.in/ns/ext/resize-port/resize-port.h')
+	autowaf.check_header(conf, 'lv2/lv2plug.in/ns/ext/uri-map/uri-map.h')
+	autowaf.check_header(conf, 'lv2/lv2plug.in/ns/ext/uri-unmap/uri-unmap.h')
+
 	conf.env.append_value('CCFLAGS', '-std=c99')
+	
 	pat = conf.env['shlib_PATTERN']
 	ext = pat[pat.rfind('.'):]
 	conf.env.append_value('shlib_EXTENSION', ext)
