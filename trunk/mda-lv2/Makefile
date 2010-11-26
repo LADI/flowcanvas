@@ -1,5 +1,5 @@
 CFLAGS = -O0 -g -ansi -Wall -Wextra -Wno-unused # -pedantic -Woverloaded-virtual
-CFLAGS += -fPIC -DPIC -Ilvz -Ivstgui -I. -DURI_PREFIX=\"http://drobilla.net/ns/ext/mda-lv2/\"
+CFLAGS += -fPIC -DPIC -Ilvz -Ivstgui -I. -DURI_PREFIX=\"http://drobilla.net/plugins/mda.lv2/\"
 
 SYSTEMNAME = $(shell uname -s)
 
