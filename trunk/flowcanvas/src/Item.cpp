@@ -31,6 +31,7 @@ Item::Item(boost::shared_ptr<Canvas> canvas,
            uint32_t                  color)
 	: Gnome::Canvas::Group(*canvas->root(), x, y)
 	, _canvas(canvas)
+	, _menu(NULL)
 	, _name(name)
 	, _minimum_width(0.0)
 	, _width(1.0)
@@ -38,7 +39,6 @@ Item::Item(boost::shared_ptr<Canvas> canvas,
 	, _border_color(color)
 	, _color(color)
 	, _selected(false)
-	, _menu(NULL)
 {
 }
 

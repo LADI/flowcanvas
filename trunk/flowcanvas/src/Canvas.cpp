@@ -40,16 +40,16 @@ sigc::signal<void, Gnome::Canvas::Item*> Canvas::signal_item_entered;
 sigc::signal<void, Gnome::Canvas::Item*> Canvas::signal_item_left;
 
 Canvas::Canvas(double width, double height)
-	: _zoom(1.0)
+	: _base_rect(*root(), 0, 0, width, height)
+	, _select_rect(NULL)
+	, _select_dash(NULL)
+	, _zoom(1.0)
 	, _width(width)
 	, _height(height)
 	, _drag_state(NOT_DRAGGING)
+	, _direction(HORIZONTAL)
 	, _remove_objects(true)
 	, _locked(false)
-	, _direction(HORIZONTAL)
-	, _base_rect(*root(), 0, 0, width, height)
-	, _select_rect(NULL)
-	, _select_dash(NULL)
 {
 	set_scroll_region(0.0, 0.0, width, height);
 	set_center_scroll_region(true);

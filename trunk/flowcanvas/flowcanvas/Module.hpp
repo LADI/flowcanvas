@@ -99,18 +99,6 @@ protected:
 
 	void embed(Gtk::Container* widget);
 
-	double _border_width;
-	bool   _title_visible;
-	double _embed_width;
-	double _embed_height;
-	double _icon_size;
-	bool   _port_renamed;
-	double _widest_input;
-	double _widest_output;
-	bool   _show_port_labels;
-	double _title_width;
-	double _title_height;
-
 	PortVector _ports;
 
 	Gnome::Canvas::Rect    _module_box;
@@ -119,6 +107,18 @@ protected:
 	Gnome::Canvas::Pixbuf* _icon_box;
 	Gtk::Container*        _embed_container;
 	Gnome::Canvas::Widget* _embed_item;
+
+	double _border_width;
+	double _embed_width;
+	double _embed_height;
+	double _icon_size;
+	double _widest_input;
+	double _widest_output;
+	double _title_width;
+	double _title_height;
+	bool   _title_visible    :1;
+	bool   _port_renamed     :1;
+	bool   _show_port_labels :1;
 
 private:
 	friend class Canvas;

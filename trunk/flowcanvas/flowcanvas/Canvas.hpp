@@ -144,7 +144,6 @@ protected:
 	virtual bool frame_event(GdkEvent* ev);
 
 private:
-
 	friend class Module;
 	bool port_event(GdkEvent* event, boost::weak_ptr<Port> port);
 
@@ -162,9 +161,9 @@ private:
 
 	boost::shared_ptr<Port> get_port_at(double x, double y);
 
-	bool         scroll_drag_handler(GdkEvent* event);
-	virtual bool select_drag_handler(GdkEvent* event);
-	virtual bool connection_drag_handler(GdkEvent* event);
+	bool scroll_drag_handler(GdkEvent* event);
+	bool select_drag_handler(GdkEvent* event);
+	bool connection_drag_handler(GdkEvent* event);
 
 	void ports_joined(boost::shared_ptr<Port> port1, boost::shared_ptr<Port> port2);
 	bool animate_selected();
@@ -175,9 +174,14 @@ private:
 	sigc::connection _parent_event_connection;
 
 	typedef std::list< boost::shared_ptr<Port> > SelectedPorts;
-	SelectedPorts _selected_ports; ///< Selected ports (hilited red)
-	boost::shared_ptr<Port> _connect_port;  ///< Port for which a connection is being made (if applicable)
+
+	SelectedPorts           _selected_ports; ///< Selected ports (hilited red)
+	boost::shared_ptr<Port> _connect_port;  ///< Port for which a connection is being made
 	boost::shared_ptr<Port> _last_selected_port;
+
+	Gnome::Canvas::Rect  _base_rect;   ///< Background
+	Gnome::Canvas::Rect* _select_rect; ///< Rectangle for drag selection
+	ArtVpathDash*        _select_dash; ///< Animated selection dash style
 
 	double _zoom;   ///< Current zoom level
 	double _width;
@@ -186,14 +190,10 @@ private:
 	enum DragState { NOT_DRAGGING, CONNECTION, SCROLL, SELECT };
 	DragState      _drag_state;
 
-	bool _remove_objects; // flag to avoid removing objects from destructors when unnecessary
-	bool _locked;
-
 	FlowDirection _direction;
 
-	Gnome::Canvas::Rect  _base_rect;   ///< Background
-	Gnome::Canvas::Rect* _select_rect; ///< Rectangle for drag selection
-	ArtVpathDash*        _select_dash; ///< Animated selection dash style
+	bool _remove_objects :1; // flag to avoid removing objects from destructors when unnecessary
+	bool _locked         :1;
 };
 
 

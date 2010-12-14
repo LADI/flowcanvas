@@ -107,12 +107,12 @@ public:
 	virtual void toggle(bool signal=true);
 
 	virtual void set_control(float value, bool signal=true);
-	virtual void set_control_min(float min) { _control_min = min; set_control(_control_value, false);  }
-	virtual void set_control_max(float max) { _control_max = max; set_control(_control_value, false);  }
+	virtual void set_control_min(float min);
+	virtual void set_control_max(float max);
 
-	float control_value() { return _control_value; }
-	float control_min()   { return _control_min; }
-	float control_max()   { return _control_max; }
+	float control_value() const { return _control ? _control->value : 0.0f; }
+	float control_min()   const { return _control ? _control->min   : 0.0f; }
+	float control_max()   const { return _control ? _control->max   : 1.0f; }
 
 	void show_control();
 	void hide_control();
@@ -129,22 +129,38 @@ protected:
 
 	boost::weak_ptr<Module> _module;
 	std::string             _name;
-	bool                    _is_input;
-	double                  _width;
-	double                  _height;
-	double                  _border_width;
-	uint32_t                _color;
-	bool                    _selected;
+	Gnome::Canvas::Text*    _label;
+	Gnome::Canvas::Rect*    _rect;
+	Gtk::Menu*              _menu;
 
-	bool  _toggled;
-	float _control_value;
-	float _control_min;
-	float _control_max;
+	struct Control {
+		Control(Gnome::Canvas::Rect* r)
+			: rect(r)
+			, value(0.0f)
+			, min(0.0f)
+			, max(1.0f)
+			{}
 
-	Gnome::Canvas::Text* _label;
-	Gnome::Canvas::Rect* _rect;
-	Gnome::Canvas::Rect* _control_rect;
-	Gtk::Menu*           _menu;
+		~Control() {
+			delete rect;
+		}
+		
+		Gnome::Canvas::Rect* rect;
+		float                value;
+		float                min;
+		float                max;
+	};
+
+	Control* _control;
+	
+	double   _width;
+	double   _height;
+	double   _border_width;
+	uint32_t _color;
+	
+	bool _is_input :1;
+	bool _selected :1;
+	bool _toggled  :1;
 };
 
 typedef std::vector<boost::shared_ptr<Port> > PortVector;

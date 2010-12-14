@@ -113,19 +113,19 @@ protected:
 
 	virtual void set_height(double h) = 0;
 	virtual void set_width(double w) = 0;
+	
+	bool on_event(GdkEvent* event);
 
 	const boost::weak_ptr<Canvas> _canvas;
 
-	bool on_event(GdkEvent* event);
-
+	Gtk::Menu*  _menu;
 	std::string _name;
 	double      _minimum_width;
 	double      _width;
 	double      _height;
 	uint32_t    _border_color;
 	uint32_t    _color;
-	bool        _selected;
-	Gtk::Menu*  _menu;
+	bool        _selected :1;
 };
 
 

@@ -36,13 +36,13 @@ Connection::Connection(boost::shared_ptr<Canvas>      canvas,
 	, _canvas(canvas)
 	, _source(source)
 	, _dest(dest)
-	, _color(color)
-	, _selected(false)
-	, _show_arrowhead(show_arrowhead)
 	, _bpath(*this)
 	, _path(gnome_canvas_path_def_new())
-	, _handle_style(HANDLE_NONE)
 	, _handle(NULL)
+	, _color(color)
+	, _handle_style(HANDLE_NONE)
+	, _selected(false)
+	, _show_arrowhead(show_arrowhead)
 {
 	_bpath.property_width_units() = 2.0;
 	set_color(color);

@@ -53,23 +53,23 @@ Module::Module(
 		double x, double y,
 		bool show_title, bool show_port_labels)
 	: Item(canvas, name, x, y, MODULE_FILL_COLOUR)
-	, _border_width(1.0)
-	, _title_visible(show_title)
-	, _embed_width(0)
-	, _embed_height(0)
-	, _icon_size(16)
-	, _port_renamed(false)
-	, _widest_input(0)
-	, _widest_output(0)
-	, _show_port_labels(show_port_labels)
-	, _title_width(0.0)
-	, _title_height(0.0)
 	, _module_box(*this, 0, 0, 0, 0) // w, h set later
 	, _canvas_title(*this, 0, 8, name) // x set later
 	, _stacked_border(NULL)
 	, _icon_box(NULL)
 	, _embed_container(NULL)
 	, _embed_item(NULL)
+	, _border_width(1.0)
+	, _embed_width(0)
+	, _embed_height(0)
+	, _icon_size(16)
+	, _widest_input(0)
+	, _widest_output(0)
+	, _title_width(0.0)
+	, _title_height(0.0)
+	, _title_visible(show_title)
+	, _port_renamed(false)
+	, _show_port_labels(show_port_labels)
 {
 	_module_box.property_fill_color_rgba() = MODULE_FILL_COLOUR;
 	_module_box.property_outline_color_rgba() = MODULE_OUTLINE_COLOUR;

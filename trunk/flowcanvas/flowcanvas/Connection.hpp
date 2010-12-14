@@ -84,14 +84,9 @@ protected:
 	const boost::weak_ptr<Canvas>      _canvas;
 	const boost::weak_ptr<Connectable> _source;
 	const boost::weak_ptr<Connectable> _dest;
-	uint32_t                           _color;
-	bool                               _selected;
-	bool                               _show_arrowhead;
 
 	Gnome::Canvas::Bpath _bpath;
 	GnomeCanvasPathDef*  _path;
-
-	HandleStyle _handle_style;
 
 	struct Handle : public Gnome::Canvas::Group {
 		Handle(Gnome::Canvas::Group& parent)
@@ -100,6 +95,12 @@ protected:
 		Gnome::Canvas::Shape* shape;
 		Gnome::Canvas::Text*  text;
 	}* _handle;
+
+	uint32_t    _color;
+	HandleStyle _handle_style;
+
+	bool _selected       :1;
+	bool _show_arrowhead :1;
 };
 
 typedef std::list<boost::shared_ptr<Connection> > ConnectionList;
