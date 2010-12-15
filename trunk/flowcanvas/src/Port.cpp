@@ -95,7 +95,6 @@ Port::~Port()
 void
 Port::show_control()
 {
-	cout << "SHOW CONTROL" << endl;
 	if (!_control) {
 		Gnome::Canvas::Rect* rect = new Gnome::Canvas::Rect(*this, 0.5, 0.5, 0.0, _height - 0.5);
 		//rect->property_outline_color_rgba() = 0xFFFFFF45;
