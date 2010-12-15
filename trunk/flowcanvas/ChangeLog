@@ -1,6 +1,7 @@
 flowcanvas (0.7.0) unstable; urgency=low
 
   * Reduce memory consumption
+  * Expand README, add missing COPYING file to distribution
 
   -- David Robillard <d@drobilla.net>  Wed, 15 Dec 2010 15:11:08 -0500
 
