@@ -441,6 +441,8 @@ Port::set_height(double h)
 {
 	if (_rect)
 		_rect->property_y2() = _rect->property_y1() + h;
+	if (_control)
+		_control->rect->property_y2() = _control->rect->property_y1() + h - 0.5;
 	_height = h;
 }
 

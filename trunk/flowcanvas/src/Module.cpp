@@ -720,7 +720,6 @@ Module::resize_vert()
 	static const double PAD = 2.0;
 	for (PortVector::iterator pi = _ports.begin(); pi != _ports.end(); ++pi) {
 		const boost::shared_ptr<Port> p = (*pi);
-		p->hide_control();
 		p->set_width(MODULE_EMPTY_PORT_BREADTH);
 		p->set_height(MODULE_EMPTY_PORT_DEPTH);
 		if (p->is_input()) {
