@@ -33,10 +33,10 @@ def build(bld):
 	bld.install_files('${DATADIR}/machina', 'machina.svg')
 
 	# Executable
-	obj = bld.new_task_gen('cxx', 'program')
+	obj = bld(features = 'cxx cxxprogram')
 	obj.target   = 'machina_gui'
 	obj.source   = 'main.cpp'
 	obj.includes = ['.', '../engine']
-	obj.defines  = 'VERSION=\\\"' + bld.env['MACHINA_VERSION'] + '\\\"'
+	obj.defines  = 'VERSION="' + bld.env['MACHINA_VERSION'] + '"'
 	obj.use      = 'libmachina_engine libmachina_gui'
 	autowaf.use_lib(bld, obj, 'GTHREAD GLIBMM REDLANDMM RAUL MACHINA EUGENE FLOWCANVAS')

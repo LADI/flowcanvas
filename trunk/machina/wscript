@@ -27,34 +27,31 @@ def configure(conf):
 	autowaf.check_pkg(conf, 'gtkmm-2.4', uselib_store='GTKMM',
 			atleast_version='2.11.12', mandatory=False)
 	autowaf.check_pkg(conf, 'jack', uselib_store='JACK',
-			atleast_version='0.109.0', mandatory=True)
+			  atleast_version='0.109.0', mandatory=True)
 	autowaf.check_pkg(conf, 'raul', uselib_store='RAUL',
 			atleast_version='0.5.1', mandatory=True)
 	autowaf.check_pkg(conf, 'flowcanvas', uselib_store='FLOWCANVAS',
 			atleast_version='0.5.1', mandatory=False)
 	autowaf.check_pkg(conf, 'libglademm-2.4', uselib_store='GLADEMM',
 			atleast_version='2.6.0', mandatory=False)
+	autowaf.check_pkg(conf, 'rasqal', uselib_store='RASQAL', mandatory=False)
 	autowaf.check_pkg(conf, 'redlandmm', uselib_store='REDLANDMM',
 			atleast_version='0.0.0', mandatory=False)
 	autowaf.check_pkg(conf, 'eugene', uselib_store='EUGENE',
 			atleast_version='0.0.0', mandatory=False)
 
 	# Check for posix_memalign (OSX, amazingly, doesn't have it)
-	conf.check(
-			function_name='posix_memalign',
-			header_name='stdlib.h',
-			define_name='HAVE_POSIX_MEMALIGN')
+	conf.check(function_name='posix_memalign',
+		   header_name='stdlib.h',
+		   define_name='HAVE_POSIX_MEMALIGN')
 
 	build_gui = conf.env['HAVE_GLADEMM'] == 1 and conf.env['HAVE_FLOWCANVAS'] == 1
 
 	autowaf.define(conf, 'MACHINA_PPQN', 19200)
-
 	autowaf.define(conf, 'MACHINA_VERSION', MACHINA_VERSION)
 	autowaf.define(conf, 'BUILD_MACHINA_GUI', int(build_gui))
-	if conf.env['BUNDLE']:
-		autowaf.define(conf, 'MACHINA_DATA_DIR', os.path.join(conf.env['DATADIRNAME'] + 'machina'))
-	else:
-		autowaf.define(conf, 'MACHINA_DATA_DIR', os.path.join(conf.env['DATADIR'], 'machina'))
+	autowaf.define(conf, 'MACHINA_DATA_DIR', os.path.join(
+			conf.env['DATADIR'], 'machina'))
 
 	conf.write_config_header('machina-config.h', remove=False)
 
