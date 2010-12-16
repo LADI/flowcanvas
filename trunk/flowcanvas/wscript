@@ -81,7 +81,6 @@ def build(bld):
 
 	# Documentation
 	autowaf.build_dox(bld, 'FLOWCANVAS', FLOWCANVAS_VERSION, top, out)
-	#bld.install_files('${HTMLDIR}', bld.path.ant_glob(out + '/default/doc/html/*'))
 
 def shutdown(self):
 	autowaf.shutdown()

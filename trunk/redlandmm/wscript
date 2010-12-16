@@ -72,7 +72,6 @@ def build(bld):
 
 	# Documentation
 	autowaf.build_dox(bld, 'REDLANDMM', REDLANDMM_VERSION, top, out)
-	#bld.install_files('${HTMLDIR}', glob.glob(pattern))
 
 def shutdown(self):
 	autowaf.shutdown()
