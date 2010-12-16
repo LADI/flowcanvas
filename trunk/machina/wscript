@@ -47,14 +47,14 @@ def configure(conf):
 
 	build_gui = conf.env['HAVE_GLADEMM'] == 1 and conf.env['HAVE_FLOWCANVAS'] == 1
 
-	conf.define('MACHINA_PPQN', 19200)
+	autowaf.define(conf, 'MACHINA_PPQN', 19200)
 
-	conf.define('MACHINA_VERSION', MACHINA_VERSION)
-	conf.define('BUILD_MACHINA_GUI', int(build_gui))
+	autowaf.define(conf, 'MACHINA_VERSION', MACHINA_VERSION)
+	autowaf.define(conf, 'BUILD_MACHINA_GUI', int(build_gui))
 	if conf.env['BUNDLE']:
-		conf.define('MACHINA_DATA_DIR', os.path.join(conf.env['DATADIRNAME'] + 'machina'))
+		autowaf.define(conf, 'MACHINA_DATA_DIR', os.path.join(conf.env['DATADIRNAME'] + 'machina'))
 	else:
-		conf.define('MACHINA_DATA_DIR', os.path.join(conf.env['DATADIR'], 'machina'))
+		autowaf.define(conf, 'MACHINA_DATA_DIR', os.path.join(conf.env['DATADIR'], 'machina'))
 
 	conf.write_config_header('machina-config.h', remove=False)
 
