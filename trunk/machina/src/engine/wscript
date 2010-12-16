@@ -24,12 +24,12 @@ def build(bld):
 			Evolver.cpp
 			Problem.cpp
 		'''
-	obj = bld.new_task_gen('cxx', 'shlib')
+	obj = bld(features = 'cxx cxxshlib')
 	obj.source = core_source
-	obj.export_incdirs = ['.']
-	obj.includes     = '.'
-	obj.name         = 'libmachina_engine'
-	obj.target       = 'machina_engine'
+	obj.export_includes = ['.']
+	obj.includes = '.'
+	obj.name     = 'libmachina_engine'
+	obj.target   = 'machina_engine'
 	core_libs = 'GLIBMM GTHREAD RAUL REDLANDMM JACK'
 	if bld.env['HAVE_EUGENE']:
 		core_libs += ' EUGENE '

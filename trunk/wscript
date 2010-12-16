@@ -14,20 +14,16 @@ VERSION = '0.0.1'
 APPNAME = 'drobillad'
 
 # Mandatory variables
-srcdir = '.'
-blddir = 'build'
+top = '.'
+out = 'build'
 
-@feature('cc', 'cxx')
-@after('apply_lib_vars')
-@before('apply_obj_vars_cc', 'apply_obj_vars_cxx')
+@feature('c', 'cxx')
+@after('apply_incpaths')
 def include_lv2_h(self):
-	lv2coredir = self.bld.path.find_dir('../../lv2/core.lv2')
-	if lv2coredir == None:
-		lv2coredir = self.bld.path.find_dir('lv2/core.lv2')
-	if lv2coredir != None:
-		self.env.append_value('INC_PATHS', lv2coredir)
+	lv2_core_path = os.path.join(self.bld.bldnode.abspath(), '..', 'lv2', 'core.lv2')
+	self.env.append_value('INCPATHS', lv2_core_path)
 
-def set_options(opt):
+def options(opt):
 	autowaf.set_options(opt)
 	opt.sub_options('lv2/core.lv2')
 	opt.sub_options('lv2')
@@ -56,8 +52,8 @@ def configure(conf):
 			os.path.join(os.getcwd(), 'lv2'),
 			os.path.join(os.getcwd(), 'lv2', 'ext'),
 			os.path.join(os.getcwd(), 'lv2', 'extensions') ])
-	lv2config.build_tree(lv2_path, os.path.join('build', 'default', 'lv2'))
-	conf.env.append_value('CPPPATH', os.path.join(os.getcwd(), 'build', 'default'))
+	lv2config.build_tree(lv2_path, os.path.join('build', 'lv2'))
+	conf.env.append_value('CPPPATH', os.path.join(os.getcwd(), 'build'))
 	print
 
 	sub_config_and_use(conf, 'lv2/core.lv2', False, 'lv2core')
@@ -79,6 +75,6 @@ def test(ctx):
 	ctx.recurse('raul')
 	ctx.recurse('slv2')
 
-def shutdown():
+def shutdown(self):
 	autowaf.shutdown()
 

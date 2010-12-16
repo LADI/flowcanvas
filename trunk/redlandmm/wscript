@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import autowaf
 import os
+import glob
 
 # Version of this package (even if built as a child)
 REDLANDMM_VERSION = '0.0.0'
@@ -11,10 +12,10 @@ VERSION = REDLANDMM_VERSION
 APPNAME = 'redlandmm'
 
 # Mandatory variables
-srcdir = '.'
-blddir = 'build'
+top = '.'
+out = 'build'
 
-def set_options(opt):
+def options(opt):
 	autowaf.set_options(opt)
 
 def configure(conf):
@@ -29,13 +30,13 @@ def configure(conf):
 
 def build(bld):
 	# Headers
-	bld.install_files('${INCLUDEDIR}/redlandmm', 'redlandmm/*.hpp')
+	bld.install_files('${INCLUDEDIR}/redlandmm', bld.path.ant_glob('redlandmm/*.hpp'))
 
 	# Pkgconfig file
 	autowaf.build_pc(bld, 'REDLANDMM', REDLANDMM_VERSION, 'GLIBMM GTHREAD REDLAND')
 
 	# Library
-	obj = bld.new_task_gen('cxx', 'shlib')
+	obj = bld(features = 'cxx cxxshlib')
 	obj.source = '''
 		src/Model.cpp
 		src/Namespaces.cpp
@@ -43,7 +44,7 @@ def build(bld):
 		src/Query.cpp
 		src/World.cpp
 	'''
-	obj.export_incdirs = ['.']
+	obj.export_includes = ['.']
 	obj.includes = ['.', './src']
 	obj.name     = 'libredlandmm'
 	obj.target   = 'redlandmm'
@@ -52,27 +53,27 @@ def build(bld):
 	obj.install_path = '${LIBDIR}'
 
 	# Unit tests
-	obj = bld.new_task_gen('cxx', 'program')
+	obj = bld(features = 'cxx cxxprogram')
 	obj.source       = 'tests/rdf_test.cpp'
 	obj.includes     = ['.', './src']
-	obj.uselib_local = 'libredlandmm'
+	obj.use          = 'libredlandmm'
 	obj.target       = 'tests/rdf_test'
 	obj.install_path = ''
 	
 	# Utilities
 	utils = 'utils/rdf_diff'
 	for i in utils.split():
-		obj = bld.new_task_gen('cxx', 'program')
+		obj = bld(features = 'cxx cxxprogram')
 		obj.source       = i + '.cpp'
 		obj.includes     = ['.']
-		obj.uselib_local = 'libredlandmm'
+		obj.use          = 'libredlandmm'
 		obj.target       = i
 		obj.install_path = '${BINDIR}'
 
 	# Documentation
-	autowaf.build_dox(bld, 'REDLANDMM', REDLANDMM_VERSION, srcdir, blddir)
-	bld.install_files('${HTMLDIR}', blddir + '/default/doc/html/*')
+	autowaf.build_dox(bld, 'REDLANDMM', REDLANDMM_VERSION, top, out)
+	#bld.install_files('${HTMLDIR}', glob.glob(pattern))
 
-def shutdown():
+def shutdown(self):
 	autowaf.shutdown()
 

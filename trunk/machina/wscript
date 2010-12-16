@@ -10,10 +10,10 @@ APPNAME = 'machina'
 VERSION = MACHINA_VERSION
 
 # Mandatory variables
-srcdir = '.'
-blddir = 'build'
+top = '.'
+out = 'build'
 
-def set_options(opt):
+def options(opt):
 	autowaf.set_options(opt)
 
 def configure(conf):
@@ -56,7 +56,7 @@ def configure(conf):
 	else:
 		conf.define('MACHINA_DATA_DIR', os.path.join(conf.env['DATADIR'], 'machina'))
 
-	conf.write_config_header('machina-config.h')
+	conf.write_config_header('machina-config.h', remove=False)
 
 	autowaf.display_msg(conf, "Jack", str(conf.env['HAVE_JACK'] == 1))
 	autowaf.display_msg(conf, "GUI", str(conf.env['BUILD_MACHINA_GUI'] == 1))

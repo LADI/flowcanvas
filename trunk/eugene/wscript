@@ -18,10 +18,10 @@ APPNAME = 'eugene'
 VERSION = EUGENE_VERSION
 
 # Mandatory variables
-srcdir = '.'
-blddir = 'build'
+top = '.'
+out = 'build'
 
-def set_options(opt):
+def options(opt):
 	autowaf.set_options(opt)
 
 def configure(conf):
@@ -42,7 +42,7 @@ def configure(conf):
 	conf.env.append_value('CXXFLAGS', '-fopenmp')
 	conf.env.append_value('LINKFLAGS', '-fopenmp')
 	conf.define('DATA_DIR', os.path.join(conf.env['PREFIX'], 'share', 'eugene'))
-	conf.write_config_header('eugene-config.h')
+	conf.write_config_header('eugene-config.h', remove=False)
 
 def build(bld):
 	# Headers
@@ -53,43 +53,43 @@ def build(bld):
 	autowaf.build_pc(bld, 'EUGENE', EUGENE_VERSION, 'GLIBMM GTHREAD')
 
 	# Library
-	obj = bld.new_task_gen('cxx', 'shlib')
+	obj = bld(features = 'cxx cxxshlib')
 	obj.source = '''
 		src/LABS.cpp
 		src/Sphere.cpp
 		src/TSP.cpp
 	'''
-	obj.export_incdirs = ['.']
-	obj.includes     = ['.', './src']
-	obj.name         = 'libeugene'
-	obj.target       = 'eugene'
-	obj.uselib       = 'GLIBMM GTHREAD'
-	obj.vnum         = EUGENE_LIB_VERSION
-	obj.install_path = '${LIBDIR}'
+	obj.export_includes = ['.']
+	obj.includes        = ['.', './src']
+	obj.name            = 'libeugene'
+	obj.target          = 'eugene'
+	obj.uselib          = 'GLIBMM GTHREAD'
+	obj.vnum            = EUGENE_LIB_VERSION
+	obj.install_path    = '${LIBDIR}'
 
 	# Console app
-	prog = bld.new_task_gen('cxx', 'program')
+	prog = bld(features = 'cxx cxxprogram')
 	prog.source       = 'src/eugene.cpp'
 	obj.includes      = ['.', './src']
-	prog.uselib_local = 'libeugene'
+	prog.use          = 'libeugene'
 	prog.target       = 'src/eugene'
 	prog.install_path = '${BINDIR}'
 
 	# GUI app
-	prog = bld.new_task_gen('cxx', 'program')
+	prog = bld(features = 'cxx cxxprogram')
 	prog.source = '''
 		gui/MainWindow.cpp
 		gui/TSPCanvas.cpp
 		gui/eugene_tsp_gui.cpp
 	'''
 	obj.includes      = ['.', './src', './gui']
-	prog.uselib_local = 'libeugene'
+	prog.use          = 'libeugene'
 	prog.uselib       = 'GTKMM GLADEMM GTHREAD GNOMECANVASMM FLOWCANVAS'
 	prog.target       = 'gui/eugene_tsp_gui'
 	prog.install_path = '${BINDIR}'
 
 	bld.install_files('${PREFIX}/share/eugene', 'gui/eugene_tsp_gui.glade')
 
-def shutdown():
+def shutdown(self):
 	autowaf.shutdown()
 
