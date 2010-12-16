@@ -34,6 +34,7 @@ def options(opt):
 		       help="Anti-alias canvas (much prettier but slower) [Default: True]")
 
 def configure(conf):
+	conf.line_just = max(conf.line_just, 45)
 	autowaf.configure(conf)
 	autowaf.display_header('FlowCanvas Configuration')
 	conf.check_tool('compiler_cxx')
