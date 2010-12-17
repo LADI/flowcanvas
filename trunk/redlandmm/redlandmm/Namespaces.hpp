@@ -23,14 +23,21 @@
 
 namespace Redland {
 
-
 /** Collection of RDF namespaces with prefixes.
  */
 class Namespaces : public std::map<std::string, std::string> {
 public:
-	std::string qualify(std::string uri) const;
-};
+	inline std::string qualify(std::string uri) const {
+		for (const_iterator i = begin(); i != end(); ++i) {
+			size_t ns_len = i->second.length();
 
+			if (uri.substr(0, ns_len) == i->second)
+				return i->first + ":" + uri.substr(ns_len);
+		}
+
+		return uri;
+	}
+};
 
 } // namespace Redland
 

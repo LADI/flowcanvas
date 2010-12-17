@@ -18,8 +18,7 @@
 #ifndef REDLANDMM_QUERY_HPP
 #define REDLANDMM_QUERY_HPP
 
-#include <list>
-#include <map>
+#include <iostream>
 
 #include <boost/shared_ptr.hpp>
 
@@ -28,12 +27,11 @@
 #include "redlandmm/Namespaces.hpp"
 #include "redlandmm/QueryResults.hpp"
 #include "redlandmm/World.hpp"
+#include "redlandmm/Model.hpp"
 
 namespace Redland {
 
 class World;
-class Model;
-
 
 /** SPARQL query.
  *
@@ -41,8 +39,7 @@ class Model;
  */
 class Query {
 public:
-	Query(World& world, Glib::ustring query)
-	{
+	inline Query(World& world, Glib::ustring query) {
 		Glib::Mutex::Lock lock(world.mutex());
 
 		// Prepend prefix header
@@ -55,15 +52,44 @@ public:
 		_query += query;
 	}
 
-	boost::shared_ptr<QueryResults>
-	run(World& world, Model& model, Glib::ustring base_uri="") const;
+	inline boost::shared_ptr<QueryResults>
+	run(World& world, Model& model, Glib::ustring base_uri_str="") const {
+		Glib::Mutex::Lock lock(world.mutex());
+
+		//std::cout << "QUERY {" << endl << _query << endl << "}" << std::endl;
+
+		if (base_uri_str == "")
+			base_uri_str = model.base_uri().to_c_string();
+
+		librdf_uri* base_uri = librdf_new_uri(
+			world.world(), (const unsigned char*)base_uri_str.c_str());
+
+		librdf_query* q = librdf_new_query(
+			world.world(), "sparql", NULL, (const unsigned char*)_query.c_str(), base_uri);
+
+		if (!q) {
+			std::cerr << "Unable to create query:" << std::endl << _query << std::endl;
+			return boost::shared_ptr<QueryResults>();
+		}
+
+		librdf_query_results* c_results = librdf_query_execute(q, model._c_obj);
+		if (!c_results) {
+			std::cerr << "Failed query:" << std::endl << _query << std::endl;
+			return boost::shared_ptr<QueryResults>();
+		}
+
+		boost::shared_ptr<QueryResults> results(new QueryResults(world, c_results));
+
+		librdf_free_query(q);
+
+		return results;
+	}
 
 	const Glib::ustring& string() const { return _query; };
 
 private:
 	Glib::ustring _query;
 };
-
 
 } // namespace Redland
 
