@@ -19,6 +19,7 @@
 #include <string>
 #include "redlandmm/Model.hpp"
 #include "redlandmm/World.hpp"
+#include "redlandmm/Delta.hpp"
 
 using namespace std;
 using namespace Redland;
@@ -44,7 +45,7 @@ main(int argc, char** argv)
 	Model a(world, from, from);
 	Model b(world, to, to);
 
-	Model::Delta delta(a, b);
+	Delta delta(a, b);
 
 	Model output(world);
 	delta.serialise(output, "turtle", "");
