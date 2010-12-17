@@ -282,39 +282,28 @@ JackDriver::on_process(jack_nframes_t nframes)
 		goto end;
 
 	while (true) {
-		const TimeDuration run_dur        = machine->run(_cycle_time);
-		const TimeDuration run_dur_frames = _cycle_time.beats_to_ticks(run_dur);
+		const uint32_t run_dur_frames = machine->run(_cycle_time);
 
-		// Machine didn't run at all (empty, or no initial states)
-
-		if (run_dur.is_zero()) {
+		if (run_dur_frames == 0) {
+			// Machine didn't run at all (machine has no initial states)
 			machine->reset(machine->time()); // Try again next cycle
-			_cycle_time.set_slice(TimeStamp(_cycle_time.ticks_unit(), 0, 0), run_dur_frames);
-			goto end;
+			_cycle_time.set_slice(TimeStamp(_frames_unit, 0, 0),
+			                      TimeStamp(_frames_unit, 0, 0));
+			break;
 
-		// Machine ran for portion of cycle (finished)
 		} else if (machine->is_finished()) {
-			const TimeStamp finish_offset = _cycle_time.offset_ticks() + run_dur_frames;
-			assert(finish_offset < length_ticks);
-
+			// Machine ran for portion of cycle and is finished
 			machine->reset(machine->time());
 
 			_cycle_time.set_slice(TimeStamp(_frames_unit, 0, 0),
-			                      TimeDuration(_frames_unit, nframes - finish_offset.ticks()));
-			_cycle_time.set_offset(finish_offset);
+			                      TimeStamp(_frames_unit, nframes - run_dur_frames, 0));
+			_cycle_time.set_offset(TimeStamp(_frames_unit, run_dur_frames, 0));
 
-		// Machine ran for entire cycle
 		} else {
-			if (machine->is_finished()) {
-				machine->reset(machine->time());
-				_cycle_time.set_slice(TimeStamp(_frames_unit, 0, 0),
-				                      TimeStamp(_frames_unit, 0, 0));
-			} else {
-				_cycle_time.set_slice(
-						_cycle_time.start_ticks() + _cycle_time.length_ticks(),
-						TimeStamp(_frames_unit, 0, 0));
-			}
-
+			// Machine ran for entire cycle
+			_cycle_time.set_slice(
+				_cycle_time.start_ticks() + _cycle_time.length_ticks(),
+				TimeStamp(_frames_unit, 0, 0));
 			break;
 		}
 	}

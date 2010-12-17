@@ -59,8 +59,8 @@ public:
 	void write_state(Redland::Model& model);
 
 	// Audio context
-	void         reset(Raul::TimeStamp time);
-	TimeDuration run(const Raul::TimeSlice& time);
+	void     reset(Raul::TimeStamp time);
+	uint32_t run(const Raul::TimeSlice& time);
 
 	// Any context
 	inline Raul::TimeStamp time() const { return _time; }

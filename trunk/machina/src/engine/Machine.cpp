@@ -299,11 +299,11 @@ Machine::exit_node(SharedPtr<Raul::MIDISink> sink, SharedPtr<Node> node)
  * machine actually finished on (so it can be restarted immediately
  * with sample accuracy if necessary).
  */
-TimeDuration
+uint32_t
 Machine::run(const Raul::TimeSlice& time)
 {
 	if (_is_finished)
-		return TimeDuration(_time.unit(), 0, 0);
+		return 0;
 
 	SharedPtr<Raul::MIDISink> sink = _sink.lock();
 
@@ -317,7 +317,6 @@ Machine::run(const Raul::TimeSlice& time)
 		bool entered = false;
 		if ( ! _nodes.empty()) {
 			for (Nodes::const_iterator n = _nodes.begin(); n != _nodes.end(); ++n) {
-
 				if ((*n)->is_active())
 					(*n)->exit(sink, _time);
 
@@ -325,23 +324,20 @@ Machine::run(const Raul::TimeSlice& time)
 					if (enter_node(sink, (*n)))
 						entered = true;
 				}
-
 			}
 		}
 		if (!entered) {
 			_is_finished = true;
-			return TimeStamp(_time.unit(), 0, 0);
+			return 0;
 		}
 	}
-
-	TimeStamp this_time(_time.unit(), 0, 0);
 
 	while (true) {
 
 		SharedPtr<Node> earliest = earliest_node();
 
-		// No more active states, machine is finished
 		if (!earliest) {
+			// No more active states, machine is finished
 #ifndef NDEBUG
 			for (Nodes::const_iterator n = _nodes.begin(); n != _nodes.end(); ++n)
 				assert( ! (*n)->is_active());
@@ -349,23 +345,20 @@ Machine::run(const Raul::TimeSlice& time)
 			_is_finished = true;
 			break;
 
-		// Earliest active state ends this cycle
-		} else if (earliest->exit_time() <= cycle_end) {
-			this_time += earliest->exit_time() - _time;
+		} else if (time.beats_to_ticks(earliest->exit_time()) < cycle_end_frames) {
+			// Earliest active state ends this cycle
 			_time = earliest->exit_time();
 			exit_node(sink, earliest);
 
-		// Earliest active state ends in the future, done this cycle
 		} else {
+			// Earliest active state ends in the future, done this cycle
 			_time = cycle_end;
-			this_time = cycle_end; // ran the entire cycle
 			break;
 		}
 
 	}
 
-	//assert(this_time <= time.length_beats());
-	return this_time;
+	return time.beats_to_ticks(_time).ticks() - time.start_ticks().ticks();
 }
 
 

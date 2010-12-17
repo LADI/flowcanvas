@@ -136,8 +136,6 @@ Node::enter(SharedPtr<MIDISink> sink, TimeStamp time)
 	_is_active = true;
 	_enter_time = time;
 
-	cerr << "ENTERING " << this << endl;
-
 	if (sink && _enter_action)
 		_enter_action->execute(sink, time);
 }
@@ -147,8 +145,6 @@ void
 Node::exit(SharedPtr<MIDISink> sink, TimeStamp time)
 {
 	assert(_is_active);
-
-	cerr << "EXITING " << this << endl;
 
 	if (sink && _exit_action)
 		_exit_action->execute(sink, time);
