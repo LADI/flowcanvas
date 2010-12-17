@@ -47,22 +47,22 @@ public:
 		BLANK    = LIBRDF_NODE_TYPE_BLANK
 	};
 
-	Node() : _world(NULL) {}
+	inline Node() : _world(NULL) {}
 
-	Node(World& world, Type t, const std::string& s);
-	Node(World& world);
-	Node(World& world, librdf_node* node);
-	Node(const Node& other);
-	~Node();
+	inline Node(World& world, Type t, const std::string& s);
+	inline Node(World& world);
+	inline Node(World& world, librdf_node* node);
+	inline Node(const Node& other);
+	inline ~Node();
 
-	Type type() const { return ((_c_obj) ? (Type)librdf_node_get_type(_c_obj) : UNKNOWN); }
+	inline Type type() const { return ((_c_obj) ? (Type)librdf_node_get_type(_c_obj) : UNKNOWN); }
 
-	World* world() const { return _world; }
+	inline World* world() const { return _world; }
 
-	librdf_node* get_node() const { return _c_obj; }
-	librdf_uri*  get_uri()  const { return librdf_node_get_uri(_c_obj); }
+	inline librdf_node* get_node() const { return _c_obj; }
+	inline librdf_uri*  get_uri()  const { return librdf_node_get_uri(_c_obj); }
 
-	bool is_valid() const { return type() != UNKNOWN; }
+	inline bool is_valid() const { return type() != UNKNOWN; }
 
 	inline operator const char*() const { return to_c_string(); }
 
@@ -78,10 +78,10 @@ public:
 		return librdf_node_equals(_c_obj, other._c_obj);
 	}
 
-	const char* to_c_string() const;
-	std::string to_string() const;
+	inline const char* to_c_string() const;
+	inline std::string to_string() const;
 
-	Glib::ustring to_turtle_token() const;
+	inline Glib::ustring to_turtle_token() const;
 
 	inline bool is_literal_type(const char* type_uri) const;
 
@@ -91,11 +91,11 @@ public:
 	inline bool is_float()    const { return is_literal_type(REDLANDMM_XSD "decimal"); }
 	inline bool is_bool()     const { return is_literal_type(REDLANDMM_XSD "boolean"); }
 
-	int   to_int()   const;
-	float to_float() const;
-	bool  to_bool()  const;
+	inline int   to_int()   const;
+	inline float to_float() const;
+	inline bool  to_bool()  const;
 
-	static Node blank_id(World& world, const std::string base="b") {
+	inline static Node blank_id(World& world, const std::string base="b") {
 		const uint64_t num = world.blank_id();
 		std::ostringstream ss;
 		ss << base << num;
@@ -109,13 +109,13 @@ private:
 
 class Resource : public Node {
 public:
-	Resource(World& world, const std::string& s) : Node(world, Node::RESOURCE, s) {}
+	inline Resource(World& world, const std::string& s) : Node(world, Node::RESOURCE, s) {}
 };
 
 
 class Literal : public Node {
 public:
-	Literal(World& world, const std::string& s) : Node(world, Node::LITERAL, s) {}
+	inline Literal(World& world, const std::string& s) : Node(world, Node::LITERAL, s) {}
 };
 
 

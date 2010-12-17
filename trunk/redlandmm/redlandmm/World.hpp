@@ -59,11 +59,11 @@ public:
 	
 	inline uint64_t blank_id() { return _next_blank_id++; }
 
-	void add_prefix(const std::string& prefix, const std::string& uri) {
+	inline void add_prefix(const std::string& prefix, const std::string& uri) {
 		_prefixes[prefix] = uri;
 	}
 
-	std::string expand_uri(const std::string& uri) const {
+	inline std::string expand_uri(const std::string& uri) const {
 		if (uri.find(":") == std::string::npos)
 			return uri;
 
@@ -74,19 +74,15 @@ public:
 		return uri;
 	}
 	
-	std::string qualify(const std::string& uri) const {
+	inline std::string qualify(const std::string& uri) const {
 		return _prefixes.qualify(uri);
 	}
 
-	const Namespaces& prefixes() const { return _prefixes; }
-
-	librdf_world* world() { return _c_obj; }
-
-	Glib::Mutex& mutex() { return *_mutex; }
+	inline const Namespaces& prefixes() const { return _prefixes; }
+	inline librdf_world*     world()          { return _c_obj; }
+	inline Glib::Mutex&      mutex()          { return *_mutex; }
 
 private:
-	void setup_prefixes();
-
 	Glib::Mutex* _mutex;
 	Namespaces   _prefixes;
 

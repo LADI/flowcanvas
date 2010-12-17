@@ -20,21 +20,19 @@
 
 namespace Redland {
 
-
 /** C++ wrapper for a redland object
  */
 template <typename T>
 class Wrapper {
 public:
-	Wrapper(T* c_obj = NULL) : _c_obj(c_obj) {}
+	inline Wrapper(T* c_obj = NULL) : _c_obj(c_obj) {}
 
-	T*       c_obj()       { return _c_obj; }
-	const T* c_obj() const { return _c_obj; }
+	inline T*       c_obj()       { return _c_obj; }
+	inline const T* c_obj() const { return _c_obj; }
 
 protected:
 	T* _c_obj;
 };
-
 
 } // namespace Redland
 

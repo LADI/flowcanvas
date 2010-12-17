@@ -85,7 +85,7 @@ public:
 		return results;
 	}
 
-	const Glib::ustring& string() const { return _query; };
+	inline const Glib::ustring& string() const { return _query; };
 
 private:
 	Glib::ustring _query;
