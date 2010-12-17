@@ -30,10 +30,11 @@
 #include "redlandmm/World.hpp"
 #include "redlandmm/Wrapper.hpp"
 
+#define REDLANDMM_XSD "http://www.w3.org/2001/XMLSchema#"
+
 namespace Redland {
 
 class World;
-
 
 /** An RDF Node (resource, literal, etc)
  */
@@ -82,14 +83,13 @@ public:
 
 	Glib::ustring to_turtle_token() const;
 
-	bool is_resource() const;
-	bool is_blank() const;
-
 	inline bool is_literal_type(const char* type_uri) const;
 
-	inline bool is_int()   const { return is_literal_type("http://www.w3.org/2001/XMLSchema#integer"); }
-	inline bool is_float() const { return is_literal_type("http://www.w3.org/2001/XMLSchema#decimal"); }
-	inline bool is_bool()  const { return is_literal_type("http://www.w3.org/2001/XMLSchema#boolean"); }
+	inline bool is_resource() const { return _c_obj && librdf_node_is_resource(_c_obj); }
+	inline bool is_blank()    const { return _c_obj && librdf_node_is_blank(_c_obj); }
+	inline bool is_int()      const { return is_literal_type(REDLANDMM_XSD "integer"); }
+	inline bool is_float()    const { return is_literal_type(REDLANDMM_XSD "decimal"); }
+	inline bool is_bool()     const { return is_literal_type(REDLANDMM_XSD "boolean"); }
 
 	int   to_int()   const;
 	float to_float() const;
@@ -219,21 +219,6 @@ Node::to_turtle_token() const
 	str.append(">");
 	return str;
 }
-
-
-inline bool
-Node::is_resource() const
-{
-	return _c_obj && librdf_node_is_resource(_c_obj);
-}
-
-
-inline bool
-Node::is_blank() const
-{
-	return _c_obj && librdf_node_is_blank(_c_obj);
-}
-
 
 inline bool
 Node::is_literal_type(const char* type_uri) const
