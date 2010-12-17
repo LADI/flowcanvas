@@ -33,7 +33,7 @@ def options(opt):
 	opt.sub_options('patchage')
 	opt.sub_options('redlandmm')
 	opt.sub_options('ingen')
-	#opt.sub_options('machina')
+	opt.sub_options('machina')
 
 def sub_config_and_use(conf, name, has_objects = True, pkgname = ''):
 	conf.sub_config(name)
@@ -64,12 +64,12 @@ def configure(conf):
 	sub_config_and_use(conf, 'patchage')
 	sub_config_and_use(conf, 'redlandmm')
 	sub_config_and_use(conf, 'ingen', False)
-	#sub_config_and_use(conf, 'machina', False)
+	sub_config_and_use(conf, 'machina', False)
 	sub_config_and_use(conf, 'plugins/lolep.lv2')
 
 def build(bld):
 	autowaf.set_recursive()
-	bld.add_subdirs('lv2/core.lv2 lv2 slv2 raul flowcanvas patchage redlandmm ingen plugins/lolep.lv2')# machina')
+	bld.add_subdirs('lv2/core.lv2 lv2 slv2 raul flowcanvas patchage redlandmm ingen plugins/lolep.lv2 machina')
 
 def test(ctx):
 	ctx.recurse('raul')

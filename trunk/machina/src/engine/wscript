@@ -27,7 +27,7 @@ def build(bld):
 	obj = bld(features = 'cxx cxxshlib')
 	obj.source = core_source
 	obj.export_includes = ['.']
-	obj.includes = '.'
+	obj.includes = ['.', '../..']
 	obj.name     = 'libmachina_engine'
 	obj.target   = 'machina_engine'
 	core_libs = 'GLIBMM GTHREAD RAUL REDLANDMM JACK'
