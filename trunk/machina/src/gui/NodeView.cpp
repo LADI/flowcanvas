@@ -63,20 +63,30 @@ NodeView::handle_click(GdkEventButton* event)
 }
 
 
+static std::string
+midi_note_name(uint8_t num)
+{
+	static const char* notes[] = {"C","C#","D","D#","E","F","F#","G","G#","A","A#","B"};
+
+	const uint8_t octave = num / 12;
+	num -= octave * 12;
+	
+	static char str[8];
+	snprintf(str, sizeof(str), "%s%d", notes[num], octave);
+	return str;
+}
+
 void
 NodeView::show_label(bool show)
 {
-	char str[4];
-
 	SharedPtr<Machina::MidiAction> action
 		= PtrCast<Machina::MidiAction>(_node->enter_action());
 
 	if (show) {
 		if (action && action->event_size() > 1
 				&& (action->event()[0] & 0xF0) == 0x90) {
-			uint8_t note = action->event()[1];
-			snprintf(str, 4, "%d", note);
-			set_name(str);
+			const uint8_t note_num = action->event()[1];
+			set_name(midi_note_name(note_num));
 		}
 	} else {
 		set_name("");
