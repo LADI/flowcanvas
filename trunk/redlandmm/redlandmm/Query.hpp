@@ -72,7 +72,7 @@ public:
 			return boost::shared_ptr<QueryResults>();
 		}
 
-		librdf_query_results* c_results = librdf_query_execute(q, model._c_obj);
+		librdf_query_results* c_results = librdf_query_execute(q, model.c_obj());
 		if (!c_results) {
 			std::cerr << "Failed query:" << std::endl << _query << std::endl;
 			return boost::shared_ptr<QueryResults>();

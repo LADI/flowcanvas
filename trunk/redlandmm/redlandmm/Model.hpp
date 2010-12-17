@@ -60,8 +60,6 @@ public:
 	World& world() const { return _world; }
 
 private:
-	friend class Query;
-	
 	void setup_prefixes();
 
 	World&             _world;

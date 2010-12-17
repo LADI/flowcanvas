@@ -230,7 +230,6 @@ Model::add_statement(const Node& subject,
 
 	assert(subject.get_node());
 	assert(predicate.get_node());
-
 	if (!object.get_node()) {
 		cerr << "WARNING: Object node is nil, statement skipped" << endl;
 		return;
@@ -250,6 +249,7 @@ Model::add_statement(const Node&   subject,
 {
 	Glib::Mutex::Lock lock(_world.mutex());
 
+	assert(subject.get_node());
 	if (!object.get_node()) {
 		cerr << "WARNING: Object node is nil, statement skipped" << endl;
 		return;
