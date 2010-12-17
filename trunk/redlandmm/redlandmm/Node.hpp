@@ -20,6 +20,7 @@
 
 #include <cassert>
 #include <cstring>
+#include <locale>
 #include <stdexcept>
 #include <string>
 
@@ -249,8 +250,10 @@ inline int
 Node::to_int() const
 {
 	assert(is_int());
-	int i = 0;
+	std::locale c_locale("C");
 	std::stringstream ss((const char*)librdf_node_get_literal_value(_c_obj));
+	ss.imbue(c_locale);
+	int i = 0;
 	ss >> i;
 	return i;
 }
@@ -259,8 +262,10 @@ inline float
 Node::to_float() const
 {
 	assert(is_float());
-	float f = 0.0f;
+	std::locale c_locale("C");
 	std::stringstream ss((const char*)librdf_node_get_literal_value(_c_obj));
+	ss.imbue(c_locale);
+	float f = 0.0f;
 	ss >> f;
 	return f;
 }
