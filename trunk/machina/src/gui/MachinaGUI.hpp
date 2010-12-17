@@ -131,6 +131,7 @@ protected:
 	Gtk::ToolButton*       _zoom_full_button;
 	Gtk::ToolButton*       _arrange_button;
 	Gtk::ToolButton*       _load_target_button;
+	Gtk::Toolbar*          _evolve_toolbar;
 	Gtk::ToggleToolButton* _evolve_button;
 	Gtk::ToolButton*       _mutate_button;
 	Gtk::ToolButton*       _compress_button;

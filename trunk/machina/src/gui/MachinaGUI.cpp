@@ -81,6 +81,7 @@ MachinaGUI::MachinaGUI(SharedPtr<Machina::Engine> engine)
 	xml->get_widget("zoom_full_but", _zoom_full_button);
 	xml->get_widget("arrange_but", _arrange_button);
 	xml->get_widget("load_target_but", _load_target_button);
+	xml->get_widget("evolve_toolbar", _evolve_toolbar);
 	xml->get_widget("evolve_but", _evolve_button);
 	xml->get_widget("mutate_but", _mutate_button);
 	xml->get_widget("compress_but", _compress_button);
@@ -184,8 +185,7 @@ MachinaGUI::MachinaGUI(SharedPtr<Machina::Engine> engine)
 	_evolve_button->signal_clicked().connect(sigc::mem_fun(this, &MachinaGUI::evolve_toggled));
 	Glib::signal_timeout().connect(sigc::mem_fun(this, &MachinaGUI::evolve_callback), 1000);
 #else
-	_evolve_button->set_sensitive(false);
-	_load_target_button->set_sensitive(false);
+	_evolve_toolbar->set_sensitive(false);
 #endif
 
 	_canvas->build(engine->machine(), _menu_view_labels->get_active());
