@@ -24,10 +24,6 @@
 #include "redlandmm/Model.hpp"
 #include "redlandmm/Node.hpp"
 
-#define CUC(x) ((const unsigned char*)(x))
-
-using namespace std;
-
 namespace Redland {
 
 
@@ -59,7 +55,7 @@ Model::Model(World& world, const Glib::ustring& data_uri, Glib::ustring base_uri
 		_storage = librdf_new_storage(_world.world(), "hashes", NULL, "hash-type='memory'");
 	_c_obj = librdf_new_model(_world.world(), _storage, NULL);
 
-	librdf_uri* uri = librdf_new_uri(world.world(), CUC(data_uri.c_str()));
+	librdf_uri* uri = librdf_new_uri(world.world(), (const unsigned char*)data_uri.c_str());
 
 	if (uri) {
 		librdf_parser* parser = librdf_new_parser(world.world(), "guess", NULL, NULL);
@@ -71,7 +67,7 @@ Model::Model(World& world, const Glib::ustring& data_uri, Glib::ustring base_uri
 		free(locale);
 		librdf_free_parser(parser);
 	} else {
-		cerr << "Unable to create URI " << data_uri << endl;
+		std::cerr << "Unable to create URI " << data_uri << std::endl;
 	}
 
 	if (uri)
@@ -100,7 +96,7 @@ Model::Model(World& world, const char* str, size_t len, Glib::ustring base_uri, 
 
 	librdf_parser* parser = librdf_new_parser(world.world(), lang.c_str(), NULL, NULL);
 	librdf_parser_parse_counted_string_into_model(
-		parser, CUC(str), len,_base.get_uri(), _c_obj);
+		parser, (const unsigned char*)str, len,_base.get_uri(), _c_obj);
 	librdf_free_parser(parser);
 }
 
@@ -124,9 +120,9 @@ Model::set_base_uri(const Glib::ustring& uri)
 
 	Glib::Mutex::Lock lock(_world.mutex());
 
-	assert(uri.find(":") != string::npos);
+	assert(uri.find(":") != std::string::npos);
 	//assert(uri.substr(uri.find(":")+1).find(":") == string::npos);
-	cout << "[Model] Base URI = " << uri << endl;
+	std::cout << "[Model] Base URI = " << uri << std::endl;
 	_base = Node(_world, Node::RESOURCE, uri);
 }
 
@@ -138,17 +134,19 @@ Model::setup_prefixes()
 
 	for (Namespaces::const_iterator i = _world.prefixes().begin(); i != _world.prefixes().end(); ++i) {
 		librdf_serializer_set_namespace(_serialiser,
-			librdf_new_uri(_world.world(), CUC(i->second.c_str())), i->first.c_str());
+			librdf_new_uri(_world.world(), (const unsigned char*)i->second.c_str()), i->first.c_str());
 	}
 
 	/* Don't write @base directive */
 	librdf_serializer_set_feature(_serialiser,
-			librdf_new_uri(_world.world(), CUC("http://feature.librdf.org/raptor-writeBaseURI")),
+			librdf_new_uri(_world.world(),
+			               (const unsigned char*)"http://feature.librdf.org/raptor-writeBaseURI"),
 			Node(_world, Node::LITERAL, "0").get_node());
 
 	/* Write relative URIs wherever possible */
 	librdf_serializer_set_feature(_serialiser,
-			librdf_new_uri(_world.world(), CUC("http://feature.librdf.org/raptor-relativeURIs")),
+			librdf_new_uri(_world.world(),
+			               (const unsigned char*)"http://feature.librdf.org/raptor-relativeURIs"),
 			Node(_world, Node::LITERAL, "1").get_node());
 }
 
@@ -183,7 +181,8 @@ Model::serialise_to_file(const Glib::ustring& uri_str, const char* lang)
 {
 	Glib::Mutex::Lock lock(_world.mutex());
 
-	librdf_uri* uri = librdf_new_uri(_world.world(), CUC(uri_str.c_str()));
+	librdf_uri* uri = librdf_new_uri(_world.world(),
+	                                 (const unsigned char*)uri_str.c_str());
 	if (uri && librdf_uri_is_file_uri(uri)) {
 		_serialiser = librdf_new_serializer(_world.world(), lang, NULL, NULL);
 		setup_prefixes();
@@ -231,7 +230,7 @@ Model::add_statement(const Node& subject,
 	assert(subject.get_node());
 	assert(predicate.get_node());
 	if (!object.get_node()) {
-		cerr << "WARNING: Object node is nil, statement skipped" << endl;
+		std::cerr << "WARNING: Object node is nil, statement skipped" << std::endl;
 		return;
 	}
 
@@ -243,21 +242,21 @@ Model::add_statement(const Node& subject,
 
 
 void
-Model::add_statement(const Node&   subject,
-                     const string& predicate_id,
-                     const Node&   object)
+Model::add_statement(const Node&        subject,
+                     const std::string& predicate_id,
+                     const Node&        object)
 {
 	Glib::Mutex::Lock lock(_world.mutex());
 
 	assert(subject.get_node());
 	if (!object.get_node()) {
-		cerr << "WARNING: Object node is nil, statement skipped" << endl;
+		std::cerr << "WARNING: Object node is nil, statement skipped" << std::endl;
 		return;
 	}
 
-	const string predicate_uri = _world.expand_uri(predicate_id);
-	librdf_node* predicate = librdf_new_node_from_uri_string(_world.world(),
-			CUC(predicate_uri.c_str()));
+	const std::string predicate_uri = _world.expand_uri(predicate_id);
+	librdf_node* predicate = librdf_new_node_from_uri_string(
+		_world.world(), (const unsigned char*)predicate_uri.c_str());
 
 	librdf_statement* triple = librdf_new_statement_from_nodes(_world.world(),
 			subject.get_node(), predicate, object.get_node());
