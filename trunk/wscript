@@ -74,7 +74,3 @@ def build(bld):
 def test(ctx):
 	ctx.recurse('raul')
 	ctx.recurse('slv2')
-
-def shutdown(self):
-	autowaf.shutdown()
-

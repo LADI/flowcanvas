@@ -34,4 +34,6 @@ def build(bld):
 	if bld.env['HAVE_EUGENE']:
 		core_libs += ' EUGENE '
 	autowaf.use_lib(bld, obj, core_libs)
+	
+	bld.add_post_fun(autowaf.run_ldconfig)
 

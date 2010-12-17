@@ -73,6 +73,4 @@ def build(bld):
 	# Documentation
 	autowaf.build_dox(bld, 'REDLANDMM', REDLANDMM_VERSION, top, out)
 
-def shutdown(self):
-	autowaf.shutdown()
-
+	bld.add_post_fun(autowaf.run_ldconfig)

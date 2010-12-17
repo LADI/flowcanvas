@@ -64,6 +64,3 @@ def build(bld):
 
 	if bld.env['BUILD_MACHINA_GUI']:
 		bld.add_subdirs('src/gui')
-
-	#bld.add_subdirs('src/machina')
-

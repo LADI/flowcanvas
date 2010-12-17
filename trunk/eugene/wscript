@@ -90,6 +90,4 @@ def build(bld):
 
 	bld.install_files('${PREFIX}/share/eugene', 'gui/eugene_tsp_gui.glade')
 
-def shutdown(self):
-	autowaf.shutdown()
-
+	bld.add_post_fun(autowaf.run_ldconfig)
