@@ -71,9 +71,9 @@ Loader::load(const Glib::ustring& uri)
 		}
 	}
 
-	const string machine_uri = string("<") + document_uri + ">";
+	const string machine_uri = string("<>");
 
-	cout << "[Loader] Loading " << machine_uri << " from " << document_uri << endl;
+	cout << "[Loader] Loading " << document_uri << endl;
 
 	machine = SharedPtr<Machine>(new Machine(TimeUnit::beats(MACHINA_PPQN)));
 

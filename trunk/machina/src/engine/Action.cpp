@@ -26,7 +26,7 @@ Action::write_state(Redland::Model& model)
 {
 	using namespace Raul;
 
-	if (!_id)
+	if (!_id.is_valid())
 		set_id(model.world().blank_id());
 
 	model.add_statement(_id,

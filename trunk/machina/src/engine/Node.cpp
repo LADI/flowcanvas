@@ -209,7 +209,7 @@ Node::write_state(Redland::Model& model)
 {
 	using namespace Raul;
 
-	if (!_id)
+	if (!_id.is_valid())
 		set_id(model.world().blank_id());
 
 	if (_is_selector)
