@@ -20,8 +20,8 @@
 
 #include <cassert>
 #include <cstring>
-#include <string>
 #include <stdexcept>
+#include <string>
 
 #include <glibmm/ustring.h>
 #include <redland.h>
@@ -84,14 +84,15 @@ public:
 	bool is_resource() const;
 	bool is_blank() const;
 
-	bool is_int() const;
-	int  to_int() const;
+	inline bool is_literal_type(const char* type_uri) const;
 
-	bool  is_float() const;
+	inline bool is_int()   const { return is_literal_type("http://www.w3.org/2001/XMLSchema#integer"); }
+	inline bool is_float() const { return is_literal_type("http://www.w3.org/2001/XMLSchema#decimal"); }
+	inline bool is_bool()  const { return is_literal_type("http://www.w3.org/2001/XMLSchema#boolean"); }
+
+	int   to_int()   const;
 	float to_float() const;
-
-	bool is_bool() const;
-	bool to_bool() const;
+	bool  to_bool()  const;
 
 	static Node blank_id(World& world, const std::string base="b") {
 		const uint64_t num = world.blank_id();
@@ -234,18 +235,16 @@ Node::is_blank() const
 
 
 inline bool
-Node::is_int() const
+Node::is_literal_type(const char* type_uri) const
 {
 	if (_c_obj && librdf_node_get_type(_c_obj) == LIBRDF_NODE_TYPE_LITERAL) {
 		librdf_uri* datatype_uri = librdf_node_get_literal_value_datatype_uri(_c_obj);
-		if (datatype_uri && !strcmp((const char*)librdf_uri_as_string(datatype_uri),
-					"http://www.w3.org/2001/XMLSchema#integer"))
+		if (datatype_uri && !strcmp((const char*)librdf_uri_as_string(datatype_uri), type_uri))
 			return true;
 	}
 	return false;
 }
-
-
+	
 inline int
 Node::to_int() const
 {
@@ -256,20 +255,6 @@ Node::to_int() const
 	return i;
 }
 
-
-inline bool
-Node::is_float() const
-{
-	if (_c_obj && librdf_node_get_type(_c_obj) == LIBRDF_NODE_TYPE_LITERAL) {
-		librdf_uri* datatype_uri = librdf_node_get_literal_value_datatype_uri(_c_obj);
-		if (datatype_uri && !strcmp((const char*)librdf_uri_as_string(datatype_uri),
-					"http://www.w3.org/2001/XMLSchema#decimal"))
-			return true;
-	}
-	return false;
-}
-
-
 inline float
 Node::to_float() const
 {
@@ -279,22 +264,6 @@ Node::to_float() const
 	ss >> f;
 	return f;
 }
-
-
-inline bool
-Node::is_bool() const
-{
-	if (_c_obj && librdf_node_get_type(_c_obj) == LIBRDF_NODE_TYPE_LITERAL) {
-		librdf_uri* datatype_uri = librdf_node_get_literal_value_datatype_uri(_c_obj);
-		if (datatype_uri) {
-			if (!strcmp((const char*)librdf_uri_as_string(datatype_uri),
-					"http://www.w3.org/2001/XMLSchema#boolean"))
-			return true;
-		}
-	}
-	return false;
-}
-
 
 inline bool
 Node::to_bool() const
