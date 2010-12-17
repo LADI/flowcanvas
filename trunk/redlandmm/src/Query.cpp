@@ -15,11 +15,13 @@
  * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include <iostream>
 #include <cassert>
 #include <cstring>
-#include "redlandmm/Query.hpp"
+#include <iostream>
+
 #include "redlandmm/Model.hpp"
+#include "redlandmm/Query.hpp"
+#include "redlandmm/QueryResults.hpp"
 
 #define CUC(x) ((const unsigned char*)(x))
 
@@ -28,7 +30,7 @@ using namespace std;
 namespace Redland {
 
 
-Query::Results
+boost::shared_ptr<QueryResults>
 Query::run(World& world, Model& model, Glib::ustring base_uri_str) const
 {
 	Glib::Mutex::Lock lock(world.mutex());
@@ -36,8 +38,6 @@ Query::run(World& world, Model& model, Glib::ustring base_uri_str) const
 	//cout << "\n**************** QUERY *******************\n";
 	//cout << _query << endl;
 	//cout << "******************************************\n\n";
-
-	Results result;
 
 	if (base_uri_str == "")
 		base_uri_str = model.base_uri().to_c_string();
@@ -50,48 +50,31 @@ Query::run(World& world, Model& model, Glib::ustring base_uri_str) const
 
 	if (!q) {
 		cerr << "Unable to create query:" << endl << _query << endl;
-		return result; /* Return an empty Results */
+		return boost::shared_ptr<QueryResults>();
 	}
 
 	// FIXME: locale kludges to work around librdf bug
 	char* locale = strdup(setlocale(LC_NUMERIC, NULL));
 	setlocale(LC_NUMERIC, "POSIX");
 
-	librdf_query_results* results = librdf_query_execute(q, model._c_obj);
-
-	if (!results) {
+	librdf_query_results* c_results = librdf_query_execute(q, model._c_obj);
+	if (!c_results) {
 		cerr << "Failed query:" << endl << _query << endl;
 		free(locale);
-		return result; /* Return an empty Results */
+		return boost::shared_ptr<QueryResults>();
 	}
 
-	while (!librdf_query_results_finished(results)) {
-
-		Bindings bindings;
-
-		for (int i=0; i < librdf_query_results_get_bindings_count(results); i++) {
-			const char* name = static_cast<const char*>(
-					librdf_query_results_get_binding_name(results, i));
-			librdf_node* value = librdf_query_results_get_binding_value(results, i);
-
-			if (name && value)
-				bindings.insert(std::make_pair(std::string(name), Node(world, value)));
-		}
-
-		result.push_back(bindings);
-		librdf_query_results_next(results);
-	}
+	boost::shared_ptr<QueryResults> results(new QueryResults(world, c_results));
 
 	setlocale(LC_NUMERIC, locale);
 	free(locale);
 
-	librdf_free_query_results(results);
 	librdf_free_query(q);
 
 	if (base_uri)
 		librdf_free_uri(base_uri);
 
-	return result;
+	return results;
 }
 
 

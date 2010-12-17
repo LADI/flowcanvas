@@ -18,11 +18,16 @@
 #ifndef REDLANDMM_QUERY_HPP
 #define REDLANDMM_QUERY_HPP
 
-#include <map>
 #include <list>
+#include <map>
+
+#include <boost/shared_ptr.hpp>
+
 #include <glibmm/ustring.h>
-#include "redlandmm/World.hpp"
+
 #include "redlandmm/Namespaces.hpp"
+#include "redlandmm/QueryResults.hpp"
+#include "redlandmm/World.hpp"
 
 namespace Redland {
 
@@ -36,9 +41,6 @@ class Model;
  */
 class Query {
 public:
-	typedef std::map<std::string, Node> Bindings; // FIXME: order?  better to use int
-	typedef std::list<Bindings>         Results;
-
 	Query(World& world, Glib::ustring query)
 	{
 		Glib::Mutex::Lock lock(world.mutex());
@@ -53,7 +55,8 @@ public:
 		_query += query;
 	}
 
-	Results run(World& world, Model& model, Glib::ustring base_uri="") const;
+	boost::shared_ptr<QueryResults>
+	run(World& world, Model& model, Glib::ustring base_uri="") const;
 
 	const Glib::ustring& string() const { return _query; };
 
