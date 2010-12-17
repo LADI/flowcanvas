@@ -39,7 +39,6 @@ def build(bld):
 	obj = bld(features = 'cxx cxxshlib')
 	obj.source = '''
 		src/Model.cpp
-		src/World.cpp
 	'''
 	obj.export_includes = ['.']
 	obj.includes = ['.', './src']
