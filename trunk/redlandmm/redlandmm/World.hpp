@@ -18,11 +18,11 @@
 #ifndef REDLANDMM_WORLD_HPP
 #define REDLANDMM_WORLD_HPP
 
+#include <stdint.h>
+
 #include <set>
 #include <stdexcept>
 #include <string>
-
-#include <stdint.h>
 
 #include <boost/utility.hpp>
 #include <glibmm/thread.h>

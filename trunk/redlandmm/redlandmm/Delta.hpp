@@ -18,7 +18,10 @@
 #ifndef REDLANDMM_DELTA_HPP
 #define REDLANDMM_DELTA_HPP
 
+#include <map>
+#include <set>
 #include <string>
+#include <utility>
 
 #include <redland.h>
 
