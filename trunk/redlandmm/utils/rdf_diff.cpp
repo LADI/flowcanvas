@@ -49,7 +49,7 @@ main(int argc, char** argv)
 
 	Model output(world);
 	delta.serialise(output, "turtle", "");
-	output.serialise_to_file_handle(stdout);
+	output.serialise_to_file_handle(stdout, "turtle");
 
 	return 0;
 }

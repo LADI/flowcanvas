@@ -31,10 +31,6 @@ using namespace std;
 namespace Redland {
 
 
-//static const char* const RDF_LANG = "rdfxml-abbrev";
-static const char* const RDF_LANG = "turtle";
-
-
 /** Create an empty in-memory RDF model.
  */
 Model::Model(World& world)
@@ -89,27 +85,24 @@ Model::Model(World& world, const Glib::ustring& data_uri, Glib::ustring base_uri
 
 /** Load a model from a string.
  */
-Model::Model(World& world, const char* str, size_t len, Glib::ustring base_uri)
+Model::Model(World& world, const char* str, size_t len, Glib::ustring base_uri, const std::string lang)
 	: _world(world)
 	, _base(world, Node::RESOURCE, base_uri == "" ? "/" : base_uri)
 	, _serialiser(NULL)
 {
 	Glib::Mutex::Lock lock(world.mutex());
+
 	_storage = librdf_new_storage(_world.world(), "trees", NULL, NULL);
 	if (!_storage)
 		_storage = librdf_new_storage(_world.world(), "hashes", NULL, "hash-type='memory'");
+
 	_c_obj = librdf_new_model(_world.world(), _storage, NULL);
 
-	librdf_parser* parser = librdf_new_parser(world.world(), "turtle", NULL, NULL);
-	char* locale = strdup(setlocale(LC_NUMERIC, NULL));
-	setlocale(LC_NUMERIC, "POSIX");
-	librdf_parser_parse_counted_string_into_model(parser, CUC(str), len,
-			_base.get_uri(), _c_obj);
-	setlocale(LC_NUMERIC, locale);
-	free(locale);
+	librdf_parser* parser = librdf_new_parser(world.world(), lang.c_str(), NULL, NULL);
+	librdf_parser_parse_counted_string_into_model(
+		parser, CUC(str), len,_base.get_uri(), _c_obj);
 	librdf_free_parser(parser);
 }
-
 
 Model::~Model()
 {
@@ -165,11 +158,11 @@ Model::setup_prefixes()
  * This must be called before any write methods.
  */
 void
-Model::serialise_to_file_handle(FILE* fd)
+Model::serialise_to_file_handle(FILE* fd, const char* lang)
 {
 	Glib::Mutex::Lock lock(_world.mutex());
 
-	_serialiser = librdf_new_serializer(_world.world(), RDF_LANG, NULL, NULL);
+	_serialiser = librdf_new_serializer(_world.world(), lang, NULL, NULL);
 
 	setup_prefixes();
 	librdf_serializer_serialize_model_to_file_handle(
@@ -186,13 +179,13 @@ Model::serialise_to_file_handle(FILE* fd)
  * This must be called before any write methods.
  */
 void
-Model::serialise_to_file(const Glib::ustring& uri_str)
+Model::serialise_to_file(const Glib::ustring& uri_str, const char* lang)
 {
 	Glib::Mutex::Lock lock(_world.mutex());
 
 	librdf_uri* uri = librdf_new_uri(_world.world(), CUC(uri_str.c_str()));
 	if (uri && librdf_uri_is_file_uri(uri)) {
-		_serialiser = librdf_new_serializer(_world.world(), RDF_LANG, NULL, NULL);
+		_serialiser = librdf_new_serializer(_world.world(), lang, NULL, NULL);
 		setup_prefixes();
 		librdf_serializer_serialize_model_to_file(
                 _serialiser, librdf_uri_to_filename(uri), _base.get_uri(), _c_obj);
@@ -211,11 +204,11 @@ Model::serialise_to_file(const Glib::ustring& uri_str)
  * the desired objects have been serialized.
  */
 char*
-Model::serialise_to_string()
+Model::serialise_to_string(const char* lang)
 {
 	Glib::Mutex::Lock lock(_world.mutex());
 
-	_serialiser = librdf_new_serializer(_world.world(), RDF_LANG, NULL, NULL);
+	_serialiser = librdf_new_serializer(_world.world(), lang, NULL, NULL);
 	setup_prefixes();
 
 	unsigned char* c_str = librdf_serializer_serialize_model_to_string(

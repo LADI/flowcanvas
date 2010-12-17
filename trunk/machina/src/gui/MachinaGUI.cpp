@@ -450,7 +450,7 @@ MachinaGUI::menu_file_save()
 		Redland::Model model(_engine->rdf_world());
 		model.set_base_uri(_save_uri);
 		_engine->machine()->write_state(model);
-		model.serialise_to_file(_save_uri);
+		model.serialise_to_file(_save_uri, "turtle");
 	}
 }
 
@@ -503,7 +503,7 @@ MachinaGUI::menu_file_save_as()
 			_save_uri = uri;
 			model.set_base_uri(_save_uri);
 			_engine->machine()->write_state(model);
-			model.serialise_to_file(_save_uri);
+			model.serialise_to_file(_save_uri, "turtle");
 		}
 	}
 }

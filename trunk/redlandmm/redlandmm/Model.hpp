@@ -37,15 +37,15 @@ class Model : public boost::noncopyable, public Wrapper<librdf_model> {
 public:
 	Model(World& world);
 	Model(World& world, const Glib::ustring& uri, Glib::ustring base_uri="");
-	Model(World& world, const char* str, size_t len, Glib::ustring base_uri="");
+	Model(World& world, const char* str, size_t len, Glib::ustring base_uri="", const std::string lang="turtle");
 	~Model();
 
 	void        set_base_uri(const Glib::ustring& uri);
 	const Node& base_uri() const { return _base; }
 
-	void  serialise_to_file_handle(FILE* fd);
-	void  serialise_to_file(const Glib::ustring& uri);
-	char* serialise_to_string();
+	void  serialise_to_file_handle(FILE* fd, const char* lang);
+	void  serialise_to_file(const Glib::ustring& uri, const char* lang);
+	char* serialise_to_string(const char* lang);
 
 	void add_statement(const Node& subject,
 	                   const Node& predicate,
@@ -61,7 +61,7 @@ public:
 
 private:
 	friend class Query;
-
+	
 	void setup_prefixes();
 
 	World&             _world;
