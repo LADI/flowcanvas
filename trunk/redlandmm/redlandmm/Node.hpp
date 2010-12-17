@@ -18,6 +18,8 @@
 #ifndef REDLANDMM_NODE_HPP
 #define REDLANDMM_NODE_HPP
 
+#include <cassert>
+#include <cstring>
 #include <string>
 #include <stdexcept>
 
@@ -114,6 +116,192 @@ public:
 	Literal(World& world, const std::string& s) : Node(world, Node::LITERAL, s) {}
 };
 
+
+inline
+Node::Node(World& world, Type type, const std::string& s)
+	: _world(&world)
+{
+	Glib::Mutex::Lock lock(world.mutex(), Glib::TRY_LOCK);
+
+	switch (type) {
+	case RESOURCE:
+		_c_obj = librdf_new_node_from_uri_string(
+			world.world(), (const unsigned char*)world.expand_uri(s).c_str());
+		break;
+	case LITERAL:
+		_c_obj = librdf_new_node_from_literal(
+			world.world(), (const unsigned char*)s.c_str(), NULL, 0);
+		break;
+	case BLANK:
+		_c_obj = librdf_new_node_from_blank_identifier(
+			world.world(), (const unsigned char*)s.c_str());
+		break;
+	default:
+		_c_obj = NULL;
+	}
+
+	assert(this->type() == type);
+}
+
+inline
+Node::Node(World& world)
+	: _world(&world)
+{
+	Glib::Mutex::Lock lock(world.mutex(), Glib::TRY_LOCK);
+	_c_obj = librdf_new_node(world.world());
+}
+
+inline
+Node::Node(World& world, librdf_node* node)
+	: _world(&world)
+{
+	Glib::Mutex::Lock lock(world.mutex(), Glib::TRY_LOCK);
+	_c_obj = node ? librdf_new_node_from_node(node) : NULL;
+}
+
+inline
+Node::Node(const Node& other)
+	: Wrapper<librdf_node>()
+	, _world(other.world())
+{
+	if (_world) {
+		Glib::Mutex::Lock lock(_world->mutex(), Glib::TRY_LOCK);
+		_c_obj = (other._c_obj ? librdf_new_node_from_node(other._c_obj) : NULL);
+	}
+
+	assert(to_string() == other.to_string());
+}
+
+inline
+Node::~Node()
+{
+	if (_world) {
+		Glib::Mutex::Lock lock(_world->mutex(), Glib::TRY_LOCK);
+		if (_c_obj)
+			librdf_free_node(_c_obj);
+	}
+}
+
+
+inline std::string
+Node::to_string() const
+{
+	return std::string(to_c_string());
+}
+
+
+inline const char*
+Node::to_c_string() const
+{
+	const Type type = this->type();
+	if (type == RESOURCE) {
+		assert(librdf_node_get_uri(_c_obj));
+		return (const char*)librdf_uri_as_string(librdf_node_get_uri(_c_obj));
+	} else if (type == LITERAL) {
+		return (const char*)librdf_node_get_literal_value(_c_obj);
+	} else if (type == BLANK) {
+		return (const char*)librdf_node_get_blank_identifier(_c_obj);
+	} else {
+		return "";
+	}
+}
+
+
+inline Glib::ustring
+Node::to_turtle_token() const
+{
+	assert(type() == RESOURCE);
+	assert(librdf_node_get_uri(_c_obj));
+	Glib::ustring str = "<";
+	str.append((const char*)librdf_uri_as_string(librdf_node_get_uri(_c_obj)));
+	str.append(">");
+	return str;
+}
+
+
+inline bool
+Node::is_resource() const
+{
+	return _c_obj && librdf_node_is_resource(_c_obj);
+}
+
+
+inline bool
+Node::is_blank() const
+{
+	return _c_obj && librdf_node_is_blank(_c_obj);
+}
+
+
+inline bool
+Node::is_int() const
+{
+	if (_c_obj && librdf_node_get_type(_c_obj) == LIBRDF_NODE_TYPE_LITERAL) {
+		librdf_uri* datatype_uri = librdf_node_get_literal_value_datatype_uri(_c_obj);
+		if (datatype_uri && !strcmp((const char*)librdf_uri_as_string(datatype_uri),
+					"http://www.w3.org/2001/XMLSchema#integer"))
+			return true;
+	}
+	return false;
+}
+
+
+inline int
+Node::to_int() const
+{
+	assert(is_int());
+	int i = 0;
+	std::stringstream ss((const char*)librdf_node_get_literal_value(_c_obj));
+	ss >> i;
+	return i;
+}
+
+
+inline bool
+Node::is_float() const
+{
+	if (_c_obj && librdf_node_get_type(_c_obj) == LIBRDF_NODE_TYPE_LITERAL) {
+		librdf_uri* datatype_uri = librdf_node_get_literal_value_datatype_uri(_c_obj);
+		if (datatype_uri && !strcmp((const char*)librdf_uri_as_string(datatype_uri),
+					"http://www.w3.org/2001/XMLSchema#decimal"))
+			return true;
+	}
+	return false;
+}
+
+
+inline float
+Node::to_float() const
+{
+	assert(is_float());
+	float f = 0.0f;
+	std::stringstream ss((const char*)librdf_node_get_literal_value(_c_obj));
+	ss >> f;
+	return f;
+}
+
+
+inline bool
+Node::is_bool() const
+{
+	if (_c_obj && librdf_node_get_type(_c_obj) == LIBRDF_NODE_TYPE_LITERAL) {
+		librdf_uri* datatype_uri = librdf_node_get_literal_value_datatype_uri(_c_obj);
+		if (datatype_uri) {
+			if (!strcmp((const char*)librdf_uri_as_string(datatype_uri),
+					"http://www.w3.org/2001/XMLSchema#boolean"))
+			return true;
+		}
+	}
+	return false;
+}
+
+
+inline bool
+Node::to_bool() const
+{
+	assert(is_bool());
+	return !strcmp((const char*)librdf_node_get_literal_value(_c_obj), "true");
+}
 
 } // namespace Redland
 
