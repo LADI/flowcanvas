@@ -30,6 +30,7 @@ namespace Machina {
 
 JackDriver::JackDriver(SharedPtr<Machine> machine)
 	: Driver(machine)
+	, _client(NULL)
 	, _machine_changed(0)
 	, _input_port(NULL)
 	, _output_port(NULL)
@@ -40,6 +41,7 @@ JackDriver::JackDriver(SharedPtr<Machine> machine)
 	, _quantization(0.0f)
 	, _record_dur(_frames_unit) // = 0
 	, _recording(0)
+	, _is_activated(false)
 {
 }
 
@@ -53,7 +55,21 @@ JackDriver::~JackDriver()
 void
 JackDriver::attach(const std::string& client_name)
 {
-	Raul::JackDriver::attach(client_name);
+	// Already connected
+	if (_client)
+		return;
+
+	jack_set_error_function(jack_error_cb);
+
+	_client = jack_client_open(client_name.c_str(), JackNullOption, NULL, NULL);
+
+	if (_client == NULL) {
+		_is_activated = false;
+	} else {
+		jack_set_error_function(jack_error_cb);
+		jack_on_shutdown(_client, jack_shutdown_cb, this);
+		jack_set_process_callback(_client, jack_process_cb, this);
+	}
 
 	if (jack_client()) {
 
@@ -98,7 +114,34 @@ JackDriver::detach()
 		jack_port_unregister(jack_client(), _output_port);
 		_output_port = NULL;
 	}
-	Raul::JackDriver::detach();
+
+	if (_client) {
+		deactivate();
+		jack_client_close(_client);
+		_client = NULL;
+		_is_activated = false;
+	}
+}
+
+
+void
+JackDriver::activate()
+{
+	if (!jack_activate(_client)) {
+		_is_activated = true;
+	} else {
+		_is_activated = false;
+	}
+}
+
+
+void
+JackDriver::deactivate()
+{
+	if (_client)
+		jack_deactivate(_client);
+
+	_is_activated = false;
 }
 
 
@@ -108,7 +151,6 @@ JackDriver::set_machine(SharedPtr<Machine> machine)
 	if (machine == _machine)
 		return;
 
-	cout << "DRIVER MACHINE: " << machine.get() << endl;
 	SharedPtr<Machine> last_machine = _last_machine; // Keep a reference
 	_machine_changed.reset(0);
 	assert(!last_machine.unique());
@@ -351,6 +393,36 @@ JackDriver::finish_record()
 	_recorder.reset();
 	machine->activate();
 	_machine->nodes().append(machine->nodes());
+}
+
+
+int
+JackDriver::jack_process_cb(jack_nframes_t nframes, void* jack_driver)
+{
+	JackDriver* me = reinterpret_cast<JackDriver*>(jack_driver);
+
+	assert(me);
+
+	me->on_process(nframes);
+
+	return 0;
+}
+
+
+void
+JackDriver::jack_shutdown_cb(void* jack_driver)
+{
+	JackDriver* me = reinterpret_cast<JackDriver*>(jack_driver);
+	assert(me);
+
+	me->_client = NULL;
+}
+
+
+void
+JackDriver::jack_error_cb(const char* msg)
+{
+	cerr << "[JACK] Error: " << msg << endl;
 }
 
 

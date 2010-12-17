@@ -19,15 +19,18 @@
 #define MACHINA_JACKDRIVER_HPP
 
 #include <boost/enable_shared_from_this.hpp>
+
+#include <jack/jack.h>
 #include <jack/midiport.h>
-#include "raul/SharedPtr.hpp"
+
+#include "raul/Command.hpp"
 #include "raul/DoubleBuffer.hpp"
 #include "raul/EventRingBuffer.hpp"
 #include "raul/Semaphore.hpp"
-#include "raul/Command.hpp"
-#include "RaulJackDriver.hpp"
-#include "Machine.hpp"
+#include "raul/SharedPtr.hpp"
+
 #include "Driver.hpp"
+#include "Machine.hpp"
 #include "Recorder.hpp"
 
 namespace Machina {
@@ -41,8 +44,7 @@ class Node;
  * "Ticks" are individual frames when running under this driver, and all code
  * in the processing context must be realtime safe (non-blocking).
  */
-class JackDriver : public Raul::JackDriver,
-                   public Machina::Driver,
+class JackDriver : public Machina::Driver,
                    public boost::enable_shared_from_this<JackDriver> {
 public:
 	JackDriver(SharedPtr<Machine> machine = SharedPtr<Machine>());
@@ -51,8 +53,8 @@ public:
 	void attach(const std::string& client_name);
 	void detach();
 
-	void activate()   { Raul::JackDriver::activate(); }
-	void deactivate() { Raul::JackDriver::deactivate(); }
+	void activate();
+	void deactivate();
 
 	void set_machine(SharedPtr<Machine> machine);
 
@@ -69,11 +71,34 @@ public:
 	void start_record(bool step);
 	void finish_record();
 
+	void start_transport() { jack_transport_start(_client); }
+	void stop_transport()  { jack_transport_stop(_client); }
+
+	void rewind_transport() {
+		jack_position_t zero;
+		zero.frame = 0;
+		zero.valid = (jack_position_bits_t)0;
+		jack_transport_reposition(_client, &zero);
+	}
+
+	bool is_activated() const { return _is_activated; }
+	bool is_attached()  const { return (_client != NULL); }
+	bool is_realtime()  const { return _client && jack_is_realtime(_client); }
+
+	jack_nframes_t sample_rate() const { return jack_get_sample_rate(_client); }
+	jack_client_t* jack_client() const { return _client; }
+
 private:
 	void process_input(SharedPtr<Machine>     machine,
 	                   const Raul::TimeSlice& time);
+	
+	static void jack_error_cb(const char* msg);	
+	static int  jack_process_cb(jack_nframes_t nframes, void* me);
+	static void jack_shutdown_cb(void* me);
+	
+	void on_process(jack_nframes_t nframes);
 
-	virtual void on_process(jack_nframes_t nframes);
+	jack_client_t* _client;
 
 	Raul::Semaphore    _machine_changed;
 	SharedPtr<Machine> _last_machine;
@@ -93,6 +118,7 @@ private:
 	Raul::TimeDuration  _record_dur;
 	Raul::AtomicInt     _recording;
 	SharedPtr<Recorder> _recorder;
+	bool                _is_activated;
 };
 
 
