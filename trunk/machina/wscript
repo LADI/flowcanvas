@@ -36,7 +36,7 @@ def configure(conf):
 			atleast_version='2.6.0', mandatory=False)
 	autowaf.check_pkg(conf, 'rasqal', uselib_store='RASQAL', mandatory=False)
 	autowaf.check_pkg(conf, 'redlandmm', uselib_store='REDLANDMM',
-			atleast_version='0.0.0', mandatory=False)
+			atleast_version='0.1.0', mandatory=False)
 	autowaf.check_pkg(conf, 'eugene', uselib_store='EUGENE',
 			atleast_version='0.0.0', mandatory=False)
 
