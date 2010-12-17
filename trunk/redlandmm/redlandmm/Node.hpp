@@ -20,8 +20,11 @@
 
 #include <string>
 #include <stdexcept>
-#include <redland.h>
+
 #include <glibmm/ustring.h>
+#include <redland.h>
+
+#include "redlandmm/World.hpp"
 #include "redlandmm/Wrapper.hpp"
 
 namespace Redland {
@@ -87,6 +90,13 @@ public:
 
 	bool is_bool() const;
 	bool to_bool() const;
+
+	static Node blank_id(World& world, const std::string base="b") {
+		const uint64_t num = world.blank_id();
+		std::ostringstream ss;
+		ss << base << num;
+		return Node(world, Node::BLANK, ss.str());
+	}
 
 private:
 	World* _world;

@@ -18,15 +18,18 @@
 #ifndef REDLANDMM_WORLD_HPP
 #define REDLANDMM_WORLD_HPP
 
+#include <set>
 #include <stdexcept>
 #include <string>
-#include <set>
-#include <redland.h>
+
+#include <stdint.h>
+
 #include <boost/utility.hpp>
 #include <glibmm/thread.h>
+#include <redland.h>
+
 #include "redlandmm/Wrapper.hpp"
 #include "redlandmm/Namespaces.hpp"
-#include "redlandmm/Node.hpp"
 
 namespace Redland {
 
@@ -37,8 +40,8 @@ class World : public boost::noncopyable, public Wrapper<librdf_world> {
 public:
 	World();
 	~World();
-
-	Node blank_id(const std::string base_name="");
+	
+	inline uint64_t blank_id() { return _next_blank_id++; }
 
 	void        add_prefix(const std::string& prefix, const std::string& uri);
 	std::string expand_uri(const std::string& uri) const;
@@ -57,7 +60,7 @@ private:
 	Namespaces   _prefixes;
 
 	std::set<std::string> _blank_ids;
-	size_t                _next_blank_id;
+	uint64_t              _next_blank_id;
 };
 
 

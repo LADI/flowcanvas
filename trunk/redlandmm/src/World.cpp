@@ -85,30 +85,5 @@ World::qualify(const string& uri) const
 	return _prefixes.qualify(uri);
 }
 
-
-Node
-World::blank_id(const string base_name)
-{
-	string name;
-
-	if (base_name != "" && base_name != "b") {
-		name = base_name;
-		for (unsigned i = 2; _blank_ids.find(name) != _blank_ids.end(); ++i) {
-			std::ostringstream ss;
-			ss << "_" << i;
-			name = ss.str();
-		}
-	} else {
-		std::ostringstream ss;
-		ss << "b" << _next_blank_id++;
-		name = ss.str();
-	}
-
-	Node result = Node(*this, Node::BLANK, name);
-	assert(result.to_string() == name);
-	return result;
-}
-
-
 } // namespace Redland
 
