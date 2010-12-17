@@ -63,6 +63,11 @@ MachineBuilder::is_delay_node(SharedPtr<Node> node) const
 void
 MachineBuilder::set_node_duration(SharedPtr<Node> node, Raul::TimeDuration d) const
 {
+	if (_step) {
+		node->set_duration(TimeStamp(d.unit(), 1, 0));
+		return;
+	}
+	
 	Raul::TimeStamp q_dur = Quantizer::quantize(TimeStamp(d.unit(), _quantization), d);
 
 	// Never quantize a note to duration 0
@@ -172,10 +177,7 @@ MachineBuilder::event(Raul::TimeStamp time_offset,
 				SharedPtr<Node> resolved = *i;
 
 				resolved->set_exit_action(SharedPtr<Action>(new MidiAction(ev_size, buf)));
-				if (_step)
-					set_node_duration(resolved, TimeStamp(t.unit()));
-				else
-					set_node_duration(resolved, t - resolved->enter_time());
+				set_node_duration(resolved, t - resolved->enter_time());
 
 				// Last active note
 				if (_active_nodes.size() == 1) {
