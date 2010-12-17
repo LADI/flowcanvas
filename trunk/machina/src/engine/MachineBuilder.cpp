@@ -128,7 +128,7 @@ MachineBuilder::event(Raul::TimeStamp time_offset,
 		Raul::TimeStamp this_connect_node_end_time(unit);
 
 		// If currently polyphonic, use a poly node with no successors as connect node
-		// Results in patterns closes to what a human would choose
+		// Results in patterns closest to what a human would choose
 		if ( ! _poly_nodes.empty()) {
 			for (PolyList::iterator j = _poly_nodes.begin(); j != _poly_nodes.end(); ++j) {
 				if (j->second->edges().empty()) {
@@ -145,7 +145,6 @@ MachineBuilder::event(Raul::TimeStamp time_offset,
 			this_connect_node          = _connect_node;
 			this_connect_node_end_time = _connect_node_end_time;
 		}
-
 
 		SharedPtr<Node> delay_node = connect_nodes(_machine,
 				this_connect_node, this_connect_node_end_time, node, t);

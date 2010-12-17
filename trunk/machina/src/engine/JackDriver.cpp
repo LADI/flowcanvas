@@ -38,7 +38,7 @@ JackDriver::JackDriver(SharedPtr<Machine> machine)
 	, _cycle_time(48000, MACHINA_PPQN, 120.0)
 	, _bpm(120.0)
 	, _quantization(0.0f)
-	, _record_time(machine->time().unit())
+	, _record_dur(_frames_unit) // = 0
 	, _recording(0)
 {
 }
@@ -137,12 +137,15 @@ JackDriver::process_input(SharedPtr<Machine> machine, const TimeSlice& time)
 			jack_midi_event_t ev;
 			jack_midi_event_get(&ev, jack_buffer, i);
 
-			_recorder->write(_record_time + TimeStamp(_record_time.unit(), ev.time, 0),
-					ev.size, ev.buffer);
+			const TimeStamp rel_time_frames = TimeStamp(_frames_unit, ev.time);
+			const TimeStamp time_frames     = _record_dur + rel_time_frames;
+			_recorder->write(time.ticks_to_beats(time_frames), ev.size, ev.buffer);
 		}
 
 		if (event_count > 0)
 			_recorder->whip();
+
+		_record_dur += time.length_ticks();
 
 	} else {
 
@@ -270,9 +273,6 @@ JackDriver::on_process(jack_nframes_t nframes)
 
 	machine->set_sink(shared_from_this());
 
-	if (_recording.get())
-		_record_time += length_beats;
-
 	if (_stop.pending())
 		machine->reset(_cycle_time.start_beats());
 
@@ -336,10 +336,10 @@ void
 JackDriver::start_record()
 {
 	// FIXME: Choose an appropriate maximum ringbuffer size
-	/*_recorder = SharedPtr<Recorder>(new Recorder(1024, _frames_unit, _quantization.get()));
+	_recorder = SharedPtr<Recorder>(new Recorder(1024, _beats_unit, _quantization.get()));
 	_recorder->start();
-	_record_time = 0;
-	_recording = 1;*/
+	_record_dur = 0;
+	_recording = 1;
 }
 
 

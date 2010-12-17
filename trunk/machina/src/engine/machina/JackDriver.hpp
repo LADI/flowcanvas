@@ -90,7 +90,7 @@ private:
 
 	Raul::Command _stop;
 
-	Raul::TimeStamp     _record_time;
+	Raul::TimeDuration  _record_dur;
 	Raul::AtomicInt     _recording;
 	SharedPtr<Recorder> _recorder;
 };
