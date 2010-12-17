@@ -70,6 +70,7 @@ MachinaGUI::MachinaGUI(SharedPtr<Machina::Engine> engine)
 	xml->get_widget("help_about_menuitem", _menu_help_about);
 	xml->get_widget("help_help_menuitem", _menu_help_help);
 	xml->get_widget("canvas_scrolledwindow", _canvas_scrolledwindow);
+	xml->get_widget("step_record_checkbutton", _step_record_checkbutton);
 	xml->get_widget("clock_checkbutton", _clock_checkbutton);
 	xml->get_widget("bpm_spinbutton", _bpm_spinbutton);
 	xml->get_widget("quantize_checkbutton", _quantize_checkbutton);
@@ -166,6 +167,7 @@ MachinaGUI::MachinaGUI(SharedPtr<Machina::Engine> engine)
 
 	_main_window->present();
 
+	_step_record_checkbutton->show();
 	_clock_checkbutton->set_active(true);
 	_quantize_checkbutton->set_active(false);
 	update_toolbar();
@@ -653,7 +655,7 @@ void
 MachinaGUI::record_toggled()
 {
 	if (_record_button->get_active() && ! _engine->driver()->recording()) {
-		_engine->driver()->start_record();
+		_engine->driver()->start_record(_step_record_checkbutton->get_active());
 	} else if (_engine->driver()->recording()) {
 		_engine->driver()->finish_record();
 		_canvas->build(_engine->machine(), _menu_view_labels->get_active());

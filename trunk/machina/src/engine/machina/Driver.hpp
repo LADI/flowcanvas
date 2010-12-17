@@ -42,7 +42,7 @@ public:
 	virtual void stop() {}
 
 	virtual bool recording() { return false; }
-	virtual void start_record() {}
+	virtual void start_record(bool step) {}
 	virtual void finish_record() {}
 
 protected:

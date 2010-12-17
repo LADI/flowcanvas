@@ -256,6 +256,26 @@
                   </packing>
                 </child>
                 <child>
+                  <widget class="GtkToggleToolButton" id="step_record_checkbutton">
+                    <property name="visible">True</property>
+                    <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+					<property name="tooltip" translatable="yes">Step recording</property>
+                    <property name="stock_id">gtk-add</property>
+                  </widget>
+                  <packing>
+                    <property name="expand">False</property>
+                  </packing>
+                </child>
+				<child>
+                  <widget class="GtkSeparatorToolItem" id="separatortoolitem4">
+                    <property name="visible">True</property>
+                  </widget>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="homogeneous">False</property>
+                  </packing>
+                </child>
+                <child>
                   <widget class="GtkToolItem" id="toolitem1">
                     <property name="visible">True</property>
                     <child>
@@ -277,7 +297,7 @@
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="tooltip" translatable="yes">Set internal tempo</property>
-                            <property name="adjustment">120 1 640 1 10 10</property>
+                            <property name="adjustment">120 1 640 1 10 0</property>
                             <property name="climb_rate">1</property>
                           </widget>
                           <packing>
@@ -339,7 +359,7 @@
                             <property name="visible">True</property>
                             <property name="sensitive">False</property>
                             <property name="can_focus">True</property>
-                            <property name="adjustment">1 1 99 1 4 4</property>
+                            <property name="adjustment">1 1 99 1 4 0</property>
                             <property name="climb_rate">1</property>
                           </widget>
                           <packing>
@@ -728,7 +748,7 @@ Selector nodes are shown in green.
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="has_focus">True</property>
-                <property name="adjustment">1 0 999999 1 10 10</property>
+                <property name="adjustment">1 0 999999 1 10 0</property>
                 <property name="climb_rate">1</property>
                 <property name="digits">2</property>
                 <property name="numeric">True</property>
@@ -769,7 +789,7 @@ Selector nodes are shown in green.
               <widget class="GtkSpinButton" id="node_properties_note_spinbutton">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
-                <property name="adjustment">60 0 127 1 10 10</property>
+                <property name="adjustment">60 0 127 1 10 0</property>
                 <property name="climb_rate">1</property>
                 <property name="numeric">True</property>
               </widget>

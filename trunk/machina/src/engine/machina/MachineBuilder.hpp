@@ -30,7 +30,8 @@ class Node;
 class MachineBuilder {
 public:
 	MachineBuilder(SharedPtr<Machine> machine,
-	               double             quantization);
+	               double             quantization,
+	               bool               step);
 
 	void set_time(Raul::TimeStamp time) { _time = time; }
 
@@ -63,6 +64,8 @@ private:
 	SharedPtr<Node>    _initial_node;
 	SharedPtr<Node>    _connect_node;
 	Raul::TimeStamp    _connect_node_end_time;
+
+	bool _step;
 };
 
 

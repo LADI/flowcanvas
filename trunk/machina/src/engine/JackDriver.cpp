@@ -333,10 +333,10 @@ JackDriver::stop()
 
 
 void
-JackDriver::start_record()
+JackDriver::start_record(bool step)
 {
 	// FIXME: Choose an appropriate maximum ringbuffer size
-	_recorder = SharedPtr<Recorder>(new Recorder(1024, _beats_unit, _quantization.get()));
+	_recorder = SharedPtr<Recorder>(new Recorder(1024, _beats_unit, _quantization.get(), step));
 	_recorder->start();
 	_record_dur = 0;
 	_recording = 1;

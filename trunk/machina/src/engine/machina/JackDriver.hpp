@@ -66,7 +66,7 @@ public:
 	void stop();
 
 	bool recording() { return _recording.get(); }
-	void start_record();
+	void start_record(bool step);
 	void finish_record();
 
 private:

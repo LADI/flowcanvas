@@ -29,13 +29,14 @@ using namespace Raul;
 namespace Machina {
 
 
-MachineBuilder::MachineBuilder(SharedPtr<Machine> machine, double q)
+MachineBuilder::MachineBuilder(SharedPtr<Machine> machine, double q, bool step)
 	: _quantization(q)
 	, _time(machine->time().unit()) // = 0
 	, _machine(machine)
 	, _initial_node(new Node(_time, true)) // duration 0
 	, _connect_node(_initial_node)
 	, _connect_node_end_time(_time) // = 0
+	, _step(step)
 {
 }
 
@@ -53,10 +54,7 @@ MachineBuilder::reset()
 bool
 MachineBuilder::is_delay_node(SharedPtr<Node> node) const
 {
-	if (node->enter_action() || node->exit_action())
-		return false;
-	else
-		return true;
+	return !node->enter_action() && !node->exit_action();
 }
 
 
@@ -93,7 +91,7 @@ MachineBuilder::connect_nodes(SharedPtr<Machine> m,
 		// Tail is a delay node, just accumulate the time difference into it
 		set_node_duration(tail, tail->duration() + head_start_time - tail_end_time);
 		tail->add_edge(SharedPtr<Edge>(new Edge(tail, head)));
-	} else if (head_start_time == tail_end_time) {
+	} else if (_step || (head_start_time == tail_end_time)) {
 		// Connect directly
 		tail->add_edge(SharedPtr<Edge>(new Edge(tail, head)));
 	} else {
@@ -174,7 +172,10 @@ MachineBuilder::event(Raul::TimeStamp time_offset,
 				SharedPtr<Node> resolved = *i;
 
 				resolved->set_exit_action(SharedPtr<Action>(new MidiAction(ev_size, buf)));
-				set_node_duration(resolved, t - resolved->enter_time());
+				if (_step)
+					set_node_duration(resolved, TimeStamp(t.unit()));
+				else
+					set_node_duration(resolved, t - resolved->enter_time());
 
 				// Last active note
 				if (_active_nodes.size() == 1) {

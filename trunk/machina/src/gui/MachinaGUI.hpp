@@ -120,6 +120,7 @@ protected:
 	Gtk::ScrolledWindow*   _canvas_scrolledwindow;
 	Gtk::TextView*         _status_text;
 	Gtk::Expander*         _messages_expander;
+	Gtk::ToggleToolButton* _step_record_checkbutton;
 	Gtk::CheckButton*      _clock_checkbutton;
 	Gtk::SpinButton*       _bpm_spinbutton;
 	Gtk::CheckButton*      _quantize_checkbutton;

@@ -26,10 +26,10 @@ using namespace Raul;
 namespace Machina {
 
 
-Recorder::Recorder(size_t buffer_size, TimeUnit unit, double q)
+Recorder::Recorder(size_t buffer_size, TimeUnit unit, double q, bool step)
 	: _unit(unit)
 	, _record_buffer(buffer_size)
-	, _builder(new MachineBuilder(SharedPtr<Machine>(new Machine(unit)), q))
+	, _builder(new MachineBuilder(SharedPtr<Machine>(new Machine(unit)), q, step))
 {
 }
 
