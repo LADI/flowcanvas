@@ -94,6 +94,17 @@ public:
 	virtual void set_base_color(uint32_t c)   { _color = c; }
 	virtual void set_default_base_color() = 0;
 
+	/** Set the partner of this node.
+	 * Partner nodes are nodes that should be visually aligned to correspond to
+	 * each other, even if they are not necessarily connected (e.g. for separate
+	 * modules representing the inputs and outputs of a single interface).
+	 * The partner is invisibly connected as if it had an input that is connected
+	 * to this item, e.g. foo.set_partner(bar) will arrange like:
+	 * [foo]  [bar] with a left-to-right flow direction.
+	 */
+	void set_partner(boost::shared_ptr<Item> partner) { _partner = partner; }
+	boost::weak_ptr<Item> partner()                   { return _partner; }
+
 	sigc::signal<void> signal_pointer_entered;
 	sigc::signal<void> signal_pointer_exited;
 	sigc::signal<void> signal_selected;
@@ -117,6 +128,8 @@ protected:
 	bool on_event(GdkEvent* event);
 
 	const boost::weak_ptr<Canvas> _canvas;
+
+	boost::weak_ptr<Item> _partner;
 
 	Gtk::Menu*  _menu;
 	std::string _name;

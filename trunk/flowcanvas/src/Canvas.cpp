@@ -1311,12 +1311,22 @@ Canvas::layout_dot(bool use_length_hints, const std::string& filename)
 		}
 	}
 
-	gvLayout (gvc, G, (char*)"dot");
-	gvRender (gvc, G, (char*)"dot", fopen("/dev/null", "w"));
+	// Add edges between partners to have them lined up as if they are connected
+	for (GVNodes::iterator i = nodes.begin(); i != nodes.end(); ++i) {
+		boost::shared_ptr<Item> partner = i->first->partner().lock();
+		if (partner) {
+			GVNodes::iterator p = nodes.find(partner);
+			if (p != nodes.end())
+				agedge(G, i->second, p->second);
+		}
+	}
+
+	gvLayout(gvc, G, (char*)"dot");
+	gvRender(gvc, G, (char*)"dot", fopen("/dev/null", "w"));
 
 	if (filename != "") {
 		FILE* fd = fopen(filename.c_str(), "w");
-		gvRender (gvc, G, (char*)"dot", fd);
+		gvRender(gvc, G, (char*)"dot", fd);
 		fclose(fd);
 	}
 #endif
