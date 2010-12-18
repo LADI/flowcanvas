@@ -18,8 +18,12 @@
 #ifndef MACHINA_ENGINE_HPP
 #define MACHINA_ENGINE_HPP
 
+#include <string>
+
 #include <glibmm/ustring.h>
+
 #include "raul/SharedPtr.hpp"
+
 #include "machina/Driver.hpp"
 #include "machina/Loader.hpp"
 
@@ -38,6 +42,9 @@ public:
 	}
 
 	Redland::World& rdf_world() { return _rdf_world; }
+
+	static SharedPtr<Driver> new_driver(const std::string& name,
+	                                    SharedPtr<Machine> machine);
 
 	SharedPtr<Driver>  driver()  { return _driver; }
 	SharedPtr<Machine> machine() { return _driver->machine(); }

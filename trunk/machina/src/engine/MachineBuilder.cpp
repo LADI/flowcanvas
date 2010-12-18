@@ -23,9 +23,10 @@
 
 #include "machina/Edge.hpp"
 #include "machina/Machine.hpp"
-#include "machina/MachineBuilder.hpp"
 #include "machina/MidiAction.hpp"
 #include "machina/Node.hpp"
+
+#include "MachineBuilder.hpp"
 
 using namespace std;
 using namespace Raul;

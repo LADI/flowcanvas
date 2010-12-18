@@ -18,10 +18,11 @@
 #ifndef MACHINA_EVOLVER_HPP
 #define MACHINA_EVOLVER_HPP
 
+#include "eugene/GAImpl.hpp"
 #include "raul/SharedPtr.hpp"
 #include "raul/Thread.hpp"
 #include "raul/TimeStamp.hpp"
-#include "eugene/GAImpl.hpp"
+
 #include "Schrodinbit.hpp"
 
 namespace Eugene { template <typename G> class HybridMutation; }

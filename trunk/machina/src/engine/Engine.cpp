@@ -16,14 +16,34 @@
  */
 
 #include <glibmm/ustring.h>
+
+#include "machina-config.h"
 #include "machina/Engine.hpp"
-#include "machina/JackDriver.hpp"
 #include "machina/Loader.hpp"
 #include "machina/Machine.hpp"
 #include "machina/SMFDriver.hpp"
+#ifdef HAVE_JACK
+#include "JackDriver.hpp"
+#endif
 
 namespace Machina {
 
+SharedPtr<Driver>
+Engine::new_driver(const std::string& name, SharedPtr<Machine> machine)
+{
+	#ifdef HAVE_JACK
+	if (name == "jack") {
+		JackDriver* driver = new JackDriver(machine);
+		driver->attach("machina");
+		return SharedPtr<Driver>(driver);
+	}
+	#endif
+	if (name == "smf")
+		return SharedPtr<Driver>(new SMFDriver(machine));
+
+	std::cerr << "Error: Unknown driver type `" << name << "'" << std::endl;
+	return SharedPtr<Driver>();
+}
 
 /** Load the machine at @a uri, and run it (replacing current machine).
  * Safe to call while engine is processing.

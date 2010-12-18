@@ -19,9 +19,9 @@
 #include <iomanip>
 
 #include "machina-config.h"
-#include "machina/JackDriver.hpp"
 #include "machina/MidiAction.hpp"
 
+#include "JackDriver.hpp"
 #include "LearnRequest.hpp"
 #include "jack_compat.h"
 

@@ -21,14 +21,16 @@
 #include <set>
 #include <vector>
 #include <iostream>
-#include "machina/Problem.hpp"
-#include "machina/Machine.hpp"
+
+#include "eugene/Problem.hpp"
 #include "machina/ActionFactory.hpp"
 #include "machina/Edge.hpp"
+#include "machina/Machine.hpp"
 #include "raul/SMFReader.hpp"
 #include "raul/midi_events.h"
-#include "eugene/Problem.hpp"
+
 #include "machina-config.h"
+#include "Problem.hpp"
 
 using namespace std;
 

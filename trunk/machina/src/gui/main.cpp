@@ -27,10 +27,6 @@
 #include "machina/SMFDriver.hpp"
 #include "MachinaGUI.hpp"
 
-#ifdef HAVE_JACK
-#include "machina/JackDriver.hpp"
-#endif
-
 using namespace std;
 using namespace Machina;
 
@@ -71,15 +67,13 @@ main(int argc, char** argv)
 	if (!machine)
 		machine = SharedPtr<Machine>(new Machine(TimeUnit(TimeUnit::BEATS, 19200)));
 
-	// Build engine
-	SharedPtr<Driver> driver;
-#ifdef HAVE_JACK
-	driver = SharedPtr<Driver>(new JackDriver(machine));
-	((JackDriver*)driver.get())->attach("machina");
-#endif
-	if (!driver)
-		driver = SharedPtr<Driver>(new SMFDriver(machine));
+	std::string driver_name = "smf";
+	#ifdef HAVE_JACK
+	driver_name = "jack";
+	#endif
 
+	// Build engine
+	SharedPtr<Driver> driver(Engine::new_driver(driver_name, machine));
 	SharedPtr<Engine> engine(new Engine(driver, rdf_world));
 
 	Gnome::Canvas::init();

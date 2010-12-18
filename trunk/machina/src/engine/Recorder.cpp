@@ -15,10 +15,11 @@
  * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include <iostream>
 #include <ios>
-#include "machina/Recorder.hpp"
-#include "machina/MachineBuilder.hpp"
+#include <iostream>
+
+#include "MachineBuilder.hpp"
+#include "Recorder.hpp"
 
 using namespace std;
 using namespace Raul;

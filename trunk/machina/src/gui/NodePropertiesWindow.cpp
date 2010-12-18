@@ -40,8 +40,7 @@ NodePropertiesWindow::NodePropertiesWindow(BaseObjectType* cobject, const Glib::
 	xml->get_widget("node_properties_ok_button", _ok_button);
 
 	_apply_button->signal_clicked().connect(sigc::mem_fun(this, &NodePropertiesWindow::apply_clicked));
-	_cancel_button->signal_clicked().connect(sigc::mem_fun(this, &NodePropertiesWindow::cancel_clicked));
-	_ok_button->signal_clicked().connect(sigc::mem_fun(this, &NodePropertiesWindow::ok_clicked));
+	_cancel_button->signal_clicked().connect(sigc::mem_fun(this, &NodePropertiesWindow::cancel_clicked));	_ok_button->signal_clicked().connect(sigc::mem_fun(this, &NodePropertiesWindow::ok_clicked));
 }
 
 
@@ -64,7 +63,7 @@ NodePropertiesWindow::apply_clicked()
 		action->event()[1] = note;
 	}
 
-	double duration_dbl = _duration_spinbutton->get_value();
+	const double duration_dbl = _duration_spinbutton->get_value();
 	TimeStamp duration(TimeUnit(TimeUnit::BEATS, 19200), duration_dbl);
 	_node->set_duration(duration);
 	_node->set_changed();

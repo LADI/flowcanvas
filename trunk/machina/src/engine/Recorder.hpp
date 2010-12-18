@@ -21,7 +21,8 @@
 #include "raul/Slave.hpp"
 #include "raul/SharedPtr.hpp"
 #include "raul/EventRingBuffer.hpp"
-#include "Machine.hpp"
+
+#include "machina/Machine.hpp"
 
 namespace Machina {
 

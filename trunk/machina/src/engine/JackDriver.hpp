@@ -29,8 +29,9 @@
 #include "raul/Semaphore.hpp"
 #include "raul/SharedPtr.hpp"
 
-#include "Driver.hpp"
-#include "Machine.hpp"
+#include "machina/Driver.hpp"
+#include "machina/Machine.hpp"
+
 #include "Recorder.hpp"
 
 namespace Machina {
