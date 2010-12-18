@@ -16,12 +16,16 @@
  */
 
 #include <algorithm>
+
 #include "raul/midi_events.h"
+#include "raul/SharedPtr.hpp"
 #include "raul/Quantizer.hpp"
-#include "machina/MachineBuilder.hpp"
-#include "machina/Machine.hpp"
-#include "machina/Node.hpp"
+
 #include "machina/Edge.hpp"
+#include "machina/Machine.hpp"
+#include "machina/MachineBuilder.hpp"
+#include "machina/MidiAction.hpp"
+#include "machina/Node.hpp"
 
 using namespace std;
 using namespace Raul;

@@ -17,10 +17,12 @@
 
 #include <iostream>
 #include <cstdlib>
+
+#include "machina/ActionFactory.hpp"
 #include "machina/Edge.hpp"
 #include "machina/Machine.hpp"
+#include "machina/MidiAction.hpp"
 #include "machina/Mutation.hpp"
-#include "machina/ActionFactory.hpp"
 
 using namespace std;
 

@@ -16,13 +16,17 @@
  */
 
 #include <cstdlib>
+
 #include "raul/SharedPtr.hpp"
 #include "redlandmm/Model.hpp"
 #include "redlandmm/World.hpp"
+
 #include "machina/Edge.hpp"
 #include "machina/Machine.hpp"
 #include "machina/MidiAction.hpp"
 #include "machina/Node.hpp"
+
+#include "LearnRequest.hpp"
 
 using namespace std;
 using namespace Raul;
@@ -367,9 +371,9 @@ Machine::run(const Raul::TimeSlice& time)
  * NOT realtime (actions are allocated here).
  */
 void
-Machine::learn(SharedPtr<LearnRequest> learn)
+Machine::learn(SharedPtr<Raul::Maid> maid, SharedPtr<Node> node)
 {
-	_pending_learn = learn;
+	_pending_learn = LearnRequest::create(maid, node);
 }
 
 
@@ -418,6 +422,4 @@ Machine::write_state(Redland::Model& model)
 	}
 }
 
-
 } // namespace Machina
-

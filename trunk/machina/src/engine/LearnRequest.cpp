@@ -16,7 +16,7 @@
  */
 
 #include "raul/Quantizer.hpp"
-#include "machina/LearnRequest.hpp"
+#include "LearnRequest.hpp"
 
 namespace Machina {
 

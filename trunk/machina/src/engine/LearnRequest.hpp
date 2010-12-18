@@ -20,9 +20,10 @@
 
 #include "raul/Maid.hpp"
 #include "raul/SharedPtr.hpp"
-#include "types.hpp"
-#include "Node.hpp"
-#include "MidiAction.hpp"
+
+#include "machina/MidiAction.hpp"
+#include "machina/Node.hpp"
+#include "machina/types.hpp"
 
 namespace Machina {
 
