@@ -31,8 +31,6 @@ public:
 	         SharedPtr<NodeView>           dst,
 	         SharedPtr<Machina::Edge>      edge);
 
-	SharedPtr<Machina::Edge> edge() { return _edge; }
-
 	void show_label(bool show);
 	void update();
 

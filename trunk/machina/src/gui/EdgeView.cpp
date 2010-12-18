@@ -82,14 +82,6 @@ EdgeView::length_hint() const
 void
 EdgeView::show_label(bool show)
 {
-	/* too slow
-	if (show) {
-		char label[4];
-		snprintf(label, 4, "%3f", _edge->probability());
-		set_label(label);
-	} else {
-		set_label("");
-	}*/
 	show_handle(show);
 	set_color(edge_color(_edge->probability()));
 }
@@ -98,12 +90,8 @@ EdgeView::show_label(bool show)
 void
 EdgeView::update()
 {
-	if (_handle/* && _handle->text*/) {
-		/*char label[4];
-		snprintf(label, 4, "%3f", _edge->probability());
-		set_label(label);*/
+	if (_handle)
 		show_handle(true);
-	}
 	set_color(edge_color(_edge->probability()));
 }
 
