@@ -1284,30 +1284,21 @@ Canvas::layout_dot(bool use_length_hints, const std::string& filename)
 
 		boost::shared_ptr<Port> src_port = boost::dynamic_pointer_cast<Port>(c->source().lock());
 		boost::shared_ptr<Port> dst_port = boost::dynamic_pointer_cast<Port>(c->dest().lock());
-
 		boost::shared_ptr<Item> src_item = boost::dynamic_pointer_cast<Item>(c->source().lock());
 		boost::shared_ptr<Item> dst_item = boost::dynamic_pointer_cast<Item>(c->dest().lock());
 
-		GVNodes::iterator src_i = nodes.end();
-		GVNodes::iterator dst_i = nodes.end();
+		GVNodes::iterator src_i = src_port
+			? nodes.find(src_port->module().lock())
+			: nodes.find(src_item);
 
-		Agnode_t* src_node = NULL;
-		Agnode_t* dst_node = NULL;
-
-		if (src_port)
-			src_i = nodes.find(src_port->module().lock());
-		else
-			src_i = nodes.find(src_item);
-
-		if (dst_port)
-			dst_i = nodes.find(dst_port->module().lock());
-		else
-			dst_i = nodes.find(dst_item);
+		GVNodes::iterator dst_i = dst_port
+			? nodes.find(dst_port->module().lock())
+			: nodes.find(dst_item);
 
 		assert(src_i != nodes.end() && dst_i != nodes.end());
 
-		src_node = src_i->second;
-		dst_node = dst_i->second;
+		Agnode_t* src_node = src_i->second;
+		Agnode_t* dst_node = dst_i->second;
 
 		assert(src_node && dst_node);
 
@@ -1358,19 +1349,19 @@ Canvas::arrange(bool use_length_hints, bool center)
 
 	// Arrange to graphviz coordinates
 	for (GVNodes::iterator i = nodes.begin(); i != nodes.end(); ++i) {
-		char* pos_prop = agget(i->second, (char*)"pos");
-		assert(pos_prop);
-		const string pos(pos_prop);
+		const string pos   = agget(i->second, (char*)"pos");
 		const string x_str = pos.substr(0, pos.find(","));
 		const string y_str = pos.substr(pos.find(",")+1);
-		const double x = strtod(x_str.c_str(), NULL) * 1.25;
-		const double y = -strtod(y_str.c_str(), NULL) * 1.25;
+		const double x     = strtod(x_str.c_str(), NULL) * 1.25;
+		const double y     = -strtod(y_str.c_str(), NULL) * 1.25;
+
 		i->first->property_x() = x - i->first->width()/2.0;
 		i->first->property_y() = y - i->first->height()/2.0;
+
 		least_x = std::min(least_x, x);
 		least_y = std::min(least_y, y);
-		most_x = std::max(most_x, x);
-		most_y = std::max(most_y, y);
+		most_x  = std::max(most_x, x);
+		most_y  = std::max(most_y, y);
 	}
 
 	// Reset numeric locale to original value
