@@ -20,10 +20,12 @@
 
 #include <string>
 #include <iostream>
+
 #include "raul/MIDISink.hpp"
-#include "raul/TimeSlice.hpp"
-#include "raul/Stateful.hpp"
 #include "raul/SharedPtr.hpp"
+#include "raul/TimeSlice.hpp"
+
+#include "Stateful.hpp"
 #include "types.hpp"
 
 namespace Machina {
@@ -31,7 +33,7 @@ namespace Machina {
 
 /** An Action, executed on entering or exiting of a state.
  */
-struct Action : public Raul::Deletable, public Raul::Stateful {
+struct Action : public Raul::Deletable, public Stateful {
 	virtual void execute(SharedPtr<Raul::MIDISink> sink, Raul::TimeStamp time) = 0;
 
 	virtual void write_state(Redland::Model& model);

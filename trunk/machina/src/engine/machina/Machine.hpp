@@ -37,7 +37,7 @@ class LearnRequest;
 
 /** A (Finite State) Machine.
  */
-class Machine : public Raul::Stateful {
+class Machine : public Stateful {
 public:
 	Machine(TimeUnit unit);
 	Machine(const Machine& copy);

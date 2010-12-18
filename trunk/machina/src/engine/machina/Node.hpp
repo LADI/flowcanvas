@@ -21,10 +21,10 @@
 #include "raul/List.hpp"
 #include "raul/MIDISink.hpp"
 #include "raul/SharedPtr.hpp"
-#include "raul/Stateful.hpp"
 
 #include "Action.hpp"
 #include "Schrodinbit.hpp"
+#include "Stateful.hpp"
 
 namespace Machina {
 
@@ -42,7 +42,7 @@ using Raul::TimeUnit;
  * Initial nodes do not have enter actions (since they are entered at
  * an undefined point in time <= 0).
  */
-class Node : public Raul::Stateful {
+class Node : public Stateful {
 public:
 	typedef std::string ID;
 

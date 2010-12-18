@@ -20,18 +20,20 @@
 
 #include <list>
 #include <boost/utility.hpp>
-#include "raul/WeakPtr.hpp"
-#include "raul/SharedPtr.hpp"
+
 #include "raul/DoubleBuffer.hpp"
-#include "raul/Stateful.hpp"
-#include "types.hpp"
+#include "raul/SharedPtr.hpp"
+#include "raul/WeakPtr.hpp"
+
 #include "Action.hpp"
+#include "Stateful.hpp"
+#include "types.hpp"
 
 namespace Machina {
 
 class Node;
 
-class Edge : public Raul::Stateful {
+class Edge : public Stateful {
 public:
 
 	Edge(WeakPtr<Node> tail, SharedPtr<Node> head)

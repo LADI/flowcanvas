@@ -49,7 +49,7 @@ Machine::Machine(TimeUnit unit)
  * fresh state (deactivated, rewound)
  */
 Machine::Machine(const Machine& copy)
-	: Raul::Stateful() // don't copy RDF ID
+	: Stateful() // don't copy RDF ID
 	, _active_nodes(MAX_ACTIVE_NODES, SharedPtr<Node>())
 	, _is_activated(false)
 	, _is_finished(false)
