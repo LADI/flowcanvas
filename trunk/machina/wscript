@@ -37,8 +37,8 @@ def configure(conf):
 	autowaf.check_pkg(conf, 'rasqal', uselib_store='RASQAL', mandatory=False)
 	autowaf.check_pkg(conf, 'redlandmm', uselib_store='REDLANDMM',
 			atleast_version='0.1.0', mandatory=False)
-	autowaf.check_pkg(conf, 'eugene', uselib_store='EUGENE',
-			atleast_version='0.0.0', mandatory=False)
+	#autowaf.check_pkg(conf, 'eugene', uselib_store='EUGENE',
+	#		atleast_version='0.0.0', mandatory=False)
 
 	# Check for posix_memalign (OSX, amazingly, doesn't have it)
 	conf.check(function_name='posix_memalign',
