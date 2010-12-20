@@ -46,8 +46,7 @@ def configure(conf):
 
 def build(bld):
 	# Headers
-	bld.install_files('${INCLUDEDIR}/eugene', 'eugene/*.h')
-	bld.install_files('${INCLUDEDIR}/eugene', 'eugene/*.hpp')
+	bld.install_files('${INCLUDEDIR}/eugene', bld.path.ant_glob('eugene/*.hpp'))
 
 	# Pkgconfig file
 	autowaf.build_pc(bld, 'EUGENE', EUGENE_VERSION, 'GLIBMM GTHREAD')
