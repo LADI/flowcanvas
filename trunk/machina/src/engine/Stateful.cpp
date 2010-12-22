@@ -1,5 +1,5 @@
-/* This file is part of Machina
- * Copyright (C) 2007-2010 David Robillard <http://drobilla.net>
+/* This file is part of Machina.
+ * Copyright (C) 2010 David Robillard <http://drobilla.net>
  *
  * Machina is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -12,36 +12,31 @@
  *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+ * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
-#ifndef MACHINA_STATEFUL_HPP
-#define MACHINA_STATEFUL_HPP
-
-#include <stdint.h>
-
-#include "redlandmm/World.hpp"
-#include "redlandmm/Model.hpp"
+#include "machina/Stateful.hpp"
 
 namespace Machina {
 
-class Stateful {
-public:
-	Stateful();
+uint64_t Stateful::_next_id = 1;
 
-	virtual ~Stateful() {}
+Stateful::Stateful()
+	: _id(_next_id++)
+{
+}
 
-	virtual void write_state(Redland::Model& model) = 0;
 
-	Redland::Node id(Redland::World& world) const;
+Redland::Node
+Stateful::id(Redland::World& world) const
+{
+	if (!_rdf_id.is_valid()) {
+		std::ostringstream ss;
+		ss << "b" << _id;
+		_rdf_id = Redland::Node(world, Redland::Node::BLANK, ss.str());
+	}
 
-private:
-	static uint64_t _next_id;
-
-	uint64_t              _id;
-	mutable Redland::Node _rdf_id;
-};
+	return _rdf_id;
+}
 
 } // namespace Machina
-
-#endif // MACHINA_STATEFUL_HPP

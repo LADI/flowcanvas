@@ -30,12 +30,12 @@ Edge::write_state(Redland::Model& model)
 {
 	using namespace Raul;
 
-	if (!_id.is_valid())
-		set_id(Redland::Node::blank_id(model.world()));
-
-	model.add_statement(_id,
-			"rdf:type",
-			Redland::Node(model.world(), Redland::Node::RESOURCE, "machina:Edge"));
+	const Redland::Node& rdf_id = id(model.world());
+	
+	model.add_statement(
+		rdf_id,
+		"rdf:type",
+		Redland::Node(model.world(), Redland::Node::RESOURCE, "machina:Edge"));
 
 	SharedPtr<Node> tail = _tail.lock();
 	SharedPtr<Node> head = _head;
@@ -43,19 +43,20 @@ Edge::write_state(Redland::Model& model)
 	if (!tail || !head)
 		return;
 
-	assert(tail->id() && head->id());
+	assert(tail->id(model.world()) && head->id(model.world()));
 
-	model.add_statement(_id,
-			"machina:tail",
-			tail->id());
+	model.add_statement(rdf_id,
+	                    "machina:tail",
+	                    tail->id(model.world()));
 
-	model.add_statement(_id,
-			"machina:head",
-			head->id());
+	model.add_statement(rdf_id,
+	                    "machina:head",
+	                    head->id(model.world()));
 
-	model.add_statement(_id,
-			"machina:probability",
-			AtomRDF::atom_to_node(model, Atom(_probability.get())));
+	model.add_statement(
+		rdf_id,
+		"machina:probability",
+		AtomRDF::atom_to_node(model, Atom(_probability.get())));
 }
 
 

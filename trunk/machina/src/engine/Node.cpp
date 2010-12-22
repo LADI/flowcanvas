@@ -209,36 +209,38 @@ Node::write_state(Redland::Model& model)
 {
 	using namespace Raul;
 
-	if (!_id.is_valid())
-		set_id(Redland::Node::blank_id(model.world()));
+	const Redland::Node& rdf_id = id(model.world());
 
 	if (_is_selector)
-		model.add_statement(_id,
-				"rdf:type",
-				Redland::Node(model.world(), Redland::Node::RESOURCE, "machina:SelectorNode"));
+		model.add_statement(
+			rdf_id,
+			"rdf:type",
+			Redland::Node(model.world(), Redland::Node::RESOURCE, "machina:SelectorNode"));
 	else
-		model.add_statement(_id,
-				"rdf:type",
-				Redland::Node(model.world(), Redland::Node::RESOURCE, "machina:Node"));
+		model.add_statement(
+			rdf_id,
+			"rdf:type",
+			Redland::Node(model.world(), Redland::Node::RESOURCE, "machina:Node"));
 
-	model.add_statement(_id,
-			"machina:duration",
-			AtomRDF::atom_to_node(model, Atom((float)_duration.to_double())));
+	model.add_statement(
+		rdf_id,
+		"machina:duration",
+		AtomRDF::atom_to_node(model, Atom((float)_duration.to_double())));
 
 	if (_enter_action) {
 		_enter_action->write_state(model);
 
-		model.add_statement(_id,
-				"machina:enterAction",
-				_enter_action->id());
+		model.add_statement(rdf_id,
+		                    "machina:enterAction",
+		                    _enter_action->id(model.world()));
 	}
 
 	if (_exit_action) {
 		_exit_action->write_state(model);
 
-		model.add_statement(_id,
-				"machina:exitAction",
-				_exit_action->id());
+		model.add_statement(rdf_id,
+		                    "machina:exitAction",
+		                    _exit_action->id(model.world()));
 	}
 }
 

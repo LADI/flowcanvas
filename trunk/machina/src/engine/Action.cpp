@@ -26,10 +26,7 @@ Action::write_state(Redland::Model& model)
 {
 	using namespace Raul;
 
-	if (!_id.is_valid())
-		set_id(Redland::Node::blank_id(model.world()));
-
-	model.add_statement(_id,
+	model.add_statement(id(model.world()),
 			Redland::Node(model.world(), Redland::Node::RESOURCE, "rdf:type"),
 			Redland::Node(model.world(), Redland::Node::RESOURCE, "machina:Action"));
 }

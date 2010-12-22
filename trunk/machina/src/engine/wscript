@@ -17,6 +17,7 @@ def build(bld):
 		Node.cpp
 		Recorder.cpp
 		SMFDriver.cpp
+		Stateful.cpp
 	'''
 	if bld.env['HAVE_EUGENE']:
 		core_source += '''
