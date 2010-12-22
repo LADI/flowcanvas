@@ -27,8 +27,8 @@ Stateful::Stateful()
 }
 
 
-Redland::Node
-Stateful::id(Redland::World& world) const
+const Redland::Node&
+Stateful::rdf_id(Redland::World& world) const
 {
 	if (!_rdf_id.is_valid()) {
 		std::ostringstream ss;

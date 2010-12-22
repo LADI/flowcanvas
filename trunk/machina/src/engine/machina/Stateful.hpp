@@ -33,7 +33,8 @@ public:
 
 	virtual void write_state(Redland::Model& model) = 0;
 
-	Redland::Node id(Redland::World& world) const;
+	uint64_t             id() const { return _id; }
+	const Redland::Node& rdf_id(Redland::World& world) const;
 
 private:
 	static uint64_t _next_id;

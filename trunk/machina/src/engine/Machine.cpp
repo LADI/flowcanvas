@@ -397,11 +397,11 @@ Machine::write_state(Redland::Model& model)
 		if ((*n)->is_initial()) {
 			model.add_statement(model.base_uri(),
 					Redland::Node(model.world(), Redland::Node::RESOURCE, "machina:initialNode"),
-					(*n)->id(model.world()));
+					(*n)->rdf_id(model.world()));
 		} else {
 			model.add_statement(model.base_uri(),
 					Redland::Node(model.world(), Redland::Node::RESOURCE, "machina:node"),
-					(*n)->id(model.world()));
+					(*n)->rdf_id(model.world()));
 		}
 	}
 
@@ -416,7 +416,7 @@ Machine::write_state(Redland::Model& model)
 
 			model.add_statement(model.base_uri(),
 				Redland::Node(model.world(), Redland::Node::RESOURCE, "machina:edge"),
-				(*e)->id(model.world()));
+				(*e)->rdf_id(model.world()));
 		}
 
 	}

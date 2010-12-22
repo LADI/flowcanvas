@@ -30,7 +30,7 @@ Edge::write_state(Redland::Model& model)
 {
 	using namespace Raul;
 
-	const Redland::Node& rdf_id = id(model.world());
+	const Redland::Node& rdf_id = this->rdf_id(model.world());
 	
 	model.add_statement(
 		rdf_id,
@@ -43,15 +43,15 @@ Edge::write_state(Redland::Model& model)
 	if (!tail || !head)
 		return;
 
-	assert(tail->id(model.world()) && head->id(model.world()));
+	assert(tail->rdf_id(model.world()) && head->rdf_id(model.world()));
 
 	model.add_statement(rdf_id,
 	                    "machina:tail",
-	                    tail->id(model.world()));
+	                    tail->rdf_id(model.world()));
 
 	model.add_statement(rdf_id,
 	                    "machina:head",
-	                    head->id(model.world()));
+	                    head->rdf_id(model.world()));
 
 	model.add_statement(
 		rdf_id,

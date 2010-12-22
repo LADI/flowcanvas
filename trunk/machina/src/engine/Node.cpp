@@ -209,7 +209,7 @@ Node::write_state(Redland::Model& model)
 {
 	using namespace Raul;
 
-	const Redland::Node& rdf_id = id(model.world());
+	const Redland::Node& rdf_id = this->rdf_id(model.world());
 
 	if (_is_selector)
 		model.add_statement(
@@ -232,7 +232,7 @@ Node::write_state(Redland::Model& model)
 
 		model.add_statement(rdf_id,
 		                    "machina:enterAction",
-		                    _enter_action->id(model.world()));
+		                    _enter_action->rdf_id(model.world()));
 	}
 
 	if (_exit_action) {
@@ -240,7 +240,7 @@ Node::write_state(Redland::Model& model)
 
 		model.add_statement(rdf_id,
 		                    "machina:exitAction",
-		                    _exit_action->id(model.world()));
+		                    _exit_action->rdf_id(model.world()));
 	}
 }
 

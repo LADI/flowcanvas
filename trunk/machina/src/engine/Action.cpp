@@ -26,7 +26,7 @@ Action::write_state(Redland::Model& model)
 {
 	using namespace Raul;
 
-	model.add_statement(id(model.world()),
+	model.add_statement(rdf_id(model.world()),
 			Redland::Node(model.world(), Redland::Node::RESOURCE, "rdf:type"),
 			Redland::Node(model.world(), Redland::Node::RESOURCE, "machina:Action"));
 }
