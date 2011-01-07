@@ -112,19 +112,17 @@ public:
 		}
 	}
 		
-	static uint32_t message_run(LV2_Handle  instance,
-	                            const void* valid_inputs,
-	                            void*       valid_outputs)
+	uint32_t message_run(const void* valid_inputs,
+	                     void*       valid_outputs)
 	{
-		RDFWrite* me  = reinterpret_cast<RDFWrite*>(instance);
-		LV2_Atom* in  = me->p<LV2_Atom>(0);
-		LV2_Atom* out = me->p<LV2_Atom>(1);
+		LV2_Atom* in  = p<LV2_Atom>(0);
+		LV2_Atom* out = p<LV2_Atom>(1);
 
 		out->type = 0;
 		out->size = 0;
 		lv2_contexts_unset_port_valid(valid_outputs, 1);
 
-		if (in->type != me->atom_Blank && in->type != me->atom_Resource) {
+		if (in->type != atom_Blank && in->type != atom_Resource) {
 			fprintf(stderr, "Unknown input type\n");
 			out->type = 0;
 			out->size = 0;
@@ -137,14 +135,14 @@ public:
 		size_t txt_len = 0;
 
 		raptor_serialize_start_to_string(serializer, NULL, &txt, &txt_len);
-		serialize_object(me, serializer, in);
+		serialize_object(this, serializer, in);
 		raptor_serialize_end(serializer);
 
-		resize_port(me, 1, sizeof(LV2_Atom) + sizeof(LV2_Atom_String) + txt_len + 1);
+		resize_port(this, 1, sizeof(LV2_Atom) + sizeof(LV2_Atom_String) + txt_len + 1);
 		
-		out = me->p<LV2_Atom>(1);
+		out = p<LV2_Atom>(1);
 
-		out->type = me->atom_String;
+		out->type = atom_String;
 		out->size = sizeof(LV2_Atom_String) + txt_len + 1;
 		
 		LV2_Atom_String* str = (LV2_Atom_String*)out->body;

@@ -151,9 +151,8 @@ struct UriUnmap {
 
 /** Message Context
  * Plugin must have method:
- * static uint32_t message_run(LV2_Handle  instance,
- *                             const void* valid_inputs,
- *                             void*       valid_outputs);
+ * uint32_t message_run(const void* valid_inputs,
+ *                      void*       valid_outputs);
  */
 template <bool Required>
 struct MessageContext {
@@ -162,9 +161,17 @@ struct MessageContext {
 
 		static const void* extension_data(const char* uri) {
 			static LV2_Contexts_MessageContext context;
-			context.run = &Derived::message_run;
+			context.run = &Derived::_message_run;
 			return &context;
 		}
+
+	protected:
+		static uint32_t _message_run(LV2_Handle  instance,
+		                             const void* valid_inputs,
+		                             void*       valid_outputs) {
+			return reinterpret_cast<Derived*>(instance)->message_run(valid_inputs, valid_outputs);
+		}
+		
 	};
 };
 

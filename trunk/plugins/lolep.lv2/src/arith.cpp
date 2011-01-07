@@ -26,10 +26,6 @@
 
 using namespace std;
 
-static uint32_t int_type;
-static uint32_t float_type;
-static uint32_t vec_type;
-
 template<typename R, typename A, typename B>
 struct SumOp { static inline R op(const A* a, const B* b) { return (*a) + (*b); } };
 
@@ -55,9 +51,9 @@ public:
 	Arith(double rate, const char* bundle, const LV2::Feature* const* features)
 		: Base(2)
 	{
-		int_type   = Base::uri_to_id(NULL, LV2_ATOM_URI "#Int32");
-		float_type = Base::uri_to_id(NULL, LV2_ATOM_URI "#Float32");
-		vec_type   = Base::uri_to_id(NULL, LV2_ATOM_URI "#Vector");
+		atom_Float  = Base::uri_to_id(NULL, LV2_ATOM_URI "#Float32");
+		atom_Int32  = Base::uri_to_id(NULL, LV2_ATOM_URI "#Int32");
+		atom_Vector = Base::uri_to_id(NULL, LV2_ATOM_URI "#Vector");
 	}
 
 	template<typename T>
@@ -73,15 +69,15 @@ public:
 		LV2_Atom* b   = reinterpret_cast<LV2_Atom*&>(this->m_ports[1]);
 		LV2_Atom* out = reinterpret_cast<LV2_Atom*&>(this->m_ports[2]);
 
-		if (a->type == int_type) {
-			if (b->type == int_type) { // int (+) int => int
+		if (a->type == atom_Int32) {
+			if (b->type == atom_Int32) { // int (+) int => int
 				std::cout << "int + int" << std::endl;
-				set_output_type<int32_t>(out, int_type);
+				set_output_type<int32_t>(out, atom_Int32);
 				*(int32_t*)out->body = Op<int32_t,int32_t,int32_t>::op(
 						(int32_t*)a->body, (int32_t*)b->body);
-			} else if (b->type == float_type) { // int (+) float => float
+			} else if (b->type == atom_Float) { // int (+) float => float
 				std::cout << "int + float" << std::endl;
-				set_output_type<float>(out, float_type);
+				set_output_type<float>(out, atom_Float);
 				*(float*)out->body = Op<float,int32_t,float>::op(
 						(int32_t*)a->body, (float*)b->body);
 			} else {
@@ -89,15 +85,15 @@ public:
 				out->size = 0;
 				//cout << "Unknown type for b (a is int)" << endl;
 			}
-		} else if (a->type == float_type) {
-			if (b->type == int_type) { // float (+) int => float
+		} else if (a->type == atom_Float) {
+			if (b->type == atom_Int32) { // float (+) int => float
 				std::cout << "float + int" << std::endl;
-				set_output_type<float>(out, float_type);
+				set_output_type<float>(out, atom_Float);
 				*(float*)out->body = Op<float,float,int32_t>::op(
 						(float*)a->body, (int32_t*)b->body);
-			} else if (b->type == float_type) { // float (+) float => float
+			} else if (b->type == atom_Float) { // float (+) float => float
 				std::cout << "float + float" << std::endl;
-				set_output_type<float>(out, float_type);
+				set_output_type<float>(out, atom_Float);
 				*(float*)out->body = Op<float,float,float>::op(
 						(float*)a->body, (float*)b->body);
 			} else {
@@ -109,6 +105,10 @@ public:
 			//cout << "Unknown type for a" << endl;
 		}
 	}
+
+	uint32_t atom_Float;
+	uint32_t atom_Int32;
+	uint32_t atom_Vector;
 };
 
 static const unsigned sum_class        = Arith<SumOp>::register_class(LOLEP_URI "/sum");

@@ -296,23 +296,21 @@ public:
 		properties->insert(make_pair(predicate, object));
 	}
 
-	static uint32_t message_run(LV2_Handle  instance,
-								const void* valid_inputs,
-								void*       valid_outputs)
+	uint32_t message_run(const void* valid_inputs,
+	                     void*       valid_outputs)
 	{
-		RDFRead*    me  = reinterpret_cast<RDFRead*>(instance);
-		LV2_Atom*   in  = me->p<LV2_Atom>(0);
-		LV2_Atom*   out = me->p<LV2_Atom>(1);
+		LV2_Atom*   in  = p<LV2_Atom>(0);
+		LV2_Atom*   out = p<LV2_Atom>(1);
 		const char* str = (char*)in->body;
 
 		out->type = 0;
 		out->size = 0;
 		lv2_contexts_unset_port_valid(valid_outputs, 1);
 		
-		if (in->type != me->atom_String)
+		if (in->type != atom_String)
 			return 0;
 
-		Model model(me);
+		Model model(this);
 
 		raptor_init();
 		raptor_parser* p = raptor_new_parser("turtle");
@@ -330,12 +328,12 @@ public:
 			? model.atom_size()
 			: sizeof(LV2_Atom) + model.atom_size(); // LV2_Model header
 		
-		if (!resize_port(me, 1, atom_size)) {
+		if (!resize_port(this, 1, atom_size)) {
 			cerr << "Failed to resize port " << 1 << " to " << atom_size << "bytes" << endl;
 			return NULL;
 		}
 		
-		out = me->p<LV2_Atom>(1);
+		out = this->p<LV2_Atom>(1);
 		uint8_t* head = (uint8_t*)out;
 
 		// Single top-level object, emit it directly
@@ -349,7 +347,7 @@ public:
 
 		// Several top-level objects, emit model
 		} else {
-			out->type = me->atom_Model;
+			out->type = atom_Model;
 			out->size = atom_size;
 			*head += sizeof(LV2_Object);
 

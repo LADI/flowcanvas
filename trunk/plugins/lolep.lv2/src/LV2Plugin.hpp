@@ -27,6 +27,7 @@
 
 #include <unistd.h>
 #include <stdarg.h>
+#include <stdlib.h>
 
 #include "lv2.h"
 #include "lv2_types.hpp"
@@ -83,9 +84,9 @@ DescList& get_lv2_descriptors();
  *  and one audio output port that just copies the input to the output.
  */
 template<class Derived,
-		class Ext1 = End, class Ext2 = End, class Ext3 = End,
-		class Ext4 = End, class Ext5 = End, class Ext6 = End,
-		class Ext7 = End, class Ext8 = End, class Ext9 = End>
+         class Ext1 = End, class Ext2 = End, class Ext3 = End,
+         class Ext4 = End, class Ext5 = End, class Ext6 = End,
+         class Ext7 = End, class Ext8 = End, class Ext9 = End>
 class Plugin
 	: public MixinTree<Derived, Ext1, Ext2, Ext3, Ext4, Ext5, Ext6, Ext7, Ext8, Ext9>
 {
@@ -150,12 +151,10 @@ public:
 	 * unsigned _ = MyPluginClass::register_class("http://my.plugin.class");
 	 *  @endcode
 	 */
-	static unsigned register_class(const std::string& uri) {
+	static unsigned register_class(const char* uri) {
 		LV2_Descriptor desc;
 		std::memset(&desc, 0, sizeof(LV2_Descriptor));
-		char* c_uri = new char[uri.size() + 1];
-		std::memcpy(c_uri, uri.c_str(), uri.size() + 1);
-		desc.URI            = c_uri;
+		desc.URI            = uri;
 		desc.instantiate    = &Derived::_create_plugin_instance;
 		desc.connect_port   = &Derived::_connect_port;
 		desc.activate       = &Derived::_activate;

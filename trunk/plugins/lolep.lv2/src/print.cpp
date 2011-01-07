@@ -42,41 +42,39 @@ class Print : public PrintBase
 public:
 	Print(double rate, const char* bundle, const LV2::Feature* const* features)
 		: PrintBase(1)
-		, atom_Bool(uri_to_id(NULL,   LV2_ATOM_URI "#Bool"))
-		, atom_Float(uri_to_id(NULL,  LV2_ATOM_URI "#Float32"))
-		, atom_Int32(uri_to_id(NULL,  LV2_ATOM_URI "#Int32"))
-		, atom_String(uri_to_id(NULL, LV2_ATOM_URI "#String"))
-		, atom_Tuple(uri_to_id(NULL,  LV2_ATOM_URI "#Tuple"))
-		, atom_Vector(uri_to_id(NULL,  LV2_ATOM_URI "#Vector"))
+		, atom_Bool(uri_to_id(NULL,      LV2_ATOM_URI "#Bool"))
+		, atom_Float(uri_to_id(NULL,     LV2_ATOM_URI "#Float32"))
+		, atom_Int32(uri_to_id(NULL,     LV2_ATOM_URI "#Int32"))
+		, atom_String(uri_to_id(NULL,    LV2_ATOM_URI "#String"))
+		, atom_Tuple(uri_to_id(NULL,     LV2_ATOM_URI "#Tuple"))
+		, atom_Vector(uri_to_id(NULL,    LV2_ATOM_URI "#Vector"))
 		, midi_MidiEvent(uri_to_id(NULL, LV2_MIDI_URI "#MidiEvent"))
 	{
 	}
 
-	static uint32_t message_run(LV2_Handle  instance,
-	                            const void* valid_inputs,
-	                            void*       valid_outputs)
+	uint32_t message_run(const void* valid_inputs,
+	                     void*       valid_outputs)
 	{
-		Print*    me = reinterpret_cast<Print*>(instance);
-		LV2_Atom* in = me->p<LV2_Atom>(0);
+		LV2_Atom* in = p<LV2_Atom>(0);
 		if (in->type == 0 && in->size == 0) {
 			printf("null\n");
-		} else if (in->type == me->atom_Bool) {
+		} else if (in->type == atom_Bool) {
 			if (*(int32_t*)in->body == 0) {
 				printf("false\n");
 			} else {
 				printf("true\n");
 			}
-		} else if (in->type == me->atom_String) {
+		} else if (in->type == atom_String) {
 			printf("\"%s\"\n", ((LV2_Atom_String*)in->body)->str);
-		} else if (in->type == me->atom_Int32) {
+		} else if (in->type == atom_Int32) {
 			printf("%d\n", *(int32_t*)in->body);
-		} else if (in->type == me->atom_Float) {
+		} else if (in->type == atom_Float) {
 			printf("%f\n", *(float*)in->body);
-		} else if (in->type == me->atom_Tuple) {
+		} else if (in->type == atom_Tuple) {
 			printf("( ... )\n");
-		} else if (in->type == me->atom_Vector) {
+		} else if (in->type == atom_Vector) {
 			printf("[ ... ]\n");
-		} else if (in->type == me->midi_MidiEvent) {
+		} else if (in->type == midi_MidiEvent) {
 			printf("(MIDI ");
 			for (uint16_t i = 0; i < in->size; ++i) {
 				printf(" %X", (unsigned)in->body[i]);

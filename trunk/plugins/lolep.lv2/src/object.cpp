@@ -48,11 +48,11 @@ public:
 		: ObjectBase(1)
 		, atom_Object(uri_to_id(NULL, LV2_ATOM_URI "#Object"))
 		, atom_URIInt(uri_to_id(NULL, LV2_ATOM_URI "#URIInt"))
-		, msg_diff(uri_to_id(NULL,  LV2_MESSAGE_URI "#diff"))
-		, msg_key(uri_to_id(NULL, LV2_MESSAGE_URI "#key"))
-		, msg_set(uri_to_id(NULL, LV2_MESSAGE_URI "#set"))
-		, msg_unset(uri_to_id(NULL, LV2_MESSAGE_URI "#unset"))
-		, msg_value(uri_to_id(NULL, LV2_MESSAGE_URI "#value"))
+		, msg_diff(uri_to_id(NULL,    LV2_MESSAGE_URI "#diff"))
+		, msg_key(uri_to_id(NULL,     LV2_MESSAGE_URI "#key"))
+		, msg_set(uri_to_id(NULL,     LV2_MESSAGE_URI "#set"))
+		, msg_unset(uri_to_id(NULL,   LV2_MESSAGE_URI "#unset"))
+		, msg_value(uri_to_id(NULL,   LV2_MESSAGE_URI "#value"))
 		, rdf_type(uri_to_id(NULL, "http://www.w3.org/1999/02/22-rdf-syntax-ns#type"))
 	{
 	}
@@ -63,21 +63,19 @@ public:
 			free(i->second);
 	}
 	
-	static uint32_t message_run(LV2_Handle  instance,
-	                            const void* valid_inputs,
-	                            void*       valid_outputs)
+	uint32_t message_run(const void* valid_inputs,
+	                     void*       valid_outputs)
 	{
-		Object*   me  = reinterpret_cast<Object*>(instance);
-		LV2_Atom* in  = me->p<LV2_Atom>(0);
-		LV2_Atom* out = me->p<LV2_Atom>(1);
+		LV2_Atom* in  = p<LV2_Atom>(0);
+		LV2_Atom* out = p<LV2_Atom>(1);
 
 		out->type = 0;
 		out->size = 0;
 
-		if (lv2_atom_is_a(in, me->rdf_type, me->atom_URIInt, me->atom_Object, me->msg_set)) {
+		if (lv2_atom_is_a(in, rdf_type, atom_URIInt, atom_Object, msg_set)) {
 			LV2_Object_Query q[] = {
-				{ me->msg_key,   NULL },
-				{ me->msg_value, NULL },
+				{ msg_key,   NULL },
+				{ msg_value, NULL },
 				{ 0, NULL }
 			};
 			
@@ -85,7 +83,7 @@ public:
 				LV2_Atom* key   = q[0].value;
 				LV2_Atom* value = q[1].value;
 				
-				if (key->type != me->atom_URIInt) {
+				if (key->type != atom_URIInt) {
 					fprintf(stderr, "error: Key is not a URI\n");
 					return 0;
 				}
@@ -95,32 +93,32 @@ public:
 				memcpy(copy, value, copy_size);
 
 				printf("SET %u\n", *(uint32_t*)key->body);
-				me->_map.insert(make_pair(*(uint32_t*)key->body, copy));
+				_map.insert(make_pair(*(uint32_t*)key->body, copy));
 
-				out->type = me->msg_diff;
+				out->type = msg_diff;
 				lv2_contexts_set_port_valid(valid_outputs, 1);
 				return 0;
 			} else {
 				fprintf(stderr, "error: received invalid set message\n");
 			}
-		} else if (lv2_atom_is_a(in, me->rdf_type, me->atom_URIInt, me->atom_Object, me->msg_unset)) {
+		} else if (lv2_atom_is_a(in, rdf_type, atom_URIInt, atom_Object, msg_unset)) {
 			LV2_Object_Query q[] = {
-				{ me->msg_key, NULL },
+				{ msg_key, NULL },
 				{ 0, NULL }
 			};
 			
 			if (lv2_object_query(in, q)) {
 				LV2_Atom* key   = q[0].value;
 
-				if (key->type != me->atom_URIInt) {
+				if (key->type != atom_URIInt) {
 					fprintf(stderr, "error: Key is not a URI\n");
 					return 0;
 				}
 
 				printf("UNSET %u\n", *(uint32_t*)key->body);
-				me->_map.erase(*(uint32_t*)key->body);
+				_map.erase(*(uint32_t*)key->body);
 
-				out->type = me->msg_diff;
+				out->type = msg_diff;
 				lv2_contexts_set_port_valid(valid_outputs, 1);
 				return 0;
 			} else {

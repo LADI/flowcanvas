@@ -45,10 +45,6 @@ def build_plugin_lib(bld, lang, bundle, name, source, libs=[]):
 	penv = bld.env.copy()
 	penv['cshlib_PATTERN'] = '%s' + bld.env['cshlib_EXTENSION'][0]
 
-	ext = 'c'
-	if lang != 'c':
-		ext = 'cpp'
-
 	obj              = bld(features = '%s %sshlib' % (lang,lang))
 	obj.env          = penv
 	obj.source       = source + ['src/LV2Plugin.cpp']
