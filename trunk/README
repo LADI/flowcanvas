@@ -13,3 +13,9 @@ You MUST clean your build if you want to switch between building the whole
 repository and configuring each project separately.  If you mix the two
 processes without cleaning BAD THINGS WILL HAPPEN.
 
+The top-level waf script provides a 'run' command to run programs from the
+build directory without requiring installation.  The run command requires
+a --cmd argument, and will set the necessary environment
+(e.g. LD_LIBRARY_PATH) for running programs from the build directory, e.g.:
+
+./waf run --cmd="build/patchage/patchage"

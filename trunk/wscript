@@ -1,9 +1,13 @@
 #!/usr/bin/env python
+import glob
 import os
 import string
 import sys
+import subprocess
 
 import autowaf
+import Logs
+import Options
 from TaskGen import feature, before, after
 
 sys.path.append("./lv2/core.lv2/")
@@ -25,6 +29,8 @@ def include_lv2_h(self):
 
 def options(opt):
 	autowaf.set_options(opt)
+	opt.add_option('--cmd', type='string', dest='cmd',
+				   help='Command to run from build directory (for run command)')
 	opt.sub_options('lv2/core.lv2')
 	opt.sub_options('lv2')
 	opt.sub_options('slv2')
@@ -67,6 +73,31 @@ def configure(conf):
 	sub_config_and_use(conf, 'machina', False)
 	sub_config_and_use(conf, 'plugins/dirg.lv2')
 	sub_config_and_use(conf, 'plugins/lolep.lv2')
+
+def run(ctx):
+	if not Options.options.cmd:
+		print >>sys.STDERR, "error: missing --cmd option for run command"
+		return
+
+	cmd = Options.options.cmd
+	Logs.pprint('GREEN', 'Running %s' % cmd)
+
+	env          = os.environ
+	library_path = []
+	if env.has_key('LD_LIBRARY_PATH'):
+		library_path = env['LD_LIBRARY_PATH'].split(os.pathsep)
+	for i in 'flowcanvas raul slv2'.split():
+		library_path += [ os.path.join(os.getcwd(), 'build', i) ]
+
+	ingen_module_path = []
+	for i in 'client engine module shared engine client gui serialisation'.split():
+		path = os.path.join(os.getcwd(), 'build', 'ingen', 'src', i)
+		library_path      += [ path ]
+		ingen_module_path += [ path ]
+
+	env['LD_LIBRARY_PATH']   = os.pathsep.join(library_path)
+	env['INGEN_MODULE_PATH'] = os.pathsep.join(ingen_module_path)
+	subprocess.call(cmd, shell=True, env=env)
 
 def build(bld):
 	autowaf.set_recursive()
