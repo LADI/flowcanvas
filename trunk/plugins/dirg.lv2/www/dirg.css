@@ -1,0 +1,77 @@
+html, body {
+	height: 99%;
+}
+
+body {
+	background-color: black;
+	color: white;
+}
+
+#ui {
+	width: 100%;
+	height: 100%;
+	text-align: center;
+	border-spacing: 0;
+}
+
+.expand-width {
+	width: 100%;
+	height: auto;
+}
+
+.expand-height {
+	height: 100%;
+	width: auto;
+}
+
+.expand {
+	height: 100%;
+	width: 100%;
+}
+
+.grid {
+	border-spacing: 0.5ex;
+	width: 100%;
+	height: 100%;
+}
+
+.row {
+	width: 100%;
+	height: 2em;
+	border-spacing: 0.5ex;
+	margin: 0;
+	padding: 0;
+}
+
+.column {
+	height: 100%;
+	width: 2em;
+	border-spacing: 0.25ex;
+	margin: 0;
+	padding: 0;
+}
+
+.gridButton {
+	border: solid 0.5ex #666;
+	border-radius: 1ex;
+	-moz-border-radius: 1ex;
+}
+
+.sideButton, .topButton {
+	border: solid 0.5ex #666;
+	border-radius: 1em;
+	-moz-border-radius: 1em;
+}
+
+.sideButton {
+	width: 2em;
+}
+
+.topButton {
+	height: 2em;
+}
+
+#log {
+	overflow: auto;
+	height: 4em;
+}

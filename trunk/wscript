@@ -65,11 +65,24 @@ def configure(conf):
 	sub_config_and_use(conf, 'redlandmm')
 	sub_config_and_use(conf, 'ingen', False)
 	sub_config_and_use(conf, 'machina', False)
+	sub_config_and_use(conf, 'plugins/dirg.lv2')
 	sub_config_and_use(conf, 'plugins/lolep.lv2')
 
 def build(bld):
 	autowaf.set_recursive()
-	bld.add_subdirs('lv2/core.lv2 lv2 slv2 raul flowcanvas patchage redlandmm ingen plugins/lolep.lv2 machina')
+	bld.add_subdirs('''
+		lv2/core.lv2
+		lv2
+		slv2
+		raul
+		flowcanvas
+		patchage
+		redlandmm
+		ingen
+		plugins/dirg.lv2
+		plugins/lolep.lv2
+		machina
+	''')
 
 def test(ctx):
 	ctx.recurse('raul')

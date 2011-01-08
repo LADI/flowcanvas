@@ -1,0 +1,43 @@
+@prefix atom:  <http://lv2plug.in/ns/ext/atom#> .
+@prefix ctx:   <http://lv2plug.in/ns/ext/contexts#> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix dirg:  <http://drobilla.net/plugins/dirg> .
+@prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
+@prefix pg:    <http://lv2plug.in/ns/ext/port-groups#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+
+dirg: a lv2:Plugin ;
+	doap:name "Dirg" ;
+	doap:maintainer [
+		foaf:name "David Robillard" ;
+		foaf:homepage <http://drobilla.net/> ;
+		foaf:mbox <mailto:d@drobilla.net> ;
+	] ;
+    lv2:requiredFeature ctx:MessageContext ;
+	doap:license <http://usefulinc.com/doap/licenses/gpl> ;
+	lv2:port [
+		a lv2:InputPort, atom:MessagePort ;
+		ctx:context ctx:MessageContext ;
+		lv2:name "Input" ;
+		lv2:index 0 ;
+		lv2:symbol "input" ;
+	] ;
+	lv2:port [
+		a lv2:InputPort, atom:MessagePort ;
+		ctx:context ctx:MessageContext ;
+		lv2:name "Control" ;
+		lv2:index 0 ;
+		lv2:symbol "control" ;
+	] , [
+		a lv2:OutputPort, atom:MessagePort ;
+		ctx:context ctx:MessageContext ;
+		lv2:name "Events" ;
+		lv2:index 1 ;
+		lv2:symbol "events" ;
+	] ;
+	rdfs:comment """
+Grid controller with support for in-browser and/or Novation Launchpad UIs
+""" .
+
+
