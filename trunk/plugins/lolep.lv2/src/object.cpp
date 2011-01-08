@@ -80,8 +80,8 @@ public:
 			};
 			
 			if (lv2_object_query(in, q)) {
-				LV2_Atom* key   = q[0].value;
-				LV2_Atom* value = q[1].value;
+				const LV2_Atom* key   = q[0].value;
+				const LV2_Atom* value = q[1].value;
 				
 				if (key->type != atom_URIInt) {
 					fprintf(stderr, "error: Key is not a URI\n");
@@ -108,7 +108,7 @@ public:
 			};
 			
 			if (lv2_object_query(in, q)) {
-				LV2_Atom* key   = q[0].value;
+				const LV2_Atom* key   = q[0].value;
 
 				if (key->type != atom_URIInt) {
 					fprintf(stderr, "error: Key is not a URI\n");

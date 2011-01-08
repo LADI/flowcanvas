@@ -15,21 +15,28 @@
  * 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-#include <algorithm>
-#include <cassert>
-#include <set>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <algorithm>
+#include <cassert>
+#include <set>
+#include <sstream>
+
 #include <raptor.h>
+
 #include "lv2/lv2plug.in/ns/ext/atom/atom.h"
 #include "lv2/lv2plug.in/ns/ext/atom/atom-helpers.h"
 #include "lv2/lv2plug.in/ns/ext/contexts/contexts.h"
 #include "lv2/lv2plug.in/ns/ext/uri-map/uri-map.h"
-#include "lolep.hpp"
-#include "LV2Plugin.hpp"
+
 #include "LV2Extensions.hpp"
+#include "LV2Plugin.hpp"
+#include "lolep.hpp"
+
+#define NS_XSD "http://www.w3.org/2001/XMLSchema#"
 
 using namespace std;
 
@@ -278,14 +285,37 @@ public:
 			break;
 		}
 		case RAPTOR_IDENTIFIER_TYPE_LITERAL: {
-			const char*  str = (const char*)statement->subject;
-			const size_t len = strlen(str);
-			object = (LV2_Atom*)malloc(sizeof(LV2_Atom) + sizeof(uint32_t) + len);
-			object->type = me->atom_String;
-			object->size = sizeof(uint32_t) + len + 1;
-			LV2_Atom_String* lv2_str = (LV2_Atom_String*)object->body;
-			lv2_str->lang = 0;
-			memcpy(lv2_str->str, str, len + 1);
+			raptor_uri* datatype_uri = statement->object_literal_datatype;
+			if (!strcmp((const char*)raptor_uri_as_string(datatype_uri), NS_XSD "integer")) {
+				std::locale c_locale("C");
+				std::stringstream ss((const char*)statement->object);
+				ss.imbue(c_locale);
+				int32_t i = 0;
+				ss >> i;
+				object = (LV2_Atom*)malloc(sizeof(LV2_Atom) + sizeof(int32_t));
+				object->type = me->atom_Int32;
+				object->size = sizeof(int32_t);
+				*(int32_t*)object->body = i;
+			} else if (!strcmp((const char*)raptor_uri_as_string(datatype_uri), NS_XSD "decimal")) {
+				std::locale c_locale("C");
+				std::stringstream ss((const char*)statement->object);
+				ss.imbue(c_locale);
+				float f = 0;
+				ss >> f;
+				object = (LV2_Atom*)malloc(sizeof(LV2_Atom) + sizeof(float));
+				object->type = me->atom_Float;
+				object->size = sizeof(float);
+				*(float*)object->body = f;
+			} else {
+				const char*  str = (const char*)statement->object;
+				const size_t len = strlen(str);
+				object = (LV2_Atom*)malloc(sizeof(LV2_Atom) + sizeof(uint32_t) + len);
+				object->type = me->atom_String;
+				object->size = sizeof(uint32_t) + len + 1;
+				LV2_Atom_String* lv2_str = (LV2_Atom_String*)object->body;
+				lv2_str->lang = 0;
+				memcpy(lv2_str->str, str, len + 1);
+			}
 			break;
 		}
 		default:
