@@ -19,8 +19,12 @@
 #define FLOWCANVAS_CONNECTION_HPP
 
 #include <stdint.h>
+
 #include <list>
+#include <string>
+
 #include <boost/weak_ptr.hpp>
+
 #include <libgnomecanvasmm.h>
 #include <libgnomecanvasmm/bpath.h>
 #include <libgnomecanvasmm/path-def.h>
@@ -49,7 +53,7 @@ public:
 	virtual void move(double /*dx*/, double /*dy*/)
 	{ /* ignore, src/dst take care of it */ }
 
-	virtual void zoom(double);
+	virtual void zoom(double z);
 
 	bool selected() const { return _selected; }
 	void set_selected(bool b);
@@ -89,7 +93,7 @@ protected:
 	GnomeCanvasPathDef*  _path;
 
 	struct Handle : public Gnome::Canvas::Group {
-		Handle(Gnome::Canvas::Group& parent)
+		explicit Handle(Gnome::Canvas::Group& parent)
 			: Gnome::Canvas::Group(parent), shape(NULL), text(NULL) {}
 		~Handle() { delete shape; delete text; }
 		Gnome::Canvas::Shape* shape;

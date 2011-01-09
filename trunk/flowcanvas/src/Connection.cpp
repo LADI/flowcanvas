@@ -18,10 +18,13 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <string>
+
 #include <libgnomecanvasmm.h>
-#include "flowcanvas/Connection.hpp"
+
 #include "flowcanvas/Canvas.hpp"
 #include "flowcanvas/Connectable.hpp"
+#include "flowcanvas/Connection.hpp"
 #include "flowcanvas/Ellipse.hpp"
 
 namespace FlowCanvas {

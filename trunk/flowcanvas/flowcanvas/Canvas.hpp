@@ -19,12 +19,16 @@
 #define FLOWCANVAS_CANVAS_HPP
 
 #include <list>
+#include <string>
+
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/utility.hpp>
+
 #include <libgnomecanvasmm.h>
+
 #include "flowcanvas/Connection.hpp"
-#include "flowcanvas/Module.hpp"
 #include "flowcanvas/Item.hpp"
+#include "flowcanvas/Module.hpp"
 
 
 /** FlowCanvas namespace, everything is defined under this.

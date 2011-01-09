@@ -15,15 +15,24 @@
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
-#include <iostream>
+#include <algorithm>
 #include <cmath>
-#include <boost/weak_ptr.hpp>
-#include <libgnomecanvasmm.h>
-#include "flowcanvas/Port.hpp"
-#include "flowcanvas/Module.hpp"
-#include "flowcanvas/Canvas.hpp"
+#include <iostream>
+#include <list>
+#include <string>
 
-using namespace std;
+#include <boost/weak_ptr.hpp>
+
+#include <libgnomecanvasmm.h>
+
+#include "flowcanvas/Canvas.hpp"
+#include "flowcanvas/Module.hpp"
+#include "flowcanvas/Port.hpp"
+
+using std::cerr;
+using std::endl;
+using std::string;
+using std::list;
 
 static const uint32_t PORT_SELECTED_COLOR   = 0xFF0000FF;
 static const uint32_t PORT_EMPTY_PORT_BREADTH = 16;

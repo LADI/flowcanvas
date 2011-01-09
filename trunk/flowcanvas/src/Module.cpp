@@ -15,17 +15,20 @@
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
-#include <functional>
-#include <list>
 #include <algorithm>
-#include <cstdlib>
 #include <cassert>
 #include <cmath>
+#include <cstdlib>
+#include <functional>
+#include <list>
+#include <string>
+
+#include "flowcanvas/Canvas.hpp"
 #include "flowcanvas/Item.hpp"
 #include "flowcanvas/Module.hpp"
-#include "flowcanvas/Canvas.hpp"
 
-using namespace std;
+using std::list;
+using std::string;
 
 namespace FlowCanvas {
 
@@ -385,7 +388,7 @@ Module::move_to(double x, double y)
 	if (x + _width >= canvas->width() || y + _height >= canvas->height()) {
 		double x1, y1, x2, y2;
 		canvas->get_scroll_region(x1, y1, x2, y2);
-		canvas->set_scroll_region(x1, y1, max(x2, x + _width), max(y2, y + _height));
+		canvas->set_scroll_region(x1, y1, std::max(x2, x + _width), std::max(y2, y + _height));
 	}
 
 	property_x() = x;
@@ -783,11 +786,11 @@ Module::fit_canvas()
 {
 	boost::shared_ptr<Canvas> canvas = _canvas.lock();
 	if (canvas) {
-		double canvas_width = canvas->width();
+		double canvas_width  = canvas->width();
 		double canvas_height = canvas->height();
 
-		canvas_width = max(canvas_width, property_x() + _width + 5.0);
-		canvas_height = max(canvas_height, property_y() + _height + 5.0);
+		canvas_width  = std::max(canvas_width, property_x() + _width + 5.0);
+		canvas_height = std::max(canvas_height, property_y() + _height + 5.0);
 
 		canvas->resize(canvas_width, canvas_height);
 	}

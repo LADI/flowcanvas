@@ -124,7 +124,7 @@ private:
 	friend class Canvas;
 
 	struct PortComparator {
-		PortComparator(const std::string& name) : _name(name) {}
+		explicit PortComparator(const std::string& name) : _name(name) {}
 		inline bool operator()(const boost::shared_ptr<Port> port)
 			{ return (port && port->name() == _name); }
 		const std::string& _name;

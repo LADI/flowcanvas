@@ -18,13 +18,18 @@
 #ifndef FLOWCANVAS_PORT_HPP
 #define FLOWCANVAS_PORT_HPP
 
-#include <string>
+#include <stdint.h>
+
+#include <algorithm>
 #include <list>
+#include <string>
 #include <vector>
-#include <inttypes.h>
-#include <libgnomecanvasmm.h>
+
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
+
+#include <libgnomecanvasmm.h>
+
 #include "flowcanvas/Connectable.hpp"
 
 namespace FlowCanvas {
@@ -134,7 +139,7 @@ protected:
 	Gtk::Menu*              _menu;
 
 	struct Control {
-		Control(Gnome::Canvas::Rect* r)
+		explicit Control(Gnome::Canvas::Rect* r)
 			: rect(r)
 			, value(0.0f)
 			, min(0.0f)

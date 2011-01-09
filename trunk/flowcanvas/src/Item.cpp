@@ -15,11 +15,16 @@
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
-#include <boost/shared_ptr.hpp>
-#include "flowcanvas/Item.hpp"
-#include "flowcanvas/Canvas.hpp"
+#include <list>
+#include <string>
 
-using namespace std;
+#include <boost/shared_ptr.hpp>
+
+#include "flowcanvas/Canvas.hpp"
+#include "flowcanvas/Item.hpp"
+
+using std::string;
+using std::list;
 
 namespace FlowCanvas {
 

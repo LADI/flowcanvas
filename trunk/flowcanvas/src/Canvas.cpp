@@ -16,23 +16,31 @@
  */
 
 #include <algorithm>
-#include <sstream>
 #include <cassert>
 #include <cmath>
-#include <map>
 #include <iostream>
-#include <cmath>
+#include <list>
+#include <map>
+#include <sstream>
+#include <string>
+#include <vector>
+
 #include <boost/enable_shared_from_this.hpp>
+
 #include "flowcanvas-config.h"
 #include "flowcanvas/Canvas.hpp"
-#include "flowcanvas/Port.hpp"
 #include "flowcanvas/Module.hpp"
+#include "flowcanvas/Port.hpp"
 
 #ifdef HAVE_AGRAPH
 #include <gvc.h>
 #endif
 
-using namespace std;
+using std::cerr;
+using std::endl;
+using std::list;
+using std::string;
+using std::vector;
 
 namespace FlowCanvas {
 
@@ -488,7 +496,7 @@ Canvas::remove_connection(boost::shared_ptr<Connectable> item1,
 
 	boost::shared_ptr<Connection> c = get_connection(item1, item2);
 	if (!c) {
-		cerr << "Couldn't find connection.\n";
+		cerr << "Couldn't find connection." << endl;
 		return ret;
 	} else {
 		remove_connection(c);
@@ -625,7 +633,7 @@ Canvas::join_selection()
 		for (size_t i = 0; i < inputs.size(); ++i)
 			ports_joined(inputs[i], outputs[0]);
 	} else { // n -> m
-		size_t num_to_connect = min(inputs.size(), outputs.size());
+		size_t num_to_connect = std::min(inputs.size(), outputs.size());
 		for (size_t i = 0; i < num_to_connect; ++i) {
 			ports_joined(inputs[i], outputs[i]);
 		}

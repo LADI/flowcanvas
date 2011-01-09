@@ -18,6 +18,8 @@
 #ifndef FLOWCANVAS_CONNECTABLE_HPP
 #define FLOWCANVAS_CONNECTABLE_HPP
 
+#include <list>
+
 #include <boost/shared_ptr.hpp>
 
 namespace FlowCanvas {

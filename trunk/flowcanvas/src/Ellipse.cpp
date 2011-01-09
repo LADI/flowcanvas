@@ -15,15 +15,18 @@
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
-#include <functional>
-#include <list>
 #include <algorithm>
-#include <cstdlib>
 #include <cassert>
 #include <cmath>
-#include "flowcanvas/Item.hpp"
-#include "flowcanvas/Ellipse.hpp"
+#include <cstdlib>
+#include <functional>
+#include <list>
+#include <string>
+
 #include "flowcanvas/Canvas.hpp"
+#include "flowcanvas/Ellipse.hpp"
+#include "flowcanvas/Item.hpp"
+
 using std::string;
 
 namespace FlowCanvas {

@@ -15,8 +15,12 @@
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
+#include <list>
+
 #include <boost/weak_ptr.hpp>
+
 #include <libgnomecanvasmm.h>
+
 #include "flowcanvas/Connectable.hpp"
 #include "flowcanvas/Connection.hpp"
 

@@ -18,12 +18,16 @@
 #ifndef FLOWCANVAS_ITEM_HPP
 #define FLOWCANVAS_ITEM_HPP
 
-#include <string>
-#include <map>
 #include <algorithm>
-#include <boost/shared_ptr.hpp>
+#include <list>
+#include <map>
+#include <string>
+
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/shared_ptr.hpp>
+
 #include <libgnomecanvasmm.h>
+
 #include "flowcanvas/Port.hpp"
 
 namespace FlowCanvas {
@@ -56,7 +60,7 @@ public:
 
 	virtual void move(double dx, double dy) = 0;
 
-	virtual void zoom(double) {}
+	virtual void zoom(double z) {}
 	boost::weak_ptr<Canvas> canvas() const { return _canvas; }
 
 	bool popup_menu(guint button, guint32 activate_time) {
@@ -119,8 +123,8 @@ public:
 protected:
 	virtual void on_drag(double dx, double dy);
 	virtual void on_drop();
-	virtual void on_click(GdkEventButton*);
-	virtual void on_double_click(GdkEventButton*);
+	virtual void on_click(GdkEventButton* ev);
+	virtual void on_double_click(GdkEventButton* ev);
 
 	virtual void set_height(double h) = 0;
 	virtual void set_width(double w) = 0;
