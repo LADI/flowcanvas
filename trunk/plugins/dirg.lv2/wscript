@@ -95,8 +95,15 @@ def build(bld):
 	rel_lv2dir = os.path.relpath(bld.env['LV2DIR'], bld.env['BINDIR'])
 	bld.symlink_as('${BINDIR}/dirg', rel_lv2dir + '/dirg.lv2/dirg')
 
-	for i in ['dirg.ttl','manifest.ttl'] + glob.glob('www/*.*'):
+	for i in ['dirg.ttl','manifest.ttl']:
 		bld(features     = 'subst',
-			source       = i,
-			target       = 'dirg.lv2/' + i,
-			install_path = '${LV2DIR}/dirg.lv2/' + os.path.dirname(i))
+			source       = str(i),
+			target       = 'dirg.lv2/' + str(i),
+			install_path = '${LV2DIR}/dirg.lv2/' + os.path.dirname(str(i)))
+
+	for i in bld.path.ant_glob('www/*'):
+		path = 'www/' + str(i)
+		bld(features     = 'subst',
+			source       = path,
+			target       = 'dirg.lv2/' + path,
+			install_path = '${LV2DIR}/dirg.lv2/' + os.path.dirname(path))
