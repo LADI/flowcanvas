@@ -53,8 +53,7 @@ class GVNodes;
  */
 class Canvas : boost::noncopyable
              , public boost::enable_shared_from_this<Canvas>
-             , public /*CANVASBASE*/Gnome::Canvas::CanvasAA
-// (CANVASBASE is a hook for a sed script in configure.ac)
+             , public Gnome::Canvas::CanvasAA
 {
 public:
 	Canvas(double width, double height);
