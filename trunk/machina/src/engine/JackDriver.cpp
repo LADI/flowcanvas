@@ -44,6 +44,8 @@ JackDriver::JackDriver(SharedPtr<Machine> machine)
 	, _cycle_time(48000, MACHINA_PPQN, 120.0)
 	, _bpm(120.0)
 	, _quantization(0.0f)
+	, _stop(0)
+	, _stop_flag(false)
 	, _record_dur(_frames_unit) // = 0
 	, _recording(0)
 	, _is_activated(false)
@@ -332,7 +334,7 @@ JackDriver::on_process(jack_nframes_t nframes)
 
 	machine->set_sink(shared_from_this());
 
-	if (_stop.pending())
+	if (_stop_flag)
 		machine->reset(_cycle_time.start_beats());
 
 	process_input(machine, _cycle_time);
@@ -372,10 +374,10 @@ end:
 	 * we need to finalize it next cycle. */
 	_last_machine = machine;
 
-	if (_stop.pending()) {
+	if (_stop_flag) {
 		_cycle_time.set_slice(TimeStamp(_frames_unit, 0, 0),
 		                      TimeStamp(_frames_unit, 0, 0));
-		_stop.finish();
+		_stop_flag = false;
 	}
 }
 
@@ -386,7 +388,8 @@ JackDriver::stop()
 	if (recording())
 		finish_record();
 
-	_stop(); // waits
+	_stop_flag= true;
+	_stop.wait();
 	_machine->deactivate();
 }
 

@@ -23,7 +23,6 @@
 #include <jack/jack.h>
 #include <jack/midiport.h>
 
-#include "raul/Command.hpp"
 #include "raul/DoubleBuffer.hpp"
 #include "raul/Semaphore.hpp"
 #include "raul/SharedPtr.hpp"
@@ -113,7 +112,8 @@ private:
 	Raul::DoubleBuffer<double> _bpm;
 	Raul::DoubleBuffer<double> _quantization;
 
-	Raul::Command _stop;
+	Raul::Semaphore _stop;
+	bool            _stop_flag;
 
 	Raul::TimeDuration  _record_dur;
 	Raul::AtomicInt     _recording;
