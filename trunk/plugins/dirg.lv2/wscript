@@ -87,8 +87,8 @@ def build(bld):
 	obj.uselib       = ['USB', 'SIGC', 'GTHREAD', 'SOUP']
 	obj.install_path = '${LV2DIR}/dirg.lv2'
 
-	rel_lv2dir = os.path.relpath(bld.env['LV2DIR'], bld.env['BINDIR'])
-	bld.symlink_as('${BINDIR}/dirg', rel_lv2dir + '/dirg.lv2/dirg')
+	#rel_lv2dir = os.path.relpath(bld.env['LV2DIR'], bld.env['BINDIR'])
+	#bld.symlink_as('${BINDIR}/dirg', rel_lv2dir + '/dirg.lv2/dirg')
 
 	for i in ['dirg.ttl','manifest.ttl']:
 		bld(features     = 'subst',
