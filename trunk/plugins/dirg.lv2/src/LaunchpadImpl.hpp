@@ -29,7 +29,6 @@
 #include <queue>
 
 #include <boost/thread.hpp>
-#include <boost/unordered_map.hpp>
 #include <boost/utility.hpp>
 
 #include <libusb.h>
@@ -67,13 +66,9 @@ private:
 	void handleWriteTransfer(libusb_transfer* transfer);
 	void handleMidi(const MidiEvent& data);
 
-	void fillCache();
-
 	sigc::signal<void, ButtonID, bool> signal_;
 
 	typedef std::pair<uint8_t, uint8_t> Key;
-
-	boost::unordered_map<Key, uint8_t> cache_;
 
 	libusb_device_handle* handle_;
 	libusb_transfer*      readTransfer_;

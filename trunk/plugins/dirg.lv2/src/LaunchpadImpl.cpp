@@ -27,8 +27,6 @@
 
 #include <iostream>
 
-#include <boost/foreach.hpp>
-
 #define VENDOR_ID      0x1235
 #define PRODUCT_ID     0x000e
 #define POLL_TIMEOUT 10
@@ -226,27 +224,6 @@ LaunchpadImpl::connect()
 
 		cout << "successfully connected to the launchpad" << endl;
 		isConnected_ = true;
-		fillCache();
-	}
-}
-
-
-void
-LaunchpadImpl::fillCache()
-{
-	boost::mutex::scoped_lock lock(writeMutex_);
-	for (int i = 0; i < 128; i++) {
-		Key key(128, i);
-		cache_[key] = 0;
-
-		key         = Key(144, i);
-		cache_[key] = 0;
-
-		key         = Key(146, i);
-		cache_[key] = 0;
-
-		key         = Key(176, i);
-		cache_[key] = 0;
 	}
 }
 
@@ -324,13 +301,9 @@ LaunchpadImpl::writeMidi(uint8_t b1, uint8_t b2, uint8_t b3)
 {
 	boost::mutex::scoped_lock lock(writeMutex_);
 
-	Key key(b1, b2);
-	if (cache_[key] != b3) {
-		writeData_.push(b1);
-		writeData_.push(b2);
-		writeData_.push(b3);
-		cache_[key] = b3;
-	}
+	writeData_.push(b1);
+	writeData_.push(b2);
+	writeData_.push(b3);
 }
 
 void
