@@ -75,7 +75,9 @@ main(int argc, char** argv)
 	if (argc == 2) {
 		dir = argv[1];
 	} else {
-		dir = binary_location();
+		char* binloc = binary_location();
+		dir = binloc;
+		free(binloc);
 		size_t last_slash = dir.find_last_of('/');
 		if (last_slash == std::string::npos)
 			last_slash = dir.find_last_of('\\');
