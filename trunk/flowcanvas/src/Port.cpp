@@ -146,17 +146,17 @@ Port::set_control(float value, bool signal)
 	if (_control->max == _control->min)
 		_control->max = _control->min + 1.0;
 
-	if (isinf(_control->max))
+	if (std::isinf(_control->max))
 		_control->max = FLT_MAX;
 
-	int inf = isinf(value);
+	int inf = std::isinf(value);
 	if (inf == -1)
 		value = _control->min;
 	else if (inf == 1)
 		value = _control->max;
 
 	const double w = (value - _control->min) / (_control->max - _control->min) * _width;
-	if (isnan(w)) {
+	if (std::isnan(w)) {
 		cerr << "WARNING (" << _name << "): Control value is NaN" << endl;
 		return;
 	}
