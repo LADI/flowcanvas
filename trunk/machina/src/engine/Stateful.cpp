@@ -15,14 +15,14 @@
  * along with Machina.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "machina/Stateful.hpp"
+#include "Stateful.hpp"
 
 namespace Machina {
 
 uint64_t Stateful::_next_id = 1;
 
 Stateful::Stateful()
-	: _id(_next_id++)
+	: _id(next_id())
 {
 }
 

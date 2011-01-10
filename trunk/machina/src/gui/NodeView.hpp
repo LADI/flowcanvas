@@ -15,23 +15,26 @@
  * along with Machina.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MACHINA_NODEVIEW_H
-#define MACHINA_NODEVIEW_H
+#ifndef MACHINA_NODEVIEW_HPP
+#define MACHINA_NODEVIEW_HPP
 
 #include "flowcanvas/Ellipse.hpp"
-#include "machina/Node.hpp"
 
+#include "client/ClientObject.hpp"
 
-class NodeView : public FlowCanvas::Ellipse {
+#include "machina/types.hpp"
+
+class NodeView
+	: public FlowCanvas::Ellipse
+	, public Machina::Client::ClientObject::View {
 public:
-	NodeView(Gtk::Window*                  window,
-	         SharedPtr<FlowCanvas::Canvas> canvas,
-	         SharedPtr<Machina::Node>      node,
-	         const std::string&            name,
-	         double                        x,
-	         double                        y);
+	NodeView(Gtk::Window*                             window,
+	         SharedPtr<FlowCanvas::Canvas>            canvas,
+	         SharedPtr<Machina::Client::ClientObject> node,
+	         double                                   x,
+	         double                                   y);
 
-	SharedPtr<Machina::Node> node() { return _node; }
+	SharedPtr<Machina::Client::ClientObject> node() { return _node; }
 
 	void show_label(bool show);
 
@@ -40,13 +43,20 @@ public:
 private:
 	void handle_click(GdkEventButton* ev);
 	void on_double_click(GdkEventButton* ev);
+	void on_property(Machina::URIInt key, const Raul::Atom& value);
+	void on_action_property(Machina::URIInt key, const Raul::Atom& value);
 	void set_selected(bool selected);
 
-	Gtk::Window*             _window;
-	SharedPtr<Machina::Node> _node;
-	uint32_t                 _default_border_color;
-	uint32_t                 _old_color;
+	bool node_is(Machina::URIInt key);
+
+	Gtk::Window*                             _window;
+	SharedPtr<Machina::Client::ClientObject> _node;
+	uint32_t                                 _default_border_color;
+	uint32_t                                 _old_color;
+
+	SharedPtr<Machina::Client::ClientObject> _enter_action;
+	sigc::connection                         _enter_action_connection;
 };
 
 
-#endif // MACHINA_NODEVIEW_H
+#endif // MACHINA_NODEVIEW_HPP

@@ -15,8 +15,8 @@
  * along with Machina.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "machina/ActionFactory.hpp"
-#include "machina/MidiAction.hpp"
+#include "ActionFactory.hpp"
+#include "MidiAction.hpp"
 
 namespace Machina {
 

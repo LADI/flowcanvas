@@ -25,9 +25,10 @@
 #include "raul/SharedPtr.hpp"
 #include "raul/WeakPtr.hpp"
 
+#include "machina/types.hpp"
+
 #include "Action.hpp"
 #include "Stateful.hpp"
-#include "types.hpp"
 
 namespace Machina {
 
@@ -35,13 +36,13 @@ class Node;
 
 class Edge : public Stateful {
 public:
-
 	Edge(WeakPtr<Node> tail, SharedPtr<Node> head)
 		: _probability(1.0f)
 		, _tail(tail)
 		, _head(head)
 	{}
 
+	void set(URIInt key, const Raul::Atom& value);
 	void write_state(Redland::Model& model);
 
 	WeakPtr<Node>   tail() { return _tail; }

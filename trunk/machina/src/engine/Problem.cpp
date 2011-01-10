@@ -23,13 +23,15 @@
 #include <iostream>
 
 #include "eugene/Problem.hpp"
-#include "machina/ActionFactory.hpp"
+
 #include "machina/Edge.hpp"
 #include "machina/Machine.hpp"
+
 #include "raul/SMFReader.hpp"
 #include "raul/midi_events.h"
 
 #include "machina-config.h"
+#include "ActionFactory.hpp"
 #include "Problem.hpp"
 
 using namespace std;

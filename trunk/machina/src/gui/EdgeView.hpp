@@ -15,32 +15,38 @@
  * along with Machina.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MACHINA_EDGEVIEW_H
-#define MACHINA_EDGEVIEW_H
+#ifndef MACHINA_EDGEVIEW_HPP
+#define MACHINA_EDGEVIEW_HPP
 
 #include "flowcanvas/Connection.hpp"
 
-namespace Machina { class Edge; }
+#include "client/ClientObject.hpp"
+
+#include "machina/types.hpp"
+
 class NodeView;
 
-
-class EdgeView : public FlowCanvas::Connection {
+class EdgeView
+	: public FlowCanvas::Connection
+	, public Machina::Client::ClientObject::View {
 public:
-	EdgeView(SharedPtr<FlowCanvas::Canvas> canvas,
-	         SharedPtr<NodeView>           src,
-	         SharedPtr<NodeView>           dst,
-	         SharedPtr<Machina::Edge>      edge);
+	EdgeView(SharedPtr<FlowCanvas::Canvas>            canvas,
+	         SharedPtr<NodeView>                      src,
+	         SharedPtr<NodeView>                      dst,
+	         SharedPtr<Machina::Client::ClientObject> edge);
 
 	void show_label(bool show);
-	void update();
 
 	virtual double length_hint() const;
 
 private:
 	bool on_event(GdkEvent* ev);
+	void on_property(Machina::URIInt key, const Raul::Atom& value);
 
-	SharedPtr<Machina::Edge> _edge;
+	float probability() const;
+
+	SharedPtr<Machina::Client::ClientObject> _edge;
 };
 
 
-#endif // MACHINA_EDGEVIEW_H
+#endif // MACHINA_EDGEVIEW_HPP

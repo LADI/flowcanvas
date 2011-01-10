@@ -19,10 +19,12 @@
 #include <iomanip>
 
 #include "machina-config.h"
-#include "machina/MidiAction.hpp"
+#include "machina/URIs.hpp"
+#include "machina/Updates.hpp"
 
 #include "JackDriver.hpp"
 #include "LearnRequest.hpp"
+#include "MidiAction.hpp"
 #include "jack_compat.h"
 
 using namespace Raul;
@@ -222,6 +224,18 @@ JackDriver::process_input(SharedPtr<Machine> machine, const TimeSlice& time)
 						learn->finish(
 							TimeStamp(TimeUnit::frames(sample_rate()),
 								jack_last_frame_time(_client) + ev.time, 0));
+
+						const uint64_t id = Stateful::next_id();
+						write_set(_updates, id,
+						          URIs::instance().rdf_type,
+						          URIs::instance().machina_MidiAction_atom);
+						write_set(_updates, learn->node()->id(),
+						          URIs::instance().machina_enter_action,
+						          Raul::Atom((int32_t)id));
+						write_set(_updates, id,
+						          URIs::instance().machina_note_number,
+						          Raul::Atom((int32_t)ev.buffer[1]));
+
 						machine->clear_pending_learn();
 					}
 				}
@@ -235,7 +249,7 @@ JackDriver::process_input(SharedPtr<Machine> machine, const TimeSlice& time)
 void
 JackDriver::write_event(Raul::TimeStamp time,
                         size_t          size,
-                        const byte*     event) throw (std::logic_error)
+                        const byte*     event)
 {
 	if (!_output_port)
 		return;
@@ -327,7 +341,7 @@ JackDriver::on_process(jack_nframes_t nframes)
 		goto end;
 
 	while (true) {
-		const uint32_t run_dur_frames = machine->run(_cycle_time);
+		const uint32_t run_dur_frames = machine->run(_cycle_time, _updates);
 
 		if (run_dur_frames == 0) {
 			// Machine didn't run at all (machine has no initial states)

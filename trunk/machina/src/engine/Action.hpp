@@ -15,43 +15,44 @@
  * along with Machina.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MACHINA_MIDIACTION_HPP
-#define MACHINA_MIDIACTION_HPP
+#ifndef MACHINA_ACTION_HPP
+#define MACHINA_ACTION_HPP
 
-#include "raul/AtomicPtr.hpp"
+#include <string>
+#include <iostream>
+
+#include "raul/MIDISink.hpp"
+#include "raul/SharedPtr.hpp"
 #include "raul/TimeSlice.hpp"
-#include "types.hpp"
-#include "Action.hpp"
 
-namespace Raul { class MIDISink; }
+#include "machina/types.hpp"
+
+#include "Stateful.hpp"
 
 namespace Machina {
 
 
-class MidiAction : public Action {
-public:
-	~MidiAction();
-
-	MidiAction(size_t               size,
-	           const unsigned char* event);
-
-	size_t event_size() { return _size; }
-	byte*  event()      { return _event.get(); }
-
-	bool set_event(size_t size, const byte* event);
-
-	void execute(SharedPtr<Raul::MIDISink> driver, Raul::TimeStamp time);
+/** An Action, executed on entering or exiting of a state.
+ */
+struct Action : public Raul::Deletable, public Stateful {
+	virtual void execute(SharedPtr<Raul::MIDISink> sink, Raul::TimeStamp time) = 0;
 
 	virtual void write_state(Redland::Model& model);
+};
+
+
+class PrintAction : public Action {
+public:
+	PrintAction(const std::string& msg) : _msg(msg) {}
+
+	void execute(SharedPtr<Raul::MIDISink>, Raul::TimeStamp time)
+	{ std::cout << "t=" << time << ": " << _msg << std::endl; }
 
 private:
-
-	size_t                 _size;
-	const size_t           _max_size;
-	Raul::AtomicPtr<byte>  _event;
+	std::string _msg;
 };
 
 
 } // namespace Machina
 
-#endif // MACHINA_MIDIACTION_HPP
+#endif // MACHINA_ACTION_HPP

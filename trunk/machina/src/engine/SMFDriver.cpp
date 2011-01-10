@@ -15,26 +15,30 @@
  * along with Machina.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <list>
 #include <iostream>
+#include <list>
+
 #include <glibmm/convert.h>
+
 #include "raul/Quantizer.hpp"
 #include "raul/SharedPtr.hpp"
 #include "raul/SMFWriter.hpp"
 #include "raul/SMFReader.hpp"
+
 #include "machina/Machine.hpp"
-#include "machina/Edge.hpp"
-#include "machina/SMFDriver.hpp"
+
+#include "Edge.hpp"
+#include "SMFDriver.hpp"
 
 using namespace std;
 
 namespace Machina {
 
 
-SMFDriver::SMFDriver(SharedPtr<Machine> machine)
-	: Driver(machine)
+SMFDriver::SMFDriver(Raul::TimeUnit unit)
+	: Driver(SharedPtr<Machine>())
 {
-	_writer = SharedPtr<Raul::SMFWriter>(new Raul::SMFWriter(machine->time().unit()));
+	_writer = SharedPtr<Raul::SMFWriter>(new Raul::SMFWriter(unit));
 }
 
 
@@ -144,7 +148,7 @@ SMFDriver::run(SharedPtr<Machine> machine, Raul::TimeStamp max_time)
 	Raul::TimeSlice time(machine->time().unit().ppt(), _writer->unit().ppt(), 120.0);
 	time.set_slice(TimeStamp(max_time.unit(), 0, 0), time.beats_to_ticks(max_time));
 	machine->set_sink(shared_from_this());
-	machine->run(time);
+	machine->run(time, SharedPtr<UpdateBuffer>());
 }
 
 

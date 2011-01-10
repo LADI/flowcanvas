@@ -15,13 +15,17 @@
  * along with Machina.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iomanip>
-#include <sstream>
 #include "flowcanvas/Canvas.hpp"
-#include "machina/Edge.hpp"
+
+#include "machina/Controller.hpp"
+#include "machina/types.hpp"
+
 #include "EdgeView.hpp"
+#include "MachinaCanvas.hpp"
+#include "MachinaGUI.hpp"
 #include "NodeView.hpp"
 
+using Machina::URIs;
 
 /* probability colour stuff */
 
@@ -59,23 +63,34 @@ inline static uint32_t edge_color(float prob)
 
 using namespace FlowCanvas;
 
-EdgeView::EdgeView(SharedPtr<Canvas>        canvas,
-                   SharedPtr<NodeView>      src,
-                   SharedPtr<NodeView>      dst,
-                   SharedPtr<Machina::Edge> edge)
+EdgeView::EdgeView(SharedPtr<Canvas>                        canvas,
+                   SharedPtr<NodeView>                      src,
+                   SharedPtr<NodeView>                      dst,
+                   SharedPtr<Machina::Client::ClientObject> edge)
 	: FlowCanvas::Connection(canvas, src, dst, 0x9FA0A0F4, true)
 	, _edge(edge)
 {
-	set_color(edge_color(_edge->probability()));
+	set_color(edge_color(probability()));
 	set_handle_style(HANDLE_CIRCLE);
 	show_handle(true);
+
+	edge->signal_property.connect(
+		sigc::mem_fun(this, &EdgeView::on_property));
+}
+
+
+float
+EdgeView::probability() const
+{
+	return _edge->get(URIs::instance().machina_probability).get_float();
 }
 
 
 double
 EdgeView::length_hint() const
 {
-	return _edge->tail().lock()->duration().ticks() * 10;
+	SharedPtr<NodeView> tail = PtrCast<NodeView>(source().lock());
+	return tail->node()->get(URIs::instance().machina_duration).get_float() * 10.0;
 }
 
 
@@ -83,37 +98,38 @@ void
 EdgeView::show_label(bool show)
 {
 	show_handle(show);
-	set_color(edge_color(_edge->probability()));
-}
-
-
-void
-EdgeView::update()
-{
-	if (_handle)
-		show_handle(true);
-	set_color(edge_color(_edge->probability()));
+	set_color(edge_color(probability()));
 }
 
 
 bool
 EdgeView::on_event(GdkEvent* ev)
 {
+	SharedPtr<MachinaCanvas> canvas = PtrCast<MachinaCanvas>(_canvas.lock());
 	if (ev->type == GDK_BUTTON_PRESS) {
 		if (ev->button.state & GDK_CONTROL_MASK) {
 			if (ev->button.button == 1) {
-				_edge->set_probability(_edge->probability() - 0.1);
-				update();
+				canvas->app()->controller()->set_property(
+					_edge->id(),
+					URIs::instance().machina_probability,
+					Raul::Atom(probability() - 0.1f));
 				return true;
 			} else if (ev->button.button == 3) {
-				_edge->set_probability(_edge->probability() + 0.1);
-				update();
+				canvas->app()->controller()->set_property(
+					_edge->id(),
+					URIs::instance().machina_probability,
+					Raul::Atom(probability() + 0.1f));
 				return true;
 			}
 		}
 	}
-
 	return false;
 }
 
 
+void
+EdgeView::on_property(Machina::URIInt key, const Raul::Atom& value)
+{
+	if (key == URIs::instance().machina_probability)
+		set_color(edge_color(value.get_float()));
+}

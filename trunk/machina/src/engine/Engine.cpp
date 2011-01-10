@@ -21,12 +21,20 @@
 #include "machina/Engine.hpp"
 #include "machina/Loader.hpp"
 #include "machina/Machine.hpp"
-#include "machina/SMFDriver.hpp"
+#include "SMFDriver.hpp"
 #ifdef HAVE_JACK
 #include "JackDriver.hpp"
 #endif
 
 namespace Machina {
+
+Engine::Engine(SharedPtr<Driver> driver, Redland::World& rdf_world)
+	: _driver(driver)
+	, _rdf_world(rdf_world)
+	, _loader(_rdf_world)
+{
+}
+
 
 SharedPtr<Driver>
 Engine::new_driver(const std::string& name, SharedPtr<Machine> machine)
@@ -39,7 +47,7 @@ Engine::new_driver(const std::string& name, SharedPtr<Machine> machine)
 	}
 	#endif
 	if (name == "smf")
-		return SharedPtr<Driver>(new SMFDriver(machine));
+		return SharedPtr<Driver>(new SMFDriver(machine->time().unit()));
 
 	std::cerr << "Error: Unknown driver type `" << name << "'" << std::endl;
 	return SharedPtr<Driver>();
@@ -51,54 +59,68 @@ Engine::new_driver(const std::string& name, SharedPtr<Machine> machine)
 SharedPtr<Machine>
 Engine::load_machine(const Glib::ustring& uri)
 {
-	SharedPtr<Machine> old_machine = _driver->machine(); // Hold a reference to current machine..
-
-	SharedPtr<Machine> m = _loader.load(uri);
-	if (m) {
-		m->activate();
-		_driver->set_machine(m);
+	SharedPtr<Machine> machine = _loader.load(uri);
+	SharedPtr<Machine> old_machine;
+	if (machine) {
+		old_machine = _driver->machine(); // Keep a reference to old machine...
+		machine->activate();
+		_driver->set_machine(machine); // Switch driver to new machine
 	}
 
 	// .. and drop it in this thread (to prevent deallocation in the RT thread)
 
-	return m;
+	return machine;
 }
 
-
-/** Load the machine at @a uri, and insert it into the current machine..
+/** Build a machine from the MIDI at @a uri, and run it (replacing current machine).
  * Safe to call while engine is processing.
  */
 SharedPtr<Machine>
-Engine::import_machine(const Glib::ustring& uri)
+Engine::load_machine_midi(const Glib::ustring& uri, double q, Raul::TimeDuration dur)
 {
-	SharedPtr<Machine> m = _loader.load(uri);
-	if (m) {
-		m->activate();
-		_driver->machine()->nodes().append(m->nodes());
+	SharedPtr<SMFDriver> file_driver(new SMFDriver(dur.unit()));
+	SharedPtr<Machine>   machine = file_driver->learn(uri, q, dur);
+	SharedPtr<Machine>   old_machine;
+	if (machine) {
+		old_machine = _driver->machine(); // Keep a reference to old machine...
+		machine->activate();
+		_driver->set_machine(machine); // Switch driver to new machine
 	}
 
-	// Discard m
+	// .. and drop it in this thread (to prevent deallocation in the RT thread)
 
-	return _driver->machine();
+	return machine;
 }
 
-
-/** Learn the SMF (MIDI) file at @a uri, add it to the current machine.
- * Safe to call while engine is processing.
- */
-SharedPtr<Machine>
-Engine::import_midi(const Glib::ustring& uri, double q, Raul::TimeDuration duration)
+void
+Engine::import_machine(SharedPtr<Machine> machine)
 {
-	SharedPtr<SMFDriver> file_driver(new SMFDriver());
-	SharedPtr<Machine> m = file_driver->learn(uri, q, duration);
-	m->activate();
-	_driver->machine()->nodes().append(m->nodes());
-
-	// Discard m
-
-	return _driver->machine();
+	machine->activate();
+	_driver->machine()->nodes().append(machine->nodes());
+	// FIXME: thread safe?
+	// FIXME: announce
 }
 
+void
+Engine::export_midi(const Glib::ustring& filename, Raul::TimeDuration dur)
+{
+	SharedPtr<Machine>            machine = _driver->machine();
+	SharedPtr<Machina::SMFDriver> file_driver(new Machina::SMFDriver(dur.unit()));
+
+	const bool activated = _driver->is_activated();
+	if (activated)
+		_driver->deactivate(); // FIXME: disable instead
+
+	machine->set_sink(file_driver->writer());
+	file_driver->writer()->start(filename, TimeStamp(dur.unit(), 0.0));
+	file_driver->run(machine, dur);
+	machine->set_sink(_driver);
+	machine->reset(machine->time());
+	file_driver->writer()->finish();
+
+	if (activated)
+		_driver->activate();
+}
 
 void
 Engine::set_bpm(double bpm)

@@ -15,17 +15,21 @@
  * along with Machina.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cmath>
 #include <iostream>
 #include <map>
-#include <cmath>
+
 #include <glibmm/ustring.h>
+
 #include "redlandmm/Query.hpp"
+
 #include "machina/Loader.hpp"
-#include "machina/Node.hpp"
-#include "machina/Edge.hpp"
 #include "machina/Machine.hpp"
-#include "machina/ActionFactory.hpp"
+
 #include "machina-config.h"
+#include "ActionFactory.hpp"
+#include "Edge.hpp"
+#include "Node.hpp"
 
 using namespace Raul;
 using namespace std;

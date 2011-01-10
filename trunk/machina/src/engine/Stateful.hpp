@@ -23,7 +23,13 @@
 #include "redlandmm/World.hpp"
 #include "redlandmm/Model.hpp"
 
+#include "machina/types.hpp"
+
+namespace Raul { class Atom; }
+
 namespace Machina {
+
+class URIs;
 
 class Stateful {
 public:
@@ -31,16 +37,29 @@ public:
 
 	virtual ~Stateful() {}
 
+	virtual void set(URIInt key, const Raul::Atom& value) {}
 	virtual void write_state(Redland::Model& model) = 0;
 
 	uint64_t             id() const { return _id; }
 	const Redland::Node& rdf_id(Redland::World& world) const;
+
+	static uint64_t next_id() { return _next_id++; }
+
+protected:
+	Stateful(uint64_t id) : _id(id) {}
 
 private:
 	static uint64_t _next_id;
 
 	uint64_t              _id;
 	mutable Redland::Node _rdf_id;
+};
+
+class StatefulKey : public Stateful {
+public:
+	StatefulKey(uint64_t id) : Stateful(id) {}
+
+	void write_state(Redland::Model& model) {}
 };
 
 } // namespace Machina

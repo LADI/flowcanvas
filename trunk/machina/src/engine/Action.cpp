@@ -17,7 +17,8 @@
 
 #include "redlandmm/World.hpp"
 #include "redlandmm/Model.hpp"
-#include "machina/Action.hpp"
+
+#include "Action.hpp"
 
 namespace Machina {
 

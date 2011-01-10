@@ -21,9 +21,12 @@
 #include "raul/AtomRDF.hpp"
 #include "redlandmm/World.hpp"
 #include "redlandmm/Model.hpp"
-#include "machina/Node.hpp"
-#include "machina/Edge.hpp"
-#include "machina/ActionFactory.hpp"
+
+#include "machina/URIs.hpp"
+
+#include "ActionFactory.hpp"
+#include "Edge.hpp"
+#include "Node.hpp"
 
 using namespace Raul;
 using namespace std;
@@ -32,24 +35,24 @@ namespace Machina {
 
 
 Node::Node(TimeDuration duration, bool initial)
-	: _is_initial(initial)
+	: _enter_time(duration.unit())
+	, _duration(duration)
+	, _is_initial(initial)
 	, _is_selector(false)
 	, _is_active(false)
-	, _enter_time(duration.unit())
-	, _duration(duration)
 {
 }
 
 
 Node::Node(const Node& copy)
 	: Stateful() // don't copy RDF ID
-	, _is_initial(copy._is_initial)
-	, _is_selector(copy._is_selector)
-	, _is_active(false)
 	, _enter_time(copy._enter_time)
 	, _duration(copy._duration)
 	, _enter_action(ActionFactory::copy(copy._enter_action))
 	, _exit_action(ActionFactory::copy(copy._exit_action))
+	, _is_initial(copy._is_initial)
+	, _is_selector(copy._is_selector)
+	, _is_active(false)
 {
 	for (Edges::const_iterator i = copy._edges.begin(); i != copy._edges.end(); ++i) {
 		SharedPtr<Edge> edge(new Edge(*i->get()));
@@ -187,20 +190,30 @@ Node::connected_to(SharedPtr<Node> node)
 }
 
 
-void
-Node::remove_edges_to(SharedPtr<Node> node)
+SharedPtr<Edge>
+Node::remove_edge_to(SharedPtr<Node> node)
 {
-	for (Edges::iterator i = _edges.begin(); i != _edges.end() ; ) {
-		Edges::iterator next = i;
-		++next;
-
-		if ((*i)->head() == node)
+	for (Edges::iterator i = _edges.begin(); i != _edges.end(); ++i) {
+		if ((*i)->head() == node) {
+			SharedPtr<Edge> edge(*i);
 			_edges.erase(i);
-
-		i = next;
+			edges_changed();
+			return edge;
+		}
 	}
 
-	edges_changed();
+	return SharedPtr<Edge>();
+}
+
+
+void
+Node::set(URIInt key, const Raul::Atom& value)
+{
+	if (key == URIs::instance().machina_initial) {
+		set_initial(value.get_bool());
+	} else if (key == URIs::instance().machina_selector) {
+		set_selector(value.get_bool());
+	}
 }
 
 

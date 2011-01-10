@@ -39,7 +39,7 @@ class Machine;
 class SMFDriver : public Driver,
                   public boost::enable_shared_from_this<SMFDriver> {
 public:
-	SMFDriver(SharedPtr<Machine> machine = SharedPtr<Machine>());
+	SMFDriver(Raul::TimeUnit unit);
 
 	SharedPtr<Machine> learn(const std::string& filename,
 	                         double             q,

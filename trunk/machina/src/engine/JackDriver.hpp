@@ -25,7 +25,6 @@
 
 #include "raul/Command.hpp"
 #include "raul/DoubleBuffer.hpp"
-#include "raul/EventRingBuffer.hpp"
 #include "raul/Semaphore.hpp"
 #include "raul/SharedPtr.hpp"
 
@@ -61,7 +60,7 @@ public:
 
 	void write_event(Raul::TimeStamp      time,
 	                 size_t               size,
-	                 const unsigned char* event) throw (std::logic_error);
+	                 const unsigned char* event);
 
 	void set_bpm(double bpm)        { _bpm.set(bpm); }
 	void set_quantization(double q) { _quantization.set(q); }

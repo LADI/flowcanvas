@@ -15,8 +15,8 @@
  * along with Machina.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MACHINA_CANVAS_HPP_H
-#define MACHINA_CANVAS_HPP_H
+#ifndef MACHINA_CANVAS_HPP_HPP
+#define MACHINA_CANVAS_HPP_HPP
 
 #include <string>
 #include "raul/SharedPtr.hpp"
@@ -28,22 +28,22 @@ using namespace FlowCanvas;
 class MachinaGUI;
 class NodeView;
 
+namespace Machina { namespace Client { class ClientObject; } }
 
 class MachinaCanvas : public Canvas
 {
 public:
 	MachinaCanvas(MachinaGUI* app, int width, int height);
 
-	void connect_node(SharedPtr<NodeView> port1,
-	                  SharedPtr<NodeView> port2);
+	//void build(SharedPtr<const Machina::Machine> machine, bool show_labels);
+	//void update_edges();
 
-	void disconnect_node(SharedPtr<NodeView> port1,
-	                     SharedPtr<NodeView> port2);
-
-	void build(SharedPtr<const Machina::Machine> machine, bool show_labels);
-	void update_edges();
+	void on_new_object(SharedPtr<Machina::Client::ClientObject> object);
+	void on_erase_object(SharedPtr<Machina::Client::ClientObject> object);
 
 	ArtVpathDash* selector_dash() { return _selector_dash; }
+
+	MachinaGUI* app() { return _app; }
 
 protected:
 	bool canvas_event(GdkEvent* event);
@@ -51,7 +51,15 @@ protected:
 	void node_clicked(WeakPtr<NodeView> item, GdkEventButton* ev);
 
 private:
-	SharedPtr<NodeView> create_node_view(SharedPtr<Machina::Node> node);
+	//SharedPtr<NodeView> create_node_view(SharedPtr<Machina::Node> node);
+
+	void action_create_node(double x, double y);
+
+	void action_connect(SharedPtr<NodeView> port1,
+	                    SharedPtr<NodeView> port2);
+
+	void action_disconnect(SharedPtr<NodeView> port1,
+	                       SharedPtr<NodeView> port2);
 
 	MachinaGUI*       _app;
 	ArtVpathDash*     _selector_dash;
@@ -59,4 +67,4 @@ private:
 };
 
 
-#endif // MACHINA_CANVAS_HPP_H
+#endif // MACHINA_CANVAS_HPP_HPP

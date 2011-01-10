@@ -21,6 +21,34 @@
 namespace Machina {
 
 
+LearnRequest::LearnRequest(SharedPtr<Raul::Maid> maid, SharedPtr<Node> node)
+	: _started(false)
+	, _start_time(TimeUnit(TimeUnit::BEATS, 19200), 0, 0) // irrelevant
+	, _quantization(0) // irrelevant
+	, _node(node)
+	, _enter_action(new MidiAction(4, NULL))
+	, _exit_action(new MidiAction(4, NULL))
+{
+	maid->manage(_enter_action);
+	maid->manage(_exit_action);
+}
+
+SharedPtr<LearnRequest>
+LearnRequest::create(SharedPtr<Raul::Maid> maid, SharedPtr<Node> node)
+{
+	SharedPtr<LearnRequest> ret(new LearnRequest(maid, node));
+	maid->manage(ret);
+	return ret;
+}
+
+void
+LearnRequest::start(double q, Raul::TimeStamp time)
+{
+	_started = true;
+	_start_time = time;
+	_quantization = q;
+}
+
 /** Add the learned actions to the node */
 void
 LearnRequest::finish(TimeStamp time)

@@ -15,24 +15,28 @@
  * along with Machina.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef NODEPROPERTIESWINDOW_H
-#define NODEPROPERTIESWINDOW_H
+#ifndef NODEPROPERTIESWINDOW_HPP
+#define NODEPROPERTIESWINDOW_HPP
 
 #include <gtkmm.h>
+
 #include <libglademm/xml.h>
-#include "machina/Node.hpp"
+
+#include <raul/SharedPtr.hpp>
+
+namespace Machina { namespace Client { class ClientObject; } }
 
 class NodePropertiesWindow : public Gtk::Dialog
 {
 public:
-	static void present(Gtk::Window* parent, SharedPtr<Machina::Node> node);
+	static void present(Gtk::Window* parent, SharedPtr<Machina::Client::ClientObject> node);
 
 private:
 	friend class Gnome::Glade::Xml;
 	NodePropertiesWindow(BaseObjectType* cobject, const Glib::RefPtr<Gnome::Glade::Xml>& glade_xml);
 	~NodePropertiesWindow();
 
-	void set_node(SharedPtr<Machina::Node> node);
+	void set_node(SharedPtr<Machina::Client::ClientObject> node);
 
 	void apply_clicked();
 	void cancel_clicked();
@@ -40,7 +44,7 @@ private:
 
 	static NodePropertiesWindow* _instance;
 
-	SharedPtr<Machina::Node> _node;
+	SharedPtr<Machina::Client::ClientObject> _node;
 
 	Gtk::SpinButton* _note_spinbutton;
 	Gtk::SpinButton* _duration_spinbutton;
@@ -50,4 +54,4 @@ private:
 };
 
 
-#endif // NODEPROPERTIESWINDOW_H
+#endif // NODEPROPERTIESWINDOW_HPP

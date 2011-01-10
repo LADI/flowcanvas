@@ -18,9 +18,15 @@
 #ifndef MACHINA_TYPES_HPP
 #define MACHINA_TYPES_HPP
 
+#include "raul/RingBuffer.hpp"
+
 namespace Machina {
 
 typedef unsigned char byte;
+
+typedef	Raul::RingBuffer UpdateBuffer;
+
+typedef uint32_t URIInt;
 
 } // namespace Machina
 

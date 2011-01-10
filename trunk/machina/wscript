@@ -50,18 +50,19 @@ def configure(conf):
 
 	autowaf.define(conf, 'MACHINA_PPQN', 19200)
 	autowaf.define(conf, 'MACHINA_VERSION', MACHINA_VERSION)
-	autowaf.define(conf, 'BUILD_MACHINA_GUI', int(build_gui))
+	autowaf.define(conf, 'MACHINA_BUILD_GUI', int(build_gui))
 	autowaf.define(conf, 'MACHINA_DATA_DIR', os.path.join(
 			conf.env['DATADIR'], 'machina'))
 
 	conf.write_config_header('machina-config.h', remove=False)
 
 	autowaf.display_msg(conf, "Jack", str(conf.env['HAVE_JACK'] == 1))
-	autowaf.display_msg(conf, "GUI", str(conf.env['BUILD_MACHINA_GUI'] == 1))
+	autowaf.display_msg(conf, "GUI", str(conf.env['MACHINA_BUILD_GUI'] == 1))
 	print
 
 def build(bld):
 	bld.add_subdirs('src/engine')
+	bld.add_subdirs('src/client')
 
-	if bld.env['BUILD_MACHINA_GUI']:
+	if bld.env['MACHINA_BUILD_GUI']:
 		bld.add_subdirs('src/gui')

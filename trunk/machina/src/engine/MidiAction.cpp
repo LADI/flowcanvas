@@ -16,11 +16,15 @@
  */
 
 #include <iostream>
+
 #include "raul/SharedPtr.hpp"
 #include "raul/MIDISink.hpp"
 #include "raul/Atom.hpp"
 #include "raul/AtomRDF.hpp"
-#include "machina/MidiAction.hpp"
+
+#include "machina/types.hpp"
+
+#include "MidiAction.hpp"
 
 namespace Machina {
 

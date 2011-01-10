@@ -24,7 +24,6 @@
 #include "machina/Engine.hpp"
 #include "machina/Machine.hpp"
 #include "machina/MidiAction.hpp"
-#include "machina/Node.hpp"
 #ifdef HAVE_EUGENE
 	#include "machina/Problem.hpp"
 #endif

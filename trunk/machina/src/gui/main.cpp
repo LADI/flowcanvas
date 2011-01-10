@@ -24,7 +24,7 @@
 #include "machina/Engine.hpp"
 #include "machina/Loader.hpp"
 #include "machina/Machine.hpp"
-#include "machina/SMFDriver.hpp"
+#include "machina/URIs.hpp"
 #include "MachinaGUI.hpp"
 
 using namespace std;
@@ -38,6 +38,8 @@ main(int argc, char** argv)
 		Glib::thread_init();
 
 	Redland::World rdf_world;
+
+	Machina::URIs::init();
 
 	SharedPtr<Machina::Machine> machine;
 

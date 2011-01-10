@@ -17,19 +17,25 @@
 
 #include <cstdlib>
 
+#include "raul/Atom.hpp"
 #include "raul/SharedPtr.hpp"
 #include "redlandmm/Model.hpp"
 #include "redlandmm/World.hpp"
 
-#include "machina/Edge.hpp"
 #include "machina/Machine.hpp"
-#include "machina/MidiAction.hpp"
-#include "machina/Node.hpp"
+#include "machina/Updates.hpp"
+#include "machina/URIs.hpp"
 
+#include "Edge.hpp"
+#include "Node.hpp"
 #include "LearnRequest.hpp"
+#include "MidiAction.hpp"
 
 using namespace std;
 using namespace Raul;
+
+static const Raul::Atom true_atom(true);
+static const Raul::Atom false_atom(false);
 
 namespace Machina {
 
@@ -162,7 +168,7 @@ Machine::remove_node(SharedPtr<Node> node)
 	_nodes.erase(_nodes.find(node));
 
 	for (Nodes::const_iterator n = _nodes.begin(); n != _nodes.end(); ++n)
-		(*n)->remove_edges_to(node);
+		(*n)->remove_edge_to(node);
 }
 
 
@@ -217,7 +223,7 @@ Machine::earliest_node() const
  * Returns true if node was entered, or false if the maximum active nodes has been reached.
  */
 bool
-Machine::enter_node(SharedPtr<Raul::MIDISink> sink, SharedPtr<Node> node)
+Machine::enter_node(SharedPtr<Raul::MIDISink> sink, SharedPtr<Node> node, SharedPtr<UpdateBuffer> updates)
 {
 	assert(!node->is_active());
 
@@ -229,6 +235,8 @@ Machine::enter_node(SharedPtr<Raul::MIDISink> sink, SharedPtr<Node> node)
 			node->enter(sink, _time);
 			assert(node->is_active());
 			_active_nodes.at(index) = node;
+
+			write_set(updates, node->id(), URIs::instance().machina_active, true_atom);
 			return true;
 		}
 		index = (index + 1) % MAX_ACTIVE_NODES;
@@ -243,9 +251,11 @@ Machine::enter_node(SharedPtr<Raul::MIDISink> sink, SharedPtr<Node> node)
 /** Exit an active node at the current _time.
  */
 void
-Machine::exit_node(SharedPtr<Raul::MIDISink> sink, SharedPtr<Node> node)
+Machine::exit_node(SharedPtr<Raul::MIDISink> sink, SharedPtr<Node> node, SharedPtr<UpdateBuffer> updates)
 {
 	node->exit(sink, _time);
+	write_set(updates, node->id(), URIs::instance().machina_active, false_atom);
+
 	assert(!node->is_active());
 
 	for (size_t i=0; i < MAX_ACTIVE_NODES; ++i)
@@ -267,7 +277,7 @@ Machine::exit_node(SharedPtr<Raul::MIDISink> sink, SharedPtr<Node> node)
 					&& rand_normal > range_min
 					&& rand_normal < range_min + (*s)->probability()) {
 
-				enter_node(sink, (*s)->head());
+				enter_node(sink, (*s)->head(), updates);
 				break;
 
 			} else {
@@ -286,7 +296,7 @@ Machine::exit_node(SharedPtr<Raul::MIDISink> sink, SharedPtr<Node> node)
 				SharedPtr<Node> head = (*e)->head();
 
 				if ( ! head->is_active())
-					enter_node(sink, head);
+					enter_node(sink, head, updates);
 			}
 		}
 
@@ -304,7 +314,7 @@ Machine::exit_node(SharedPtr<Raul::MIDISink> sink, SharedPtr<Node> node)
  * with sample accuracy if necessary).
  */
 uint32_t
-Machine::run(const Raul::TimeSlice& time)
+Machine::run(const Raul::TimeSlice& time, SharedPtr<UpdateBuffer> updates)
 {
 	if (_is_finished)
 		return 0;
@@ -321,11 +331,13 @@ Machine::run(const Raul::TimeSlice& time)
 		bool entered = false;
 		if ( ! _nodes.empty()) {
 			for (Nodes::const_iterator n = _nodes.begin(); n != _nodes.end(); ++n) {
-				if ((*n)->is_active())
+				if ((*n)->is_active()) {
 					(*n)->exit(sink, _time);
+					write_set(updates, (*n)->id(), URIs::instance().machina_active, false_atom);
+				}
 
 				if ((*n)->is_initial()) {
-					if (enter_node(sink, (*n)))
+					if (enter_node(sink, (*n), updates))
 						entered = true;
 				}
 			}
@@ -352,7 +364,7 @@ Machine::run(const Raul::TimeSlice& time)
 		} else if (time.beats_to_ticks(earliest->exit_time()) < cycle_end_frames) {
 			// Earliest active state ends this cycle
 			_time = earliest->exit_time();
-			exit_node(sink, earliest);
+			exit_node(sink, earliest, updates);
 
 		} else {
 			// Earliest active state ends in the future, done this cycle
@@ -375,7 +387,6 @@ Machine::learn(SharedPtr<Raul::Maid> maid, SharedPtr<Node> node)
 {
 	_pending_learn = LearnRequest::create(maid, node);
 }
-
 
 void
 Machine::write_state(Redland::Model& model)

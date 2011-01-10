@@ -16,9 +16,12 @@
  */
 
 #include <fstream>
+#include <iostream>
 #include <string>
+
 #include <gtkmm.h>
 #include <libglademm/xml.h>
+
 #include "machina-config.h"
 
 class GladeXml

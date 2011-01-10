@@ -15,18 +15,27 @@
  * along with Machina.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef MACHINA_GUI_H
-#define MACHINA_GUI_H
+#ifndef MACHINA_GUI_HPP
+#define MACHINA_GUI_HPP
 
 #include <string>
 #include <libgnomecanvasmm.h>
-#include "machina-config.h"
-#include "raul/SharedPtr.hpp"
+
 #include "raul/Maid.hpp"
+#include "raul/SharedPtr.hpp"
+#include "raul/TimeStamp.hpp"
+
+#include "machina-config.h"
 
 using namespace std;
 
-namespace Machina { class Machine; class Engine; class Evolver; }
+namespace Machina {
+class Machine;
+class Engine;
+class Evolver;
+class Controller;
+namespace Client { class ClientModel; class ClientObject; }
+}
 
 class MachinaCanvas;
 
@@ -46,7 +55,14 @@ public:
 	void attach();
 	void quit() { _main_window->hide(); }
 
+	SharedPtr<Machina::Controller> controller() { return _controller; }
+
 	inline void queue_refresh() { _refresh = true; }
+
+	void on_new_object(SharedPtr<Machina::Client::ClientObject> object);
+	void on_erase_object(SharedPtr<Machina::Client::ClientObject> object);
+
+	SharedPtr<Machina::Client::ClientModel> client_model() { return _client_model; }
 
 protected:
 	void connect_widgets();
@@ -93,9 +109,11 @@ protected:
 
 	Raul::TimeUnit _unit;
 
-	boost::shared_ptr<MachinaCanvas>   _canvas;
-	boost::shared_ptr<Machina::Engine> _engine;
-
+	SharedPtr<MachinaCanvas>                _canvas;
+	SharedPtr<Machina::Engine>              _engine;
+	SharedPtr<Machina::Client::ClientModel> _client_model;
+	SharedPtr<Machina::Controller>          _controller;
+	
 	SharedPtr<Raul::Maid>       _maid;
 	SharedPtr<Machina::Evolver> _evolver;
 
@@ -144,4 +162,4 @@ protected:
 	Gtk::ToolButton*       _adjust_edge_button;
 };
 
-#endif // MACHINA_GUI_H
+#endif // MACHINA_GUI_HPP

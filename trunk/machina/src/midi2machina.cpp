@@ -20,7 +20,6 @@
 #include "redlandmm/Model.hpp"
 #include "machina/Engine.hpp"
 #include "machina/Machine.hpp"
-#include "machina/Node.hpp"
 #include "machina/Action.hpp"
 #include "machina/Edge.hpp"
 #include "machina/SMFDriver.hpp"

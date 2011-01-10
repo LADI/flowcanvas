@@ -16,8 +16,6 @@
  */
 
 #include <string>
-#include "machina/MidiAction.hpp"
-#include "machina/ActionFactory.hpp"
 #include "NodePropertiesWindow.hpp"
 #include "GladeXml.hpp"
 
@@ -38,9 +36,13 @@ NodePropertiesWindow::NodePropertiesWindow(BaseObjectType* cobject, const Glib::
 	xml->get_widget("node_properties_apply_button", _apply_button);
 	xml->get_widget("node_properties_cancel_button", _cancel_button);
 	xml->get_widget("node_properties_ok_button", _ok_button);
-
-	_apply_button->signal_clicked().connect(sigc::mem_fun(this, &NodePropertiesWindow::apply_clicked));
-	_cancel_button->signal_clicked().connect(sigc::mem_fun(this, &NodePropertiesWindow::cancel_clicked));	_ok_button->signal_clicked().connect(sigc::mem_fun(this, &NodePropertiesWindow::ok_clicked));
+	
+	_apply_button->signal_clicked().connect(
+		sigc::mem_fun(this, &NodePropertiesWindow::apply_clicked));
+	_cancel_button->signal_clicked().connect(
+		sigc::mem_fun(this, &NodePropertiesWindow::cancel_clicked));
+	_ok_button->signal_clicked().connect(
+		sigc::mem_fun(this, &NodePropertiesWindow::ok_clicked));
 }
 
 
@@ -52,6 +54,7 @@ NodePropertiesWindow::~NodePropertiesWindow()
 void
 NodePropertiesWindow::apply_clicked()
 {
+	#if 0
 	const uint8_t note = _note_spinbutton->get_value();
 	if (!_node->enter_action()) {
 		_node->set_enter_action(ActionFactory::note_on(note));
@@ -67,6 +70,7 @@ NodePropertiesWindow::apply_clicked()
 	TimeStamp duration(TimeUnit(TimeUnit::BEATS, 19200), duration_dbl);
 	_node->set_duration(duration);
 	_node->set_changed();
+	#endif
 }
 
 
@@ -88,9 +92,10 @@ NodePropertiesWindow::ok_clicked()
 
 
 void
-NodePropertiesWindow::set_node(SharedPtr<Machina::Node> node)
+NodePropertiesWindow::set_node(SharedPtr<Machina::Client::ClientObject> node)
 {
 	_node = node;
+	#if 0
 	SharedPtr<MidiAction> enter_action = PtrCast<MidiAction>(node->enter_action());
 	if (enter_action && enter_action->event_size() > 1
 			&& (enter_action->event()[0] & 0xF0) == 0x90) {
@@ -103,11 +108,12 @@ NodePropertiesWindow::set_node(SharedPtr<Machina::Node> node)
 		_note_spinbutton->hide();
 	}
 	_duration_spinbutton->set_value(node->duration().to_double());
+	#endif
 }
 
 
 void
-NodePropertiesWindow::present(Gtk::Window* parent, SharedPtr<Machina::Node> node)
+NodePropertiesWindow::present(Gtk::Window* parent, SharedPtr<Machina::Client::ClientObject> node)
 {
 	if (!_instance) {
 		Glib::RefPtr<Gnome::Glade::Xml> xml = GladeXml::create();

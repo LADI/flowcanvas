@@ -25,10 +25,12 @@
 #include <libgnomecanvasmm.h>
 #include <libglademm/xml.h>
 #include "redlandmm/Model.hpp"
+#include "machina/Controller.hpp"
 #include "machina/Engine.hpp"
 #include "machina/Machine.hpp"
 #include "machina/Mutation.hpp"
-#include "machina/SMFDriver.hpp"
+#include "machina/Updates.hpp"
+#include "client/ClientModel.hpp"
 #include "GladeXml.hpp"
 #include "MachinaGUI.hpp"
 #include "MachinaCanvas.hpp"
@@ -47,6 +49,8 @@ MachinaGUI::MachinaGUI(SharedPtr<Machina::Engine> engine)
 	, _evolve(false)
 	, _unit(TimeUnit::BEATS, 19200)
 	, _engine(engine)
+	, _client_model(new Machina::Client::ClientModel())
+	, _controller(new Machina::Controller(_engine, *_client_model.get()))
 	, _maid(new Raul::Maid(32))
 {
 	_canvas = boost::shared_ptr<MachinaCanvas>(new MachinaCanvas(this, 1600*2, 1200*2));
@@ -190,7 +194,11 @@ MachinaGUI::MachinaGUI(SharedPtr<Machina::Engine> engine)
 	_evolve_toolbar->set_sensitive(false);
 #endif
 
-	_canvas->build(engine->machine(), _menu_view_labels->get_active());
+	_controller->announce(engine->machine());
+	_canvas->arrange();
+
+	_client_model->signal_new_object.connect(sigc::mem_fun(this, &MachinaGUI::on_new_object));
+	_client_model->signal_erase_object.connect(sigc::mem_fun(this, &MachinaGUI::on_erase_object));
 }
 
 
@@ -218,14 +226,7 @@ MachinaGUI::evolve_callback()
 bool
 MachinaGUI::idle_callback()
 {
-	const bool show_labels = _menu_view_labels->get_active();
-
-	for (ItemList::iterator i = _canvas->items().begin(); i != _canvas->items().end(); ++i) {
-		const SharedPtr<NodeView> nv = PtrCast<NodeView>(*i);
-		if (nv && nv->node()->changed())
-			nv->update_state(show_labels);
-	}
-
+	_controller->process_updates();
 	return true;
 }
 
@@ -239,12 +240,12 @@ MachinaGUI::scrolled_window_event(GdkEvent* event)
 			ItemList selection = _canvas->selected_items();
 			_canvas->clear_selection();
 
-			for (ItemList::iterator i = selection.begin();
-					i != selection.end(); ++i) {
+			for (ItemList::iterator i = selection.begin(); i != selection.end(); ++i) {
 				SharedPtr<NodeView> view = PtrCast<NodeView>(*i);
 				if (view) {
-					_engine->machine()->remove_node(view->node());
-					_canvas->remove_item(view);
+					_controller->erase(view->node()->id());
+					//_engine->machine()->remove_node(view->node());
+					//_canvas->remove_item(view);
 				}
 			}
 
@@ -320,6 +321,7 @@ MachinaGUI::random_mutation(SharedPtr<Machine> machine)
 void
 MachinaGUI::mutate(SharedPtr<Machine> machine, unsigned mutation)
 {
+	#if 0
 	if (!machine)
 		machine = _engine->machine();
 
@@ -356,6 +358,7 @@ MachinaGUI::mutate(SharedPtr<Machine> machine, unsigned mutation)
 			break;
 		default: throw;
 	}
+	#endif
 }
 
 
@@ -428,10 +431,11 @@ MachinaGUI::menu_file_open()
 	const int result = dialog.run();
 
 	if (result == Gtk::RESPONSE_OK) {
-		SharedPtr<Machina::Machine> new_machine = _engine->import_machine(dialog.get_uri());
+		SharedPtr<Machina::Machine> new_machine = _engine->load_machine(dialog.get_uri());
 		if (new_machine) {
 			_canvas->destroy();
-			_canvas->build(new_machine, _menu_view_labels->get_active());
+			_controller->announce(new_machine);
+			_canvas->arrange();
 			_save_uri = dialog.get_uri();
 		}
 	}
@@ -537,19 +541,19 @@ MachinaGUI::menu_import_midi()
 	const int result = dialog.run();
 
 	if (result == Gtk::RESPONSE_OK) {
-		SharedPtr<Machina::SMFDriver> file_driver(new Machina::SMFDriver());
+		const double length_dbl = length_sb->get_value_as_int();
+		const Raul::TimeStamp length(_unit, length_dbl);
 
-		double length_dbl = length_sb->get_value_as_int();
-		Raul::TimeStamp length(_unit, length_dbl);
-
-		SharedPtr<Machina::Machine> machine = file_driver->learn(dialog.get_filename(), 0.0, length);
+		SharedPtr<Machina::Machine> machine = _engine->load_machine_midi(
+			dialog.get_filename(), 0.0, length);
 
 		if (machine) {
 			dialog.hide();
 			machine->activate();
 			machine->reset(machine->time());
-			_canvas->build(machine, _menu_view_labels->get_active());
+			//_canvas->build(machine, _menu_view_labels->get_active());
 			_engine->driver()->set_machine(machine);
+			_controller->announce(machine);
 		} else {
 			Gtk::MessageDialog msg_dialog(dialog, "Error loading MIDI file",
 					false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_OK, true);
@@ -572,19 +576,23 @@ MachinaGUI::menu_export_midi()
 	filt.set_name("MIDI Files");
 	dialog.set_filter(filt);
 
+	Gtk::HBox* extra_widget = Gtk::manage(new Gtk::HBox());
+	Gtk::SpinButton* dur_sb = Gtk::manage(new Gtk::SpinButton());
+	dur_sb->set_increments(1, 10);
+	dur_sb->set_range(0, INT_MAX);
+	dur_sb->set_value(0);
+	extra_widget->pack_start(*Gtk::manage(new Gtk::Label("")), true, true);
+	extra_widget->pack_start(*Gtk::manage(new Gtk::Label("Duration (beats): ")), false, false);
+	extra_widget->pack_start(*dur_sb, false, false);
+	dialog.set_extra_widget(*extra_widget);
+	extra_widget->show_all();
+
 	const int result = dialog.run();
 
 	if (result == Gtk::RESPONSE_OK) {
-		SharedPtr<Machina::SMFDriver> file_driver(new Machina::SMFDriver());
-		_engine->driver()->deactivate();
-		const SharedPtr<Machina::Machine> m = _engine->machine();
-		m->set_sink(file_driver->writer());
-		file_driver->writer()->start(dialog.get_filename(), TimeStamp(_unit, 0.0));
-		file_driver->run(m, TimeStamp(_unit, 32.0)); // TODO: solve halting problem
-		m->set_sink(_engine->driver());
-		m->reset(m->time());
-		file_driver->writer()->finish();
-		_engine->driver()->activate();
+		const double dur_dbl = dur_sb->get_value_as_int();
+		const Raul::TimeStamp dur(_unit, dur_dbl);
+		_engine->export_midi(dialog.get_filename(), dur);
 	}
 }
 
@@ -658,7 +666,7 @@ MachinaGUI::record_toggled()
 		_engine->driver()->start_record(_step_record_checkbutton->get_active());
 	} else if (_engine->driver()->recording()) {
 		_engine->driver()->finish_record();
-		_canvas->build(_engine->machine(), _menu_view_labels->get_active());
+		//_canvas->build(_engine->machine(), _menu_view_labels->get_active());
 		update_toolbar();
 	}
 }
@@ -672,7 +680,7 @@ MachinaGUI::stop_clicked()
 	if (_engine->driver()->recording()) {
 		_engine->driver()->stop();
 		_engine->machine()->deactivate();
-		_canvas->build(_engine->machine(), _menu_view_labels->get_active());
+		//_canvas->build(_engine->machine(), _menu_view_labels->get_active());
 	} else {
 		_engine->driver()->stop();
 		_engine->machine()->deactivate();
@@ -691,4 +699,14 @@ MachinaGUI::play_toggled()
 		_engine->machine()->deactivate();
 }
 
+void
+MachinaGUI::on_new_object(SharedPtr<Client::ClientObject> object)
+{
+	_canvas->on_new_object(object);
+}
 
+void
+MachinaGUI::on_erase_object(SharedPtr<Client::ClientObject> object)
+{
+	_canvas->on_erase_object(object);
+}

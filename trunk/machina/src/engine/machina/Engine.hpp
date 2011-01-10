@@ -34,12 +34,7 @@ class Machine;
 
 class Engine {
 public:
-	Engine(SharedPtr<Driver> driver, Redland::World& rdf_world)
-		: _driver(driver)
-		, _rdf_world(rdf_world)
-		, _loader(_rdf_world)
-	{
-	}
+	Engine(SharedPtr<Driver> driver, Redland::World& rdf_world);
 
 	Redland::World& rdf_world() { return _rdf_world; }
 
@@ -50,8 +45,14 @@ public:
 	SharedPtr<Machine> machine() { return _driver->machine(); }
 
 	SharedPtr<Machine> load_machine(const Glib::ustring& uri);
-	SharedPtr<Machine> import_machine(const Glib::ustring& uri);
-	SharedPtr<Machine> import_midi(const Glib::ustring& uri, double q, Raul::TimeDuration d);
+	SharedPtr<Machine> load_machine_midi(const Glib::ustring& uri,
+	                                     double               q,
+	                                     Raul::TimeDuration   dur);
+
+	void import_machine(SharedPtr<Machine> machine);
+
+	void export_midi(const Glib::ustring& filename,
+	                 Raul::TimeDuration   dur);
 
 	void set_bpm(double bpm);
 	void set_quantization(double beat_fraction);

@@ -44,8 +44,6 @@ using Raul::TimeUnit;
  */
 class Node : public Stateful {
 public:
-	typedef std::string ID;
-
 	Node(TimeDuration duration, bool initial=false);
 	Node(const Node& copy);
 
@@ -62,9 +60,10 @@ public:
 
 	void add_edge(SharedPtr<Edge> edge);
 	void remove_edge(SharedPtr<Edge> edge);
-	void remove_edges_to(SharedPtr<Node> node);
+	SharedPtr<Edge> remove_edge_to(SharedPtr<Node> node);
 	bool connected_to(SharedPtr<Node> node);
 
+	void set(URIInt key, const Raul::Atom& value);
 	void write_state(Redland::Model& model);
 
 	bool         is_initial() const           { return _is_initial; }
@@ -72,7 +71,7 @@ public:
 	bool         is_active() const            { return _is_active; }
 	TimeStamp    enter_time() const           { assert(_is_active); return _enter_time; }
 	TimeStamp    exit_time() const            { assert(_is_active); return _enter_time + _duration; }
-	TimeDuration duration()                   { return _duration; }
+	TimeDuration duration() const             { return _duration; }
 	void         set_duration(TimeDuration d) { _duration = d; }
 	bool         is_selector() const          { return _is_selector; }
 	void         set_selector(bool i);
@@ -88,15 +87,15 @@ public:
 private:
 	Node& operator=(const Node& other); // undefined
 
-	Schrodinbit       _changed;
-	bool              _is_initial;
-	bool              _is_selector;
-	bool              _is_active;
 	TimeStamp         _enter_time; ///< valid iff _is_active
 	TimeDuration      _duration;
 	SharedPtr<Action> _enter_action;
 	SharedPtr<Action> _exit_action;
 	Edges             _edges;
+	Schrodinbit       _changed;
+	bool              _is_initial;
+	bool              _is_selector;
+	bool              _is_active;
 };
 
 

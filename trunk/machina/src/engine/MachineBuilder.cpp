@@ -21,12 +21,12 @@
 #include "raul/SharedPtr.hpp"
 #include "raul/Quantizer.hpp"
 
-#include "machina/Edge.hpp"
 #include "machina/Machine.hpp"
-#include "machina/MidiAction.hpp"
-#include "machina/Node.hpp"
 
+#include "Edge.hpp"
+#include "Node.hpp"
 #include "MachineBuilder.hpp"
+#include "MidiAction.hpp"
 
 using namespace std;
 using namespace Raul;

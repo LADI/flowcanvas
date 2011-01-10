@@ -18,11 +18,12 @@
 #include <iostream>
 #include <cstdlib>
 
-#include "machina/ActionFactory.hpp"
-#include "machina/Edge.hpp"
 #include "machina/Machine.hpp"
-#include "machina/MidiAction.hpp"
 #include "machina/Mutation.hpp"
+
+#include "ActionFactory.hpp"
+#include "Edge.hpp"
+#include "MidiAction.hpp"
 
 using namespace std;
 

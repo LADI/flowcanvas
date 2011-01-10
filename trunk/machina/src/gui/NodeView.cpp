@@ -1,5 +1,5 @@
 /* This file is part of Machina.
- * Copyright (C) 2007-2009 David Robillard <http://drobilla.net>
+ * Copyright (C) 2007-2010 David Robillard <http://drobilla.net>
  *
  * Machina is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,29 +15,37 @@
  * along with Machina.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <iostream>
-#include "machina/MidiAction.hpp"
-#include "NodeView.hpp"
+#include "machina/Controller.hpp"
+#include "machina/URIs.hpp"
+#include "machina/types.hpp"
+
+#include "client/ClientModel.hpp"
+
+#include "MachinaCanvas.hpp"
+#include "MachinaGUI.hpp"
 #include "NodePropertiesWindow.hpp"
+#include "NodeView.hpp"
 
 using namespace std;
+using Machina::URIs;
 
-NodeView::NodeView(Gtk::Window*                  window,
-                   SharedPtr<FlowCanvas::Canvas> canvas,
-                   SharedPtr<Machina::Node>      node,
-                   const std::string&            name,
-                   double                        x,
-                   double                        y)
-	: FlowCanvas::Ellipse(canvas, name, x, y, 20, 20, false)
+NodeView::NodeView(Gtk::Window*                             window,
+                   SharedPtr<FlowCanvas::Canvas>            canvas,
+                   SharedPtr<Machina::Client::ClientObject> node,
+                   double                                   x,
+                   double                                   y)
+	: FlowCanvas::Ellipse(canvas, "", x, y, 20, 20, false)
 	, _window(window)
 	, _node(node)
 	, _default_border_color(_border_color)
 	, _old_color(_color)
 {
-	signal_clicked.connect(sigc::mem_fun(this, &NodeView::handle_click));
-	update_state(false);
-}
+	signal_clicked.connect(
+		sigc::mem_fun(this, &NodeView::handle_click));
 
+	node->signal_property.connect(
+		sigc::mem_fun(this, &NodeView::on_property));
+}
 
 void
 NodeView::on_double_click(GdkEventButton*)
@@ -45,23 +53,31 @@ NodeView::on_double_click(GdkEventButton*)
 	NodePropertiesWindow::present(_window, _node);
 }
 
+bool
+NodeView::node_is(Machina::URIInt key)
+{
+	const Raul::Atom& value = _node->get(key);
+	return value.type() == Raul::Atom::BOOL && value.get_bool();
+}
 
 void
 NodeView::handle_click(GdkEventButton* event)
 {
 	if (event->state & GDK_CONTROL_MASK) {
+		SharedPtr<MachinaCanvas> canvas = PtrCast<MachinaCanvas>(_canvas.lock());
 		if (event->button == 1) {
-			bool is_initial = _node->is_initial();
-			_node->set_initial( ! is_initial );
-			update_state(_label != NULL);
+			canvas->app()->controller()->set_property(
+					_node->id(),
+					URIs::instance().machina_initial,
+					!node_is(URIs::instance().machina_initial));
 		} else if (event->button == 3) {
-			bool is_selector = _node->is_selector();
-			_node->set_selector( ! is_selector );
-			update_state(_label != NULL);
+			canvas->app()->controller()->set_property(
+					_node->id(),
+					URIs::instance().machina_selector,
+					!node_is(URIs::instance().machina_selector));
 		}
 	}
 }
-
 
 static std::string
 midi_note_name(uint8_t num)
@@ -79,23 +95,22 @@ midi_note_name(uint8_t num)
 void
 NodeView::show_label(bool show)
 {
-	SharedPtr<Machina::MidiAction> action
-		= PtrCast<Machina::MidiAction>(_node->enter_action());
-
 	if (show) {
-		if (action && action->event_size() > 1
-				&& (action->event()[0] & 0xF0) == 0x90) {
-			const uint8_t note_num = action->event()[1];
-			set_name(midi_note_name(note_num));
+		if (_enter_action) {
+			Raul::Atom note_number = _enter_action->get(URIs::instance().machina_note_number);
+			if (note_number.is_valid()) {
+				set_name(midi_note_name(note_number.get_int32()));
+				return;
+			}
 		}
-	} else {
-		set_name("");
 	}
+	
+	set_name("");
 }
 
-
 /// Dash style for selector node outlines
-static ArtVpathDash* selector_dash()
+static ArtVpathDash*
+selector_dash()
 {
 	static ArtVpathDash* selector_dash = NULL;
 
@@ -115,32 +130,45 @@ NodeView::set_selected(bool selected)
 {
 	Ellipse::set_selected(selected);
 	if (!selected)
-		_ellipse.property_dash() = _node->is_selector() ? selector_dash() : 0;
+		_ellipse.property_dash() = node_is(URIs::instance().machina_selector) ? selector_dash() : 0;
 }
-
 
 void
-NodeView::update_state(bool show_labels)
+NodeView::on_property(Machina::URIInt key, const Raul::Atom& value)
 {
-	static const uint32_t active_color = 0x408040FF;
+	static const uint32_t active_color        = 0x408040FF;
 	static const uint32_t active_border_color = 0x00FF00FF;
 
-	if (_node->is_active()) {
-		if (_color != active_color) {
-			_old_color = _color;
-			set_base_color(active_color);
-			set_border_color(active_border_color);
+	if (key == URIs::instance().machina_selector) {
+		_ellipse.property_dash() = value.get_bool() ? selector_dash() : 0;
+	} else if (key == URIs::instance().machina_initial) {
+		set_border_width(value.get_bool() ? 4.0 : 1.0);
+	} else if (key == URIs::instance().machina_active) {
+		if (value.get_bool()) {
+			if (_color != active_color) {
+				_old_color = _color;
+				set_base_color(active_color);
+				set_border_color(active_border_color);
+			}
+		} else if (_color == active_color) {
+			set_base_color(_old_color);
+			set_border_color(_default_border_color);
 		}
-	} else if (_color == active_color) {
-		set_base_color(_old_color);
-		set_border_color(_default_border_color);
+	} else if (key == URIs::instance().machina_enter_action) {
+		const uint64_t action_id = value.get_int32();
+		SharedPtr<MachinaCanvas> canvas = PtrCast<MachinaCanvas>(_canvas.lock());
+		_enter_action_connection.disconnect();
+		_enter_action = canvas->app()->client_model()->find(action_id);
+		_enter_action_connection = _enter_action->signal_property.connect(
+			sigc::mem_fun(this, &NodeView::on_action_property));
+	} else {
+		cout << "Unknown property " << key << endl;
 	}
-
-	_ellipse.property_dash() = _node->is_selector() ? selector_dash() : 0;
-
-	set_border_width(_node->is_initial() ? 4.0 : 1.0);
-
-	if (show_labels)
-		show_label(true);
 }
 
+void
+NodeView::on_action_property(Machina::URIInt key, const Raul::Atom& value)
+{
+	if (key == URIs::instance().machina_note_number)
+		show_label(true);
+}

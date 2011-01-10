@@ -11,11 +11,11 @@ def build(bld):
 		NodeView.cpp
 	'''
 
-	obj.includes        = ['.', '../..', '../engine']
+	obj.includes        = ['.', '..', '../..', '../engine']
 	obj.export_includes = ['.']
 	obj.name            = 'libmachina_gui'
 	obj.target          = 'machina_gui'
-	obj.use             = 'libmachina_engine'
+	obj.use             = 'libmachina_engine libmachina_client'
 	autowaf.use_lib(bld, obj, '''
 		FLOWCANVAS
 		GLADEMM

@@ -17,14 +17,14 @@
 
 #include <map>
 
+#include "raul/log.hpp"
 #include "raul/SharedPtr.hpp"
 #include "raul/TimeStamp.hpp"
 
-#include "machina/Action.hpp"
-#include "machina/Edge.hpp"
 #include "machina/Engine.hpp"
-#include "machina/Machine.hpp"
-#include "machina/Node.hpp"
+#include "machina/Controller.hpp"
+#include "client/ClientObject.hpp"
+#include "client/ClientModel.hpp"
 
 #include "EdgeView.hpp"
 #include "MachinaCanvas.hpp"
@@ -33,7 +33,7 @@
 
 using namespace Raul;
 using namespace FlowCanvas;
-
+using namespace Machina;
 
 MachinaCanvas::MachinaCanvas(MachinaGUI* app, int width, int height)
 	: Canvas(width, height)
@@ -42,7 +42,6 @@ MachinaCanvas::MachinaCanvas(MachinaGUI* app, int width, int height)
 {
 	grab_focus();
 }
-
 
 void
 MachinaCanvas::node_clicked(WeakPtr<NodeView> item, GdkEventButton* event)
@@ -54,19 +53,19 @@ MachinaCanvas::node_clicked(WeakPtr<NodeView> item, GdkEventButton* event)
 	if (event->state & GDK_CONTROL_MASK)
 		return;
 
-	// Middle click, learn
-	if (event->button == 2) {
-		_app->engine()->machine()->learn(_app->maid(), node->node());
+	if (event->button == 2) { // Middle click: learn
+		_app->controller()->learn(_app->maid(), node->node()->id());
 		return;
-	} else if (event->button == 3) {
+
+	} else if (event->button == 3) { // Right click: connect/disconnect
 		SharedPtr<NodeView> last = _last_clicked.lock();
 
 		if (last) {
 			if (node != last) {
 				if (get_connection(last, node))
-					disconnect_node(last, node);
+					action_disconnect(last, node);
 				else
-					connect_node(last, node);
+					action_connect(last, node);
 			}
 
 			last->set_default_base_color();
@@ -79,38 +78,14 @@ MachinaCanvas::node_clicked(WeakPtr<NodeView> item, GdkEventButton* event)
 	}
 }
 
-
 bool
 MachinaCanvas::canvas_event(GdkEvent* event)
 {
-	static int last = 0;
-
-	SharedPtr<Machina::Machine> machine = _app->engine()->machine();
-	if (!machine)
-		return false;
-
 	if (event->type == GDK_BUTTON_RELEASE
 			&& event->button.button == 3
 			&& !(event->button.state & (GDK_CONTROL_MASK))) {
 
-		const double x = event->button.x;
-		const double y = event->button.y;
-
-		string name = string("Note")+(char)(last++ +'0');
-
-		TimeDuration dur(machine->time().unit(), 1.0);
-		SharedPtr<Machina::Node> node(new Machina::Node(dur, false));
-		SharedPtr<NodeView> view(new NodeView(_app->window(), shared_from_this(), node,
-					name, x, y));
-
-		view->signal_clicked.connect(sigc::bind<0>(sigc::mem_fun(this,
-						&MachinaCanvas::node_clicked), WeakPtr<NodeView>(view)));
-		add_item(view);
-		view->resize();
-		view->raise_to_top();
-
-		machine->add_node(node);
-
+		action_create_node(event->button.x, event->button.y);
 		return true;
 
 	} else {
@@ -118,101 +93,90 @@ MachinaCanvas::canvas_event(GdkEvent* event)
 	}
 }
 
-
 void
-MachinaCanvas::connect_node(boost::shared_ptr<NodeView> src,
-                            boost::shared_ptr<NodeView> head)
+MachinaCanvas::on_new_object(SharedPtr<Client::ClientObject> object)
 {
-	SharedPtr<Machina::Edge> edge(new Machina::Edge(src->node(), head->node()));
-	src->node()->add_edge(edge);
+	const Machina::URIs& uris = URIs::instance();
+	const Raul::Atom&    type = object->get(uris.rdf_type);
+	if (type == "machina:Node") {
+		SharedPtr<NodeView> view(
+			new NodeView(_app->window(), shared_from_this(), object,
+			             object->get(uris.machina_canvas_x).get_float(),
+			             object->get(uris.machina_canvas_y).get_float()));
 
-	boost::shared_ptr<Connection> c(new EdgeView(shared_from_this(),
-			src, head, edge));
-	src->add_connection(c);
-	head->add_connection(c);
-	add_connection(c);
-}
+		//if ( ! node->enter_action() && ! node->exit_action() )
+		//	view->set_base_color(0x101010FF);
 
+		view->signal_clicked.connect(
+			sigc::bind<0>(sigc::mem_fun(this, &MachinaCanvas::node_clicked),
+			              WeakPtr<NodeView>(view)));
 
-void
-MachinaCanvas::disconnect_node(boost::shared_ptr<NodeView> src,
-                               boost::shared_ptr<NodeView> head)
-{
-	src->node()->remove_edges_to(head->node());
-	remove_connection(src, head);
-}
+		object->set_view(view);
+		add_item(view);
 
+	} else if (type == "machina:Edge") {
+		SharedPtr<Machina::Client::ClientObject> tail = _app->client_model()->find(
+			object->get(uris.machina_tail_id).get_int32());
+		SharedPtr<Machina::Client::ClientObject> head = _app->client_model()->find(
+			object->get(uris.machina_head_id).get_int32());
 
-SharedPtr<NodeView>
-MachinaCanvas::create_node_view(SharedPtr<Machina::Node> node)
-{
-	SharedPtr<NodeView> view(new NodeView(_app->window(), shared_from_this(), node,
-				"", 10, 10));
+		SharedPtr<NodeView> tail_view = PtrCast<NodeView>(tail->view());
+		SharedPtr<NodeView> head_view = PtrCast<NodeView>(head->view());
 
-	if ( ! node->enter_action() && ! node->exit_action() )
-		view->set_base_color(0x101010FF);
+		SharedPtr<EdgeView> view(
+			new EdgeView(shared_from_this(), tail_view, head_view, object));
 
-	view->signal_clicked.connect(sigc::bind<0>(sigc::mem_fun(this,
-					&MachinaCanvas::node_clicked), WeakPtr<NodeView>(view)));
+		tail_view->add_connection(view);
+		head_view->add_connection(view);
 
-	add_item(view);
+		object->set_view(view);
+		add_connection(view);
 
-	return view;
-}
-
-
-void
-MachinaCanvas::build(SharedPtr<const Machina::Machine> machine, bool show_labels)
-{
-	destroy();
-	_last_clicked.reset();
-	assert(_items.empty());
-
-	if (!machine)
-		return;
-
-	std::map<SharedPtr<Machina::Node>, SharedPtr<NodeView> > views;
-
-	for (Machina::Machine::Nodes::const_iterator i = machine->nodes().begin();
-			i != machine->nodes().end(); ++i) {
-
-		const SharedPtr<NodeView> view = create_node_view(*i);
-		views.insert(std::make_pair((*i), view));
+	} else {
+		Raul::error << "Unknown object type " << type << std::endl;
 	}
+}
 
-	for (ItemList::iterator i = _items.begin(); i != _items.end(); ++i) {
-		const SharedPtr<NodeView> view = PtrCast<NodeView>(*i);
-		if (!view)
-			continue;
-
-		for (Machina::Node::Edges::const_iterator e = view->node()->edges().begin();
-				e != view->node()->edges().end(); ++e) {
-
-			SharedPtr<NodeView> head_view = views[(*e)->head()];
-			if (!head_view) {
-				cerr << "WARNING: Edge to node with no view" << endl;
-				continue;
-			}
-
-			boost::shared_ptr<Connection> c(new EdgeView(shared_from_this(),
-					view, head_view, (*e)));
-			view->add_connection(c);
-			head_view->add_connection(c);
-			add_connection(c);
+void
+MachinaCanvas::on_erase_object(SharedPtr<Client::ClientObject> object)
+{
+	const Raul::Atom& type = object->get(URIs::instance().rdf_type);
+	if (type == "machina:Node") {
+		SharedPtr<NodeView> view = PtrCast<NodeView>(object->view());
+		if (view) {
+			remove_item(view);
 		}
+	} else if (type == "machina:Edge") {
+		SharedPtr<EdgeView> view = PtrCast<EdgeView>(object->view());
+		if (view) {
+			remove_connection(view->source().lock(), view->dest().lock());
+		}
+	} else {
+		Raul::error << "Unknown object type " << type << std::endl;
 	}
-
-	arrange();
 }
-
 
 void
-MachinaCanvas::update_edges()
+MachinaCanvas::action_create_node(double x, double y)
 {
-	for (ConnectionList::iterator i = _connections.begin(); i != _connections.end(); ++i) {
-		SharedPtr<EdgeView> edge = PtrCast<EdgeView>(*i);
-		if (edge)
-			edge->update();
-	}
+	Machina::Client::ClientObject obj(0);
+	obj.set(URIs::instance().rdf_type, "machina:Node");
+	obj.set(URIs::instance().machina_canvas_x, Raul::Atom((float)x));
+	obj.set(URIs::instance().machina_canvas_y, Raul::Atom((float)y));
+	obj.set(URIs::instance().machina_duration, Raul::Atom((float)1.0));
+	_app->controller()->create(obj);
 }
 
+void
+MachinaCanvas::action_connect(boost::shared_ptr<NodeView> src,
+                              boost::shared_ptr<NodeView> head)
+{
+	_app->controller()->connect(src->node()->id(), head->node()->id());
+}
+
+void
+MachinaCanvas::action_disconnect(boost::shared_ptr<NodeView> src,
+                                 boost::shared_ptr<NodeView> head)
+{
+	_app->controller()->disconnect(src->node()->id(), head->node()->id());
+}

@@ -19,11 +19,13 @@
 #define MACHINA_DRIVER_HPP
 
 #include "raul/MIDISink.hpp"
+#include "raul/RingBuffer.hpp"
+
+#include "machina/types.hpp"
 
 namespace Machina {
 
 class Machine;
-
 
 class Driver : public Raul::MIDISink {
 public:
@@ -33,9 +35,13 @@ public:
 	SharedPtr<Machine> machine() { return _machine; }
 	virtual void set_machine(SharedPtr<Machine> machine) { _machine = machine; }
 
+	SharedPtr<UpdateBuffer> update_sink() { return _updates; }
+	void set_update_sink(SharedPtr<UpdateBuffer> b) { _updates = b; }
+	
 	virtual void set_bpm(double bpm) = 0;
 	virtual void set_quantization(double q) = 0;
 
+	virtual bool is_activated() const { return false; }
 	virtual void activate() {}
 	virtual void deactivate() {}
 
@@ -46,7 +52,8 @@ public:
 	virtual void finish_record() {}
 
 protected:
-	SharedPtr<Machine> _machine;
+	SharedPtr<Machine>      _machine;
+	SharedPtr<UpdateBuffer> _updates;
 };
 
 

@@ -21,9 +21,10 @@
 #include "raul/Maid.hpp"
 #include "raul/SharedPtr.hpp"
 
-#include "machina/MidiAction.hpp"
-#include "machina/Node.hpp"
 #include "machina/types.hpp"
+
+#include "MidiAction.hpp"
+#include "Node.hpp"
 
 namespace Machina {
 
@@ -35,38 +36,20 @@ class MidiAction;
  */
 class LearnRequest : public Raul::Deletable {
 public:
-
 	static SharedPtr<LearnRequest>
-	create(SharedPtr<Raul::Maid> maid, SharedPtr<Node> node)
-	{
-		SharedPtr<LearnRequest> ret(new LearnRequest(maid, node));
-		maid->manage(ret);
-		return ret;
-	}
+	create(SharedPtr<Raul::Maid> maid, SharedPtr<Node> node);
 
-	void start(double q, Raul::TimeStamp time)
-		{ _started = true; _start_time = time; _quantization = q; }
-
+	void start(double q, Raul::TimeStamp time);
 	void finish(TimeStamp time);
 
-	bool started() { return _started; }
+	inline bool started() const { return _started; }
 
 	const SharedPtr<Node>&       node()         { return _node; }
 	const SharedPtr<MidiAction>& enter_action() { return _enter_action; }
 	const SharedPtr<MidiAction>& exit_action()  { return _exit_action; }
 
 private:
-	LearnRequest(SharedPtr<Raul::Maid> maid, SharedPtr<Node> node)
-		: _started(false)
-		, _start_time(TimeUnit(TimeUnit::BEATS, 19200), 0, 0) // irrelevant
-		, _quantization(0) // irrelevant
-		, _node(node)
-		, _enter_action(new MidiAction(4, NULL))
-		, _exit_action(new MidiAction(4, NULL))
-	{
-		maid->manage(_enter_action);
-		maid->manage(_exit_action);
-	}
+	LearnRequest(SharedPtr<Raul::Maid> maid, SharedPtr<Node> node);
 
 	bool                  _started;
 	TimeStamp             _start_time;

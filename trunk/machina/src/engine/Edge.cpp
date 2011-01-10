@@ -17,13 +17,20 @@
 
 #include "raul/Atom.hpp"
 #include "raul/AtomRDF.hpp"
+
 #include "redlandmm/World.hpp"
 #include "redlandmm/Model.hpp"
-#include "machina/Node.hpp"
-#include "machina/Edge.hpp"
+
+#include "Edge.hpp"
+#include "Node.hpp"
 
 namespace Machina {
 
+void
+Edge::set(URIInt key, const Raul::Atom& value)
+{
+	std::cout << "EDGE SET " << key << " = " << value << std::endl;
+}
 
 void
 Edge::write_state(Redland::Model& model)

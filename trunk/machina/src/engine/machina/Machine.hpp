@@ -23,6 +23,7 @@
 
 #include "raul/List.hpp"
 #include "raul/Maid.hpp"
+#include "raul/RingBuffer.hpp"
 #include "raul/SharedPtr.hpp"
 #include "raul/TimeSlice.hpp"
 #include "raul/WeakPtr.hpp"
@@ -33,6 +34,7 @@
 
 namespace Machina {
 
+class Controller;
 class LearnRequest;
 
 /** A (Finite State) Machine.
@@ -63,7 +65,7 @@ public:
 
 	// Audio context
 	void     reset(Raul::TimeStamp time);
-	uint32_t run(const Raul::TimeSlice& time);
+	uint32_t run(const Raul::TimeSlice& time, SharedPtr<UpdateBuffer> updates);
 
 	// Any context
 	inline Raul::TimeStamp time() const { return _time; }
@@ -84,8 +86,8 @@ private:
 
 	// Audio context
 	SharedPtr<Node> earliest_node() const;
-	bool enter_node(SharedPtr<Raul::MIDISink> sink, SharedPtr<Node> node);
-	void exit_node(SharedPtr<Raul::MIDISink> sink, SharedPtr<Node>);
+	bool enter_node(SharedPtr<Raul::MIDISink> sink, SharedPtr<Node> node, SharedPtr<UpdateBuffer> updates);
+	void exit_node(SharedPtr<Raul::MIDISink> sink, SharedPtr<Node>, SharedPtr<UpdateBuffer> updates);
 
 	static const size_t MAX_ACTIVE_NODES = 128;
 	std::vector< SharedPtr<Node> > _active_nodes;
