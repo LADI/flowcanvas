@@ -18,7 +18,7 @@
 #include <ctype.h>
 #include <stdio.h>
 
-#include <boost/thread.hpp>
+#include <glib.h>
 
 #include "lv2/lv2plug.in/ns/ext/atom/atom.h"
 #include "lv2/lv2plug.in/ns/ext/atom/atom-helpers.h"
@@ -90,7 +90,7 @@ public:
 	uint32_t message_run(const void* valid_inputs,
 	                     void*       valid_outputs)
 	{
-		boost::mutex::scoped_lock lock(mutex);
+		g_mutex_lock(mutex);
 
 		const LV2_Atom* const in = p<LV2_Atom>(0);
 
@@ -125,6 +125,7 @@ public:
 
 		if (!resize_port(this, 1, atom_size)) {
 			cerr << "Failed to resize output port to " << atom_size << "bytes" << endl;
+			g_mutex_unlock(mutex);
 			return 0;
 		}
 
@@ -162,17 +163,20 @@ public:
 
 		presses.clear();
 
+		g_mutex_unlock(mutex);
 		return 0;
 	}
 
 	void button_pressed(ButtonID id) {
-		boost::mutex::scoped_lock lock(mutex);
+		g_mutex_lock(mutex);
 
 		// Push request for message thread and request execution
 		presses.push_back(id);
 		request_run(ctx_MessageContext);
 
 		toggle_button_state(id);
+
+		g_mutex_unlock(mutex);
 	}
 
 	void toggle_button_state(ButtonID id) {
@@ -201,8 +205,8 @@ public:
 
 	typedef std::vector<ButtonID> Presses;
 
-	boost::mutex mutex;
-	Presses      presses;
+	GMutex* mutex;
+	Presses presses;
 
 	PadState state;
 	SPtr<UI> web_ui;

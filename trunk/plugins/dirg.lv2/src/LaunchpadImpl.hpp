@@ -28,11 +28,8 @@
 #include <vector>
 #include <queue>
 
-#include <boost/thread.hpp>
-#include <boost/utility.hpp>
-
+#include <glib.h>
 #include <libusb.h>
-
 #include <sigc++/sigc++.h>
 
 #include "dirg_internal.hpp"
@@ -40,9 +37,9 @@
 typedef std::vector<uint8_t> MidiEvent;
 
 /** Actual launchpad implementation.
- * There can only be one! DA dada DA DA (Highlander theme)
+ * Only one of these may exist at once.
  */
-class LaunchpadImpl : public boost::noncopyable
+class LaunchpadImpl
 {
 public:
 	LaunchpadImpl();
@@ -59,6 +56,8 @@ private:
 	void disconnect();
 
 	void run();
+
+	static void* static_run(void* me) { ((LaunchpadImpl*)me)->run(); return 0; }
 
 	void writeMidi(uint8_t b1, uint8_t b2, uint8_t b3);
 
@@ -80,11 +79,11 @@ private:
 
 	time_t reconnectWait_;
 
-	boost::thread thread_;
+	GThread* thread_;
 
 	std::vector<uint8_t> readData_;
 	std::queue<uint8_t>  writeData_;
-	boost::mutex         writeMutex_;
+	GMutex*              writeMutex_;
 	int                  lastMidiPos_;
 	uint8_t              lastMidiStatus_;
 
@@ -95,6 +94,9 @@ private:
 	volatile bool quit_;
 
 private:
+	LaunchpadImpl(const LaunchpadImpl&); // Undefined
+	LaunchpadImpl& operator=(const LaunchpadImpl&); // Undefined
+
 	static void callback(libusb_transfer* transfer);
 
 	static const int LIVE   = 176;

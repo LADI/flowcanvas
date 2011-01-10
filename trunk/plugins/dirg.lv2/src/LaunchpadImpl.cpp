@@ -34,7 +34,6 @@
 using std::cerr;
 using std::cout;
 using std::endl;
-using sigc::signal;
 
 static bool
 hasError(libusb_transfer* transfer)
@@ -99,7 +98,7 @@ LaunchpadImpl::handleMidi(const MidiEvent& data)
 void
 LaunchpadImpl::handleWriteTransfer(libusb_transfer* transfer)
 {
-	boost::mutex::scoped_lock lock(writeMutex_);
+	g_mutex_lock(writeMutex_);
 	if (!writeData_.empty()) {
 		unsigned int pos = 0;
 		while (pos < writeData_.size() && pos < 8) {
@@ -125,14 +124,15 @@ LaunchpadImpl::handleWriteTransfer(libusb_transfer* transfer)
 			}
 		}
 		for (int i = pos; i < 8; i++) {
-			transfer->buffer[i] = 145; //fill rest of message with junk
+			transfer->buffer[i] = 145; // fill rest of message with junk
 		}
 		lastMidiStatus_ = 0;
 	} else {
 		for (int i = 0; i < 8; i++) {
-			transfer->buffer[i] = 145; //fill rest of message with junk
+			transfer->buffer[i] = 145; // fill rest of message with junk
 		}
 	}
+	g_mutex_unlock(writeMutex_);
 }
 
 void
@@ -170,14 +170,16 @@ LaunchpadImpl::LaunchpadImpl()
 	, quit_(false)
 {
 	reconnectWait_ = 1;
-	thread_        = boost::thread(boost::bind(&LaunchpadImpl::run, this));
+	thread_        = g_thread_create(&LaunchpadImpl::static_run, this, TRUE, NULL);
+	writeMutex_    = g_mutex_new();
 }
 
 LaunchpadImpl::~LaunchpadImpl()
 {
 	shallDisconnect_ = true;
 	quit_            = true;
-	thread_.join();
+	g_thread_join(thread_);
+	g_mutex_free(writeMutex_);
 }
 
 void
@@ -299,11 +301,11 @@ LaunchpadImpl::run()
 void
 LaunchpadImpl::writeMidi(uint8_t b1, uint8_t b2, uint8_t b3)
 {
-	boost::mutex::scoped_lock lock(writeMutex_);
-
+	g_mutex_lock(writeMutex_);
 	writeData_.push(b1);
 	writeData_.push(b2);
 	writeData_.push(b3);
+	g_mutex_unlock(writeMutex_);
 }
 
 void

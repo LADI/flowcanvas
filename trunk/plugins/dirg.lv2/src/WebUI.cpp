@@ -16,19 +16,17 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#include <stdio.h>
+#include <fcntl.h>
 #include <math.h>
-
+#include <stdio.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <fcntl.h>
 
 #include <iostream>
 #include <string>
 
-#include <boost/thread.hpp>
-
+#include <glib.h>
 #include <libsoup/soup.h>
 
 #include "dirg_internal.hpp"
@@ -59,10 +57,12 @@ private:
 		return reinterpret_cast<WebUI*>(ptr)->message_callback(s, m, p, q, c);
 	}
 
+	static void* _run(void* me);
+
 	static const unsigned GRID_W = 8;
 	static const unsigned GRID_H = 8;
 
-	boost::thread     thread;
+	GThread*          thread;
 	SoupServer*       server;
 	SoupMessage*      update_msg;
 	const PadState&   state;
@@ -240,7 +240,7 @@ WebUI::activate()
 
 	cout << "Started HTTP server on port " << soup_server_get_port(server) << endl;
 
-	thread = boost::thread(boost::bind(soup_server_run, server));
+	thread = g_thread_create(&WebUI::_run, this, TRUE, NULL);
 }
 
 void
@@ -248,11 +248,18 @@ WebUI::deactivate()
 {
 	if (server) {
 		soup_server_quit(server);
-		thread.join();
+		g_thread_join(thread);
 		server = NULL;
 	}
 }
-	
+
+void*
+WebUI::_run(void* me)
+{
+	soup_server_run(((WebUI*)me)->server);
+	return NULL;
+}
+
 void
 WebUI::set_colour(ButtonID button, float hue, float value)
 {

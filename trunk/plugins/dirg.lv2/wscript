@@ -27,12 +27,6 @@ def configure(conf):
 	autowaf.display_header('Dirg Configuration')
 	conf.check_tool('compiler_cxx')
 
-	# Check for required boost headers/libraries
-	autowaf.check_header(conf, 'boost/utility.hpp')
-	autowaf.check_header(conf, 'boost/unordered_map.hpp')
-	autowaf.check_header(conf, 'boost/thread.hpp')
-	conf.check(lib='boost_thread', uselib_store='BOOST_THREAD')
-
 	# Check for required LV2 headers
 	autowaf.check_header(conf, 'lv2/lv2plug.in/ns/lv2core/lv2.h')
 	autowaf.check_header(conf, 'lv2/lv2plug.in/ns/ext/atom/atom.h')
@@ -41,8 +35,9 @@ def configure(conf):
 	autowaf.check_header(conf, 'lv2/lv2plug.in/ns/ext/uri-map/uri-map.h')
 
 	# Check for libraries
-	autowaf.check_pkg(conf, 'libusb-1.0', uselib_store='USB', mandatory=True)
-	autowaf.check_pkg(conf, 'sigc++-2.0', uselib_store='SIGC', mandatory=True)
+	autowaf.check_pkg(conf, 'gthread-2.0', uselib_store='GTHREAD', mandatory=True)
+	autowaf.check_pkg(conf, 'libusb-1.0',  uselib_store='USB', mandatory=True)
+	autowaf.check_pkg(conf, 'sigc++-2.0',  uselib_store='SIGC', mandatory=True)
 
 	# Check for libsoup unless --no-http is given
 	if not Options.options.no_http:
@@ -78,7 +73,7 @@ def build(bld):
 	obj.source       = dirg_source + ' src/dirg.cpp '
 	obj.target       = 'dirg.lv2/dirg'
 	obj.includes     = ['.']
-	obj.uselib       = ['USB', 'SIGC', 'BOOST_THREAD', 'SOUP']
+	obj.uselib       = ['USB', 'SIGC', 'GTHREAD', 'SOUP']
 	obj.install_path = '${LV2DIR}/dirg.lv2'
 
 	# Plugin Library
@@ -89,7 +84,7 @@ def build(bld):
 	obj.source       = dirg_source + ' src/LV2Plugin.cpp src/dirg_lv2.cpp '
 	obj.target       = 'dirg.lv2/dirg'
 	obj.includes     = ['.']
-	obj.uselib       = ['USB', 'SIGC', 'BOOST_THREAD', 'SOUP']
+	obj.uselib       = ['USB', 'SIGC', 'GTHREAD', 'SOUP']
 	obj.install_path = '${LV2DIR}/dirg.lv2'
 
 	rel_lv2dir = os.path.relpath(bld.env['LV2DIR'], bld.env['BINDIR'])
