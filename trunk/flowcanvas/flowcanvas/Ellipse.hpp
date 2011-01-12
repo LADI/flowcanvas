@@ -31,7 +31,7 @@ namespace FlowCanvas {
 class Canvas;
 
 
-/** A named circle (possibly).
+/** A (possibly named) circular Item which is Connectable.
  *
  * Unlike a Module, this doesn't contain ports, but is directly Connectable itself
  * (think your classic circles 'n' lines diagram, ala FSM).

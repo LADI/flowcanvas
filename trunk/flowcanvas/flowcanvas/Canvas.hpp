@@ -42,7 +42,7 @@ class Module;
 class GVNodes;
 
 
-/** \defgroup FlowCanvas Canvas widget for dataflow systems.
+/** \defgroup FlowCanvas FlowCanvas
  *
  * A generic dataflow widget using libgnomecanvas.
  */

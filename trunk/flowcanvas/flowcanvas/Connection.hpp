@@ -92,6 +92,7 @@ protected:
 	Gnome::Canvas::Bpath _bpath;
 	GnomeCanvasPathDef*  _path;
 
+	/** A handle on a connection line to allow mouse interaction. */
 	struct Handle : public Gnome::Canvas::Group {
 		explicit Handle(Gnome::Canvas::Group& parent)
 			: Gnome::Canvas::Group(parent), shape(NULL), text(NULL) {}

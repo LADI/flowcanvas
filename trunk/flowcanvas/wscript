@@ -16,9 +16,9 @@ FLOWCANVAS_VERSION = '0.7.1'
 #   0.5.3 = 2,1,0
 #   0.6.0 = 3,0,0
 #   0.6.3 = 4,0,0 (unreleased)
-#   0.6.4 = 4,1,0 (unreleased)
+#   0.6.4 = 4,1,0
 #   0.7.0 = 5,0,0 (unreleased)
-#   0.7.1 = 5,1,0 (unreleased)
+#   0.7.1 = 5,1,0
 FLOWCANVAS_LIB_VERSION = '5.1.0'
 
 # Variables for 'waf dist'
@@ -32,16 +32,19 @@ out = 'build'
 def options(opt):
 	autowaf.set_options(opt)
 	opt.add_option('--anti-alias', action='store_false', default=True, dest='anti_alias',
-		       help="Anti-alias canvas (much prettier but slower) [Default: True]")
+	               help="Anti-alias canvas (much prettier but slower) [Default: True]")
 
 def configure(conf):
 	conf.line_just = max(conf.line_just, 45)
 	autowaf.configure(conf)
 	autowaf.display_header('FlowCanvas Configuration')
 	conf.check_tool('compiler_cxx')
-	autowaf.check_pkg(conf, 'libgvc', uselib_store='AGRAPH', atleast_version='2.8', mandatory=False)
-	autowaf.check_pkg(conf, 'gtkmm-2.4', uselib_store='GLIBMM', atleast_version='2.10.0', mandatory=True)
-	autowaf.check_pkg(conf, 'libgnomecanvasmm-2.6', uselib_store='GNOMECANVASMM', atleast_version='2.6.0', mandatory=True)
+	autowaf.check_pkg(conf, 'libgvc', uselib_store='AGRAPH',
+	                  atleast_version='2.8', mandatory=False)
+	autowaf.check_pkg(conf, 'gtkmm-2.4', uselib_store='GLIBMM',
+	                  atleast_version='2.10.0', mandatory=True)
+	autowaf.check_pkg(conf, 'libgnomecanvasmm-2.6', uselib_store='GNOMECANVASMM',
+	                  atleast_version='2.6.0', mandatory=True)
 
 	# Boost headers
 	autowaf.check_header(conf, 'boost/shared_ptr.hpp', mandatory=True)

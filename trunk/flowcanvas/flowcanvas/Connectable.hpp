@@ -27,6 +27,8 @@ namespace FlowCanvas {
 class Connection;
 
 
+/** An object a Connection can connect to.
+ */
 class Connectable {
 public:
 	virtual ~Connectable() {}
@@ -47,7 +49,6 @@ public:
 	Connections& connections() { return _connections; }
 
 protected:
-
 	Connections _connections; ///< needed for dragging
 };
 

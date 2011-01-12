@@ -138,6 +138,7 @@ protected:
 	Gnome::Canvas::Rect*    _rect;
 	Gtk::Menu*              _menu;
 
+	/** Port control value indicator "gauge" */
 	struct Control {
 		explicit Control(Gnome::Canvas::Rect* r)
 			: rect(r)

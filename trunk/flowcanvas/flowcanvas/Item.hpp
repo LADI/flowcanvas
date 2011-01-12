@@ -35,7 +35,7 @@ namespace FlowCanvas {
 class Canvas;
 
 
-/** An item on the canvas.
+/** An item on a Canvas.
  *
  * \ingroup FlowCanvas
  */

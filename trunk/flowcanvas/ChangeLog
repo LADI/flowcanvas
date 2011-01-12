@@ -1,9 +1,14 @@
-flowcanvas (0.7.0) unstable; urgency=low
+flowcanvas (0.7.1) unstable; urgency=low
 
-  * Reduce memory consumption
-  * Expand README, add missing COPYING file to distribution
+  * Reduce memory consumption and improve alignment
+  * Eliminate port control "gauge" overhead for non-control ports
+  * Add "partner" concept for aligning related but unconnected nodes
+  * Add missing #includes
+  * Expand README
+  * Add missing COPYING file to distribution
+  * Upgrade to waf 1.6.2
 
-  -- David Robillard <d@drobilla.net>  Wed, 15 Dec 2010 15:11:08 -0500
+ -- David Robillard <d@drobilla.net>  Tue, 11 Jan 2011 17:42:07 -0500
 
 flowcanvas (0.6.4) unstable; urgency=low
 
@@ -12,7 +17,7 @@ flowcanvas (0.6.4) unstable; urgency=low
   * Fix centering (e.g. on arrange, initial view)
   * Upgrade to waf 1.5.18
 
-  -- David Robillard <d@drobilla.net>  Fri, 03 Sep 2010 20:24:36 -0400
+ -- David Robillard <d@drobilla.net>  Fri, 03 Sep 2010 20:24:36 -0400
 
 flowcanvas (0.6.0) unstable; urgency=low
 
