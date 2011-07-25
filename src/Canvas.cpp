@@ -1,5 +1,5 @@
 /* This file is part of FlowCanvas.
- * Copyright (C) 2007-2009 Dave Robillard <http://drobilla.net>
+ * Copyright (C) 2007-2009 David Robillard <http://drobilla.net>
  *
  * FlowCanvas is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -16,23 +16,31 @@
  */
 
 #include <algorithm>
-#include <sstream>
 #include <cassert>
 #include <cmath>
-#include <map>
 #include <iostream>
-#include <cmath>
+#include <list>
+#include <map>
+#include <sstream>
+#include <string>
+#include <vector>
+
 #include <boost/enable_shared_from_this.hpp>
+
 #include "flowcanvas-config.h"
 #include "flowcanvas/Canvas.hpp"
-#include "flowcanvas/Port.hpp"
 #include "flowcanvas/Module.hpp"
+#include "flowcanvas/Port.hpp"
 
 #ifdef HAVE_AGRAPH
 #include <gvc.h>
 #endif
 
-using namespace std;
+using std::cerr;
+using std::endl;
+using std::list;
+using std::string;
+using std::vector;
 
 namespace FlowCanvas {
 
@@ -40,16 +48,16 @@ sigc::signal<void, Gnome::Canvas::Item*> Canvas::signal_item_entered;
 sigc::signal<void, Gnome::Canvas::Item*> Canvas::signal_item_left;
 
 Canvas::Canvas(double width, double height)
-	: _zoom(1.0)
+	: _base_rect(*root(), 0, 0, width, height)
+	, _select_rect(NULL)
+	, _select_dash(NULL)
+	, _zoom(1.0)
 	, _width(width)
 	, _height(height)
 	, _drag_state(NOT_DRAGGING)
+	, _direction(HORIZONTAL)
 	, _remove_objects(true)
 	, _locked(false)
-	, _direction(HORIZONTAL)
-	, _base_rect(*root(), 0, 0, width, height)
-	, _select_rect(NULL)
-	, _select_dash(NULL)
 {
 	set_scroll_region(0.0, 0.0, width, height);
 	set_center_scroll_region(true);
@@ -488,7 +496,7 @@ Canvas::remove_connection(boost::shared_ptr<Connectable> item1,
 
 	boost::shared_ptr<Connection> c = get_connection(item1, item2);
 	if (!c) {
-		cerr << "Couldn't find connection.\n";
+		cerr << "Couldn't find connection." << endl;
 		return ret;
 	} else {
 		remove_connection(c);
@@ -625,7 +633,7 @@ Canvas::join_selection()
 		for (size_t i = 0; i < inputs.size(); ++i)
 			ports_joined(inputs[i], outputs[0]);
 	} else { // n -> m
-		size_t num_to_connect = min(inputs.size(), outputs.size());
+		size_t num_to_connect = std::min(inputs.size(), outputs.size());
 		for (size_t i = 0; i < num_to_connect; ++i) {
 			ports_joined(inputs[i], outputs[i]);
 		}
@@ -1284,30 +1292,21 @@ Canvas::layout_dot(bool use_length_hints, const std::string& filename)
 
 		boost::shared_ptr<Port> src_port = boost::dynamic_pointer_cast<Port>(c->source().lock());
 		boost::shared_ptr<Port> dst_port = boost::dynamic_pointer_cast<Port>(c->dest().lock());
-
 		boost::shared_ptr<Item> src_item = boost::dynamic_pointer_cast<Item>(c->source().lock());
 		boost::shared_ptr<Item> dst_item = boost::dynamic_pointer_cast<Item>(c->dest().lock());
 
-		GVNodes::iterator src_i = nodes.end();
-		GVNodes::iterator dst_i = nodes.end();
+		GVNodes::iterator src_i = src_port
+			? nodes.find(src_port->module().lock())
+			: nodes.find(src_item);
 
-		Agnode_t* src_node = NULL;
-		Agnode_t* dst_node = NULL;
-
-		if (src_port)
-			src_i = nodes.find(src_port->module().lock());
-		else
-			src_i = nodes.find(src_item);
-
-		if (dst_port)
-			dst_i = nodes.find(dst_port->module().lock());
-		else
-			dst_i = nodes.find(dst_item);
+		GVNodes::iterator dst_i = dst_port
+			? nodes.find(dst_port->module().lock())
+			: nodes.find(dst_item);
 
 		assert(src_i != nodes.end() && dst_i != nodes.end());
 
-		src_node = src_i->second;
-		dst_node = dst_i->second;
+		Agnode_t* src_node = src_i->second;
+		Agnode_t* dst_node = dst_i->second;
 
 		assert(src_node && dst_node);
 
@@ -1320,12 +1319,22 @@ Canvas::layout_dot(bool use_length_hints, const std::string& filename)
 		}
 	}
 
-	gvLayout (gvc, G, (char*)"dot");
-	gvRender (gvc, G, (char*)"dot", fopen("/dev/null", "w"));
+	// Add edges between partners to have them lined up as if they are connected
+	for (GVNodes::iterator i = nodes.begin(); i != nodes.end(); ++i) {
+		boost::shared_ptr<Item> partner = i->first->partner().lock();
+		if (partner) {
+			GVNodes::iterator p = nodes.find(partner);
+			if (p != nodes.end())
+				agedge(G, i->second, p->second);
+		}
+	}
+
+	gvLayout(gvc, G, (char*)"dot");
+	gvRender(gvc, G, (char*)"dot", fopen("/dev/null", "w"));
 
 	if (filename != "") {
 		FILE* fd = fopen(filename.c_str(), "w");
-		gvRender (gvc, G, (char*)"dot", fd);
+		gvRender(gvc, G, (char*)"dot", fd);
 		fclose(fd);
 	}
 #endif
@@ -1358,19 +1367,19 @@ Canvas::arrange(bool use_length_hints, bool center)
 
 	// Arrange to graphviz coordinates
 	for (GVNodes::iterator i = nodes.begin(); i != nodes.end(); ++i) {
-		char* pos_prop = agget(i->second, (char*)"pos");
-		assert(pos_prop);
-		const string pos(pos_prop);
+		const string pos   = agget(i->second, (char*)"pos");
 		const string x_str = pos.substr(0, pos.find(","));
 		const string y_str = pos.substr(pos.find(",")+1);
-		const double x = strtod(x_str.c_str(), NULL) * 1.25;
-		const double y = -strtod(y_str.c_str(), NULL) * 1.25;
+		const double x     = strtod(x_str.c_str(), NULL) * 1.25;
+		const double y     = -strtod(y_str.c_str(), NULL) * 1.25;
+
 		i->first->property_x() = x - i->first->width()/2.0;
 		i->first->property_y() = y - i->first->height()/2.0;
+
 		least_x = std::min(least_x, x);
 		least_y = std::min(least_y, y);
-		most_x = std::max(most_x, x);
-		most_y = std::max(most_y, y);
+		most_x  = std::max(most_x, x);
+		most_y  = std::max(most_y, y);
 	}
 
 	// Reset numeric locale to original value

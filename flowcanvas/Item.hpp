@@ -1,5 +1,5 @@
 /* This file is part of FlowCanvas.
- * Copyright (C) 2007-2009 Dave Robillard <http://drobilla.net>
+ * Copyright (C) 2007-2009 David Robillard <http://drobilla.net>
  *
  * FlowCanvas is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -18,12 +18,16 @@
 #ifndef FLOWCANVAS_ITEM_HPP
 #define FLOWCANVAS_ITEM_HPP
 
-#include <string>
-#include <map>
 #include <algorithm>
-#include <boost/shared_ptr.hpp>
+#include <list>
+#include <map>
+#include <string>
+
 #include <boost/enable_shared_from_this.hpp>
+#include <boost/shared_ptr.hpp>
+
 #include <libgnomecanvasmm.h>
+
 #include "flowcanvas/Port.hpp"
 
 namespace FlowCanvas {
@@ -31,7 +35,7 @@ namespace FlowCanvas {
 class Canvas;
 
 
-/** An item on the canvas.
+/** An item on a Canvas.
  *
  * \ingroup FlowCanvas
  */
@@ -56,7 +60,7 @@ public:
 
 	virtual void move(double dx, double dy) = 0;
 
-	virtual void zoom(double) {}
+	virtual void zoom(double z) {}
 	boost::weak_ptr<Canvas> canvas() const { return _canvas; }
 
 	bool popup_menu(guint button, guint32 activate_time) {
@@ -94,6 +98,17 @@ public:
 	virtual void set_base_color(uint32_t c)   { _color = c; }
 	virtual void set_default_base_color() = 0;
 
+	/** Set the partner of this node.
+	 * Partner nodes are nodes that should be visually aligned to correspond to
+	 * each other, even if they are not necessarily connected (e.g. for separate
+	 * modules representing the inputs and outputs of a single interface).
+	 * The partner is invisibly connected as if it had an input that is connected
+	 * to this item, e.g. foo.set_partner(bar) will arrange like:
+	 * [foo]  [bar] with a left-to-right flow direction.
+	 */
+	void set_partner(boost::shared_ptr<Item> partner) { _partner = partner; }
+	boost::weak_ptr<Item> partner()                   { return _partner; }
+
 	sigc::signal<void> signal_pointer_entered;
 	sigc::signal<void> signal_pointer_exited;
 	sigc::signal<void> signal_selected;
@@ -108,24 +123,26 @@ public:
 protected:
 	virtual void on_drag(double dx, double dy);
 	virtual void on_drop();
-	virtual void on_click(GdkEventButton*);
-	virtual void on_double_click(GdkEventButton*);
+	virtual void on_click(GdkEventButton* ev);
+	virtual void on_double_click(GdkEventButton* ev);
 
 	virtual void set_height(double h) = 0;
 	virtual void set_width(double w) = 0;
+	
+	bool on_event(GdkEvent* event);
 
 	const boost::weak_ptr<Canvas> _canvas;
 
-	bool on_event(GdkEvent* event);
+	boost::weak_ptr<Item> _partner;
 
+	Gtk::Menu*  _menu;
 	std::string _name;
 	double      _minimum_width;
 	double      _width;
 	double      _height;
 	uint32_t    _border_color;
 	uint32_t    _color;
-	bool        _selected;
-	Gtk::Menu*  _menu;
+	bool        _selected :1;
 };
 
 

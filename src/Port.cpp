@@ -1,5 +1,5 @@
 /* This file is part of FlowCanvas.
- * Copyright (C) 2007-2009 Dave Robillard <http://drobilla.net>
+ * Copyright (C) 2007-2009 David Robillard <http://drobilla.net>
  *
  * FlowCanvas is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -15,15 +15,24 @@
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
-#include <iostream>
+#include <algorithm>
 #include <cmath>
-#include <boost/weak_ptr.hpp>
-#include <libgnomecanvasmm.h>
-#include "flowcanvas/Port.hpp"
-#include "flowcanvas/Module.hpp"
-#include "flowcanvas/Canvas.hpp"
+#include <iostream>
+#include <list>
+#include <string>
 
-using namespace std;
+#include <boost/weak_ptr.hpp>
+
+#include <libgnomecanvasmm.h>
+
+#include "flowcanvas/Canvas.hpp"
+#include "flowcanvas/Module.hpp"
+#include "flowcanvas/Port.hpp"
+
+using std::cerr;
+using std::endl;
+using std::string;
+using std::list;
 
 static const uint32_t PORT_SELECTED_COLOR   = 0xFF0000FF;
 static const uint32_t PORT_EMPTY_PORT_BREADTH = 16;
@@ -40,16 +49,15 @@ Port::Port(boost::shared_ptr<Module> module, const string& name, bool is_input, 
 	: Gnome::Canvas::Group(*module.get(), 0, 0)
 	, _module(module)
 	, _name(name)
-	, _is_input(is_input)
+	, _label(NULL)
+	, _rect(NULL)
+	, _menu(NULL)
+	, _control(NULL)
 	, _color(color)
+	, _is_input(is_input)
 	, _selected(false)
 	, _toggled(false)
-	, _control_value(0.0f)
-	, _control_min(0.0f)
-	, _control_max(1.0f)
-	, _rect(NULL)
-	, _control_rect(NULL)
-	, _menu(NULL)
+
 {
 	boost::shared_ptr<Canvas> canvas = module->canvas().lock();
 
@@ -89,19 +97,20 @@ Port::~Port()
 {
 	delete _label;
 	delete _rect;
-	delete _control_rect;
+	delete _control;
 }
 
 
 void
 Port::show_control()
 {
-	if (!_control_rect) {
-		_control_rect = new Gnome::Canvas::Rect(*this, 0.5, 0.5, 0.0, _height - 0.5);
-		//_control_rect->property_outline_color_rgba() = 0xFFFFFF45;
-		_control_rect->property_width_pixels() = 0;
-		_control_rect->property_fill_color_rgba() = 0xFFFFFF80;
-		_control_rect->show();
+	if (!_control) {
+		Gnome::Canvas::Rect* rect = new Gnome::Canvas::Rect(*this, 0.5, 0.5, 0.0, _height - 0.5);
+		//rect->property_outline_color_rgba() = 0xFFFFFF45;
+		rect->property_width_pixels() = 0;
+		rect->property_fill_color_rgba() = 0xFFFFFF80;
+		rect->show();
+		_control = new Control(rect);
 	}
 }
 
@@ -109,8 +118,8 @@ Port::show_control()
 void
 Port::hide_control()
 {
-	delete _control_rect;
-	_control_rect = NULL;
+	delete _control;
+	_control = NULL;
 }
 
 
@@ -119,58 +128,78 @@ Port::hide_control()
 void
 Port::set_control(float value, bool signal)
 {
-	if (!_control_rect)
+	if (!_control)
 		return;
 
 	if (_toggled) {
 		if (value != 0.0)
-			value = _control_max;
+			value = _control->max;
 		else
-			value = _control_min;
+			value = _control->min;
 	}
 
-	//cerr << _name << ".set_control(" << value << "): " << _control_min << " .. " << _control_max
-	//		<< " -> ";
-	if (value < _control_min)
-		_control_min = value;
-	if (value > _control_max)
-		_control_max = value;
+	if (value < _control->min)
+		_control->min = value;
+	if (value > _control->max)
+		_control->max = value;
 
-	if (_control_max == _control_min)
-		_control_max = _control_min + 1.0;
+	if (_control->max == _control->min)
+		_control->max = _control->min + 1.0;
 
-	if (isinf(_control_max))
-		_control_max = FLT_MAX;
+	if (std::isinf(_control->max))
+		_control->max = FLT_MAX;
 
-	int inf = isinf(value);
+	int inf = std::isinf(value);
 	if (inf == -1)
-		value = _control_min;
+		value = _control->min;
 	else if (inf == 1)
-		value = _control_max;
+		value = _control->max;
 
-	const double w = (value - _control_min) / (_control_max - _control_min) * _width;
-	if (isnan(w)) {
+	const double w = (value - _control->min) / (_control->max - _control->min) * _width;
+	if (std::isnan(w)) {
 		cerr << "WARNING (" << _name << "): Control value is NaN" << endl;
 		return;
 	}
 
 	//cerr << w << " / " << _width << endl;
 
-	_control_rect->property_x2() = _control_rect->property_x1() + std::max(0.0, w-1.0);
-	if (signal && _control_value == value)
+	_control->rect->property_x2() = _control->rect->property_x1() + std::max(0.0, w-1.0);
+	if (signal && _control->value == value)
 		signal = false;
 
-	_control_value = value;
+	_control->value = value;
 
 	if (signal)
-		signal_control_changed.emit(_control_value);
+		signal_control_changed.emit(_control->value);
+}
+
+
+void
+Port::set_control_min(float min)
+{
+	if (!_control)
+		return;
+	
+	_control->min = min;
+	set_control(_control->value, false);
+}
+
+
+void
+Port::set_control_max(float max)
+{
+	if (!_control)
+		return;
+
+	_control->max = max;
+	set_control(_control->value, false);
 }
 
 
 void
 Port::toggle(bool signal)
 {
-	if (_control_value == 0.0f)
+	if (_control->value == 0.0f)
 		set_control(1.0f, signal);
 	else
 		set_control(0.0f, signal);
@@ -212,9 +241,9 @@ Port::set_name(const string& n)
 		_height = _label->property_text_height();
 		_rect->property_x2() = _width;
 		_rect->property_y2() = _height;
-		if (_control_rect) {
-			_control_rect->property_x2() = _control_rect->property_x1() + (_control_value * (_width-1));
-			_control_rect->property_y2() = _height - 0.5;
+		if (_control) {
+			_control->rect->property_x2() = _control->rect->property_x1() + (_control->value * (_width-1));
+			_control->rect->property_y2() = _height - 0.5;
 		}
 		_label->property_x() = (_width / 2.0) - 3.0;
 		_label->property_y() = (_height / 2.0);
@@ -410,7 +439,8 @@ Port::set_width(double w)
 	if (_rect)
 		_rect->property_x2() = _rect->property_x2() + (w - _width);
 	_width = w;
-	set_control(_control_value, false);
+	if (_control)
+		set_control(_control->value, false);
 }
 
 
@@ -419,6 +449,8 @@ Port::set_height(double h)
 {
 	if (_rect)
 		_rect->property_y2() = _rect->property_y1() + h;
+	if (_control)
+		_control->rect->property_y2() = _control->rect->property_y1() + h - 0.5;
 	_height = h;
 }
 

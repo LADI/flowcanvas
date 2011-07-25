@@ -1,5 +1,5 @@
 /* This file is part of FlowCanvas.
- * Copyright (C) 2007-2009 Dave Robillard <http://drobilla.net>
+ * Copyright (C) 2007-2009 David Robillard <http://drobilla.net>
  *
  * FlowCanvas is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -31,7 +31,7 @@ namespace FlowCanvas {
 class Canvas;
 
 
-/** A named circle (possibly).
+/** A (possibly named) circular Item which is Connectable.
  *
  * Unlike a Module, this doesn't contain ports, but is directly Connectable itself
  * (think your classic circles 'n' lines diagram, ala FSM).

@@ -1,5 +1,5 @@
 /* This file is part of FlowCanvas.
- * Copyright (C) 2007-2009 Dave Robillard <http://drobilla.net>
+ * Copyright (C) 2007-2009 David Robillard <http://drobilla.net>
  *
  * FlowCanvas is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -15,11 +15,16 @@
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
-#include <boost/shared_ptr.hpp>
-#include "flowcanvas/Item.hpp"
-#include "flowcanvas/Canvas.hpp"
+#include <list>
+#include <string>
 
-using namespace std;
+#include <boost/shared_ptr.hpp>
+
+#include "flowcanvas/Canvas.hpp"
+#include "flowcanvas/Item.hpp"
+
+using std::string;
+using std::list;
 
 namespace FlowCanvas {
 
@@ -31,6 +36,7 @@ Item::Item(boost::shared_ptr<Canvas> canvas,
            uint32_t                  color)
 	: Gnome::Canvas::Group(*canvas->root(), x, y)
 	, _canvas(canvas)
+	, _menu(NULL)
 	, _name(name)
 	, _minimum_width(0.0)
 	, _width(1.0)
@@ -38,7 +44,6 @@ Item::Item(boost::shared_ptr<Canvas> canvas,
 	, _border_color(color)
 	, _color(color)
 	, _selected(false)
-	, _menu(NULL)
 {
 }
 

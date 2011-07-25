@@ -1,5 +1,5 @@
 /* This file is part of FlowCanvas.
- * Copyright (C) 2007-2009 Dave Robillard <http://drobilla.net>
+ * Copyright (C) 2007-2009 David Robillard <http://drobilla.net>
  *
  * FlowCanvas is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -15,15 +15,18 @@
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
-#include <functional>
-#include <list>
 #include <algorithm>
-#include <cstdlib>
 #include <cassert>
 #include <cmath>
-#include "flowcanvas/Item.hpp"
-#include "flowcanvas/Ellipse.hpp"
+#include <cstdlib>
+#include <functional>
+#include <list>
+#include <string>
+
 #include "flowcanvas/Canvas.hpp"
+#include "flowcanvas/Ellipse.hpp"
+#include "flowcanvas/Item.hpp"
+
 using std::string;
 
 namespace FlowCanvas {

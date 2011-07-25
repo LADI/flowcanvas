@@ -1,5 +1,5 @@
 /* This file is part of FlowCanvas.
- * Copyright (C) 2007-2009 Dave Robillard <http://drobilla.net>
+ * Copyright (C) 2007-2009 David Robillard <http://drobilla.net>
  *
  * FlowCanvas is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -19,8 +19,12 @@
 #define FLOWCANVAS_CONNECTION_HPP
 
 #include <stdint.h>
+
 #include <list>
+#include <string>
+
 #include <boost/weak_ptr.hpp>
+
 #include <libgnomecanvasmm.h>
 #include <libgnomecanvasmm/bpath.h>
 #include <libgnomecanvasmm/path-def.h>
@@ -49,7 +53,7 @@ public:
 	virtual void move(double /*dx*/, double /*dy*/)
 	{ /* ignore, src/dst take care of it */ }
 
-	virtual void zoom(double);
+	virtual void zoom(double z);
 
 	bool selected() const { return _selected; }
 	void set_selected(bool b);
@@ -84,22 +88,24 @@ protected:
 	const boost::weak_ptr<Canvas>      _canvas;
 	const boost::weak_ptr<Connectable> _source;
 	const boost::weak_ptr<Connectable> _dest;
-	uint32_t                           _color;
-	bool                               _selected;
-	bool                               _show_arrowhead;
 
 	Gnome::Canvas::Bpath _bpath;
 	GnomeCanvasPathDef*  _path;
 
-	HandleStyle _handle_style;
-
+	/** A handle on a connection line to allow mouse interaction. */
 	struct Handle : public Gnome::Canvas::Group {
-		Handle(Gnome::Canvas::Group& parent)
+		explicit Handle(Gnome::Canvas::Group& parent)
 			: Gnome::Canvas::Group(parent), shape(NULL), text(NULL) {}
 		~Handle() { delete shape; delete text; }
 		Gnome::Canvas::Shape* shape;
 		Gnome::Canvas::Text*  text;
 	}* _handle;
+
+	uint32_t    _color;
+	HandleStyle _handle_style;
+
+	bool _selected       :1;
+	bool _show_arrowhead :1;
 };
 
 typedef std::list<boost::shared_ptr<Connection> > ConnectionList;

@@ -1,5 +1,5 @@
 /* This file is part of FlowCanvas.
- * Copyright (C) 2007-2009 Dave Robillard <http://drobilla.net>
+ * Copyright (C) 2007-2009 David Robillard <http://drobilla.net>
  *
  * FlowCanvas is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -15,17 +15,20 @@
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
-#include <functional>
-#include <list>
 #include <algorithm>
-#include <cstdlib>
 #include <cassert>
 #include <cmath>
+#include <cstdlib>
+#include <functional>
+#include <list>
+#include <string>
+
+#include "flowcanvas/Canvas.hpp"
 #include "flowcanvas/Item.hpp"
 #include "flowcanvas/Module.hpp"
-#include "flowcanvas/Canvas.hpp"
 
-using namespace std;
+using std::list;
+using std::string;
 
 namespace FlowCanvas {
 
@@ -53,23 +56,23 @@ Module::Module(
 		double x, double y,
 		bool show_title, bool show_port_labels)
 	: Item(canvas, name, x, y, MODULE_FILL_COLOUR)
-	, _border_width(1.0)
-	, _title_visible(show_title)
-	, _embed_width(0)
-	, _embed_height(0)
-	, _icon_size(16)
-	, _port_renamed(false)
-	, _widest_input(0)
-	, _widest_output(0)
-	, _show_port_labels(show_port_labels)
-	, _title_width(0.0)
-	, _title_height(0.0)
 	, _module_box(*this, 0, 0, 0, 0) // w, h set later
 	, _canvas_title(*this, 0, 8, name) // x set later
 	, _stacked_border(NULL)
 	, _icon_box(NULL)
 	, _embed_container(NULL)
 	, _embed_item(NULL)
+	, _border_width(1.0)
+	, _embed_width(0)
+	, _embed_height(0)
+	, _icon_size(16)
+	, _widest_input(0)
+	, _widest_output(0)
+	, _title_width(0.0)
+	, _title_height(0.0)
+	, _title_visible(show_title)
+	, _port_renamed(false)
+	, _show_port_labels(show_port_labels)
 {
 	_module_box.property_fill_color_rgba() = MODULE_FILL_COLOUR;
 	_module_box.property_outline_color_rgba() = MODULE_OUTLINE_COLOUR;
@@ -385,7 +388,7 @@ Module::move_to(double x, double y)
 	if (x + _width >= canvas->width() || y + _height >= canvas->height()) {
 		double x1, y1, x2, y2;
 		canvas->get_scroll_region(x1, y1, x2, y2);
-		canvas->set_scroll_region(x1, y1, max(x2, x + _width), max(y2, y + _height));
+		canvas->set_scroll_region(x1, y1, std::max(x2, x + _width), std::max(y2, y + _height));
 	}
 
 	property_x() = x;
@@ -720,7 +723,6 @@ Module::resize_vert()
 	static const double PAD = 2.0;
 	for (PortVector::iterator pi = _ports.begin(); pi != _ports.end(); ++pi) {
 		const boost::shared_ptr<Port> p = (*pi);
-		p->hide_control();
 		p->set_width(MODULE_EMPTY_PORT_BREADTH);
 		p->set_height(MODULE_EMPTY_PORT_DEPTH);
 		if (p->is_input()) {
@@ -784,11 +786,11 @@ Module::fit_canvas()
 {
 	boost::shared_ptr<Canvas> canvas = _canvas.lock();
 	if (canvas) {
-		double canvas_width = canvas->width();
+		double canvas_width  = canvas->width();
 		double canvas_height = canvas->height();
 
-		canvas_width = max(canvas_width, property_x() + _width + 5.0);
-		canvas_height = max(canvas_height, property_y() + _height + 5.0);
+		canvas_width  = std::max(canvas_width, property_x() + _width + 5.0);
+		canvas_height = std::max(canvas_height, property_y() + _height + 5.0);
 
 		canvas->resize(canvas_width, canvas_height);
 	}

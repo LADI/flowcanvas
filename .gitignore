@@ -1,4 +1,4 @@
 /.waf-*
 /build
-/.lock-wscript
+/.lock-wafbuild
 *.pyc

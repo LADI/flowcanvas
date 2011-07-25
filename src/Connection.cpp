@@ -1,5 +1,5 @@
 /* This file is part of FlowCanvas.
- * Copyright (C) 2007-2009 Dave Robillard <http://drobilla.net>
+ * Copyright (C) 2007-2009 David Robillard <http://drobilla.net>
  *
  * FlowCanvas is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -18,10 +18,13 @@
 #include <algorithm>
 #include <cassert>
 #include <cmath>
+#include <string>
+
 #include <libgnomecanvasmm.h>
-#include "flowcanvas/Connection.hpp"
+
 #include "flowcanvas/Canvas.hpp"
 #include "flowcanvas/Connectable.hpp"
+#include "flowcanvas/Connection.hpp"
 #include "flowcanvas/Ellipse.hpp"
 
 namespace FlowCanvas {
@@ -36,13 +39,13 @@ Connection::Connection(boost::shared_ptr<Canvas>      canvas,
 	, _canvas(canvas)
 	, _source(source)
 	, _dest(dest)
-	, _color(color)
-	, _selected(false)
-	, _show_arrowhead(show_arrowhead)
 	, _bpath(*this)
 	, _path(gnome_canvas_path_def_new())
-	, _handle_style(HANDLE_NONE)
 	, _handle(NULL)
+	, _color(color)
+	, _handle_style(HANDLE_NONE)
+	, _selected(false)
+	, _show_arrowhead(show_arrowhead)
 {
 	_bpath.property_width_units() = 2.0;
 	set_color(color);

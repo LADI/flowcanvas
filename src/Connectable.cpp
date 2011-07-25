@@ -1,5 +1,5 @@
 /* This file is part of FlowCanvas.
- * Copyright (C) 2007-2009 Dave Robillard <http://drobilla.net>
+ * Copyright (C) 2007-2009 David Robillard <http://drobilla.net>
  *
  * FlowCanvas is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -15,8 +15,12 @@
  * 51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
+#include <list>
+
 #include <boost/weak_ptr.hpp>
+
 #include <libgnomecanvasmm.h>
+
 #include "flowcanvas/Connectable.hpp"
 #include "flowcanvas/Connection.hpp"
 

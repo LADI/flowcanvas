@@ -1,14 +1,49 @@
+flowcanvas (0.7.1) unstable; urgency=low
+
+  * Reduce memory consumption and improve alignment
+  * Eliminate port control "gauge" overhead for non-control ports
+  * Add "partner" concept for aligning related but unconnected nodes
+  * Add missing #includes
+  * Expand README
+  * Add missing COPYING file to distribution
+  * Upgrade to waf 1.6.2
+
+ -- David Robillard <d@drobilla.net>  Tue, 11 Jan 2011 17:42:07 -0500
+
+flowcanvas (0.6.4) unstable; urgency=low
+
+  * Consistently call Item::store_location when items are moved,
+    previous versions didn't on arrange or when dragging a selection
+  * Fix centering (e.g. on arrange, initial view)
+  * Upgrade to waf 1.5.18
+
+ -- David Robillard <d@drobilla.net>  Fri, 03 Sep 2010 20:24:36 -0400
+
+flowcanvas (0.6.0) unstable; urgency=low
+
+  * Switch to waf build system
+  * Fix compilation with GCC 4.4
+  * Make Canvas::scroll_to_center() public
+  * Add item entered/left signals
+  * Add vertical flow layout w/o port labels (pd style)
+  * Fix some stuck cursor grab issues
+  * Slightly more sophisticated port and module sizing
+  * Resize performance improvements
+
+ -- David Robillard <d@drobilla.net>  Tue, 08 Dec 2009 20:46:57 -0500
+
+
 flowcanvas (0.5.1) unstable; urgency=low
 
   * Multiple selection
   * Gray background when canvas is locked
- 
- -- Dave Robillard <dave@drobilla.net>  Sun, 07 Sep 2008 14:10:32 -0400
+
+ -- David Robillard <d@drobilla.net>  Sun, 07 Sep 2008 14:10:32 -0400
 
 
 flowcanvas (0.5.0) unstable; urgency=low
 
   * Initial Debian release
- 
- -- Dave Robillard <dave@drobilla.net>  Sun, 06 Jul 2008 16:35:31 -0400
+
+ -- David Robillard <d@drobilla.net>  Sun, 06 Jul 2008 16:35:31 -0400
 

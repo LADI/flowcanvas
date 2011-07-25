@@ -1,5 +1,5 @@
 /* This file is part of FlowCanvas.
- * Copyright (C) 2007-2009 Dave Robillard <http://drobilla.net>
+ * Copyright (C) 2007-2009 David Robillard <http://drobilla.net>
  *
  * FlowCanvas is free software; you can redistribute it and/or modify it under the
  * terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,8 @@
 #ifndef FLOWCANVAS_CONNECTABLE_HPP
 #define FLOWCANVAS_CONNECTABLE_HPP
 
+#include <list>
+
 #include <boost/shared_ptr.hpp>
 
 namespace FlowCanvas {
@@ -25,6 +27,8 @@ namespace FlowCanvas {
 class Connection;
 
 
+/** An object a Connection can connect to.
+ */
 class Connectable {
 public:
 	virtual ~Connectable() {}
@@ -45,7 +49,6 @@ public:
 	Connections& connections() { return _connections; }
 
 protected:
-
 	Connections _connections; ///< needed for dragging
 };
 
