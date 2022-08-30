@@ -1,3 +1,25 @@
+This source codebase is deprecated
+by the upstream and author David Robillard
+and as part of LADI project.
+
+For upstream alternative, see
+http://drobilla.net/software/ganv.html
+
+As part of LADI project, flowcanavs
+was embedded into gladish source codebase
+in commit:
+
+commit 67cc9c9e05d47e6074167fc05c12ec87e8c0058e
+Author: Nedko Arnaudov <nedko@arnaudov.name>
+Date:   Sat Apr 7 23:47:03 2012 +0300
+
+    embed flowcanvas-0.7.1
+
+The gladish-flowcanvas module is being
+reworked as LADI/lanv:
+
+https://github.com/LADI/lanv
+
 FlowCanvas
 ----
 
